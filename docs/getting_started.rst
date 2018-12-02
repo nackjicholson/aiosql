@@ -2,7 +2,7 @@
 Getting Started
 ###############
 
-Below is an example of a program which can pring "{greeting}, {world}!" from data held in a minimal SQLite database of
+Below is an example of a program which can pring "{greeting}, {world_name}!" from data held in a minimal SQLite database of
 worlds and greetings.
 
 The SQL is in a ``greetings.sql`` file with ``-- name: `` definitions on each query to tell ``aiosql`` under which name
@@ -36,17 +36,17 @@ get the results.
     conn = sqlite3.connect("greetings.db")
 
     greetings = queries.get_greetings(conn)
-    users = queries.get_users_by_username(conn, username="willvaughn")
+    worlds = queries.get_worlds_by_name(conn, world_name="Earth")
     # greetings = [(1, "Hi"), (2, "Aloha"), (3, "Hola")]
-    # users = [{"user_id": 1, "username": "willvaughn", "name": "Will"}]
+    # worlds = [{"world_id": 1, "world_name": "Earth"}]
 
-    name = users[0]["name"]
-    for _, greeting in greetings:
-       print(f"{greeting}, {name}!")
+    for world in worlds:
+        for _, greeting in greetings:
+            print(f"{greeting}, {world['world_name']}!")
 
-    # Hi, Will!
-    # Aloha, Will!
-    # Hola, Will!
+    # Hi, Earth!
+    # Aloha, Earth!
+    # Hola, Earth!
 
     conn.close()
 
@@ -66,22 +66,22 @@ both our queries for greetings and worlds in parallel!
 
 
     async def main():
-       with async aiosqlite.connect("greetings.db") as conn:
-           # Parallel queries!!!
-           greetings, users = await asyncio.gather(
-               queries.get_all_greetings(conn),
-               queries.get_users_by_username(conn, username="willvaughn")
-           )
-           # greetings = [(1, "Hi"), (2, "Aloha"), (3, "Hola")]
-           # users = [{"user_id": 1, "username": "willvaughn", "name": "Will"}]
+        with async aiosqlite.connect("greetings.db") as conn:
+            # Parallel queries!!!
+            greetings, worlds = await asyncio.gather(
+                queries.get_all_greetings(conn),
+                queries.get_worlds_by_name(conn, world_name="Earth")
+            )
+            # greetings = [(1, "Hi"), (2, "Aloha"), (3, "Hola")]
+            # worlds = [{"world_id": 1, "world_name": "Earth"}]
 
-       name = users[0]["name"]
-       for _, greeting in greetings:
-           print(f"{greeting}, {name}!")
+            for world in worlds:
+                for _, greeting in greetings:
+                    print(f"{greeting}, {world['world_name']}!")
 
-       # Hi, Will!
-       # Aloha, Will!
-       # Hola, Will!
+            # Hi, Earth!
+            # Aloha, Earth!
+            # Hola, Earth!
 
 
     asyncio.run(main())
