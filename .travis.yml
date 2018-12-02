@@ -1,7 +1,4 @@
 language: python
-python:
-- '3.6'
-- 3.7-dev
 services:
 - postgresql
 addons:
@@ -11,6 +8,10 @@ addons:
     - postgresql-10
     - postgresql-client-10
     - postgresql-server-dev-10
+matrix:
+  include:
+    - python: '3.6'
+      env: TOXENV=py36
 install:
 - pip install -U pip
 - pip install poetry tox
