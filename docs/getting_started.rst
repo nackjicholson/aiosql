@@ -1,8 +1,14 @@
-#####
-Usage
-#####
+###############
+Getting Started
+###############
 
-You define SQL queries in a ``greetings.sql`` file:
+Below is an example of a program which can pring "{greeting}, {world}!" from data held in a minimal SQLite database of
+worlds and greetings.
+
+The SQL is in a ``greetings.sql`` file with ``-- name: `` definitions on each query to tell ``aiosql`` under which name
+we would like to be able to execute this code. The name ``get-all-greetings`` will be available to us after loading as
+a method ``get_all_greetings(conn)``. Each method on an ``aiosql.Queries`` object accepts a database connection it can
+use in order to communicate with a database.
 
 .. code-block:: sql
 
@@ -10,20 +16,16 @@ You define SQL queries in a ``greetings.sql`` file:
     -- Get all the greetings in the database
     select * from greetings;
 
-    -- name: $get-users-by-username
-    -- Get all the users from the database,
-    -- and return them dictionaries.
-    select user_id,
-           username,
-           name
-      from users
-     where username = :username;
+    -- name: $get-worlds-by-name
+    -- Get all the world record from the database.
+    select world_id,
+           world_name,
+           location
+      from worlds
+     where world_name = :world_name;
 
-Sync with ``sqlite3``
-=====================
-
-By specifying ``db_driver="sqlite3"`` you will use the python stdlib ``sqlite3`` driver to execute these sql queries
-in python by the names you define in ``--name: foobar`` comments.
+By specifying ``db_driver="sqlite3"`` we can use the python stdlib ``sqlite3`` driver to execute these sql queries and
+get the results.
 
 .. code-block:: python
 
@@ -49,9 +51,9 @@ in python by the names you define in ``--name: foobar`` comments.
     conn.close()
 
 
-Going Async with ``aiosqlite``
-===============================
-To do this in an ``asyncio`` environment specify ``db_driver="aiosqlite"`` you can use the `aiosqlite <https://github.com/jreese/aiosqlite>`_ driver.
+We can also use our ``greetings.db`` SQLite database with the `aiosqlite <https://github.com/jreese/aiosqlite>`_ driver
+with ``db_driver="aiosqlite"``. It's a little bit different, but lets us leverage ``asyncio.gather`` to make
+both our queries for greetings and worlds in parallel!
 
 .. code-block:: python
 
@@ -60,12 +62,12 @@ To do this in an ``asyncio`` environment specify ``db_driver="aiosqlite"`` you c
     import aiosql
     import aiosqlite
 
+    queries = aiosql.from_path("greetings.sql", db_driver="aiosqlite")
+
 
     async def main():
-       queries = aiosql.from_path("greetings.sql", db_driver="aiosqlite")
-
-       # Parallel queries!!!
        with async aiosqlite.connect("greetings.db") as conn:
+           # Parallel queries!!!
            greetings, users = await asyncio.gather(
                queries.get_all_greetings(conn),
                queries.get_users_by_username(conn, username="willvaughn")
