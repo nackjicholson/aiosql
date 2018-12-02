@@ -1,7 +1,7 @@
 language: python
 python:
   - "3.6"
-  - "3.7"
+  - "3.7-dev"
 services:
   - postgresql
 addons:
@@ -13,7 +13,7 @@ addons:
       - postgresql-server-dev-10
 install:
   - pip install -U pip
-  - pip install poetry
+  - pip install poetry tox
 script: tox
 
 before_deploy:
