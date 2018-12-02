@@ -1,0 +1,6 @@
+[flake8]
+# Derived from the one from Black itself. Ignore rules that are handled by Black.
+# Except for E501 the max-line-length violation.
+ignore = E203, E266, W503, E704
+select = B,C,E,F,W,T4,B9
+max-line-length = 100

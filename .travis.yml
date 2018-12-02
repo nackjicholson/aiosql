@@ -1,0 +1,29 @@
+language: python
+python:
+  - "3.6"
+  - "3.7"
+services:
+  - postgresql
+addons:
+  postgresql: "10"
+  apt:
+    packages:
+      - postgresql-10
+      - postgresql-client-10
+      - postgresql-server-dev-10
+install:
+  - pip install -U pip
+  - pip install poetry
+script: tox
+
+before_deploy:
+  - poetry install
+  - poetry run invoke docs
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  keep-history: true
+  local-dir: docs/_build/html
+  on:
+    branch: master
