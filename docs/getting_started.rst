@@ -5,9 +5,9 @@ Getting Started
 Below is an example of a program which can pring "{greeting}, {world_name}!" from data held in a minimal SQLite database of
 worlds and greetings.
 
-The SQL is in a ``greetings.sql`` file with ``-- name: `` definitions on each query to tell ``aiosql`` under which name
-we would like to be able to execute this code. The name ``get-all-greetings`` will be available to us after loading as
-a method ``get_all_greetings(conn)``. Each method on an ``aiosql.Queries`` object accepts a database connection it can
+The SQL is in a ``greetings.sql`` file with ``-- name:`` definitions on each query to tell ``aiosql`` under which name
+we would like to be able to execute this code. The name ``get-all-greetings`` will be available to us afterloading as
+a method ``get_all_greetings(conn)``. Each method on an ``aiosql.Queries`` object accepts a database connec tion it can
 use in order to communicate with a database.
 
 .. code-block:: sql
