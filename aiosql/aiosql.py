@@ -1,34 +1,32 @@
-import re
 from pathlib import Path
+from enum import Enum
 
-from .loaders.aiosqlite import AioSQLiteQueryLoader
-from .loaders.asyncpg import AsyncPGQueryLoader
-from .loaders.psycopg2 import PsycoPG2QueryLoader
-from .loaders.sqlite3 import SQLite3QueryLoader
-from .exceptions import SQLLoadException
-
-namedef_pattern = re.compile(r"--\s*name\s*:\s*")
-empty_pattern = re.compile(r"^\s*$")
+from .adapters.aiosqlite import AioSQLiteAdapter
+from .adapters.asyncpg import AsyncPGAdapter
+from .adapters.psycopg2 import PsycoPG2Adapter
+from .adapters.sqlite3 import SQLite3DriverAdapter
+from .exceptions import SQLLoadException, SQLParseException
+from .patterns import namedef_pattern, empty_pattern, doc_pattern, name_pattern
 
 
-_LOADERS = {
-    "aiosqlite": lambda: AioSQLiteQueryLoader(),
-    "asyncpg": lambda: AsyncPGQueryLoader(),
-    "psycopg2": lambda: PsycoPG2QueryLoader(),
-    "sqlite3": lambda: SQLite3QueryLoader(),
+_ADAPTERS = {
+    "aiosqlite": AioSQLiteAdapter,
+    "asyncpg": AsyncPGAdapter,
+    "psycopg2": PsycoPG2Adapter,
+    "sqlite3": SQLite3DriverAdapter,
 }
 
 
-def register_query_loader(db_driver, loader):
-    """Registers custom QueryLoader classes to extend ``aiosql`` to to handle new driver types.
+def register_driver_adapter(driver_name, driver_adapter):
+    """Registers custom driver adapter classes to extend ``aiosql`` to to handle additional drivers.
 
-    For details on how to create new ``QueryLoader`` see the
-    :py:class:`aiosql.loaders.base.QueryLoader` documentation.
+    For details on how to create a new driver adapter see the documentation `link <https://nackjiholson.github.io/aiosql>`_.
+    TODO: Make a link to the documentation when it exists.
 
     Args:
-        db_driver (str): The driver type name.
-        loader: (aiosql.QueryLoader|function) Either an instance of a QueryLoader or
-                                              a function which builds an instance.
+        driver_name (str): The driver type name.
+        driver_adapter (callable): Either n class or function which creates an instance of a
+                                   driver adapter.
 
     Returns:
         None
@@ -36,33 +34,58 @@ def register_query_loader(db_driver, loader):
     Example:
         To register a new loader::
 
-            import aiosql
+            class MyDbAdapter():
+                def process_sql(self, name, op_type, sql):
+                    pass
 
-            class MyDbLoader(aiosql.QueryLoader):
-                # ... overrides process_sql and create_fn
-                pass
+                def select(self, conn, sql, parameters, return_as_dict):
+                    pass
 
-            aiosql.register_query_loader('mydb', MyDbLoader())
+                def insert_update_delete(self, conn, sql, parameters):
+                    pass
+
+                def insert_update_delete_many(self, conn, sql, parameters):
+                    pass
+
+                def insert_returning(self, conn, sql, parameters):
+                    pass
+
+                def execute_script(self, conn, sql):
+                    pass
+
+
+            aiosql.register_driver_adapter('mydb', MyDbAdapter)
 
     """
-    _LOADERS[db_driver] = loader
+    _ADAPTERS[driver_name] = driver_adapter
 
 
-def get_query_loader(db_driver):
-    """Get the QueryLoader instance for registered by the ``db_driver`` name.
+def get_driver_adapter(driver_name):
+    """Get the driver adapter instance registered by the ``driver_name``.
 
     Args:
-        db_driver (str): The driver type name.
+        driver_name (str): The database driver name.
 
     Returns:
-        aiosql.QueryLoader An instance of QueryLoader for the given db_driver.
+        object: A driver adapter class.
     """
     try:
-        loader = _LOADERS[db_driver]
+        driver_adapter = _ADAPTERS[driver_name]
     except KeyError:
-        raise ValueError(f"Encountered unregistered db_driver: {db_driver}")
+        raise ValueError(f"Encountered unregistered driver_name: {driver_name}")
 
-    return loader() if callable(loader) else loader
+    return driver_adapter()
+
+
+class SQLOperationType(Enum):
+    """Enumeration of aiosql operation types.
+    """
+
+    SELECT = 0
+    INSERT_UPDATE_DELETE = 1
+    INSERT_UPDATE_DELETE_MANY = 2
+    INSERT_RETURNING = 3
+    SCRIPT = 4
 
 
 class Queries:
@@ -128,17 +151,105 @@ class Queries:
             self._available_queries.add(f"{name}.{child_name}")
 
 
-def load_queries_from_sql(sql, query_loader):
+def _create_fn(name, op_type, sql, return_as_dict, driver_adapter):
+    def fn(conn, *args, **kwargs):
+        parameters = kwargs if len(kwargs) > 0 else args
+        if op_type == SQLOperationType.SELECT:
+            return driver_adapter.select(conn, name, sql, parameters, return_as_dict)
+        elif op_type == SQLOperationType.INSERT_UPDATE_DELETE:
+            return driver_adapter.insert_update_delete(conn, name, sql, parameters)
+        elif op_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
+            return driver_adapter.insert_update_delete_many(conn, name, sql, *parameters)
+        elif op_type == SQLOperationType.INSERT_RETURNING:
+            return driver_adapter.insert_returning(conn, name, sql, parameters)
+        elif op_type == SQLOperationType.SCRIPT:
+            return driver_adapter.execute_script(conn, sql)
+        else:
+            raise RuntimeError()
+
+    return fn
+
+
+def _create_aio_fn(name, op_type, sql, return_as_dict, driver_adapter):
+    async def fn(conn, *args, **kwargs):
+        parameters = kwargs if len(kwargs) > 0 else args
+        if op_type == SQLOperationType.SELECT:
+            return await driver_adapter.select(conn, name, sql, parameters, return_as_dict)
+        elif op_type == SQLOperationType.INSERT_UPDATE_DELETE:
+            return await driver_adapter.insert_update_delete(conn, name, sql, parameters)
+        elif op_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
+            return await driver_adapter.insert_update_delete_many(conn, name, sql, *parameters)
+        elif op_type == SQLOperationType.INSERT_RETURNING:
+            return await driver_adapter.insert_returning(conn, name, sql, parameters)
+        elif op_type == SQLOperationType.SCRIPT:
+            return await driver_adapter.execute_script(conn, sql)
+        else:
+            raise RuntimeError()
+
+    return fn
+
+
+def load(sql_text, driver_adapter):
+    lines = sql_text.strip().splitlines()
+    name = lines[0].replace("-", "_")
+
+    if name.endswith("<!"):
+        op_type = SQLOperationType.INSERT_RETURNING
+        name = name[:-2]
+    elif name.endswith("*!"):
+        op_type = SQLOperationType.INSERT_UPDATE_DELETE_MANY
+        name = name[:-2]
+    elif name.endswith("!"):
+        op_type = SQLOperationType.INSERT_UPDATE_DELETE
+        name = name[:-1]
+    elif name.endswith("#"):
+        op_type = SQLOperationType.SCRIPT
+        name = name[:-1]
+    else:
+        op_type = SQLOperationType.SELECT
+
+    return_as_dict = False
+    if name.startswith("$"):
+        return_as_dict = True
+        name = name[1:]
+
+    if not name_pattern.match(name):
+        raise SQLParseException(f'name must convert to valid python variable, got "{name}".')
+
+    docs = ""
+    sql = ""
+    for line in lines[1:]:
+        match = doc_pattern.match(line)
+        if match:
+            docs += match.group(1) + "\n"
+        else:
+            sql += line + "\n"
+
+    docs = docs.strip()
+    sql = driver_adapter.process_sql(name, op_type, sql.strip())
+
+    if driver_adapter.is_aio_driver:
+        fn = _create_aio_fn(name, op_type, sql, return_as_dict, driver_adapter)
+    else:
+        fn = _create_fn(name, op_type, sql, return_as_dict, driver_adapter)
+
+    fn.__name__ = name
+    fn.__docs__ = docs
+    fn.sql = sql
+    return name, fn
+
+
+def load_queries_from_sql(sql, driver_adapter):
     queries = []
     for query_text in namedef_pattern.split(sql):
         if not empty_pattern.match(query_text):
-            queries.append(query_loader.load(query_text))
+            queries.append(load(query_text, driver_adapter))
     return queries
 
 
-def load_queries_from_file(file_path, query_loader):
+def load_queries_from_file(file_path, driver_adapter):
     with file_path.open() as fp:
-        return load_queries_from_sql(fp.read(), query_loader)
+        return load_queries_from_sql(fp.read(), driver_adapter)
 
 
 def load_queries_from_dir_path(dir_path, query_loader):
@@ -164,12 +275,12 @@ def load_queries_from_dir_path(dir_path, query_loader):
     return _recurse_load_queries(dir_path)
 
 
-def from_str(sql, db_driver):
+def from_str(sql, driver_name):
     """Load queries from a SQL string.
 
     Args:
         sql (str) A string containing SQL statements and aiosql name:
-        db_driver (str): The database driver to use to load and execute queries.
+        driver_name (str): The database driver to use to load and execute queries.
 
     Returns:
         Queries
@@ -197,16 +308,16 @@ def from_str(sql, db_driver):
             # queries.get_users_by_username(conn, username="willvaughn")
 
     """
-    query_loader = get_query_loader(db_driver)
-    return Queries(load_queries_from_sql(sql, query_loader))
+    driver_adapter = get_driver_adapter(driver_name)
+    return Queries(load_queries_from_sql(sql, driver_adapter))
 
 
-def from_path(sql_path, db_driver):
+def from_path(sql_path, driver_name):
     """Load queries from a sql file, or a directory of sql files.
 
     Args:
         sql_path (str|Path): Path to a ``.sql`` file or directory containing ``.sql`` files.
-        db_driver (str): The database driver to use to load and execute queries.
+        driver_name (str): The database driver to use to load and execute queries.
 
     Returns:
         Queries
@@ -217,8 +328,8 @@ def from_path(sql_path, db_driver):
             import sqlite3
             import aiosql
 
-            queries = aiosql.from_path("./greetings.sql", db_driver="sqlite3")
-            queries2 = aiosql.from_path("./sql_dir", db_driver="sqlite3")
+            queries = aiosql.from_path("./greetings.sql", driver_name="sqlite3")
+            queries2 = aiosql.from_path("./sql_dir", driver_name="sqlite3")
 
     """
     path = Path(sql_path)
@@ -226,11 +337,11 @@ def from_path(sql_path, db_driver):
     if not path.exists():
         raise SQLLoadException(f"File does not exist: {path}")
 
-    query_loader = get_query_loader(db_driver)
+    driver_adapter = get_driver_adapter(driver_name)
 
     if path.is_file():
-        return Queries(load_queries_from_file(path, query_loader))
+        return Queries(load_queries_from_file(path, driver_adapter))
     elif path.is_dir():
-        return load_queries_from_dir_path(path, query_loader)
+        return load_queries_from_dir_path(path, driver_adapter)
     else:
         raise SQLLoadException(f"The sql_path must be a directory or file, got {sql_path}")

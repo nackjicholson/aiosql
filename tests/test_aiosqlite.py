@@ -8,113 +8,107 @@ import pytest
 
 @pytest.fixture()
 def queries():
-    dir_path = Path(__file__).parent / "f1db/sql"
+    dir_path = Path(__file__).parent / "blogdb/sql"
     return aiosql.from_path(dir_path, "aiosqlite")
 
 
 @pytest.mark.asyncio
 async def test_record_query(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
-        actual = await queries.get_drivers(conn)
+        actual = await queries.users.get_all(conn)
 
-        assert len(actual) == 20
+        assert len(actual) == 3
         assert actual[0] == {
-            "driverid": 1,
-            "driverref": "hamilton",
-            "number": 44,
-            "code": "HAM",
-            "forename": "Lewis",
-            "surname": "Hamilton",
-            "dob": "1985-01-07",
-            "nationality": "British",
-            "url": "http://en.wikipedia.org/wiki/Lewis_Hamilton",
-        }
-        assert actual[19] == {
-            "driverid": 20,
-            "driverref": "sirotkin",
-            "number": 35,
-            "code": "SIR",
-            "forename": "Sergey",
-            "surname": "Sirotkin",
-            "dob": "1995-08-27",
-            "nationality": "Russian",
-            "url": "http://en.wikipedia.org/wiki/Sergey_Sirotkin_(racing_driver)",
+            "userid": 1,
+            "username": "bobsmith",
+            "firstname": "Bob",
+            "lastname": "Smith",
         }
 
 
 @pytest.mark.asyncio
-async def test_variable_replace_query(sqlite3_db_path, queries):
+async def test_parameterized_query(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
-        actual = await queries.get_drivers_born_after(conn, dob="1995-01-01")
+        actual = await queries.blogs.get_user_blogs(conn, userid=1)
+        expected = [("How to make a pie.", "2018-11-23"), ("What I did Today", "2017-07-28")]
+        assert actual == expected
+
+
+@pytest.mark.asyncio
+async def test_parameterized_record_query(sqlite3_db_path, queries):
+    async with aiosqlite.connect(sqlite3_db_path) as conn:
+        actual = await queries.blogs.sqlite_get_blogs_published_after(conn, published="2018-01-01")
 
         expected = [
-            ("stroll", "STR", 18, "1998-10-29"),
-            ("leclerc", "LEC", 16, "1997-10-16"),
-            ("max_verstappen", "VER", 33, "1997-09-30"),
-            ("ocon", "OCO", 31, "1996-09-17"),
-            ("gasly", "GAS", 10, "1996-02-07"),
-            ("sirotkin", "SIR", 35, "1995-08-27"),
+            {"title": "How to make a pie.", "username": "bobsmith", "published": "2018-11-23"},
+            {"title": "Testing", "username": "janedoe", "published": "2018-01-01"},
         ]
 
         assert actual == expected
 
 
 @pytest.mark.asyncio
-async def test_create_returning_query(sqlite3_db_path, queries):
+async def test_insert_returning(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
-        driverid = await queries.create_new_driver(
-            conn,
-            driverref="vaughn",
-            number=98,
-            code="VAU",
-            forename="William",
-            surname="Vaughn",
-            dob="1984-06-17",
-            nationality="United States",
-            url="https://gitlab.com/willvaughn",
+        blogid = await queries.blogs.publish_blog(
+            conn, userid=2, title="My first blog", content="Hello, World!", published="2018-12-04"
         )
 
-        cur = await conn.execute(
-            """\
-            select driverid,
-                   code,
-                   number
-              from drivers
-             where driverid = ?;
-        """,
-            (driverid,),
-        )
-        actual = await cur.fetchall()
-        expected = [(21, "VAU", 98)]
-
-        assert actual == expected
+        sql = """
+            select title
+              from blogs
+             where blogid = :blogid;"""
+        async with conn.execute(sql, {"blogid": blogid}) as cur:
+            actual = await cur.fetchone()
+            expected = ("My first blog",)
+            assert actual == expected
 
 
 @pytest.mark.asyncio
-async def test_delete_query(sqlite3_db_path, queries):
+async def test_delete(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
-        # ocon lost his seat
-        actual = await queries.delete_driver(conn, driverid=15)
+        # Removing the "janedoe" blog titled "Testing"
+        actual = await queries.blogs.remove_blog(conn, blogid=2)
         assert actual is None
 
-        drivers = await queries.get_drivers(conn)
-        assert len(drivers) == 19
+        janes_blogs = await queries.blogs.get_user_blogs(conn, userid=3)
+        assert len(janes_blogs) == 0
+
+
+@pytest.mark.asyncio
+async def test_insert_many(sqlite3_db_path, queries):
+    blogs = [
+        (2, "Blog Part 1", "content - 1", "2018-12-04"),
+        (2, "Blog Part 2", "content - 2", "2018-12-05"),
+        (2, "Blog Part 3", "content - 3", "2018-12-06"),
+    ]
+
+    async with aiosqlite.connect(sqlite3_db_path) as conn:
+        actual = await queries.blogs.sqlite_bulk_publish(conn, blogs)
+        assert actual is None
+
+        johns_blogs = await queries.blogs.get_user_blogs(conn, userid=2)
+        assert johns_blogs == [
+            ("Blog Part 3", "2018-12-06"),
+            ("Blog Part 2", "2018-12-05"),
+            ("Blog Part 1", "2018-12-04"),
+        ]
 
 
 @pytest.mark.asyncio
 async def test_async_methods(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
-        spanish_drivers, french_drivers = await asyncio.gather(
-            queries.get_drivers_by_nationality(conn, nationality="Spanish"),
-            queries.get_drivers_by_nationality(conn, nationality="French"),
+        users, sorted_users = await asyncio.gather(
+            queries.users.get_all(conn), queries.users.get_all_sorted(conn)
         )
 
-        assert spanish_drivers == [
-            (2, "alonso", 14, "ALO", "Fernando", "Alonso", "1981-07-29", "Spanish"),
-            (13, "sainz", 55, "SAI", "Carlos", "Sainz", "1994-09-01", "Spanish"),
-        ]
-        assert french_drivers == [
-            (5, "grosjean", 8, "GRO", "Romain", "Grosjean", "1986-04-17", "French"),
-            (15, "ocon", 31, "OCO", "Esteban", "Ocon", "1996-09-17", "French"),
-            (17, "gasly", 10, "GAS", "Pierre", "Gasly", "1996-02-07", "French"),
-        ]
+    assert users == [
+        {"userid": 1, "username": "bobsmith", "firstname": "Bob", "lastname": "Smith"},
+        {"userid": 2, "username": "johndoe", "firstname": "John", "lastname": "Doe"},
+        {"userid": 3, "username": "janedoe", "firstname": "Jane", "lastname": "Doe"},
+    ]
+    assert sorted_users == [
+        {"userid": 1, "username": "bobsmith", "firstname": "Bob", "lastname": "Smith"},
+        {"userid": 3, "username": "janedoe", "firstname": "Jane", "lastname": "Doe"},
+        {"userid": 2, "username": "johndoe", "firstname": "John", "lastname": "Doe"},
+    ]
