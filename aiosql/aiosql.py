@@ -6,7 +6,12 @@ from .adapters.asyncpg import AsyncPGAdapter
 from .adapters.psycopg2 import PsycoPG2Adapter
 from .adapters.sqlite3 import SQLite3DriverAdapter
 from .exceptions import SQLLoadException, SQLParseException
-from .patterns import namedef_pattern, empty_pattern, doc_pattern, name_pattern
+from .patterns import (
+    query_name_definition_pattern,
+    empty_pattern,
+    doc_comment_pattern,
+    valid_query_name_pattern,
+)
 
 
 _ADAPTERS = {
@@ -81,17 +86,17 @@ class SQLOperationType(Enum):
     """Enumeration of aiosql operation types.
     """
 
-    SELECT = 0
+    INSERT_RETURNING = 0
     INSERT_UPDATE_DELETE = 1
     INSERT_UPDATE_DELETE_MANY = 2
-    INSERT_RETURNING = 3
-    SCRIPT = 4
+    SCRIPT = 3
+    SELECT = 4
 
 
 class Queries:
-    """Container object containing methods built from SQL queries.
+    """Container object with dynamic methods built from SQL queries.
 
-    The ``-- name: foobar`` definition comments in the SQL content determine what the dynamic
+    The ``-- name`` definition comments in the SQL content determine what the dynamic
     methods of this class will be named.
 
     @DynamicAttrs
@@ -107,8 +112,8 @@ class Queries:
             queries = []
         self._available_queries = set()
 
-        for name, fn in queries:
-            self.add_query(name, fn)
+        for query_name, fn in queries:
+            self.add_query(query_name, fn)
 
     @property
     def available_queries(self):
@@ -122,68 +127,72 @@ class Queries:
     def __repr__(self):
         return "Queries(" + self.available_queries.__repr__() + ")"
 
-    def add_query(self, name, fn):
+    def add_query(self, query_name, fn):
         """Adds a new dynamic method to this class.
 
         Args:
-            name (str): The method name as found in the SQL content.
+            query_name (str): The method name as found in the SQL content.
             fn (function): The loaded query function built by a QueryLoader class.
 
         Returns:
 
         """
-        setattr(self, name, fn)
-        self._available_queries.add(name)
+        setattr(self, query_name, fn)
+        self._available_queries.add(query_name)
 
-    def add_child_queries(self, name, child_queries):
+    def add_child_queries(self, child_name, child_queries):
         """Adds a Queries object as a property.
 
         Args:
-            name (str): The property name to group the child queries under.
+            child_name (str): The property name to group the child queries under.
             child_queries (Queries): Queries instance to add as sub-queries.
 
         Returns:
             None
 
         """
-        setattr(self, name, child_queries)
+        setattr(self, child_name, child_queries)
         for child_name in child_queries.available_queries:
-            self._available_queries.add(f"{name}.{child_name}")
+            self._available_queries.add(f"{child_name}.{child_name}")
 
 
-def _create_fn(name, op_type, sql, return_as_dict, driver_adapter):
+def _create_fn(query_name, op_type, sql, return_as_dict, driver_adapter):
     def fn(conn, *args, **kwargs):
         parameters = kwargs if len(kwargs) > 0 else args
-        if op_type == SQLOperationType.SELECT:
-            return driver_adapter.select(conn, name, sql, parameters, return_as_dict)
+        if op_type == SQLOperationType.INSERT_RETURNING:
+            return driver_adapter.insert_returning(conn, query_name, sql, parameters)
         elif op_type == SQLOperationType.INSERT_UPDATE_DELETE:
-            return driver_adapter.insert_update_delete(conn, name, sql, parameters)
+            return driver_adapter.insert_update_delete(conn, query_name, sql, parameters)
         elif op_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
-            return driver_adapter.insert_update_delete_many(conn, name, sql, *parameters)
-        elif op_type == SQLOperationType.INSERT_RETURNING:
-            return driver_adapter.insert_returning(conn, name, sql, parameters)
+            return driver_adapter.insert_update_delete_many(conn, query_name, sql, *parameters)
         elif op_type == SQLOperationType.SCRIPT:
             return driver_adapter.execute_script(conn, sql)
+        elif op_type == SQLOperationType.SELECT:
+            return driver_adapter.select(conn, query_name, sql, parameters, return_as_dict)
         else:
+            # TODO: think about message, or if this is a custom error
             raise RuntimeError()
 
     return fn
 
 
-def _create_aio_fn(name, op_type, sql, return_as_dict, driver_adapter):
+def _create_aio_fn(query_name, op_type, sql, return_as_dict, driver_adapter):
     async def fn(conn, *args, **kwargs):
         parameters = kwargs if len(kwargs) > 0 else args
-        if op_type == SQLOperationType.SELECT:
-            return await driver_adapter.select(conn, name, sql, parameters, return_as_dict)
+        if op_type == SQLOperationType.INSERT_RETURNING:
+            return await driver_adapter.insert_returning(conn, query_name, sql, parameters)
         elif op_type == SQLOperationType.INSERT_UPDATE_DELETE:
-            return await driver_adapter.insert_update_delete(conn, name, sql, parameters)
+            return await driver_adapter.insert_update_delete(conn, query_name, sql, parameters)
         elif op_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
-            return await driver_adapter.insert_update_delete_many(conn, name, sql, *parameters)
-        elif op_type == SQLOperationType.INSERT_RETURNING:
-            return await driver_adapter.insert_returning(conn, name, sql, parameters)
+            return await driver_adapter.insert_update_delete_many(
+                conn, query_name, sql, *parameters
+            )
         elif op_type == SQLOperationType.SCRIPT:
             return await driver_adapter.execute_script(conn, sql)
+        elif op_type == SQLOperationType.SELECT:
+            return await driver_adapter.select(conn, query_name, sql, parameters, return_as_dict)
         else:
+            # TODO: think about message, or if this is a custom error
             raise RuntimeError()
 
     return fn
@@ -191,57 +200,60 @@ def _create_aio_fn(name, op_type, sql, return_as_dict, driver_adapter):
 
 def load(sql_text, driver_adapter):
     lines = sql_text.strip().splitlines()
-    name = lines[0].replace("-", "_")
+    query_name = lines[0].replace("-", "_")
 
-    if name.endswith("<!"):
+    if query_name.endswith("<!"):
         op_type = SQLOperationType.INSERT_RETURNING
-        name = name[:-2]
-    elif name.endswith("*!"):
+        query_name = query_name[:-2]
+    elif query_name.endswith("*!"):
         op_type = SQLOperationType.INSERT_UPDATE_DELETE_MANY
-        name = name[:-2]
-    elif name.endswith("!"):
+        query_name = query_name[:-2]
+    elif query_name.endswith("!"):
         op_type = SQLOperationType.INSERT_UPDATE_DELETE
-        name = name[:-1]
-    elif name.endswith("#"):
+        query_name = query_name[:-1]
+    elif query_name.endswith("#"):
+        # TODO: need execute_script method on all driver adapters
         op_type = SQLOperationType.SCRIPT
-        name = name[:-1]
+        query_name = query_name[:-1]
     else:
         op_type = SQLOperationType.SELECT
 
+    # TODO: Consider is this needed or should it be handled by connection driver
+    # via sqlite3.Row for instance.
     return_as_dict = False
-    if name.startswith("$"):
+    if query_name.startswith("$"):
         return_as_dict = True
-        name = name[1:]
+        query_name = query_name[1:]
 
-    if not name_pattern.match(name):
-        raise SQLParseException(f'name must convert to valid python variable, got "{name}".')
+    if not valid_query_name_pattern.match(query_name):
+        raise SQLParseException(f'name must convert to valid python variable, got "{query_name}".')
 
     docs = ""
     sql = ""
     for line in lines[1:]:
-        match = doc_pattern.match(line)
+        match = doc_comment_pattern.match(line)
         if match:
             docs += match.group(1) + "\n"
         else:
             sql += line + "\n"
 
     docs = docs.strip()
-    sql = driver_adapter.process_sql(name, op_type, sql.strip())
+    sql = driver_adapter.process_sql(query_name, op_type, sql.strip())
 
     if driver_adapter.is_aio_driver:
-        fn = _create_aio_fn(name, op_type, sql, return_as_dict, driver_adapter)
+        fn = _create_aio_fn(query_name, op_type, sql, return_as_dict, driver_adapter)
     else:
-        fn = _create_fn(name, op_type, sql, return_as_dict, driver_adapter)
+        fn = _create_fn(query_name, op_type, sql, return_as_dict, driver_adapter)
 
-    fn.__name__ = name
+    fn.__name__ = query_name
     fn.__docs__ = docs
     fn.sql = sql
-    return name, fn
+    return query_name, fn
 
 
 def load_queries_from_sql(sql, driver_adapter):
     queries = []
-    for query_text in namedef_pattern.split(sql):
+    for query_text in query_name_definition_pattern.split(sql):
         if not empty_pattern.match(query_text):
             queries.append(load(query_text, driver_adapter))
     return queries
@@ -262,8 +274,8 @@ def load_queries_from_dir_path(dir_path, query_loader):
             if p.is_file() and p.suffix != ".sql":
                 continue
             elif p.is_file() and p.suffix == ".sql":
-                for name, fn in load_queries_from_file(p, query_loader):
-                    queries.add_query(name, fn)
+                for query_name, fn in load_queries_from_file(p, query_loader):
+                    queries.add_query(query_name, fn)
             elif p.is_dir():
                 child_name = p.relative_to(dir_path).name
                 child_queries = _recurse_load_queries(p)

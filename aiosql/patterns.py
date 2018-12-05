@@ -1,6 +1,6 @@
 import re
 
-namedef_pattern = re.compile(r"--\s*name\s*:\s*")
+query_name_definition_pattern = re.compile(r"--\s*name\s*:\s*")
 """
 Pattern: Identifies name definition comments.
 """
@@ -10,12 +10,12 @@ empty_pattern = re.compile(r"^\s*$")
 Pattern: Identifies empty lines.
 """
 
-name_pattern = re.compile(r"\w+")
+valid_query_name_pattern = re.compile(r"\w+")
 """
 Pattern: Enforces names are valid python variable names.
 """
 
-doc_pattern = re.compile(r"\s*--\s*(.*)$")
+doc_comment_pattern = re.compile(r"\s*--\s*(.*)$")
 """
 Pattern: Identifies SQL comments.
 """

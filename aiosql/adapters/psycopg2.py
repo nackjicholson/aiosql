@@ -15,11 +15,11 @@ class PsycoPG2Adapter:
     is_aio_driver = False
 
     @staticmethod
-    def process_sql(_name, _op_type, sql):
+    def process_sql(_query_name, _op_type, sql):
         return var_pattern.sub(replacer, sql)
 
     @staticmethod
-    def select(conn, _name, sql, parameters, return_as_dict):
+    def select(conn, _query_name, sql, parameters, return_as_dict):
         with conn.cursor() as cur:
             cur.execute(sql, parameters)
             rows = cur.fetchall()
@@ -31,17 +31,17 @@ class PsycoPG2Adapter:
             return rows
 
     @staticmethod
-    def insert_update_delete(conn, _name, sql, parameters):
+    def insert_update_delete(conn, _query_name, sql, parameters):
         with conn.cursor() as cur:
             cur.execute(sql, parameters)
 
     @staticmethod
-    def insert_update_delete_many(conn, _name, sql, parmeters):
+    def insert_update_delete_many(conn, _query_name, sql, parmeters):
         with conn.cursor() as cur:
             cur.executemany(sql, parmeters)
 
     @staticmethod
-    def insert_returning(conn, _name, sql, parameters):
+    def insert_returning(conn, _query_name, sql, parameters):
         with conn.cursor() as cur:
             cur.execute(sql, parameters)
             res = cur.fetchone()
