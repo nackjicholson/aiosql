@@ -36,14 +36,18 @@ def register_driver_adapter(driver_name, driver_adapter):
     Returns:
         None
 
-    Example:
+    Examples:
         To register a new loader::
 
             class MyDbAdapter():
                 def process_sql(self, name, op_type, sql):
                     pass
 
-                def select(self, conn, sql, parameters, return_as_dict):
+                def select(self, conn, sql, parameters):
+                    pass
+
+                @contextmanager
+                def select(self, conn, sql, parameters):
                     pass
 
                 def insert_update_delete(self, conn, sql, parameters):
@@ -59,7 +63,15 @@ def register_driver_adapter(driver_name, driver_adapter):
                     pass
 
 
-            aiosql.register_driver_adapter('mydb', MyDbAdapter)
+            aiosql.register_driver_adapter("mydb", MyDbAdapter)
+
+        If your adapter constructor takes arguments you can register a function which can build
+        your adapter instance::
+
+            def adapter_factory():
+                return MyDbAdapter("foo", 42)
+
+            aiosql.register_driver_adapter("mydb", adapter_factory)
 
     """
     _ADAPTERS[driver_name] = driver_adapter
@@ -132,7 +144,7 @@ class Queries:
 
         Args:
             query_name (str): The method name as found in the SQL content.
-            fn (function): The loaded query function built by a QueryLoader class.
+            fn (function): The loaded query function.
 
         Returns:
 
@@ -197,24 +209,24 @@ def _create_fns(query_name, docs, op_type, sql, driver_adapter):
     aio_fn.__docs__ = docs
     aio_fn.sql = sql
 
-    ctx_name = f"{query_name}_cursor"
+    ctx_mgr_method_name = f"{query_name}_cursor"
 
     def ctx_mgr(conn, *args, **kwargs):
         parameters = kwargs if len(kwargs) > 0 else args
         return driver_adapter.select_cursor(conn, query_name, sql, parameters)
 
-    ctx_mgr.__name__ = ctx_name
+    ctx_mgr.__name__ = ctx_mgr_method_name
     ctx_mgr.__docs__ = docs
     ctx_mgr.sql = sql
 
-    if driver_adapter.is_aio_driver:
+    if getattr(driver_adapter, "is_aio_driver", False):
         if op_type == SQLOperationType.SELECT:
-            return [(query_name, aio_fn), (ctx_name, ctx_mgr)]
+            return [(query_name, aio_fn), (ctx_mgr_method_name, ctx_mgr)]
         else:
             return [(query_name, aio_fn)]
     else:
         if op_type == SQLOperationType.SELECT:
-            return [(query_name, fn), (ctx_name, ctx_mgr)]
+            return [(query_name, fn), (ctx_mgr_method_name, ctx_mgr)]
         else:
             return [(query_name, fn)]
 
@@ -233,7 +245,6 @@ def load_methods(sql_text, driver_adapter):
         op_type = SQLOperationType.INSERT_UPDATE_DELETE
         query_name = query_name[:-1]
     elif query_name.endswith("#"):
-        # TODO: need execute_script method on all driver adapters
         op_type = SQLOperationType.SCRIPT
         query_name = query_name[:-1]
     else:
@@ -288,8 +299,8 @@ def load_queries_from_dir_path(dir_path, query_loader):
                 child_queries = _recurse_load_queries(p)
                 queries.add_child_queries(child_name, child_queries)
             else:
-                # TODO Think about this error and message
-                raise RuntimeError(p)
+                # This should be practically unreachable.
+                raise SQLLoadException(f"The path must be a directory or file, got {p}")
         return queries
 
     return _recurse_load_queries(dir_path)
@@ -316,7 +327,7 @@ def from_str(sql, driver_name):
             -- Get all the greetings in the database
             select * from greetings;
 
-            -- name: $get-users-by-username
+            -- name: get-users-by-username
             -- Get all the users from the database,
             -- and return it as a dict
             select * from users where username =:username;

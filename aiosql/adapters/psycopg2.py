@@ -14,8 +14,6 @@ def replacer(match):
 
 
 class PsycoPG2Adapter:
-    is_aio_driver = False
-
     @staticmethod
     def process_sql(_query_name, _op_type, sql):
         return var_pattern.sub(replacer, sql)
@@ -49,3 +47,8 @@ class PsycoPG2Adapter:
             cur.execute(sql, parameters)
             res = cur.fetchone()
             return res if res else None
+
+    @staticmethod
+    def execute_script(conn, sql):
+        with conn.cursor() as cur:
+            cur.execute(sql)

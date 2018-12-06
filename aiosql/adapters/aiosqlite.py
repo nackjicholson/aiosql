@@ -44,3 +44,7 @@ class AioSQLiteAdapter:
     async def insert_update_delete_many(conn, _query_name, sql, parameters):
         cur = await conn.executemany(sql, parameters)
         await cur.close()
+
+    @staticmethod
+    async def execute_script(conn, sql):
+        await conn.executescript(sql)

@@ -97,3 +97,8 @@ class AsyncPGAdapter:
         parameters = [self.maybe_order_params(query_name, params) for params in parameters]
         async with MaybeAcquire(conn) as connection:
             await connection.executemany(sql, parameters)
+
+    @staticmethod
+    async def execute_script(conn, sql):
+        async with MaybeAcquire(conn) as connection:
+            await connection.execute(sql)

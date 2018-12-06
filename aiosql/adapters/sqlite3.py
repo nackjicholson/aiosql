@@ -2,8 +2,6 @@ from contextlib import contextmanager
 
 
 class SQLite3DriverAdapter:
-    is_aio_driver = False
-
     @staticmethod
     def process_sql(_query_name, _op_type, sql):
         """Pass through function because the ``sqlite3`` driver already handles the :var_name
