@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from ..aioctxlib import aiocontextmanager
 from ..patterns import var_pattern
 
 
@@ -69,20 +70,23 @@ class AsyncPGAdapter:
         else:
             raise ValueError(f"Parameters expected to be dict or tuple, received {parameters}")
 
-    async def select(self, conn, query_name, sql, parameters, return_as_dict):
+    async def select(self, conn, query_name, sql, parameters):
         parameters = self.maybe_order_params(query_name, parameters)
         async with MaybeAcquire(conn) as connection:
-            records = await connection.fetch(sql, *parameters)
-            if return_as_dict:
-                return [dict(record) for record in records]
-            else:
-                return [tuple(record) for record in records]
+            return await connection.fetch(sql, *parameters)
+
+    @aiocontextmanager
+    async def select_cursor(self, conn, query_name, sql, parameters):
+        parameters = self.maybe_order_params(query_name, parameters)
+        async with MaybeAcquire(conn) as connection:
+            stmt = await connection.prepare(sql)
+            async with connection.transaction():
+                yield stmt.cursor(*parameters)
 
     async def insert_returning(self, conn, query_name, sql, parameters):
         parameters = self.maybe_order_params(query_name, parameters)
         async with MaybeAcquire(conn) as connection:
-            record = await connection.fetchrow(sql, *parameters)
-            return tuple(record)
+            return await connection.fetchrow(sql, *parameters)
 
     async def insert_update_delete(self, conn, query_name, sql, parameters):
         parameters = self.maybe_order_params(query_name, parameters)

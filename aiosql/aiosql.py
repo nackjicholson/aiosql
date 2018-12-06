@@ -156,7 +156,7 @@ class Queries:
             self._available_queries.add(f"{child_name}.{child_name}")
 
 
-def _create_fn(query_name, op_type, sql, return_as_dict, driver_adapter):
+def _create_fns(query_name, docs, op_type, sql, driver_adapter):
     def fn(conn, *args, **kwargs):
         parameters = kwargs if len(kwargs) > 0 else args
         if op_type == SQLOperationType.INSERT_RETURNING:
@@ -168,16 +168,15 @@ def _create_fn(query_name, op_type, sql, return_as_dict, driver_adapter):
         elif op_type == SQLOperationType.SCRIPT:
             return driver_adapter.execute_script(conn, sql)
         elif op_type == SQLOperationType.SELECT:
-            return driver_adapter.select(conn, query_name, sql, parameters, return_as_dict)
+            return driver_adapter.select(conn, query_name, sql, parameters)
         else:
-            # TODO: think about message, or if this is a custom error
-            raise RuntimeError()
+            raise ValueError(f"Unknown op_type: {op_type}")
 
-    return fn
+    fn.__name__ = query_name
+    fn.__docs__ = docs
+    fn.sql = sql
 
-
-def _create_aio_fn(query_name, op_type, sql, return_as_dict, driver_adapter):
-    async def fn(conn, *args, **kwargs):
+    async def aio_fn(conn, *args, **kwargs):
         parameters = kwargs if len(kwargs) > 0 else args
         if op_type == SQLOperationType.INSERT_RETURNING:
             return await driver_adapter.insert_returning(conn, query_name, sql, parameters)
@@ -190,15 +189,37 @@ def _create_aio_fn(query_name, op_type, sql, return_as_dict, driver_adapter):
         elif op_type == SQLOperationType.SCRIPT:
             return await driver_adapter.execute_script(conn, sql)
         elif op_type == SQLOperationType.SELECT:
-            return await driver_adapter.select(conn, query_name, sql, parameters, return_as_dict)
+            return await driver_adapter.select(conn, query_name, sql, parameters)
         else:
-            # TODO: think about message, or if this is a custom error
-            raise RuntimeError()
+            raise ValueError(f"Unknown op_type: {op_type}")
 
-    return fn
+    aio_fn.__name__ = query_name
+    aio_fn.__docs__ = docs
+    aio_fn.sql = sql
+
+    ctx_name = f"{query_name}_cursor"
+
+    def ctx_mgr(conn, *args, **kwargs):
+        parameters = kwargs if len(kwargs) > 0 else args
+        return driver_adapter.select_cursor(conn, query_name, sql, parameters)
+
+    ctx_mgr.__name__ = ctx_name
+    ctx_mgr.__docs__ = docs
+    ctx_mgr.sql = sql
+
+    if driver_adapter.is_aio_driver:
+        if op_type == SQLOperationType.SELECT:
+            return [(query_name, aio_fn), (ctx_name, ctx_mgr)]
+        else:
+            return [(query_name, aio_fn)]
+    else:
+        if op_type == SQLOperationType.SELECT:
+            return [(query_name, fn), (ctx_name, ctx_mgr)]
+        else:
+            return [(query_name, fn)]
 
 
-def load(sql_text, driver_adapter):
+def load_methods(sql_text, driver_adapter):
     lines = sql_text.strip().splitlines()
     query_name = lines[0].replace("-", "_")
 
@@ -218,13 +239,6 @@ def load(sql_text, driver_adapter):
     else:
         op_type = SQLOperationType.SELECT
 
-    # TODO: Consider is this needed or should it be handled by connection driver
-    # via sqlite3.Row for instance.
-    return_as_dict = False
-    if query_name.startswith("$"):
-        return_as_dict = True
-        query_name = query_name[1:]
-
     if not valid_query_name_pattern.match(query_name):
         raise SQLParseException(f'name must convert to valid python variable, got "{query_name}".')
 
@@ -240,22 +254,15 @@ def load(sql_text, driver_adapter):
     docs = docs.strip()
     sql = driver_adapter.process_sql(query_name, op_type, sql.strip())
 
-    if driver_adapter.is_aio_driver:
-        fn = _create_aio_fn(query_name, op_type, sql, return_as_dict, driver_adapter)
-    else:
-        fn = _create_fn(query_name, op_type, sql, return_as_dict, driver_adapter)
-
-    fn.__name__ = query_name
-    fn.__docs__ = docs
-    fn.sql = sql
-    return query_name, fn
+    return _create_fns(query_name, docs, op_type, sql, driver_adapter)
 
 
 def load_queries_from_sql(sql, driver_adapter):
     queries = []
     for query_text in query_name_definition_pattern.split(sql):
         if not empty_pattern.match(query_text):
-            queries.append(load(query_text, driver_adapter))
+            for method_pair in load_methods(query_text, driver_adapter):
+                queries.append(method_pair)
     return queries
 
 
@@ -281,6 +288,7 @@ def load_queries_from_dir_path(dir_path, query_loader):
                 child_queries = _recurse_load_queries(p)
                 queries.add_child_queries(child_name, child_queries)
             else:
+                # TODO Think about this error and message
                 raise RuntimeError(p)
         return queries
 

@@ -16,7 +16,7 @@ def queries():
 @pytest.mark.asyncio
 async def test_record_query(pg_dsn, queries):
     conn = await asyncpg.connect(pg_dsn)
-    actual = await queries.users.get_all(conn)
+    actual = [dict(rec) for rec in await queries.users.get_all(conn)]
     await conn.close()
 
     assert len(actual) == 3
@@ -41,7 +41,8 @@ async def test_parameterized_query(pg_dsn, queries):
 @pytest.mark.asyncio
 async def test_parameterized_record_query(pg_dsn, queries):
     conn = await asyncpg.connect(pg_dsn)
-    actual = await queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
+    records = await queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
+    actual = [dict(rec) for rec in records]
     await conn.close()
 
     expected = [
@@ -50,6 +51,19 @@ async def test_parameterized_record_query(pg_dsn, queries):
     ]
 
     assert actual == expected
+
+
+@pytest.mark.asyncio
+async def test_select_cursor_context_manager(pg_dsn, queries):
+    conn = await asyncpg.connect(pg_dsn)
+    async with queries.blogs.get_user_blogs_cursor(conn, userid=1) as cursor:
+        actual = [tuple(rec) async for rec in cursor]
+        expected = [
+            ("How to make a pie.", date(2018, 11, 23)),
+            ("What I did Today", date(2017, 7, 28)),
+        ]
+        assert actual == expected
+    await conn.close()
 
 
 @pytest.mark.asyncio
@@ -133,12 +147,12 @@ async def test_async_methods(pg_dsn, queries):
             queries.users.get_all(pool), queries.users.get_all_sorted(pool)
         )
 
-    assert users == [
+    assert [dict(u) for u in users] == [
         {"userid": 1, "username": "bobsmith", "firstname": "Bob", "lastname": "Smith"},
         {"userid": 2, "username": "johndoe", "firstname": "John", "lastname": "Doe"},
         {"userid": 3, "username": "janedoe", "firstname": "Jane", "lastname": "Doe"},
     ]
-    assert sorted_users == [
+    assert [dict(u) for u in sorted_users] == [
         {"userid": 1, "username": "bobsmith", "firstname": "Bob", "lastname": "Smith"},
         {"userid": 3, "username": "janedoe", "firstname": "Jane", "lastname": "Doe"},
         {"userid": 2, "username": "johndoe", "firstname": "John", "lastname": "Doe"},

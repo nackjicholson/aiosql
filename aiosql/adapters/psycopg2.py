@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from ..patterns import var_pattern
 
 
@@ -19,16 +21,17 @@ class PsycoPG2Adapter:
         return var_pattern.sub(replacer, sql)
 
     @staticmethod
-    def select(conn, _query_name, sql, parameters, return_as_dict):
+    def select(conn, _query_name, sql, parameters):
         with conn.cursor() as cur:
             cur.execute(sql, parameters)
-            rows = cur.fetchall()
+            return cur.fetchall()
 
-            if return_as_dict:
-                cols = [col[0] for col in cur.description]
-                rows = [dict(zip(cols, row)) for row in rows]
-
-            return rows
+    @staticmethod
+    @contextmanager
+    def select_cursor(conn, _query_name, sql, parameters):
+        with conn.cursor() as cur:
+            cur.execute(sql, parameters)
+            yield cur
 
     @staticmethod
     def insert_update_delete(conn, _query_name, sql, parameters):

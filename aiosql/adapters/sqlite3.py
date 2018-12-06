@@ -1,3 +1,6 @@
+from contextlib import contextmanager
+
+
 class SQLite3DriverAdapter:
     is_aio_driver = False
 
@@ -18,19 +21,22 @@ class SQLite3DriverAdapter:
         return sql
 
     @staticmethod
-    def select(conn, _query_name, sql, parameters, return_as_dict):
+    def select(conn, _query_name, sql, parameters):
         cur = conn.cursor()
         cur.execute(sql, parameters)
-
-        if return_as_dict:
-            cols = [col[0] for col in cur.description]
-            results = [dict(zip(cols, row)) for row in cur.fetchall()]
-        else:
-            results = cur.fetchall()
-
+        results = cur.fetchall()
         cur.close()
-
         return results
+
+    @staticmethod
+    @contextmanager
+    def select_cursor(conn, _query_name, sql, parameters):
+        cur = conn.cursor()
+        cur.execute(sql, parameters)
+        try:
+            yield cur
+        finally:
+            cur.close()
 
     @staticmethod
     def insert_update_delete(conn, _query_name, sql, parameters):

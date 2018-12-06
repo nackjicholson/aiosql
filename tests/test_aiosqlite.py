@@ -12,9 +12,17 @@ def queries():
     return aiosql.from_path(dir_path, "aiosqlite")
 
 
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
+
 @pytest.mark.asyncio
 async def test_record_query(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
+        conn.row_factory = dict_factory
         actual = await queries.users.get_all(conn)
 
         assert len(actual) == 3
@@ -37,6 +45,7 @@ async def test_parameterized_query(sqlite3_db_path, queries):
 @pytest.mark.asyncio
 async def test_parameterized_record_query(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
+        conn.row_factory = dict_factory
         actual = await queries.blogs.sqlite_get_blogs_published_after(conn, published="2018-01-01")
 
         expected = [
@@ -45,6 +54,15 @@ async def test_parameterized_record_query(sqlite3_db_path, queries):
         ]
 
         assert actual == expected
+
+
+@pytest.mark.asyncio
+async def test_select_cursor_context_manager(sqlite3_db_path, queries):
+    async with aiosqlite.connect(sqlite3_db_path) as conn:
+        async with queries.blogs.get_user_blogs_cursor(conn, userid=1) as cursor:
+            actual = [row async for row in cursor]
+            expected = [("How to make a pie.", "2018-11-23"), ("What I did Today", "2017-07-28")]
+            assert actual == expected
 
 
 @pytest.mark.asyncio
@@ -98,6 +116,7 @@ async def test_insert_many(sqlite3_db_path, queries):
 @pytest.mark.asyncio
 async def test_async_methods(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
+        conn.row_factory = dict_factory
         users, sorted_users = await asyncio.gather(
             queries.users.get_all(conn), queries.users.get_all_sorted(conn)
         )

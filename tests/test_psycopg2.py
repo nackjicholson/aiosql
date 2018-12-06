@@ -2,6 +2,8 @@ from datetime import date
 from pathlib import Path
 
 import aiosql
+import psycopg2
+import psycopg2.extras
 import pytest
 
 
@@ -12,7 +14,9 @@ def queries():
 
 
 def test_record_query(pg_conn, queries):
-    actual = queries.users.get_all(pg_conn)
+    dsn = pg_conn.get_dsn_parameters()
+    with psycopg2.connect(**dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+        actual = queries.users.get_all(conn)
 
     assert len(actual) == 3
     assert actual[0] == {
@@ -30,7 +34,9 @@ def test_parameterized_query(pg_conn, queries):
 
 
 def test_parameterized_record_query(pg_conn, queries):
-    actual = queries.blogs.pg_get_blogs_published_after(pg_conn, published=date(2018, 1, 1))
+    dsn = pg_conn.get_dsn_parameters()
+    with psycopg2.connect(**dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+        actual = queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
 
     expected = [
         {"title": "How to make a pie.", "username": "bobsmith", "published": date(2018, 11, 23)},
@@ -38,6 +44,16 @@ def test_parameterized_record_query(pg_conn, queries):
     ]
 
     assert actual == expected
+
+
+def test_select_cursor_context_manager(pg_conn, queries):
+    with queries.blogs.get_user_blogs_cursor(pg_conn, userid=1) as cursor:
+        actual = cursor.fetchall()
+        expected = [
+            ("How to make a pie.", date(2018, 11, 23)),
+            ("What I did Today", date(2017, 7, 28)),
+        ]
+        assert actual == expected
 
 
 def test_insert_returning(pg_conn, queries):

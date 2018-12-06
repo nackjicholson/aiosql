@@ -1,3 +1,6 @@
+from ..aioctxlib import aiocontextmanager
+
+
 class AioSQLiteAdapter:
     is_aio_driver = True
 
@@ -17,15 +20,15 @@ class AioSQLiteAdapter:
         return sql
 
     @staticmethod
-    async def select(conn, _query_name, sql, parameters, return_as_dict):
+    async def select(conn, _query_name, sql, parameters):
         async with conn.execute(sql, parameters) as cur:
-            rows = await cur.fetchall()
+            return await cur.fetchall()
 
-            if return_as_dict:
-                cols = [col[0] for col in cur.description]
-                rows = [dict(zip(cols, row)) for row in rows]
-
-            return rows
+    @staticmethod
+    @aiocontextmanager
+    async def select_cursor(conn, _query_name, sql, parameters):
+        async with conn.execute(sql, parameters) as cur:
+            yield cur
 
     @staticmethod
     async def insert_returning(conn, _query_name, sql, parameters):

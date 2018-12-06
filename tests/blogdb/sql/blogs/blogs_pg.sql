@@ -1,4 +1,4 @@
--- name: $pg-get-blogs-published-after
+-- name: pg-get-blogs-published-after
 -- Get all blogs by all authors published after the given date.
   select title,
          username,
