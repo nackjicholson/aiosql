@@ -4,7 +4,7 @@ version = "2.0.0"
 description = "Simple SQL in Python."
 authors = ["William Vaughn <vaughnwilld@gmail.com>"]
 license = "FreeBSD"
-repository = "https://gitlab.com/willvaughn/aiosql"
+repository = "https://github.com/nackjicholson/aiosql"
 readme = "README.md"
 keywords = ["SQL", "asyncio", "PostgreSQL", "sqlite", "psycopg2"]
 
