@@ -4,53 +4,65 @@ from pathlib import Path
 
 import pytest
 
-F1DB_PATH = Path(__file__).parent / "f1db"
-DRIVERS_DATA_PATH = F1DB_PATH / "data/drivers_data.csv"
+BLOGDB_PATH = Path(__file__).parent / "blogdb"
+USERS_DATA_PATH = BLOGDB_PATH / "data/users_data.csv"
+BLOGS_DATA_PATH = BLOGDB_PATH / "data/blogs_data.csv"
 
 
 def populate_sqlite3_db(db_path):
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
-    cur.execute(
-        """\
-            create table drivers (
-                driverid integer not null primary key,
-                driverref text not null,
-                number integer not null,
-                code text not null,
-                forename text not null,
-                surname text not null,
-                dob date not null,
-                nationality text not null,
-                url text unique
-            );"""
+    cur.executescript(
+        """
+            create table users (
+                userid integer not null primary key,
+                username text not null,
+                firstname integer not null,
+                lastname text not null
+            );
+            
+            create table blogs (
+                blogid integer not null primary key,
+                userid integer not null,
+                title text not null,
+                content text not null,
+                published date not null default CURRENT_DATE,
+                foreign key(userid) references users(userid)
+            );
+            """
     )
 
-    with DRIVERS_DATA_PATH.open() as fp:
-        reader = csv.reader(fp)
-        rows = list(reader)
+    with USERS_DATA_PATH.open() as fp:
+        users = list(csv.reader(fp))
+        cur.executemany(
+            """
+               insert into users (
+                    username,
+                    firstname,
+                    lastname
+               ) values (?, ?, ?);""",
+            users,
+        )
+    with BLOGS_DATA_PATH.open() as fp:
+        blogs = list(csv.reader(fp))
+        cur.executemany(
+            """
+                insert into blogs (
+                    userid,
+                    title,
+                    content,
+                    published
+                ) values (?, ?, ?, ?);""",
+            blogs,
+        )
 
-    cur.executemany(
-        """\
-            insert into drivers (
-                driverref,
-                number,
-                code,
-                forename,
-                surname,
-                dob,
-                nationality,
-                url
-            ) values (?, ?, ?, ?, ?, ?, ?, ?);""",
-        rows,
-    )
     conn.commit()
     conn.close()
 
 
 @pytest.fixture()
 def sqlite3_db_path(tmpdir):
-    db_path = str(Path(tmpdir.strpath) / "f1db.db")
+    db_path = str(Path(tmpdir.strpath) / "blogdb.db")
     populate_sqlite3_db(db_path)
     return db_path
 
@@ -66,27 +78,37 @@ def sqlite3_conn(sqlite3_db_path):
 def pg_conn(postgresql):
     """Runs the sqitch plan and loads seed data before returning db connection.
     """
-    columns = ["driverref", "number", "code", "forename", "surname", "dob", "nationality", "url"]
     with postgresql:
-        # Loads data from f1db fixture data
+        # Loads data from blogdb fixture data
         with postgresql.cursor() as cur:
             cur.execute(
-                """\
-                create table drivers (
-                  driverid serial not null primary key,
-                  driverref varchar(255) not null default '',
-                  number integer default null,
-                  code varchar(3) default null,
-                  forename varchar(255) not null default '',
-                  surname varchar(255) not null default '',
-                  dob date default null,
-                  nationality varchar(255) default null,
-                  url varchar(255) not null unique default ''
+                """
+                create table users (
+                    userid serial not null primary key,
+                    username varchar(32) not null,
+                    firstname varchar(255) not null,
+                    lastname varchar(255) not null
                 );"""
             )
+            cur.execute(
+                """
+                create table blogs (
+                    blogid serial not null primary key,
+                    userid integer not null references users(userid),
+                    title varchar(255) not null,
+                    content text not null,
+                    published date not null default CURRENT_DATE
+                );"""
+            )
+
         with postgresql.cursor() as cur:
-            with DRIVERS_DATA_PATH.open() as fp:
-                cur.copy_from(fp, "drivers", sep=",", columns=columns)
+            with USERS_DATA_PATH.open() as fp:
+                cur.copy_from(fp, "users", sep=",", columns=["username", "firstname", "lastname"])
+            with BLOGS_DATA_PATH.open() as fp:
+                cur.copy_from(
+                    fp, "blogs", sep=",", columns=["userid", "title", "content", "published"]
+                )
+
     return postgresql
 
 

@@ -2,92 +2,122 @@ from datetime import date
 from pathlib import Path
 
 import aiosql
+import psycopg2
+import psycopg2.extras
 import pytest
 
 
 @pytest.fixture()
 def queries():
-    dir_path = Path(__file__).parent / "f1db/sql"
+    dir_path = Path(__file__).parent / "blogdb" / "sql"
     return aiosql.from_path(dir_path, "psycopg2")
 
 
 def test_record_query(pg_conn, queries):
-    actual = queries.get_drivers(pg_conn)
+    dsn = pg_conn.get_dsn_parameters()
+    with psycopg2.connect(**dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+        actual = queries.users.get_all(conn)
 
-    assert len(actual) == 20
+    assert len(actual) == 3
     assert actual[0] == {
-        "driverid": 1,
-        "driverref": "hamilton",
-        "number": 44,
-        "code": "HAM",
-        "forename": "Lewis",
-        "surname": "Hamilton",
-        "dob": date(1985, 1, 7),
-        "nationality": "British",
-        "url": "http://en.wikipedia.org/wiki/Lewis_Hamilton",
-    }
-    assert actual[19] == {
-        "driverid": 20,
-        "driverref": "sirotkin",
-        "number": 35,
-        "code": "SIR",
-        "forename": "Sergey",
-        "surname": "Sirotkin",
-        "dob": date(1995, 8, 27),
-        "nationality": "Russian",
-        "url": "http://en.wikipedia.org/wiki/Sergey_Sirotkin_(racing_driver)",
+        "userid": 1,
+        "username": "bobsmith",
+        "firstname": "Bob",
+        "lastname": "Smith",
     }
 
 
-def test_variable_replace_query(pg_conn, queries):
-    actual = queries.get_drivers_born_after(pg_conn, dob="1995-01-01")
+def test_parameterized_query(pg_conn, queries):
+    actual = queries.blogs.get_user_blogs(pg_conn, userid=1)
+    expected = [("How to make a pie.", date(2018, 11, 23)), ("What I did Today", date(2017, 7, 28))]
+    assert actual == expected
+
+
+def test_parameterized_record_query(pg_conn, queries):
+    dsn = pg_conn.get_dsn_parameters()
+    with psycopg2.connect(**dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+        actual = queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
 
     expected = [
-        ("stroll", "STR", 18, date(1998, 10, 29)),
-        ("leclerc", "LEC", 16, date(1997, 10, 16)),
-        ("max_verstappen", "VER", 33, date(1997, 9, 30)),
-        ("ocon", "OCO", 31, date(1996, 9, 17)),
-        ("gasly", "GAS", 10, date(1996, 2, 7)),
-        ("sirotkin", "SIR", 35, date(1995, 8, 27)),
+        {"title": "How to make a pie.", "username": "bobsmith", "published": "2018-11-23 00:00"},
+        {"title": "Testing", "username": "janedoe", "published": "2018-01-01 00:00"},
     ]
 
     assert actual == expected
 
 
-def test_create_returning_query(pg_conn, queries):
-    driverid = queries.create_new_driver_pg(
-        pg_conn,
-        driverref="vaughn",
-        number=98,
-        code="VAU",
-        forename="William",
-        surname="Vaughn",
-        dob="1984-06-17",
-        nationality="United States",
-        url="https://gitlab.com/willvaughn",
-    )
+def test_select_cursor_context_manager(pg_conn, queries):
+    with queries.blogs.get_user_blogs_cursor(pg_conn, userid=1) as cursor:
+        actual = cursor.fetchall()
+        expected = [
+            ("How to make a pie.", date(2018, 11, 23)),
+            ("What I did Today", date(2017, 7, 28)),
+        ]
+        assert actual == expected
 
-    with pg_conn.cursor() as cur:
-        cur.execute(
-            """\
-            select driverid,
-                   code,
-                   number
-              from drivers
-             where driverid = %s;
-        """,
-            (driverid,),
+
+def test_insert_returning(pg_conn, queries):
+    with pg_conn:
+        blogid, title = queries.blogs.pg_publish_blog(
+            pg_conn,
+            userid=2,
+            title="My first blog",
+            content="Hello, World!",
+            published=date(2018, 12, 4),
         )
-        actual = cur.fetchall()
-    expected = [(21, "VAU", 98)]
+        with pg_conn.cursor() as cur:
+            cur.execute(
+                """\
+                select blogid,
+                       title
+                  from blogs
+                 where blogid = %s;
+                """,
+                (blogid,),
+            )
+            expected = cur.fetchone()
 
-    assert actual == expected
+    assert (blogid, title) == expected
 
 
-def test_delete_query(pg_conn, queries):
-    # ocon lost his seat
-    actual = queries.delete_driver(pg_conn, driverid=15)
+def test_delete(pg_conn, queries):
+    # Removing the "janedoe" blog titled "Testing"
+    actual = queries.blogs.remove_blog(pg_conn, blogid=2)
     assert actual is None
 
-    drivers = queries.get_drivers(pg_conn)
-    assert len(drivers) == 19
+    janes_blogs = queries.blogs.get_user_blogs(pg_conn, userid=3)
+    assert len(janes_blogs) == 0
+
+
+def test_insert_many(pg_conn, queries):
+    blogs = [
+        {
+            "userid": 2,
+            "title": "Blog Part 1",
+            "content": "content - 1",
+            "published": date(2018, 12, 4),
+        },
+        {
+            "userid": 2,
+            "title": "Blog Part 2",
+            "content": "content - 2",
+            "published": date(2018, 12, 5),
+        },
+        {
+            "userid": 2,
+            "title": "Blog Part 3",
+            "content": "content - 3",
+            "published": date(2018, 12, 6),
+        },
+    ]
+
+    with pg_conn:
+        actual = queries.blogs.pg_bulk_publish(pg_conn, blogs)
+        assert actual is None
+
+        johns_blogs = queries.blogs.get_user_blogs(pg_conn, userid=2)
+        assert johns_blogs == [
+            ("Blog Part 3", date(2018, 12, 6)),
+            ("Blog Part 2", date(2018, 12, 5)),
+            ("Blog Part 1", date(2018, 12, 4)),
+        ]
