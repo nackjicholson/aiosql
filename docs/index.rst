@@ -37,7 +37,7 @@ Quick Example
 
     -- name: get-all-greetings
     -- Get all the greetings in the database
-    select * from greetings;
+    select greeting_id, greeting from greetings;
 
     -- name: $get-users-by-username
     -- Get all the users from the database,
@@ -66,7 +66,7 @@ Quick Example
                queries.get_users_by_username(conn, username="willvaughn")
            )
            # greetings = [(1, "Hi"), (2, "Aloha"), (3, "Hola")]
-           # users = [{"user_id": 1, "username": "willvaughn", "name": "Will"}]
+           # users = [(1, "willvaughn", "Will")]
 
     asyncio.run(main())
 

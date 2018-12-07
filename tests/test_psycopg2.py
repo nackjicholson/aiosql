@@ -39,8 +39,8 @@ def test_parameterized_record_query(pg_conn, queries):
         actual = queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
 
     expected = [
-        {"title": "How to make a pie.", "username": "bobsmith", "published": date(2018, 11, 23)},
-        {"title": "Testing", "username": "janedoe", "published": date(2018, 1, 1)},
+        {"title": "How to make a pie.", "username": "bobsmith", "published": "2018-11-23 00:00"},
+        {"title": "Testing", "username": "janedoe", "published": "2018-01-01 00:00"},
     ]
 
     assert actual == expected

@@ -41,8 +41,8 @@ def test_parameterized_record_query(sqlite3_conn, queries):
     actual = queries.blogs.sqlite_get_blogs_published_after(sqlite3_conn, published="2018-01-01")
 
     expected = [
-        {"title": "How to make a pie.", "username": "bobsmith", "published": "2018-11-23"},
-        {"title": "Testing", "username": "janedoe", "published": "2018-01-01"},
+        {"title": "How to make a pie.", "username": "bobsmith", "published": "2018-11-23 00:00"},
+        {"title": "Testing", "username": "janedoe", "published": "2018-01-01 00:00"},
     ]
 
     assert actual == expected

@@ -2,7 +2,7 @@
 -- Get all blogs by all authors published after the given date.
   select title,
          username,
-         published
+         to_char(published, 'YYYY-MM-DD HH24:MI') as published
     from blogs
     join users using(userid)
    where published >= :published
