@@ -47,7 +47,7 @@ def register_driver_adapter(driver_name, driver_adapter):
                     pass
 
                 @contextmanager
-                def select(self, conn, sql, parameters):
+                def select_cursor(self, conn, sql, parameters):
                     pass
 
                 def insert_update_delete(self, conn, sql, parameters):
