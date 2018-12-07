@@ -9,12 +9,13 @@ aiosql - Simple SQL in Python
 
 SQL is code, you should be able to write it, version control it, comment on it, and use it in database tools
 like ``psql`` as you would any other SQL. But, you also want to be able to use it from your python
-applications, and that's where ``aiosql`` can help. With ``aiosql`` you can organize your SQL in ``.sql``
-files and load them into a python object with methods to call.
+applications, and that's where ``aiosql`` can help. With ``aiosql`` you can organize your SQL statements in ``.sql``
+files and load them into a python object as methods to call.
 
-This project supports python versions >3.6 because it supports ``asyncio`` database drivers for SQLite and PostgreSQL
-out of the box, and can be extended to support other database types. If you are using other versions of python please
-see the related `anosql <https://github.com/honza/anosql>`_ package which this project is based on.
+This project supports standard and ``asyncio`` based drivers for SQLite (``sqlite3``, ``aiosqlite``) and PostgreSQL
+(``psycopg2``, ``asyncpg``) out of the box, and can be extended to support other database drivers by you!
+``asyncio`` support restricts this package to python versions >3.6. If you are using older versions of python
+please see the related `anosql <https://github.com/honza/anosql>`_ package which this project is based on.
 
 Contents
 ========
@@ -25,7 +26,7 @@ Contents
    Install <install>
    Getting Started <getting_started>
    Defining Queries <defining_queries>
-   Extending aiosql to additional database drivers <query_loaders>
+   Extending aiosql to additional database drivers <driver_adapters>
    API <source/modules>
 
 Quick Example
@@ -39,7 +40,7 @@ Quick Example
     -- Get all the greetings in the database
     select greeting_id, greeting from greetings;
 
-    -- name: $get-users-by-username
+    -- name: get-users-by-username
     -- Get all the users from the database,
     -- and return it as a dict
     select user_id,

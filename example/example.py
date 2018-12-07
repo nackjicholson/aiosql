@@ -62,12 +62,18 @@ def deletedb():
         db_path.unlink()
 
 
+def get_users():
+    conn = sqlite3.connect(dir_path / "exampleblog.db")
+    rows = queries.users.get_all(conn)
+    for username, firstname, lastname in rows:
+        print(username, firstname, lastname)
+
+
 def get_user_blogs(username):
     conn = sqlite3.connect(dir_path / "exampleblog.db")
-    with conn:
-        conn.row_factory = sqlite3.Row
-        records = queries.blogs.get_user_blogs(conn, username=username)
-        for rec in records:
+    conn.row_factory = sqlite3.Row
+    with queries.blogs.get_user_blogs_cursor(conn, username=username) as cur:
+        for rec in cur:
             print("------")
             print(f'"{rec["title"]}"')
             print(f"by {rec['username']} at {rec['published']}")
@@ -82,6 +88,9 @@ if __name__ == "__main__":
 
     deletedb_parser = subparsers.add_parser("deletedb")
     deletedb_parser.set_defaults(cmd=deletedb)
+
+    get_users_parser = subparsers.add_parser("get-users")
+    get_users_parser.set_defaults(cmd=get_users)
 
     get_user_blogs_parser = subparsers.add_parser("get-user-blogs")
     get_user_blogs_parser.add_argument("username")

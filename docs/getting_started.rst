@@ -6,9 +6,9 @@ Below is an example of a program which can print ``"{greeting}, {world_name}!"``
 database containing greetings and worlds.
 
 The SQL is in a ``greetings.sql`` file with ``-- name:`` definitions on each query to tell ``aiosql`` under which name
-we would like to be able to execute this code. The name ``get-all-greetings`` will be available to us afterloading as
-a method ``get_all_greetings(conn)``. Each method on an ``aiosql.Queries`` object accepts a database connec tion it can
-use in order to communicate with a database.
+we would like to be able to execute them. For example, the query under the name ``get-all-greetings`` in the example
+below will be available to us after loading via ``aiosql.from_path`` as a method ``get_all_greetings(conn)``.
+Each method on an ``aiosql.Queries`` object accepts a database connection to use in communicating with the database.
 
 .. code-block:: sql
 
@@ -25,7 +25,8 @@ use in order to communicate with a database.
      where world_name = :world_name;
 
 By specifying ``db_driver="sqlite3"`` we can use the python stdlib ``sqlite3`` driver to execute these sql queries and
-get the results.
+get the results. We're also using the ``sqlite3.Row`` type for our records to make it easy to access our data via
+their column names rather than as tuple indices.
 
 .. code-block:: python
 
