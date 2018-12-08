@@ -283,7 +283,7 @@ def load_queries_from_file(file_path, driver_adapter):
         return load_queries_from_sql(fp.read(), driver_adapter)
 
 
-def load_queries_from_dir_path(dir_path, query_loader):
+def load_queries_from_dir_path(dir_path, driver_adapter):
     if not dir_path.is_dir():
         raise ValueError(f"The path {dir_path} must be a directory")
 
@@ -293,7 +293,7 @@ def load_queries_from_dir_path(dir_path, query_loader):
             if p.is_file() and p.suffix != ".sql":
                 continue
             elif p.is_file() and p.suffix == ".sql":
-                for query_name, fn in load_queries_from_file(p, query_loader):
+                for query_name, fn in load_queries_from_file(p, driver_adapter):
                     queries.add_query(query_name, fn)
             elif p.is_dir():
                 child_name = p.relative_to(dir_path).name
