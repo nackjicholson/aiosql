@@ -1,4 +1,3 @@
-import os
 import argparse
 import sqlite3
 from pathlib import Path
@@ -10,6 +9,7 @@ dir_path = Path(__file__).parent
 sql_path = dir_path / "sql"
 db_path = dir_path / "exampleblog.db"
 queries = aiosql.from_path(dir_path / "sql", "sqlite3")
+
 
 users = [("bobsmith", "Bob", "Smith"), ("johndoe", "John", "Doe"), ("janedoe", "Jane", "Doe")]
 blogs = [
@@ -72,7 +72,6 @@ def get_users():
 def get_user_blogs(username):
     conn = sqlite3.connect(dir_path / "exampleblog.db")
     conn.row_factory = sqlite3.Row
-    help(queries.blogs.get_user_blogs)
     with queries.blogs.get_user_blogs_cursor(conn, username=username) as cur:
         for rec in cur:
             print("------")

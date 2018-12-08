@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiosql"
-version = "2.0.1"
+version = "2.0.2"
 description = "Simple SQL in Python."
 authors = ["William Vaughn <vaughnwilld@gmail.com>"]
 license = "FreeBSD"

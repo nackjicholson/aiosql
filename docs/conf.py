@@ -26,7 +26,7 @@ author = "William Vaughn"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "2.0.1"
+release = "2.0.2"
 
 
 # -- General configuration ---------------------------------------------------
@@ -79,7 +79,7 @@ html_theme = "bizstyle"
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-html_theme_options = {"rightsidebar": True}
+# html_theme_options = {"rightsidebar": True}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

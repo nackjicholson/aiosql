@@ -165,8 +165,8 @@ class Queries:
 
         """
         setattr(self, child_name, child_queries)
-        for child_name in child_queries.available_queries:
-            self._available_queries.add(f"{child_name}.{child_name}")
+        for child_query_name in child_queries.available_queries:
+            self._available_queries.add(f"{child_name}.{child_query_name}")
 
 
 def _create_fns(query_name, docs, op_type, sql, driver_adapter):
@@ -352,7 +352,7 @@ def from_path(sql_path, driver_name):
         driver_name (str): The database driver to use to load and execute queries.
 
     Returns:
-        Queries
+        Queries: Queries object.
 
     Example:
         Loading queries paths::
