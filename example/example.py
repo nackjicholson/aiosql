@@ -72,6 +72,7 @@ def get_users():
 def get_user_blogs(username):
     conn = sqlite3.connect(dir_path / "exampleblog.db")
     conn.row_factory = sqlite3.Row
+    help(queries.blogs.get_user_blogs)
     with queries.blogs.get_user_blogs_cursor(conn, username=username) as cur:
         for rec in cur:
             print("------")

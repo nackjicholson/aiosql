@@ -26,7 +26,7 @@ Contents
    Install <install>
    Getting Started <getting_started>
    Defining Queries <defining_queries>
-   Extending aiosql to additional database drivers <driver_adapters>
+   Extending aiosql <driver_adapters>
    API <source/modules>
 
 Quick Example

@@ -25,7 +25,8 @@ _ADAPTERS = {
 def register_driver_adapter(driver_name, driver_adapter):
     """Registers custom driver adapter classes to extend ``aiosql`` to to handle additional drivers.
 
-    For details on how to create a new driver adapter see the documentation `link <https://nackjiholson.github.io/aiosql>`_.
+    For details on how to create a new driver adapter see the documentation
+    `link <https://nackjiholson.github.io/aiosql>`_.
     TODO: Make a link to the documentation when it exists.
 
     Args:
@@ -185,7 +186,7 @@ def _create_fns(query_name, docs, op_type, sql, driver_adapter):
             raise ValueError(f"Unknown op_type: {op_type}")
 
     fn.__name__ = query_name
-    fn.__docs__ = docs
+    fn.__doc__ = docs
     fn.sql = sql
 
     async def aio_fn(conn, *args, **kwargs):
@@ -206,7 +207,7 @@ def _create_fns(query_name, docs, op_type, sql, driver_adapter):
             raise ValueError(f"Unknown op_type: {op_type}")
 
     aio_fn.__name__ = query_name
-    aio_fn.__docs__ = docs
+    aio_fn.__doc__ = docs
     aio_fn.sql = sql
 
     ctx_mgr_method_name = f"{query_name}_cursor"
@@ -216,7 +217,7 @@ def _create_fns(query_name, docs, op_type, sql, driver_adapter):
         return driver_adapter.select_cursor(conn, query_name, sql, parameters)
 
     ctx_mgr.__name__ = ctx_mgr_method_name
-    ctx_mgr.__docs__ = docs
+    ctx_mgr.__doc__ = docs
     ctx_mgr.sql = sql
 
     if getattr(driver_adapter, "is_aio_driver", False):
