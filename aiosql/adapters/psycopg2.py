@@ -46,7 +46,10 @@ class PsycoPG2Adapter:
         with conn.cursor() as cur:
             cur.execute(sql, parameters)
             res = cur.fetchone()
-            return res if res else None
+            if res:
+                return res[0] if len(res) == 1 else res
+            else:
+                return None
 
     @staticmethod
     def execute_script(conn, sql):

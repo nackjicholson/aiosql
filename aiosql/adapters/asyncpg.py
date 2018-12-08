@@ -86,7 +86,11 @@ class AsyncPGAdapter:
     async def insert_returning(self, conn, query_name, sql, parameters):
         parameters = self.maybe_order_params(query_name, parameters)
         async with MaybeAcquire(conn) as connection:
-            return await connection.fetchrow(sql, *parameters)
+            res = await connection.fetchrow(sql, *parameters)
+            if res:
+                return res[0] if len(res) == 1 else res
+            else:
+                return None
 
     async def insert_update_delete(self, conn, query_name, sql, parameters):
         parameters = self.maybe_order_params(query_name, parameters)
