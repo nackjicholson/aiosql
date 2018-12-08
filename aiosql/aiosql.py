@@ -335,9 +335,8 @@ def from_str(sql, driver_name):
             \"""
 
             queries = aiosql.from_str(sql_text, db_driver="sqlite3")
-            # Example usage after loading:
-            # queries.get_all_greetings(conn)
-            # queries.get_users_by_username(conn, username="willvaughn")
+            queries.get_all_greetings(conn)
+            queries.get_users_by_username(conn, username="willvaughn")
 
     """
     driver_adapter = get_driver_adapter(driver_name)
