@@ -162,69 +162,6 @@ class QueryDatum(NamedTuple):
         return QueryDatum(query_name, doc_comments, operation_type, sql, dataclass_name)
 
 
-class Queries:
-    """Container object with dynamic methods built from SQL queries.
-
-    The ``-- name`` definition comments in the SQL content determine what the dynamic
-    methods of this class will be named.
-
-    @DynamicAttrs
-    """
-
-    def __init__(self, queries=None):
-        """Queries constructor.
-
-        Args:
-            queries (list(tuple)):
-        """
-        if queries is None:
-            queries = []
-        self._available_queries = set()
-
-        for query_name, fn in queries:
-            self.add_query(query_name, fn)
-
-    @property
-    def available_queries(self):
-        """Returns listing of all the available query methods loaded in this class.
-
-        Returns:
-            list(str): List of dot-separated method accessor names.
-        """
-        return sorted(self._available_queries)
-
-    def __repr__(self):
-        return "Queries(" + self.available_queries.__repr__() + ")"
-
-    def add_query(self, query_name, fn):
-        """Adds a new dynamic method to this class.
-
-        Args:
-            query_name (str): The method name as found in the SQL content.
-            fn (function): The loaded query function.
-
-        Returns:
-
-        """
-        setattr(self, query_name, fn)
-        self._available_queries.add(query_name)
-
-    def add_child_queries(self, child_name, child_queries):
-        """Adds a Queries object as a property.
-
-        Args:
-            child_name (str): The property name to group the child queries under.
-            child_queries (Queries): Queries instance to add as sub-queries.
-
-        Returns:
-            None
-
-        """
-        setattr(self, child_name, child_queries)
-        for child_query_name in child_queries.available_queries:
-            self._available_queries.add(f"{child_name}.{child_query_name}")
-
-
 def _create_methods(query_datum: QueryDatum, driver_adapter) -> List[Tuple[str, Callable]]:
     is_aio_driver = getattr(driver_adapter, "is_aio_driver", False)
     query_name, doc_comments, operation_type, sql, _ = query_datum
@@ -327,28 +264,90 @@ def load_query_data_from_dir_path(dir_path) -> QueryDataTree:
     return _recurse_load_query_data_tree(dir_path)
 
 
-def make_queries_from_list(query_data: List[QueryDatum], driver_adapter) -> Queries:
-    queries = Queries()
+class Queries:
+    """Container object with dynamic methods built from SQL queries.
 
-    for query_datum in query_data:
-        for method_name, method_fn in _create_methods(query_datum, driver_adapter):
-            queries.add_query(method_name, method_fn)
+    The ``-- name`` definition comments in the SQL content determine what the dynamic
+    methods of this class will be named.
 
-    return queries
+    @DynamicAttrs
+    """
 
+    def __init__(self, queries=None):
+        """Queries constructor.
 
-def make_queries_from_tree(query_data_tree: QueryDataTree, driver_adapter) -> Queries:
-    queries = Queries()
+        Args:
+            queries (list(tuple)):
+        """
+        if queries is None:
+            queries = []
+        self._available_queries = set()
+        self.add_queries(queries)
 
-    for key, value in query_data_tree.items():
-        if isinstance(value, dict):
-            queries.add_child_queries(key, make_queries_from_tree(value, driver_adapter))
-        else:
-            methods = _create_methods(value, driver_adapter)
-            for method_name, method_fn in methods:
-                queries.add_query(method_name, method_fn)
+    @property
+    def available_queries(self):
+        """Returns listing of all the available query methods loaded in this class.
 
-    return queries
+        Returns:
+            list(str): List of dot-separated method accessor names.
+        """
+        return sorted(self._available_queries)
+
+    def __repr__(self):
+        return "Queries(" + self.available_queries.__repr__() + ")"
+
+    def add_query(self, query_name, fn):
+        """Adds a new dynamic method to this class.
+
+        Args:
+            query_name (str): The method name as found in the SQL content.
+            fn (function): The loaded query function.
+
+        Returns:
+
+        """
+        setattr(self, query_name, fn)
+        self._available_queries.add(query_name)
+
+    def add_queries(self, queries):
+        for query_name, fn in queries:
+            self.add_query(query_name, fn)
+
+    def add_child_queries(self, child_name, child_queries):
+        """Adds a Queries object as a property.
+
+        Args:
+            child_name (str): The property name to group the child queries under.
+            child_queries (Queries): Queries instance to add as sub-queries.
+
+        Returns:
+            None
+
+        """
+        setattr(self, child_name, child_queries)
+        for child_query_name in child_queries.available_queries:
+            self._available_queries.add(f"{child_name}.{child_query_name}")
+
+    @staticmethod
+    def from_list(query_data: List[QueryDatum], driver_adapter):
+        queries = Queries()
+
+        for query_datum in query_data:
+            queries.add_queries(_create_methods(query_datum, driver_adapter))
+
+        return queries
+
+    @staticmethod
+    def from_tree(query_data_tree: QueryDataTree, driver_adapter):
+        queries = Queries()
+
+        for key, value in query_data_tree.items():
+            if isinstance(value, dict):
+                queries.add_child_queries(key, Queries.from_tree(value, driver_adapter))
+            else:
+                queries.add_queries(_create_methods(value, driver_adapter))
+
+        return queries
 
 
 def from_str(sql, driver_name):
@@ -385,7 +384,7 @@ def from_str(sql, driver_name):
     """
     driver_adapter = get_driver_adapter(driver_name)
     query_data = load_query_data_from_sql(sql)
-    return make_queries_from_list(query_data, driver_adapter)
+    return Queries.from_list(query_data, driver_adapter)
 
 
 def from_path(sql_path, driver_name, dataclass_map=None):
@@ -418,9 +417,9 @@ def from_path(sql_path, driver_name, dataclass_map=None):
 
     if path.is_file():
         query_data = load_query_data_from_file(path)
-        return make_queries_from_list(query_data, driver_adapter)
+        return Queries.from_list(query_data, driver_adapter)
     elif path.is_dir():
         query_data_tree = load_query_data_from_dir_path(path)
-        return make_queries_from_tree(query_data_tree, driver_adapter)
+        return Queries.from_tree(query_data_tree, driver_adapter)
     else:
         raise SQLLoadException(f"The sql_path must be a directory or file, got {sql_path}")
