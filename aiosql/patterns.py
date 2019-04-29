@@ -5,6 +5,11 @@ query_name_definition_pattern = re.compile(r"--\s*name\s*:\s*")
 Pattern: Identifies name definition comments.
 """
 
+query_dataclass_definition_pattern = re.compile(r"--\s*dataclass\s*:\s*(\w+)\s*")
+"""
+Pattern: Identifies dataclass definition comments.
+"""
+
 empty_pattern = re.compile(r"^\s*$")
 """
 Pattern: Identifies empty lines.

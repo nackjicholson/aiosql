@@ -14,15 +14,23 @@ def replacer(match):
 
 
 class PsycoPG2Adapter:
+    def __init__(self, dataclass_map=None):
+        self._dataclass_map = dataclass_map if dataclass_map is not None else {}
+
     @staticmethod
     def process_sql(_query_name, _op_type, sql):
         return var_pattern.sub(replacer, sql)
 
-    @staticmethod
-    def select(conn, _query_name, sql, parameters):
+    def select(self, conn, _query_name, sql, parameters, dataclass_name=None):
         with conn.cursor() as cur:
             cur.execute(sql, parameters)
-            return cur.fetchall()
+            rows = cur.fetchall()
+        if dataclass_name is None:
+            return rows
+        else:
+            cls = self._dataclass_map[dataclass_name]
+            column_names = [c.name for c in cur.description]
+            return [cls(**dict(zip(column_names, row))) for row in rows]
 
     @staticmethod
     @contextmanager

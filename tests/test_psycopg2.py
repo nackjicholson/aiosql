@@ -1,5 +1,6 @@
 from datetime import date
 from pathlib import Path
+from typing import NamedTuple
 
 import aiosql
 import psycopg2
@@ -7,10 +8,17 @@ import psycopg2.extras
 import pytest
 
 
+class UserBlogSummary(NamedTuple):
+    title: str
+    published: date
+
+
 @pytest.fixture()
 def queries():
+    dataclass_map = {"UserBlogSummary": UserBlogSummary}
+
     dir_path = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(dir_path, "psycopg2")
+    return aiosql.from_path(dir_path, "psycopg2", dataclass_map)
 
 
 def test_record_query(pg_conn, queries):
@@ -30,6 +38,15 @@ def test_record_query(pg_conn, queries):
 def test_parameterized_query(pg_conn, queries):
     actual = queries.blogs.get_user_blogs(pg_conn, userid=1)
     expected = [("How to make a pie.", date(2018, 11, 23)), ("What I did Today", date(2017, 7, 28))]
+    assert actual == expected
+
+
+def test_dataclass_query(pg_conn, queries):
+    actual = queries.blogs.pg_get_user_blogs(pg_conn, userid=1)
+    expected = [
+        UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
+        UserBlogSummary(title="What I did Today", published=date(2017, 7, 28)),
+    ]
     assert actual == expected
 
 

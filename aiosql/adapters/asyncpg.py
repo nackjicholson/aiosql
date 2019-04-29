@@ -24,8 +24,9 @@ class MaybeAcquire:
 class AsyncPGAdapter:
     is_aio_driver = True
 
-    def __init__(self):
+    def __init__(self, dataclass_map=None):
         self.var_replacements = defaultdict(dict)
+        self._dataclass_map = dataclass_map if dataclass_map is not None else {}
 
     def process_sql(self, query_name, _op_type, sql):
         count = 0
