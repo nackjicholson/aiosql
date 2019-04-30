@@ -41,12 +41,14 @@ def test_parameterized_query(pg_conn, queries):
     assert actual == expected
 
 
-def test_dataclass_query(pg_conn, queries):
+def test_row_class_query(pg_conn, queries):
     actual = queries.blogs.pg_get_user_blogs(pg_conn, userid=1)
     expected = [
         UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
         UserBlogSummary(title="What I did Today", published=date(2017, 7, 28)),
     ]
+
+    assert all(isinstance(row, UserBlogSummary) for row in actual)
     assert actual == expected
 
 

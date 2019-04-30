@@ -2,9 +2,6 @@ from contextlib import contextmanager
 
 
 class SQLite3DriverAdapter:
-    def __init__(self, dataclass_map=None):
-        self._dataclass_map = dataclass_map if dataclass_map is not None else {}
-
     @staticmethod
     def process_sql(_query_name, _op_type, sql):
         """Pass through function because the ``sqlite3`` driver already handles the :var_name
@@ -22,7 +19,7 @@ class SQLite3DriverAdapter:
         return sql
 
     @staticmethod
-    def select(conn, _query_name, sql, parameters):
+    def select(conn, _query_name, sql, parameters, _row_class=None):
         cur = conn.cursor()
         cur.execute(sql, parameters)
         results = cur.fetchall()

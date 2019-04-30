@@ -24,9 +24,8 @@ class MaybeAcquire:
 class AsyncPGAdapter:
     is_aio_driver = True
 
-    def __init__(self, dataclass_map=None):
+    def __init__(self):
         self.var_replacements = defaultdict(dict)
-        self._dataclass_map = dataclass_map if dataclass_map is not None else {}
 
     def process_sql(self, query_name, _op_type, sql):
         count = 0
@@ -71,7 +70,7 @@ class AsyncPGAdapter:
         else:
             raise ValueError(f"Parameters expected to be dict or tuple, received {parameters}")
 
-    async def select(self, conn, query_name, sql, parameters):
+    async def select(self, conn, query_name, sql, parameters, _row_class=None):
         parameters = self.maybe_order_params(query_name, parameters)
         async with MaybeAcquire(conn) as connection:
             return await connection.fetch(sql, *parameters)

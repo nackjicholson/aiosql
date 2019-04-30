@@ -1,7 +1,7 @@
 from pathlib import Path
 from enum import Enum
 from types import MethodType
-from typing import List, NamedTuple, Dict, Union, Callable, Tuple
+from typing import List, NamedTuple, Dict, Union, Callable, Tuple, Any, Optional
 
 from .adapters.aiosqlite import AioSQLiteAdapter
 from .adapters.asyncpg import AsyncPGAdapter
@@ -10,7 +10,7 @@ from .adapters.sqlite3 import SQLite3DriverAdapter
 from .exceptions import SQLLoadException, SQLParseException
 from .patterns import (
     query_name_definition_pattern,
-    query_dataclass_definition_pattern,
+    query_row_class_definition_pattern,
     empty_pattern,
     doc_comment_pattern,
     valid_query_name_pattern,
@@ -25,76 +25,22 @@ _ADAPTERS = {
 }
 
 
-def register_driver_adapter(driver_name, driver_adapter):
-    """Registers custom driver adapter classes to extend ``aiosql`` to to handle additional drivers.
-
-    For details on how to create a new driver adapter see the documentation
-    `link <https://nackjiholson.github.io/aiosql>`_.
-
-    Args:
-        driver_name (str): The driver type name.
-        driver_adapter (callable): Either n class or function which creates an instance of a
-                                   driver adapter.
-
-    Returns:
-        None
-
-    Examples:
-        To register a new loader::
-
-            class MyDbAdapter():
-                def process_sql(self, name, op_type, sql):
-                    pass
-
-                def select(self, conn, sql, parameters):
-                    pass
-
-                @contextmanager
-                def select_cursor(self, conn, sql, parameters):
-                    pass
-
-                def insert_update_delete(self, conn, sql, parameters):
-                    pass
-
-                def insert_update_delete_many(self, conn, sql, parameters):
-                    pass
-
-                def insert_returning(self, conn, sql, parameters):
-                    pass
-
-                def execute_script(self, conn, sql):
-                    pass
-
-
-            aiosql.register_driver_adapter("mydb", MyDbAdapter)
-
-        If your adapter constructor takes arguments you can register a function which can build
-        your adapter instance::
-
-            def adapter_factory():
-                return MyDbAdapter("foo", 42)
-
-            aiosql.register_driver_adapter("mydb", adapter_factory)
-
-    """
-    _ADAPTERS[driver_name] = driver_adapter
-
-
-def get_driver_adapter(driver_name, dataclass_map):
+def make_driver_adapter(driver_adapter: Union[str, Any]):
     """Get the driver adapter instance registered by the ``driver_name``.
 
     Args:
-        driver_name (str): The database driver name.
+        driver_adapter (str|Any): The database driver name.
 
     Returns:
         object: A driver adapter class.
     """
-    try:
-        driver_adapter = _ADAPTERS[driver_name]
-    except KeyError:
-        raise ValueError(f"Encountered unregistered driver_name: {driver_name}")
+    if isinstance(driver_adapter, str):
+        try:
+            driver_adapter = _ADAPTERS[driver_adapter]
+        except KeyError:
+            raise ValueError(f"Encountered unregistered driver_adapter: {driver_adapter}")
 
-    return driver_adapter(dataclass_map)
+    return driver_adapter()
 
 
 class SQLOperationType(Enum):
@@ -113,93 +59,50 @@ class QueryDatum(NamedTuple):
     doc_comments: str
     operation_type: SQLOperationType
     sql: str
-    dataclass_name: str = None
-
-    @staticmethod
-    def from_sql_str(query_str: str):
-        lines = query_str.strip().splitlines()
-        query_name = lines[0].replace("-", "_")
-
-        if query_name.endswith("<!"):
-            operation_type = SQLOperationType.INSERT_RETURNING
-            query_name = query_name[:-2]
-        elif query_name.endswith("*!"):
-            operation_type = SQLOperationType.INSERT_UPDATE_DELETE_MANY
-            query_name = query_name[:-2]
-        elif query_name.endswith("!"):
-            operation_type = SQLOperationType.INSERT_UPDATE_DELETE
-            query_name = query_name[:-1]
-        elif query_name.endswith("#"):
-            operation_type = SQLOperationType.SCRIPT
-            query_name = query_name[:-1]
-        else:
-            operation_type = SQLOperationType.SELECT
-
-        if not valid_query_name_pattern.match(query_name):
-            raise SQLParseException(
-                f'name must convert to valid python variable, got "{query_name}".'
-            )
-
-        # check if line 1 is dataset, if it is make a dataset name, else it's None?
-        dataclass_match = query_dataclass_definition_pattern.match(lines[1])
-        if dataclass_match:
-            line_offset = 2
-            dataclass_name = dataclass_match.group(1)
-        else:
-            line_offset = 1
-            dataclass_name = None
-
-        doc_comments = ""
-        sql = ""
-        for line in lines[line_offset:]:
-            doc_match = doc_comment_pattern.match(line)
-            if doc_match:
-                doc_comments += doc_match.group(1) + "\n"
-            else:
-                sql += line + "\n"
-
-        doc_comments = doc_comments.strip()
-        return QueryDatum(query_name, doc_comments, operation_type, sql, dataclass_name)
+    row_class: Any = None
 
 
-def _create_methods(query_datum: QueryDatum, driver_adapter) -> List[Tuple[str, Callable]]:
-    is_aio_driver = getattr(driver_adapter, "is_aio_driver", False)
-    query_name, doc_comments, operation_type, sql, _ = query_datum
-    sql = driver_adapter.process_sql(query_name, operation_type, sql)
+def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Callable]]:
+    query_name, doc_comments, operation_type, sql, row_class = query_datum
+    # sql = driver_adapter.process_sql(query_name, operation_type, sql)
 
-    if is_aio_driver:
+    if is_aio:
 
-        async def fn(conn, *args, **kwargs):
+        async def fn(self, conn, *args, **kwargs):
             parameters = kwargs if len(kwargs) > 0 else args
             if operation_type == SQLOperationType.INSERT_RETURNING:
-                return await driver_adapter.insert_returning(conn, query_name, sql, parameters)
+                return await self.driver_adapter.insert_returning(conn, query_name, sql, parameters)
             elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE:
-                return await driver_adapter.insert_update_delete(conn, query_name, sql, parameters)
+                return await self.driver_adapter.insert_update_delete(
+                    conn, query_name, sql, parameters
+                )
             elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
-                return await driver_adapter.insert_update_delete_many(
+                return await self.driver_adapter.insert_update_delete_many(
                     conn, query_name, sql, *parameters
                 )
             elif operation_type == SQLOperationType.SCRIPT:
-                return await driver_adapter.execute_script(conn, sql)
+                return await self.driver_adapter.execute_script(conn, sql)
             elif operation_type == SQLOperationType.SELECT:
-                return await driver_adapter.select(conn, query_name, sql, parameters)
+                return await self.driver_adapter.select(conn, query_name, sql, parameters)
             else:
                 raise ValueError(f"Unknown op_type: {operation_type}")
 
     else:
 
-        def fn(conn, *args, **kwargs):
+        def fn(self, conn, *args, **kwargs):
             parameters = kwargs if len(kwargs) > 0 else args
             if operation_type == SQLOperationType.INSERT_RETURNING:
-                return driver_adapter.insert_returning(conn, query_name, sql, parameters)
+                return self.driver_adapter.insert_returning(conn, query_name, sql, parameters)
             elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE:
-                return driver_adapter.insert_update_delete(conn, query_name, sql, parameters)
+                return self.driver_adapter.insert_update_delete(conn, query_name, sql, parameters)
             elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
-                return driver_adapter.insert_update_delete_many(conn, query_name, sql, *parameters)
+                return self.driver_adapter.insert_update_delete_many(
+                    conn, query_name, sql, *parameters
+                )
             elif operation_type == SQLOperationType.SCRIPT:
-                return driver_adapter.execute_script(conn, sql)
+                return self.driver_adapter.execute_script(conn, sql)
             elif operation_type == SQLOperationType.SELECT:
-                return driver_adapter.select(conn, query_name, sql, parameters)
+                return self.driver_adapter.select(conn, query_name, sql, parameters, row_class)
             else:
                 raise ValueError(f"Unknown op_type: {operation_type}")
 
@@ -209,9 +112,9 @@ def _create_methods(query_datum: QueryDatum, driver_adapter) -> List[Tuple[str, 
 
     ctx_mgr_method_name = f"{query_name}_cursor"
 
-    def ctx_mgr(conn, *args, **kwargs):
+    def ctx_mgr(self, conn, *args, **kwargs):
         parameters = kwargs if len(kwargs) > 0 else args
-        return driver_adapter.select_cursor(conn, query_name, sql, parameters)
+        return self.driver_adapter.select_cursor(conn, query_name, sql, parameters)
 
     ctx_mgr.__name__ = ctx_mgr_method_name
     ctx_mgr.__doc__ = doc_comments
@@ -264,6 +167,94 @@ def load_query_data_from_dir_path(dir_path) -> QueryDataTree:
     return _recurse_load_query_data_tree(dir_path)
 
 
+class QueryParser:
+    def __init__(self, driver_adapter, row_classes: Optional[Dict]):
+        self.driver_adapter = driver_adapter
+        self.row_classes = row_classes if row_classes is not None else {}
+
+    def _make_query_datum(self, query_str: str):
+        lines = query_str.strip().splitlines()
+        query_name = lines[0].replace("-", "_")
+
+        if query_name.endswith("<!"):
+            operation_type = SQLOperationType.INSERT_RETURNING
+            query_name = query_name[:-2]
+        elif query_name.endswith("*!"):
+            operation_type = SQLOperationType.INSERT_UPDATE_DELETE_MANY
+            query_name = query_name[:-2]
+        elif query_name.endswith("!"):
+            operation_type = SQLOperationType.INSERT_UPDATE_DELETE
+            query_name = query_name[:-1]
+        elif query_name.endswith("#"):
+            operation_type = SQLOperationType.SCRIPT
+            query_name = query_name[:-1]
+        else:
+            operation_type = SQLOperationType.SELECT
+
+        if not valid_query_name_pattern.match(query_name):
+            raise SQLParseException(
+                f'name must convert to valid python variable, got "{query_name}".'
+            )
+
+        row_class_match = query_row_class_definition_pattern.match(lines[1])
+        if row_class_match:
+            line_offset = 2
+            row_class_name = row_class_match.group(1)
+        else:
+            line_offset = 1
+            row_class_name = None
+
+        doc_comments = ""
+        sql = ""
+        for line in lines[line_offset:]:
+            doc_match = doc_comment_pattern.match(line)
+            if doc_match:
+                doc_comments += doc_match.group(1) + "\n"
+            else:
+                sql += line + "\n"
+
+        doc_comments = doc_comments.strip()
+        sql = self.driver_adapter.process_sql(query_name, operation_type, sql)
+        row_class = self.row_classes.get(row_class_name)
+
+        return QueryDatum(query_name, doc_comments, operation_type, sql, row_class)
+
+    def load_query_data_from_sql(self, sql: str) -> List[QueryDatum]:
+        query_data = []
+        for query_sql_str in query_name_definition_pattern.split(sql):
+            if not empty_pattern.match(query_sql_str):
+                query_data.append(self._make_query_datum(query_sql_str))
+        return query_data
+
+    def load_query_data_from_file(self, file_path: Path) -> List[QueryDatum]:
+        with file_path.open() as fp:
+            return self.load_query_data_from_sql(fp.read())
+
+    def load_query_data_from_dir_path(self, dir_path) -> QueryDataTree:
+        if not dir_path.is_dir():
+            raise ValueError(f"The path {dir_path} must be a directory")
+
+        def _recurse_load_query_data_tree(path):
+            # queries = Queries()
+            query_data_tree = {}
+            for p in path.iterdir():
+                if p.is_file() and p.suffix != ".sql":
+                    continue
+                elif p.is_file() and p.suffix == ".sql":
+                    for query_datum in self.load_query_data_from_file(p):
+                        query_data_tree[query_datum.query_name] = query_datum
+                elif p.is_dir():
+                    child_name = p.relative_to(dir_path).name
+                    child_query_data_tree = _recurse_load_query_data_tree(p)
+                    query_data_tree[child_name] = child_query_data_tree
+                else:
+                    # This should be practically unreachable.
+                    raise SQLLoadException(f"The path must be a directory or file, got {p}")
+            return query_data_tree
+
+        return _recurse_load_query_data_tree(dir_path)
+
+
 class Queries:
     """Container object with dynamic methods built from SQL queries.
 
@@ -273,16 +264,15 @@ class Queries:
     @DynamicAttrs
     """
 
-    def __init__(self, queries=None):
+    def __init__(self, driver_adapter):
         """Queries constructor.
 
         Args:
-            queries (list(tuple)):
+            driver_adapter (object):
         """
-        if queries is None:
-            queries = []
+        self.driver_adapter = driver_adapter
+        self.is_aio = getattr(driver_adapter, "is_aio_driver", False)
         self._available_queries = set()
-        self.add_queries(queries)
 
     @property
     def available_queries(self):
@@ -311,7 +301,7 @@ class Queries:
 
     def add_queries(self, queries):
         for query_name, fn in queries:
-            self.add_query(query_name, fn)
+            self.add_query(query_name, MethodType(fn, self))
 
     def add_child_queries(self, child_name, child_queries):
         """Adds a Queries object as a property.
@@ -328,34 +318,27 @@ class Queries:
         for child_query_name in child_queries.available_queries:
             self._available_queries.add(f"{child_name}.{child_query_name}")
 
-    @staticmethod
-    def from_list(query_data: List[QueryDatum], driver_adapter):
-        queries = Queries()
-
+    def load_from_list(self, query_data: List[QueryDatum], driver_adapter):
         for query_datum in query_data:
-            queries.add_queries(_create_methods(query_datum, driver_adapter))
+            self.add_queries(_create_methods(query_datum, driver_adapter))
+        return self
 
-        return queries
-
-    @staticmethod
-    def from_tree(query_data_tree: QueryDataTree, driver_adapter):
-        queries = Queries()
-
+    def load_from_tree(self, query_data_tree: QueryDataTree):
         for key, value in query_data_tree.items():
             if isinstance(value, dict):
-                queries.add_child_queries(key, Queries.from_tree(value, driver_adapter))
+                self.add_child_queries(key, Queries(self.driver_adapter).load_from_tree(value))
             else:
-                queries.add_queries(_create_methods(value, driver_adapter))
+                self.add_queries(_create_methods(value, self.is_aio))
+        return self
 
-        return queries
 
-
-def from_str(sql, driver_name):
+def from_str(sql, driver_adapter, row_classes=None):
     """Load queries from a SQL string.
 
     Args:
         sql (str) A string containing SQL statements and aiosql name:
-        driver_name (str): The database driver to use to load and execute queries.
+        driver_adapter (str|Any): The database driver to use to load and execute queries.
+        row_classes (dict|None):
 
     Returns:
         Queries
@@ -382,18 +365,21 @@ def from_str(sql, driver_name):
             queries.get_users_by_username(conn, username="willvaughn")
 
     """
-    driver_adapter = get_driver_adapter(driver_name)
-    query_data = load_query_data_from_sql(sql)
-    return Queries.from_list(query_data, driver_adapter)
+    driver_adapter = make_driver_adapter(driver_adapter)
+    query_parser = QueryParser(driver_adapter, row_classes)
+    query_data = query_parser.load_query_data_from_sql(sql)
+    return Queries(driver_adapter).load_from_list(query_data)
 
 
-def from_path(sql_path, driver_name, dataclass_map=None):
+def from_path(
+    sql_path: Union[str, Path], driver_adapter: Union[str, Any], row_classes: Optional[Dict] = None
+):
     """Load queries from a sql file, or a directory of sql files.
 
     Args:
         sql_path (str|Path): Path to a ``.sql`` file or directory containing ``.sql`` files.
-        driver_name (str): The database driver to use to load and execute queries.
-        dataclass_map (dict|None):
+        driver_adapter (str|Any): The database driver to use to load and execute queries.
+        row_classes (dict|None):
 
     Returns:
         Queries: Queries object.
@@ -413,13 +399,14 @@ def from_path(sql_path, driver_name, dataclass_map=None):
     if not path.exists():
         raise SQLLoadException(f"File does not exist: {path}")
 
-    driver_adapter = get_driver_adapter(driver_name, dataclass_map)
+    driver_adapter = make_driver_adapter(driver_adapter)
+    query_parser = QueryParser(driver_adapter, row_classes)
 
     if path.is_file():
-        query_data = load_query_data_from_file(path)
-        return Queries.from_list(query_data, driver_adapter)
+        query_data = query_parser.load_query_data_from_file(path)
+        return Queries(driver_adapter).load_from_list(query_data)
     elif path.is_dir():
-        query_data_tree = load_query_data_from_dir_path(path)
-        return Queries.from_tree(query_data_tree, driver_adapter)
+        query_data_tree = query_parser.load_query_data_from_dir_path(path)
+        return Queries(driver_adapter).load_from_tree(query_data_tree)
     else:
         raise SQLLoadException(f"The sql_path must be a directory or file, got {sql_path}")

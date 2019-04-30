@@ -41,7 +41,7 @@ values (
 )
 
 -- name: pg-get-user-blogs
--- dataclass: UserBlogSummary
+-- row_class: UserBlogSummary
 -- Get blogs authored by a user.
   select title,
          published

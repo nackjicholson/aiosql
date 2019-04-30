@@ -4,9 +4,6 @@ from ..aioctxlib import aiocontextmanager
 class AioSQLiteAdapter:
     is_aio_driver = True
 
-    def __init__(self, dataclass_map=None):
-        self._dataclass_map = dataclass_map if dataclass_map is not None else {}
-
     @staticmethod
     def process_sql(_query_name, _op_type, sql):
         """Pass through function because the ``aiosqlite`` driver can already handle the
@@ -23,7 +20,7 @@ class AioSQLiteAdapter:
         return sql
 
     @staticmethod
-    async def select(conn, _query_name, sql, parameters):
+    async def select(conn, _query_name, sql, parameters, _row_class=None):
         async with conn.execute(sql, parameters) as cur:
             return await cur.fetchall()
 
