@@ -13,13 +13,13 @@ class UserBlogSummary(NamedTuple):
     published: date
 
 
-ROW_CLASSES = {"UserBlogSummary": UserBlogSummary}
+RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 
 
 @pytest.fixture()
 def queries():
     dir_path = Path(__file__).parent / "blogdb/sql"
-    return aiosql.from_path(dir_path, "asyncpg", ROW_CLASSES)
+    return aiosql.from_path(dir_path, "asyncpg", RECORD_CLASSES)
 
 
 @pytest.mark.asyncio
@@ -63,7 +63,7 @@ async def test_parameterized_record_query(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
-async def test_row_class_query(pg_dsn, queries):
+async def test_record_class_query(pg_dsn, queries):
     conn = await asyncpg.connect(pg_dsn)
     actual = await queries.blogs.get_user_blogs(conn, userid=1)
     await conn.close()

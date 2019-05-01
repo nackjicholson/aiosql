@@ -2,6 +2,16 @@
 -- Get all user records
 select * from users;
 
+
+-- name: get-by-username^
+select userid,
+       username,
+       firstname,
+       lastname
+  from users
+ where username = :username;
+
+
 -- name: get-by-lastname
   select userid,
          username,

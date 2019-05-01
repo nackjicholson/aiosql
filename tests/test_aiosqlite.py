@@ -12,13 +12,13 @@ class UserBlogSummary(NamedTuple):
     published: str
 
 
-ROW_CLASSES = {"UserBlogSummary": UserBlogSummary}
+RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 
 
 @pytest.fixture()
 def queries():
     dir_path = Path(__file__).parent / "blogdb/sql"
-    return aiosql.from_path(dir_path, "aiosqlite", ROW_CLASSES)
+    return aiosql.from_path(dir_path, "aiosqlite", RECORD_CLASSES)
 
 
 def dict_factory(cursor, row):
@@ -70,7 +70,7 @@ async def test_parameterized_record_query(sqlite3_db_path, queries):
 
 
 @pytest.mark.asyncio
-async def test_row_class_query(sqlite3_db_path, queries):
+async def test_record_class_query(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
         actual = await queries.blogs.get_user_blogs(conn, userid=1)
         expected = [

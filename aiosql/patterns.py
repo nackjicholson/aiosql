@@ -5,9 +5,9 @@ query_name_definition_pattern = re.compile(r"--\s*name\s*:\s*")
 Pattern: Identifies name definition comments.
 """
 
-query_row_class_definition_pattern = re.compile(r"--\s*row_class\s*:\s*(\w+)\s*")
+query_record_class_definition_pattern = re.compile(r"--\s*record_class\s*:\s*(\w+)\s*")
 """
-Pattern: Identifies row_class definition comments.
+Pattern: Identifies record_class definition comments.
 """
 
 empty_pattern = re.compile(r"^\s*$")

@@ -10,7 +10,7 @@ class UserBlogSummary(NamedTuple):
     published: str
 
 
-ROW_CLASSES = {"UserBlogSummary": UserBlogSummary}
+RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 
 
 def dict_factory(cursor, row):
@@ -23,7 +23,7 @@ def dict_factory(cursor, row):
 @pytest.fixture()
 def queries():
     p = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(p, "sqlite3", ROW_CLASSES)
+    return aiosql.from_path(p, "sqlite3", RECORD_CLASSES)
 
 
 def test_record_query(sqlite3_conn, queries):
@@ -57,7 +57,7 @@ def test_parameterized_record_query(sqlite3_conn, queries):
     assert actual == expected
 
 
-def test_row_class_query(sqlite3_conn, queries):
+def test_record_class_query(sqlite3_conn, queries):
     actual = queries.blogs.get_user_blogs(sqlite3_conn, userid=1)
     expected = [
         UserBlogSummary(title="How to make a pie.", published="2018-11-23"),

@@ -13,13 +13,13 @@ class UserBlogSummary(NamedTuple):
     published: date
 
 
-ROW_CLASSES = {"UserBlogSummary": UserBlogSummary}
+RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 
 
 @pytest.fixture()
 def queries():
     dir_path = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(dir_path, "psycopg2", ROW_CLASSES)
+    return aiosql.from_path(dir_path, "psycopg2", RECORD_CLASSES)
 
 
 def test_record_query(pg_conn, queries):
@@ -55,7 +55,7 @@ def test_parameterized_record_query(pg_conn, queries):
     assert actual == expected
 
 
-def test_row_class_query(pg_conn, queries):
+def test_record_class_query(pg_conn, queries):
     actual = queries.blogs.get_user_blogs(pg_conn, userid=1)
     expected = [
         UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
@@ -74,6 +74,10 @@ def test_select_cursor_context_manager(pg_conn, queries):
             ("What I did Today", date(2017, 7, 28)),
         ]
         assert actual == expected
+
+
+def test_select_one():
+    pass
 
 
 def test_insert_returning(pg_conn, queries):

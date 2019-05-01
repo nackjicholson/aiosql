@@ -19,16 +19,15 @@ class PsycoPG2Adapter:
         return var_pattern.sub(replacer, sql)
 
     @staticmethod
-    def select(conn, _query_name, sql, parameters, row_class=None):
+    def select(conn, _query_name, sql, parameters, record_class=None):
         with conn.cursor() as cur:
             cur.execute(sql, parameters)
             rows = cur.fetchall()
-        if row_class is None:
+        if record_class is None:
             return rows
         else:
-            # cls = self._dataclass_map[row_class]
             column_names = [c.name for c in cur.description]
-            return [row_class(**dict(zip(column_names, row))) for row in rows]
+            return [record_class(**dict(zip(column_names, row))) for row in rows]
 
     @staticmethod
     @contextmanager

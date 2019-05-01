@@ -10,7 +10,7 @@ from .adapters.sqlite3 import SQLite3DriverAdapter
 from .exceptions import SQLLoadException, SQLParseException
 from .patterns import (
     query_name_definition_pattern,
-    query_row_class_definition_pattern,
+    query_record_class_definition_pattern,
     empty_pattern,
     doc_comment_pattern,
     valid_query_name_pattern,
@@ -59,11 +59,11 @@ class QueryDatum(NamedTuple):
     doc_comments: str
     operation_type: SQLOperationType
     sql: str
-    row_class: Any = None
+    record_class: Any = None
 
 
 def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Callable]]:
-    query_name, doc_comments, operation_type, sql, row_class = query_datum
+    query_name, doc_comments, operation_type, sql, record_class = query_datum
 
     if is_aio:
 
@@ -83,7 +83,7 @@ def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Cal
                 return await self.driver_adapter.execute_script(conn, sql)
             elif operation_type == SQLOperationType.SELECT:
                 return await self.driver_adapter.select(
-                    conn, query_name, sql, parameters, row_class
+                    conn, query_name, sql, parameters, record_class
                 )
             else:
                 raise ValueError(f"Unknown op_type: {operation_type}")
@@ -103,7 +103,7 @@ def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Cal
             elif operation_type == SQLOperationType.SCRIPT:
                 return self.driver_adapter.execute_script(conn, sql)
             elif operation_type == SQLOperationType.SELECT:
-                return self.driver_adapter.select(conn, query_name, sql, parameters, row_class)
+                return self.driver_adapter.select(conn, query_name, sql, parameters, record_class)
             else:
                 raise ValueError(f"Unknown op_type: {operation_type}")
 
@@ -169,9 +169,9 @@ def load_query_data_from_dir_path(dir_path) -> QueryDataTree:
 
 
 class QueryParser:
-    def __init__(self, driver_adapter, row_classes: Optional[Dict]):
+    def __init__(self, driver_adapter, record_classes: Optional[Dict]):
         self.driver_adapter = driver_adapter
-        self.row_classes = row_classes if row_classes is not None else {}
+        self.record_classes = record_classes if record_classes is not None else {}
 
     def _make_query_datum(self, query_str: str):
         lines = query_str.strip().splitlines()
@@ -197,13 +197,13 @@ class QueryParser:
                 f'name must convert to valid python variable, got "{query_name}".'
             )
 
-        row_class_match = query_row_class_definition_pattern.match(lines[1])
-        if row_class_match:
+        record_class_match = query_record_class_definition_pattern.match(lines[1])
+        if record_class_match:
             line_offset = 2
-            row_class_name = row_class_match.group(1)
+            record_class_name = record_class_match.group(1)
         else:
             line_offset = 1
-            row_class_name = None
+            record_class_name = None
 
         doc_comments = ""
         sql = ""
@@ -216,9 +216,9 @@ class QueryParser:
 
         doc_comments = doc_comments.strip()
         sql = self.driver_adapter.process_sql(query_name, operation_type, sql)
-        row_class = self.row_classes.get(row_class_name)
+        record_class = self.record_classes.get(record_class_name)
 
-        return QueryDatum(query_name, doc_comments, operation_type, sql, row_class)
+        return QueryDatum(query_name, doc_comments, operation_type, sql, record_class)
 
     def load_query_data_from_sql(self, sql: str) -> List[QueryDatum]:
         query_data = []
@@ -333,13 +333,13 @@ class Queries:
         return self
 
 
-def from_str(sql, driver_adapter, row_classes=None):
+def from_str(sql, driver_adapter, record_classes=None):
     """Load queries from a SQL string.
 
     Args:
         sql (str) A string containing SQL statements and aiosql name:
         driver_adapter (str|Any): The database driver to use to load and execute queries.
-        row_classes (dict|None):
+        record_classes (dict|None):
 
     Returns:
         Queries
@@ -367,20 +367,22 @@ def from_str(sql, driver_adapter, row_classes=None):
 
     """
     driver_adapter = make_driver_adapter(driver_adapter)
-    query_parser = QueryParser(driver_adapter, row_classes)
+    query_parser = QueryParser(driver_adapter, record_classes)
     query_data = query_parser.load_query_data_from_sql(sql)
     return Queries(driver_adapter).load_from_list(query_data)
 
 
 def from_path(
-    sql_path: Union[str, Path], driver_adapter: Union[str, Any], row_classes: Optional[Dict] = None
+    sql_path: Union[str, Path],
+    driver_adapter: Union[str, Any],
+    record_classes: Optional[Dict] = None,
 ):
     """Load queries from a sql file, or a directory of sql files.
 
     Args:
         sql_path (str|Path): Path to a ``.sql`` file or directory containing ``.sql`` files.
         driver_adapter (str|Any): The database driver to use to load and execute queries.
-        row_classes (dict|None):
+        record_classes (dict|None):
 
     Returns:
         Queries: Queries object.
@@ -401,7 +403,7 @@ def from_path(
         raise SQLLoadException(f"File does not exist: {path}")
 
     driver_adapter = make_driver_adapter(driver_adapter)
-    query_parser = QueryParser(driver_adapter, row_classes)
+    query_parser = QueryParser(driver_adapter, record_classes)
 
     if path.is_file():
         query_data = query_parser.load_query_data_from_file(path)
