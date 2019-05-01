@@ -1,15 +1,24 @@
 import asyncio
 from pathlib import Path
+from typing import NamedTuple
 
 import aiosql
 import aiosqlite
 import pytest
 
 
+class UserBlogSummary(NamedTuple):
+    title: str
+    published: str
+
+
+ROW_CLASSES = {"UserBlogSummary": UserBlogSummary}
+
+
 @pytest.fixture()
 def queries():
     dir_path = Path(__file__).parent / "blogdb/sql"
-    return aiosql.from_path(dir_path, "aiosqlite")
+    return aiosql.from_path(dir_path, "aiosqlite", ROW_CLASSES)
 
 
 def dict_factory(cursor, row):
@@ -57,6 +66,19 @@ async def test_parameterized_record_query(sqlite3_db_path, queries):
             {"title": "Testing", "username": "janedoe", "published": "2018-01-01 00:00"},
         ]
 
+        assert actual == expected
+
+
+@pytest.mark.asyncio
+async def test_row_class_query(sqlite3_db_path, queries):
+    async with aiosqlite.connect(sqlite3_db_path) as conn:
+        actual = await queries.blogs.get_user_blogs(conn, userid=1)
+        expected = [
+            UserBlogSummary(title="How to make a pie.", published="2018-11-23"),
+            UserBlogSummary(title="What I did Today", published="2017-07-28"),
+        ]
+
+        assert all(isinstance(row, UserBlogSummary) for row in actual)
         assert actual == expected
 
 

@@ -38,13 +38,5 @@ values (
   :title,
   :content,
   :published
-)
+);
 
--- name: pg-get-user-blogs
--- row_class: UserBlogSummary
--- Get blogs authored by a user.
-  select title,
-         published
-    from blogs
-   where userid = :userid
-order by published desc;

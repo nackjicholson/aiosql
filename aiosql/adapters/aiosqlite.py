@@ -20,9 +20,13 @@ class AioSQLiteAdapter:
         return sql
 
     @staticmethod
-    async def select(conn, _query_name, sql, parameters, _row_class=None):
+    async def select(conn, _query_name, sql, parameters, row_class=None):
         async with conn.execute(sql, parameters) as cur:
-            return await cur.fetchall()
+            results = await cur.fetchall()
+            if row_class is not None:
+                column_names = [c[0] for c in cur.description]
+                results = [row_class(**dict(zip(column_names, row))) for row in results]
+            return results
 
     @staticmethod
     @aiocontextmanager

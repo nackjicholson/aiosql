@@ -64,7 +64,6 @@ class QueryDatum(NamedTuple):
 
 def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Callable]]:
     query_name, doc_comments, operation_type, sql, row_class = query_datum
-    # sql = driver_adapter.process_sql(query_name, operation_type, sql)
 
     if is_aio:
 
@@ -83,7 +82,9 @@ def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Cal
             elif operation_type == SQLOperationType.SCRIPT:
                 return await self.driver_adapter.execute_script(conn, sql)
             elif operation_type == SQLOperationType.SELECT:
-                return await self.driver_adapter.select(conn, query_name, sql, parameters)
+                return await self.driver_adapter.select(
+                    conn, query_name, sql, parameters, row_class
+                )
             else:
                 raise ValueError(f"Unknown op_type: {operation_type}")
 

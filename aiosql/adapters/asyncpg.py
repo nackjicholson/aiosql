@@ -70,10 +70,13 @@ class AsyncPGAdapter:
         else:
             raise ValueError(f"Parameters expected to be dict or tuple, received {parameters}")
 
-    async def select(self, conn, query_name, sql, parameters, _row_class=None):
+    async def select(self, conn, query_name, sql, parameters, row_class=None):
         parameters = self.maybe_order_params(query_name, parameters)
         async with MaybeAcquire(conn) as connection:
-            return await connection.fetch(sql, *parameters)
+            results = await connection.fetch(sql, *parameters)
+            if row_class is not None:
+                results = [row_class(**dict(rec)) for rec in results]
+            return results
 
     @aiocontextmanager
     async def select_cursor(self, conn, query_name, sql, parameters):

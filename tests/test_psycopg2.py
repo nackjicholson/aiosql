@@ -13,12 +13,13 @@ class UserBlogSummary(NamedTuple):
     published: date
 
 
+ROW_CLASSES = {"UserBlogSummary": UserBlogSummary}
+
+
 @pytest.fixture()
 def queries():
-    dataclass_map = {"UserBlogSummary": UserBlogSummary}
-
     dir_path = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(dir_path, "psycopg2", dataclass_map)
+    return aiosql.from_path(dir_path, "psycopg2", ROW_CLASSES)
 
 
 def test_record_query(pg_conn, queries):
@@ -36,19 +37,8 @@ def test_record_query(pg_conn, queries):
 
 
 def test_parameterized_query(pg_conn, queries):
-    actual = queries.blogs.get_user_blogs(pg_conn, userid=1)
-    expected = [("How to make a pie.", date(2018, 11, 23)), ("What I did Today", date(2017, 7, 28))]
-    assert actual == expected
-
-
-def test_row_class_query(pg_conn, queries):
-    actual = queries.blogs.pg_get_user_blogs(pg_conn, userid=1)
-    expected = [
-        UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
-        UserBlogSummary(title="What I did Today", published=date(2017, 7, 28)),
-    ]
-
-    assert all(isinstance(row, UserBlogSummary) for row in actual)
+    actual = queries.users.get_by_lastname(pg_conn, lastname="Doe")
+    expected = [(3, "janedoe", "Jane", "Doe"), (2, "johndoe", "John", "Doe")]
     assert actual == expected
 
 
@@ -62,6 +52,17 @@ def test_parameterized_record_query(pg_conn, queries):
         {"title": "Testing", "username": "janedoe", "published": "2018-01-01 00:00"},
     ]
 
+    assert actual == expected
+
+
+def test_row_class_query(pg_conn, queries):
+    actual = queries.blogs.get_user_blogs(pg_conn, userid=1)
+    expected = [
+        UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
+        UserBlogSummary(title="What I did Today", published=date(2017, 7, 28)),
+    ]
+
+    assert all(isinstance(row, UserBlogSummary) for row in actual)
     assert actual == expected
 
 

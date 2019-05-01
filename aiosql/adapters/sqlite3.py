@@ -19,10 +19,13 @@ class SQLite3DriverAdapter:
         return sql
 
     @staticmethod
-    def select(conn, _query_name, sql, parameters, _row_class=None):
+    def select(conn, _query_name, sql, parameters, row_class=None):
         cur = conn.cursor()
         cur.execute(sql, parameters)
         results = cur.fetchall()
+        if row_class is not None:
+            column_names = [c[0] for c in cur.description]
+            results = [row_class(**dict(zip(column_names, row))) for row in results]
         cur.close()
         return results
 
