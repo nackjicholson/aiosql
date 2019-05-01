@@ -76,7 +76,15 @@ class AsyncPGAdapter:
             results = await connection.fetch(sql, *parameters)
             if record_class is not None:
                 results = [record_class(**dict(rec)) for rec in results]
-            return results
+        return results
+
+    async def select_one(self, conn, query_name, sql, parameters, record_class=None):
+        parameters = self.maybe_order_params(query_name, parameters)
+        async with MaybeAcquire(conn) as connection:
+            result = await connection.fetchrow(sql, *parameters)
+            if result is not None and record_class is not None:
+                result = record_class(**dict(result))
+        return result
 
     @aiocontextmanager
     async def select_cursor(self, conn, query_name, sql, parameters):

@@ -30,6 +30,17 @@ class SQLite3DriverAdapter:
         return results
 
     @staticmethod
+    def select_one(conn, _query_name, sql, parameters, record_class=None):
+        cur = conn.cursor()
+        cur.execute(sql, parameters)
+        result = cur.fetchone()
+        if result is not None and record_class is not None:
+            column_names = [c[0] for c in cur.description]
+            result = record_class(**dict(zip(column_names, result)))
+        cur.close()
+        return result
+
+    @staticmethod
     @contextmanager
     def select_cursor(conn, _query_name, sql, parameters):
         cur = conn.cursor()

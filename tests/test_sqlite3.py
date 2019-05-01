@@ -75,6 +75,12 @@ def test_select_cursor_context_manager(sqlite3_conn, queries):
         assert actual == expected
 
 
+def test_select_one(sqlite3_conn, queries):
+    actual = queries.users.get_by_username(sqlite3_conn, username="johndoe")
+    expected = (2, "johndoe", "John", "Doe")
+    assert actual == expected
+
+
 def test_insert_returning(sqlite3_conn, queries):
     with sqlite3_conn:
         blogid = queries.blogs.publish_blog(

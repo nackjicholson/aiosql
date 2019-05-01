@@ -92,6 +92,15 @@ async def test_select_cursor_context_manager(sqlite3_db_path, queries):
 
 
 @pytest.mark.asyncio
+async def test_select_one(sqlite3_db_path, queries):
+    async with aiosqlite.connect(sqlite3_db_path) as conn:
+        actual = await queries.users.get_by_username(conn, username="johndoe")
+
+    expected = (2, "johndoe", "John", "Doe")
+    assert actual == expected
+
+
+@pytest.mark.asyncio
 async def test_insert_returning(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
         blogid = await queries.blogs.publish_blog(

@@ -22,12 +22,21 @@ class PsycoPG2Adapter:
     def select(conn, _query_name, sql, parameters, record_class=None):
         with conn.cursor() as cur:
             cur.execute(sql, parameters)
-            rows = cur.fetchall()
-        if record_class is None:
-            return rows
-        else:
-            column_names = [c.name for c in cur.description]
-            return [record_class(**dict(zip(column_names, row))) for row in rows]
+            results = cur.fetchall()
+            if record_class is not None:
+                column_names = [c.name for c in cur.description]
+                results = [record_class(**dict(zip(column_names, row))) for row in results]
+        return results
+
+    @staticmethod
+    def select_one(conn, _query_name, sql, parameters, record_class=None):
+        with conn.cursor() as cur:
+            cur.execute(sql, parameters)
+            result = cur.fetchone()
+            if result is not None and record_class is not None:
+                column_names = [c.name for c in cur.description]
+                result = record_class(**dict(zip(column_names, result)))
+        return result
 
     @staticmethod
     @contextmanager

@@ -76,8 +76,10 @@ def test_select_cursor_context_manager(pg_conn, queries):
         assert actual == expected
 
 
-def test_select_one():
-    pass
+def test_select_one(pg_conn, queries):
+    actual = queries.users.get_by_username(pg_conn, username="johndoe")
+    expected = (2, "johndoe", "John", "Doe")
+    assert actual == expected
 
 
 def test_insert_returning(pg_conn, queries):

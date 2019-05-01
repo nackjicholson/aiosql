@@ -91,6 +91,14 @@ async def test_select_cursor_context_manager(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
+async def test_select_one(pg_dsn, queries):
+    conn = await asyncpg.connect(pg_dsn)
+    actual = await queries.users.get_by_username(conn, username="johndoe")
+    expected = (2, "johndoe", "John", "Doe")
+    assert actual == expected
+
+
+@pytest.mark.asyncio
 async def test_insert_returning(pg_dsn, queries):
     async with asyncpg.create_pool(pg_dsn) as pool:
         blogid, title = await queries.blogs.pg_publish_blog(

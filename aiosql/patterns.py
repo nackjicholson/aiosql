@@ -15,7 +15,7 @@ empty_pattern = re.compile(r"^\s*$")
 Pattern: Identifies empty lines.
 """
 
-valid_query_name_pattern = re.compile(r"\w+")
+valid_query_name_pattern = re.compile(r"^\w+$")
 """
 Pattern: Enforces names are valid python variable names.
 """
