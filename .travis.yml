@@ -13,10 +13,10 @@ matrix:
     - python: '3.6'
       env: TOXENV=py36
 before_install:
-install:
-- pip install -U pip
-- pip install poetry
-script: poetry run pytest tests
+  - pip install -U pip
+  - pip install poetry
+install: poetry install
+script: pytest tests
 before_deploy:
 - poetry install
 - poetry run invoke docs
