@@ -25,6 +25,7 @@ Contents
 
    Install <install>
    Getting Started <getting_started>
+   Sync vs Async <sync_vs_async>
    Defining Queries <defining_queries>
    Extending aiosql <driver_adapters>
    Upgrading <upgrading>

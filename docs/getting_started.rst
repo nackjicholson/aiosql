@@ -2,149 +2,134 @@
 Getting Started
 ###############
 
-sqlite3
-=======
+Basic Usage
+===========
 
-Below is an example of a program which can print ``"{greeting}, {world_name}!"`` from data held in a minimal SQLite
-database containing greetings and worlds.
-
-The SQL is in a ``greetings.sql`` file with ``-- name:`` definitions on each query to tell ``aiosql`` under which name
-we would like to be able to execute them from our Python application.
+Given you have a SQL file like the one below called ``users.sql``
 
 .. code-block:: sql
 
-    -- name: get-all-greetings
-    -- Get all the greetings in the database
-    select greeting_id, greeting from greetings;
+    -- name: get-all-users
+    -- Get all user records
+    select * from users;
 
-    -- name: get-worlds-by-name
-    -- Get the world record from the database.
-    select world_id,
-           world_name
-      from worlds
-     where world_name = :world_name;
 
-To load these queries into python we can use ``aiosql.from_path``.
+    -- name: get-user-by-username
+    -- Get user with the given username field.
+    select userid,
+           username,
+           firstname,
+           lastname
+      from users
+     where username = :username;
+
+You can use ``aiosql`` to load the queries in this file for use in your Python application:
 
 .. code-block:: python
 
+    import aiosql
     import sqlite3
-    import aiosql
 
-    queries = aiosql.from_path("greetings.sql", driver_adapter="sqlite3")
+    conn = sqlite3.connect("myapp.db")
+    queries = aiosql.from_path("users.sql", "sqlite3")
 
-The query under the name ``get-all-greetings`` will now be available as a method ``queries.get_all_greetings()``
-and ``get-worlds-by-name`` will be available as ``queries.get_worlds_by_name()``
+    users = queries.get_all_users(conn)
+    # >>> [(1, "nackjicholson", "William", "Vaughn"), (2, "johndoe", "John", "Doe"), ...]
 
-By specifying ``driver_adapter="sqlite3"`` we are letting ``aiosql`` know that to execute the queries it
-will be receiving a ``sqlite3`` connection as the first argument of each method.
-It's worth repeating, each method on an ``aiosql.Queries`` object accepts a database connection to use in
-communicating with the database, all of it's other variables used for substitution in the SQL are passed as
-additional keyword arguments.
+    users = queries.get_user_by_username(conn, username="nackjicholson")
+    # >>> [(1, "nackjicholson", "William", "Vaughn")
+
+This is pretty nice, we're able to define our methods in SQL and use them as methods from python!
+
+Query Operators
+===============
+
+``aiosql`` can help you do even more by allowing you to declare in the SQL how you would like a query to be executed
+and returned in python. For instance, the ``get-user-by-username`` query above should really only return a single result
+instead of a list containing one user. With the raw ``sqlite3`` driver in python we would probably have used
+``cur.fetchone()`` instead of `cur.fetchall()` to retrieve a single row. We can inform ``aiosql`` to select a single row
+by using the ``^`` (select one) operator on the end of our query name.
+
+.. code-block:: sql
+    -- name: get-user-by-username^
+    -- Get user with the given username field.
+    select userid,
+           username,
+           firstname,
+           lastname
+      from users
+     where username = :username;
 
 .. code-block:: python
 
-    conn = sqlite3.connect("greetings.db")
-    conn.row_factory = sqlite3.Row
+    nack = queries.get_user_by_username(conn, username="nackjicholson")
+    # >>> (1, "nackjicholson", "William", "Vaughn")
 
-    # greetings = [
-    #     <Row greeting_id=1, greeting="Hi">,
-    #     <Row greeting_id=2, greeting="Aloha">,
-    #     <Row greeting_id=3, greeting="Hola">
-    # ]
-    greetings = queries.get_greetings(conn)
+Python Domain Objects
+=====================
 
-    # worlds = [<Row world_id=1, world_name="Earth">]
-    worlds = queries.get_worlds_by_name(conn, world_name="Earth")
-
-    # Hi, Earth!
-    # Aloha, Earth!
-    # Hola, Earth!
-    for world_row in worlds:
-        for greeting_row in greetings:
-            print(f"{greeting_row['greeting']}, {world_row['world_name']}!")
-
-    conn.close()
-
-Here we've set up our ``sqlite3`` connection. Using the ``sqlite3.Row`` type for our records to make it easy to access our
-data via their column names rather than as tuple indices. This is a nice feature of ``sqlite3`` and ``aiosql`` doesn't
-ruin it for us.
-
-aiosqlite
-=========
-
-We can also use our ``greetings.db`` SQLite database with the `aiosqlite <https://github.com/jreese/aiosqlite>`_ driver
-by specifying ``driver_adapter="aiosqlite"``. It's a little bit different, but lets us leverage ``asyncio.gather`` to make
-both our queries for greetings and worlds in parallel! I'll throw in a few changes that demonstrate some other
-cool features of ``aiosql`` as well.
-
-1. ``record_class`` directive.
-    - Enables marshalling rows out of SQL into python domain objects like `@dataclass` instances or `NamedTuple`.
-      In this example it is used to build instances of ``World`` and ``Greeting``.
-2. ``^`` Select One Query Operator
-    - Adding this to the SQL comment ``--name: get-world-by-name^`` indicates to ``aiosql`` that when we call the
-      ``queries.get_world_by_name()`` method we should get a single row back.
+Using your own python types for SQL data is possible by declaring a `record_class` directive for a query. This informs
+``aiosql`` that it should marshal our data to be held by a python class. In python3.7 a good choice for this is the new
+``dataclass`` package. You can also easily use ``typing.NamedTuple``, ``collections.namedtuple``, or any other python
+class. It's up to you!
 
 .. code-block:: sql
 
-    -- name: get-all-greetings
-    -- record_class: Greeting
-    -- Get all the greetings in the database
-    select greeting_id, greeting from greetings;
+    -- name: get-user-by-username^
+    -- record_class: User
+    -- Get user with the given username field.
+    select userid,
+           username,
+           firstname,
+           lastname
+      from users
+     where username = :username;
 
-    -- name: get-world-by-name^
-    -- record_class: World
-    -- Get the world record from the database.
-    select world_id,
-           world_name
-      from worlds
-     where world_name = :world_name;
+All we have to do is provide our custom type to ``aiosql`` when we load our queries via the ``record_classes`` argument.
 
 .. code-block:: python
 
-    import asyncio
-
     import aiosql
-    import aiosqlite
-    from typing import NamedTuple
+    import sqlite3
+    from dataclasses import dataclass
 
 
-    class Greeting(NamedTuple):
-        greeting_id: int
-        greeting: str
+    @dataclass
+    class User:
+        userid: int
+        username: str
+        firstname: str
+        lastname: str
 
 
-    class World(NamedTuple)
-        world_id: int,
-        world_name: str
+    conn = sqlite3.connect("myapp.db")
+    queries = aiosql.from_path("users.sql", "sqlite3", record_classes={"User": User})
+
+    nack = queries.get_user_by_username(conn, username="nackjicholson")
+    # >>> User(userid=1, username="nackjicholson", firstname="William", lastname="Vaughn")
+
+Hopefully this is enough to intrigue you and entice you to give aiosql a try. Happy SQLing!
+
+Queries Type Hinting
+====================
+
+Because the ``aiosql.Queries`` instance is dynamically bound with methods loaded from the directives in your ``.sql``
+files, IDEs and editors can't statically analyze your ``Queries`` instance in order to provide you with helpful
+method auto-completion or interface information.
+
+Python 3.6 gives us a way to fix this if we'd like by providing a type annotation. This can be very helpful, but beware
+it can also become a bit of a maintenance burden because we have to keep the type annotation up to date with any changes
+we make to our ``.sql`` code. It's up to you whether the IDE tooling and type information is worth it to you.
+
+.. code-block:: python
+
+    class QInterface:
+        def get_all_users(conn) -> List[User]:
+            pass
+
+        def get_user_by_username(conn, username: str) -> User:
+            pass
 
 
-    queries = aiosql.from_path(
-        "greetings.sql",
-        driver_adapter="aiosqlite",
-        record_classes={"Greeting": Greeting, "World": World}
-    )
+    queries: QInterface = aiosql.from_path("...")
 
-    async def main():
-        with async aiosqlite.connect("greetings.db") as conn:
-            # Parallel queries!!!
-            #
-            # greetings = [
-            #     <Greeting greeting_id=1, greeting="Hi">,
-            #     <Greeting greeting_id=2, greeting="Aloha">,
-            #     <Greeting greeting_id=3, greeting="Hola">
-            # ]
-            # world = <World world_id=1, world_name="Earth">
-            greetings, world = await asyncio.gather(
-                queries.get_all_greetings(conn),
-                queries.get_world_by_name(conn, world_name="Earth")
-            )
-
-            # Hi, Earth!
-            # Aloha, Earth!
-            # Hola, Earth!
-            for greeting in greetings:
-                print(f"{greeting_row.greeting}, {world.world_name}!")
-
-
-    asyncio.run(main())
