@@ -123,11 +123,13 @@ we make to our ``.sql`` code. It's up to you whether the IDE tooling and type in
 
 .. code-block:: python
 
+    from typing import List, Optional
+
     class QInterface:
         def get_all_users(conn) -> List[User]:
             pass
 
-        def get_user_by_username(conn, username: str) -> User:
+        def get_user_by_username(conn, username: str) -> Optional[User]:
             pass
 
 

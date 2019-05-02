@@ -57,11 +57,12 @@ by the database driver.
 Select One Row with ``^``
 -------------------------
 
-The ``^`` operator will execute the query, and only return the first row of a result set. Behind the scenes in most
-of the drivers this uses something like ``cur.fetchone()`` vs ``cur.fetchall()``. This is useful when you know there
-should be one, and exactly one record for your query. For instance, if you have a unique index on the username field
-in your users table so that no two users should ever share the same username, you could use ``^`` to tell the driver
-to only select a single row, and to return it rather than a list of rows with length of 1.
+The ``^`` operator will execute the query, and only return the first row of a result set. If there are now rows in the
+result set it returns ``None``. When using a raw driver this is usually done with ``cur.fetchone()`` vs
+``cur.fetchall()``. This is useful when you know there should be one, and exactly one record for your query. For
+instance, if you have a unique index on the username field in your users table so that no two users should ever share
+the same username, you could use ``^`` to tell the driver to only select a single row, and to return it rather than a
+list of rows with length of 1.
 
 .. code-block:: sql
 
