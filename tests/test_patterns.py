@@ -36,7 +36,7 @@ def test_var_pattern_is_quote_aware():
     assert groupdicts == expected
 
 
-def test_var_pattern_does_not_drop_semicolon():
+def test_var_pattern_does_not_require_semicolon_trail():
     """Make sure keywords ending queries are recognized even without
     semi-colons.
     """
