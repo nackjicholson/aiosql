@@ -68,7 +68,11 @@ Quick Example
         name: str
 
 
-    queries = aiosql.from_path("greetings.sql", "aiosqlite", record_classes={"User": User})
+    queries = aiosql.from_path(
+        "greetings.sql",
+        "aiosqlite",
+        record_classes={"User": User}
+    )
 
 
     async def main():
