@@ -11,12 +11,16 @@ Database driver adapters in ``aiosql`` are a duck-typed class which follow the b
         def process_sql(self, name, op_type, sql):
             pass
 
-        def select(self, conn, sql, parameters):
+        def select(self, conn, sql, parameters, row_class=None):
+            pass
+
+        def select_one(self, conn, sql, parameters, row_class=None):
             pass
 
         @contextmanager
         def select_cursor(self, conn, sql, parameters):
             pass
+
 
         def insert_update_delete(self, conn, sql, parameters):
             pass
@@ -31,22 +35,16 @@ Database driver adapters in ``aiosql`` are a duck-typed class which follow the b
             pass
 
 
-    aiosql.register_driver_adapter("mydb", MyDbAdapter)
-
 If your adapter constructor takes arguments you can register a function which can build
 your adapter instance::
 
     def adapter_factory():
         return MyDbAdapter("foo", 42)
 
-    aiosql.register_driver_adapter("mydb", adapter_factory)
-
 Looking at the source of the builtin
 `adapters/ <https://github.com/nackjicholson/aiosql/tree/master/aiosql/adapters>`_ is a great place
 to start seeing how you may write your own database driver adapter.
 
+To use the adapter pass it's constructor or factory as the driver_adapter argument when building Queries::
 
-TODO:
-
-- Instructions on making new driver adapters
-- How to use the ``aiosql.register_driver_adapter(driver_name, driver_adapter)`` function to add support for a new ``db_driver``
+    queries = aiosql.from_path("foo.sql", driver_adapter=MyDbAdapter)

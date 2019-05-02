@@ -1,4 +1,14 @@
 #########################
+Upgrading from 2.x to 3.x
+#########################
+
+- The ``register_driver_adapter`` function is gone. Instead the ``driver_adapter`` argument of ``aiosql.from_path`` and
+  ``aiosql.from_str`` can be used to pass a constructor or factory function which can build an instance of your driver
+  adapter class.
+
+- Non-breaking addition of the ``^`` "select_one" operator. Let's you select a single row from the database.
+
+#########################
 Upgrading from 1.x to 2.x
 #########################
 

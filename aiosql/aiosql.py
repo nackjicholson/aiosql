@@ -42,8 +42,13 @@ def from_str(sql, driver_adapter, record_classes=None):
 
     Args:
         sql (str) A string containing SQL statements and aiosql name:
-        driver_adapter (str|Any): The database driver to use to load and execute queries.
-        record_classes (dict|None):
+        driver_adapter (str|Any): Either a string to designate one of the aiosql built-in
+                                  database driver adapters. One of "sqlite3", "psycopg2",
+                                  "aiosqlite", or "asyncpg". If you have defined your own adapter
+                                  class, you can pass it's constructor.
+        record_classes (dict|None): Mapping of strings used in "record_class" declarations to the
+                                    python classes which aiosql should use when marshaling SQL
+                                    results.
 
     Returns:
         Queries
@@ -59,15 +64,15 @@ def from_str(sql, driver_adapter, record_classes=None):
             -- Get all the greetings in the database
             select * from greetings;
 
-            -- name: get-users-by-username
+            -- name: get-user-by-username^
             -- Get all the users from the database,
             -- and return it as a dict
             select * from users where username =:username;
             \"""
 
-            queries = aiosql.from_str(sql_text, db_driver="sqlite3")
+            queries = aiosql.from_str(sql_text, "sqlite3")
             queries.get_all_greetings(conn)
-            queries.get_users_by_username(conn, username="willvaughn")
+            queries.get_user_by_username(conn, username="willvaughn")
 
     """
     driver_adapter = _make_driver_adapter(driver_adapter)
@@ -81,24 +86,26 @@ def from_path(
     driver_adapter: Union[str, Any],
     record_classes: Optional[Dict] = None,
 ):
-    """Load queries from a sql file, or a directory of sql files.
+    """Load queries from a ``.sql`` file, or directory of ``.sql`` files.
 
     Args:
         sql_path (str|Path): Path to a ``.sql`` file or directory containing ``.sql`` files.
-        driver_adapter (str|Any): The database driver to use to load and execute queries.
-        record_classes (dict|None):
+        driver_adapter (str|Any): Either a string to designate one of the aiosql built-in
+                                  database driver adapters. One of "sqlite3", "psycopg2",
+                                  "aiosqlite", or "asyncpg". If you have defined your own adapter
+                                  class, you can pass it's constructor.
+        record_classes (dict|None): Mapping of strings used in "record_class" declarations to the
+                                    python classes which aiosql should use when marshaling SQL
+                                    results.
 
     Returns:
         Queries: Queries object.
 
-    Example:
-        Loading queries paths::
+    Example::
 
-            import sqlite3
-            import aiosql
-
-            queries = aiosql.from_path("./greetings.sql", driver_name="sqlite3")
-            queries2 = aiosql.from_path("./sql_dir", driver_name="sqlite3")
+        >>> aiosql.from_path("./sql", "pscycopg2")
+        >>> aiosql.from_path("./sql", MyDBAdapter)
+        >>> aiosql.from_path("./sql/users.sql", "aiosqlite", record_classes={"User": User})
 
     """
     path = Path(sql_path)

@@ -1,9 +1,11 @@
--- name: insert-many*!
+-- name: insert_many*!
 insert into users(username, firstname, lastname) values (?, ?, ?);
 
 
--- name: get-all
-select username,
+-- name: get_all
+-- record_class: User
+select userid,
+       username,
        firstname,
        lastname
   from users;
