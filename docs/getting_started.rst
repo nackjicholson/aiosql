@@ -71,7 +71,7 @@ both our queries for greetings and worlds in parallel!
 
 
     async def main():
-        with async aiosqlite.connect("greetings.db") as conn:
+        async with aiosqlite.connect("greetings.db") as conn:
             conn.row_factory = aiosqlite.Row
             # Parallel queries!!!
             greetings, worlds = await asyncio.gather(
