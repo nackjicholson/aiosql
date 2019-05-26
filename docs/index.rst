@@ -78,7 +78,7 @@ Quick Example
 
     async def main():
        # Parallel queries!!!
-       with async aiosqlite.connect("greetings.db") as conn:
+       async with aiosqlite.connect("greetings.db") as conn:
            greetings, user = await asyncio.gather(
                queries.get_all_greetings(conn),
                queries.get_user_by_username(conn, username="willvaughn")
