@@ -38,4 +38,5 @@ values (
   :title,
   :content,
   :published
-)
+);
+

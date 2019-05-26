@@ -1,16 +1,25 @@
 import asyncio
 from datetime import date
 from pathlib import Path
+from typing import NamedTuple
 
 import aiosql
 import asyncpg
 import pytest
 
 
+class UserBlogSummary(NamedTuple):
+    title: str
+    published: date
+
+
+RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
+
+
 @pytest.fixture()
 def queries():
     dir_path = Path(__file__).parent / "blogdb/sql"
-    return aiosql.from_path(dir_path, "asyncpg")
+    return aiosql.from_path(dir_path, "asyncpg", RECORD_CLASSES)
 
 
 @pytest.mark.asyncio
@@ -54,6 +63,21 @@ async def test_parameterized_record_query(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
+async def test_record_class_query(pg_dsn, queries):
+    conn = await asyncpg.connect(pg_dsn)
+    actual = await queries.blogs.get_user_blogs(conn, userid=1)
+    await conn.close()
+
+    expected = [
+        UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
+        UserBlogSummary(title="What I did Today", published=date(2017, 7, 28)),
+    ]
+
+    assert all(isinstance(row, UserBlogSummary) for row in actual)
+    assert actual == expected
+
+
+@pytest.mark.asyncio
 async def test_select_cursor_context_manager(pg_dsn, queries):
     conn = await asyncpg.connect(pg_dsn)
     async with queries.blogs.get_user_blogs_cursor(conn, userid=1) as cursor:
@@ -64,6 +88,14 @@ async def test_select_cursor_context_manager(pg_dsn, queries):
         ]
         assert actual == expected
     await conn.close()
+
+
+@pytest.mark.asyncio
+async def test_select_one(pg_dsn, queries):
+    conn = await asyncpg.connect(pg_dsn)
+    actual = await queries.users.get_by_username(conn, username="johndoe")
+    expected = (2, "johndoe", "John", "Doe")
+    assert actual == expected
 
 
 @pytest.mark.asyncio

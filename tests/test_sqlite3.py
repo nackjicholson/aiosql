@@ -1,7 +1,16 @@
 from pathlib import Path
+from typing import NamedTuple
 
 import aiosql
 import pytest
+
+
+class UserBlogSummary(NamedTuple):
+    title: str
+    published: str
+
+
+RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 
 
 def dict_factory(cursor, row):
@@ -14,7 +23,7 @@ def dict_factory(cursor, row):
 @pytest.fixture()
 def queries():
     p = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(p, "sqlite3")
+    return aiosql.from_path(p, "sqlite3", RECORD_CLASSES)
 
 
 def test_record_query(sqlite3_conn, queries):
@@ -31,8 +40,8 @@ def test_record_query(sqlite3_conn, queries):
 
 
 def test_parameterized_query(sqlite3_conn, queries):
-    actual = queries.blogs.get_user_blogs(sqlite3_conn, userid=1)
-    expected = [("How to make a pie.", "2018-11-23"), ("What I did Today", "2017-07-28")]
+    actual = queries.users.get_by_lastname(sqlite3_conn, lastname="Doe")
+    expected = [(3, "janedoe", "Jane", "Doe"), (2, "johndoe", "John", "Doe")]
     assert actual == expected
 
 
@@ -48,11 +57,28 @@ def test_parameterized_record_query(sqlite3_conn, queries):
     assert actual == expected
 
 
+def test_record_class_query(sqlite3_conn, queries):
+    actual = queries.blogs.get_user_blogs(sqlite3_conn, userid=1)
+    expected = [
+        UserBlogSummary(title="How to make a pie.", published="2018-11-23"),
+        UserBlogSummary(title="What I did Today", published="2017-07-28"),
+    ]
+
+    assert all(isinstance(row, UserBlogSummary) for row in actual)
+    assert actual == expected
+
+
 def test_select_cursor_context_manager(sqlite3_conn, queries):
     with queries.blogs.get_user_blogs_cursor(sqlite3_conn, userid=1) as cursor:
         actual = cursor.fetchall()
         expected = [("How to make a pie.", "2018-11-23"), ("What I did Today", "2017-07-28")]
         assert actual == expected
+
+
+def test_select_one(sqlite3_conn, queries):
+    actual = queries.users.get_by_username(sqlite3_conn, username="johndoe")
+    expected = (2, "johndoe", "John", "Doe")
+    assert actual == expected
 
 
 def test_insert_returning(sqlite3_conn, queries):

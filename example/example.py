@@ -1,14 +1,35 @@
 import argparse
 import sqlite3
+from datetime import datetime
 from pathlib import Path
+from typing import NamedTuple
 
 import aiosql
+
+
+class User(NamedTuple):
+    userid: int
+    username: str
+    firstname: str
+    lastname: str
+
+
+class UserBlog(NamedTuple):
+    blogid: int
+    author: str
+    title: str
+    published: datetime
+
+    def __post_init__(self):
+        self.published = datetime.strptime(self.publised, "%Y-%m-%d %H:%M")
 
 
 dir_path = Path(__file__).parent
 sql_path = dir_path / "sql"
 db_path = dir_path / "exampleblog.db"
-queries = aiosql.from_path(dir_path / "sql", "sqlite3")
+queries = aiosql.from_path(
+    dir_path / "sql", "sqlite3", record_classes={"User": User, "UserBlog": UserBlog}
+)
 
 
 users = [("bobsmith", "Bob", "Smith"), ("johndoe", "John", "Doe"), ("janedoe", "Jane", "Doe")]
@@ -64,19 +85,17 @@ def deletedb():
 
 def get_users():
     conn = sqlite3.connect(dir_path / "exampleblog.db")
-    rows = queries.users.get_all(conn)
-    for username, firstname, lastname in rows:
-        print(username, firstname, lastname)
+    for user in queries.users.get_all(conn):
+        print(user)
 
 
 def get_user_blogs(username):
     conn = sqlite3.connect(dir_path / "exampleblog.db")
-    conn.row_factory = sqlite3.Row
-    with queries.blogs.get_user_blogs_cursor(conn, username=username) as cur:
-        for rec in cur:
-            print("------")
-            print(f'"{rec["title"]}"')
-            print(f"by {rec['username']} at {rec['published']}")
+    user_blogs = queries.blogs.get_user_blogs(conn, username=username)
+    for user_blog in user_blogs:
+        print("------")
+        print(f'"{user_blog.title}"')
+        print(f"by {user_blog.author} at {user_blog.published}")
 
 
 if __name__ == "__main__":

@@ -12,10 +12,11 @@ matrix:
   include:
     - python: '3.6'
       env: TOXENV=py36
-install:
-- pip install -U pip
-- pip install poetry tox
-script: tox
+before_install:
+  - pip install -U pip
+  - pip install poetry
+install: poetry install
+script: pytest tests
 before_deploy:
 - poetry install
 - poetry run invoke docs

@@ -1,5 +1,6 @@
 from datetime import date
 from pathlib import Path
+from typing import NamedTuple
 
 import aiosql
 import psycopg2
@@ -7,10 +8,18 @@ import psycopg2.extras
 import pytest
 
 
+class UserBlogSummary(NamedTuple):
+    title: str
+    published: date
+
+
+RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
+
+
 @pytest.fixture()
 def queries():
     dir_path = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(dir_path, "psycopg2")
+    return aiosql.from_path(dir_path, "psycopg2", RECORD_CLASSES)
 
 
 def test_record_query(pg_conn, queries):
@@ -28,8 +37,8 @@ def test_record_query(pg_conn, queries):
 
 
 def test_parameterized_query(pg_conn, queries):
-    actual = queries.blogs.get_user_blogs(pg_conn, userid=1)
-    expected = [("How to make a pie.", date(2018, 11, 23)), ("What I did Today", date(2017, 7, 28))]
+    actual = queries.users.get_by_lastname(pg_conn, lastname="Doe")
+    expected = [(3, "janedoe", "Jane", "Doe"), (2, "johndoe", "John", "Doe")]
     assert actual == expected
 
 
@@ -46,6 +55,17 @@ def test_parameterized_record_query(pg_conn, queries):
     assert actual == expected
 
 
+def test_record_class_query(pg_conn, queries):
+    actual = queries.blogs.get_user_blogs(pg_conn, userid=1)
+    expected = [
+        UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
+        UserBlogSummary(title="What I did Today", published=date(2017, 7, 28)),
+    ]
+
+    assert all(isinstance(row, UserBlogSummary) for row in actual)
+    assert actual == expected
+
+
 def test_select_cursor_context_manager(pg_conn, queries):
     with queries.blogs.get_user_blogs_cursor(pg_conn, userid=1) as cursor:
         actual = cursor.fetchall()
@@ -54,6 +74,12 @@ def test_select_cursor_context_manager(pg_conn, queries):
             ("What I did Today", date(2017, 7, 28)),
         ]
         assert actual == expected
+
+
+def test_select_one(pg_conn, queries):
+    actual = queries.users.get_by_username(pg_conn, username="johndoe")
+    expected = (2, "johndoe", "John", "Doe")
+    assert actual == expected
 
 
 def test_insert_returning(pg_conn, queries):
