@@ -25,3 +25,13 @@ delete from blogs where blogid = :blogid;
     from blogs
    where userid = :userid
 order by published desc;
+
+
+-- name: get-user-blogs-df
+-- record_class: UserBlogDF
+-- Get blogs authored by a user.
+  select title,
+         published
+    from blogs
+   where userid = :userid
+order by published desc;

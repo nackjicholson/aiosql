@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import NamedTuple
 
 import aiosql
+import pandas as pd
 import pytest
 
 
@@ -10,7 +11,8 @@ class UserBlogSummary(NamedTuple):
     published: str
 
 
-RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
+RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary,
+                  "UserBlogDF": pd.DataFrame}
 
 
 def dict_factory(cursor, row):

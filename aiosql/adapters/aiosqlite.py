@@ -25,7 +25,7 @@ class AioSQLiteAdapter:
             results = await cur.fetchall()
             if record_class is not None:
                 column_names = [c[0] for c in cur.description]
-                results = [record_class(**dict(zip(column_names, row))) for row in results]
+                results = assign_record_class(results, column_names, record_class)
         return results
 
     @staticmethod
@@ -34,7 +34,7 @@ class AioSQLiteAdapter:
             result = await cur.fetchone()
             if result is not None and record_class is not None:
                 column_names = [c[0] for c in cur.description]
-                result = record_class(**dict(zip(column_names, result)))
+                result = assign_record_class(results, column_names, record_class, True)
         return result
 
     @staticmethod

@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 
+from ..record import assign_record_class
 
 class SQLite3DriverAdapter:
     @staticmethod
@@ -25,7 +26,7 @@ class SQLite3DriverAdapter:
         results = cur.fetchall()
         if record_class is not None:
             column_names = [c[0] for c in cur.description]
-            results = [record_class(**dict(zip(column_names, row))) for row in results]
+            results = assign_record_class(results, column_names, record_class)
         cur.close()
         return results
 
@@ -36,7 +37,7 @@ class SQLite3DriverAdapter:
         result = cur.fetchone()
         if result is not None and record_class is not None:
             column_names = [c[0] for c in cur.description]
-            result = record_class(**dict(zip(column_names, result)))
+            result = assign_record_class(results, column_names, record_class, True)
         cur.close()
         return result
 

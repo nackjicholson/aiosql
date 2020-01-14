@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from ..aioctxlib import aiocontextmanager
 from ..patterns import var_pattern
-
+from ..record import assign_record_class
 
 class MaybeAcquire:
     def __init__(self, client):
@@ -75,6 +75,7 @@ class AsyncPGAdapter:
         async with MaybeAcquire(conn) as connection:
             results = await connection.fetch(sql, *parameters)
             if record_class is not None:
+                results = assign_record_class(results, None, record_class)
                 results = [record_class(**dict(rec)) for rec in results]
         return results
 

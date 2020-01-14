@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import NamedTuple
 
 import aiosql
+import pandas as pd
 import psycopg2
 import psycopg2.extras
 import pytest
@@ -13,7 +14,8 @@ class UserBlogSummary(NamedTuple):
     published: date
 
 
-RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
+RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary,
+                  "UserBlogDF": pd.DataFrame}
 
 
 @pytest.fixture()
@@ -63,6 +65,17 @@ def test_record_class_query(pg_conn, queries):
     ]
 
     assert all(isinstance(row, UserBlogSummary) for row in actual)
+    assert actual == expected
+
+
+def test_record_class_df_query(pg_conn, queries):
+    actual = queries.blogs.get_user_blogs_df(pg_conn, userid=1)
+    expected = pd.DataFrame([
+        ("How to make a pie.", date(2018, 11, 23)),
+        ("What I did Today", date(2017, 7, 28)),
+    ], columns=['title', 'date'])
+
+    assert isinstance(actual, pd.DataFrame)
     assert actual == expected
 
 

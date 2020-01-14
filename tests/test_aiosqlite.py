@@ -4,6 +4,7 @@ from typing import NamedTuple
 
 import aiosql
 import aiosqlite
+import pandas as pd
 import pytest
 
 
@@ -12,7 +13,8 @@ class UserBlogSummary(NamedTuple):
     published: str
 
 
-RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
+RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary,
+                  "UserBlogDF": pd.DataFrame}
 
 
 @pytest.fixture()
