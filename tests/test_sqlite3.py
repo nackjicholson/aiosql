@@ -70,6 +70,17 @@ def test_record_class_query(sqlite3_conn, queries):
     assert actual == expected
 
 
+def test_record_class_query_df(sqlite3_conn, queries):
+    actual = queries.blogs.get_user_blogs_df(sqlite3_conn, userid=1)
+    expected = pd.DataFrame([
+        ("How to make a pie.", "2018-11-23"),
+        ("What I did Today", "2017-07-28"),
+    ], columns=['title', 'published'])
+
+    assert isinstance(actual, pd.DataFrame)
+    assert actual.equals(expected)
+
+
 def test_select_cursor_context_manager(sqlite3_conn, queries):
     with queries.blogs.get_user_blogs_cursor(sqlite3_conn, userid=1) as cursor:
         actual = cursor.fetchall()

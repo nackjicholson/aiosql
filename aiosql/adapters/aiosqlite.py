@@ -1,5 +1,5 @@
 from ..aioctxlib import aiocontextmanager
-
+from ..record import assign_record_class
 
 class AioSQLiteAdapter:
     is_aio_driver = True

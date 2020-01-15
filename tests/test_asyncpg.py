@@ -80,6 +80,21 @@ async def test_record_class_query(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
+async def test_record_class_query_df(pg_dsn, queries):
+    conn = await asyncpg.connect(pg_dsn)
+    actual = await queries.blogs.get_user_blogs_df(conn, userid=1)
+    await conn.close()
+
+    expected = pd.DataFrame([
+        ("How to make a pie.", date(2018, 11, 23)),
+        ("What I did Today", date(2017, 7, 28)),
+    ], columns=['title', 'published'])
+
+    assert isinstance(actual, pd.DataFrame)
+    assert actual.equals(expected)
+
+
+@pytest.mark.asyncio
 async def test_select_cursor_context_manager(pg_dsn, queries):
     conn = await asyncpg.connect(pg_dsn)
     async with queries.blogs.get_user_blogs_cursor(conn, userid=1) as cursor:

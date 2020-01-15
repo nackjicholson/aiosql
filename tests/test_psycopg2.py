@@ -73,10 +73,10 @@ def test_record_class_df_query(pg_conn, queries):
     expected = pd.DataFrame([
         ("How to make a pie.", date(2018, 11, 23)),
         ("What I did Today", date(2017, 7, 28)),
-    ], columns=['title', 'date'])
+    ], columns=['title', 'published'])
 
     assert isinstance(actual, pd.DataFrame)
-    assert actual == expected
+    assert actual.equals(expected)
 
 
 def test_select_cursor_context_manager(pg_conn, queries):

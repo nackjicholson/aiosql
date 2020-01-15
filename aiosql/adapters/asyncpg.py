@@ -76,7 +76,6 @@ class AsyncPGAdapter:
             results = await connection.fetch(sql, *parameters)
             if record_class is not None:
                 results = assign_record_class(results, None, record_class)
-                results = [record_class(**dict(rec)) for rec in results]
         return results
 
     async def select_one(self, conn, query_name, sql, parameters, record_class=None):
