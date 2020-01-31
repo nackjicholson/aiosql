@@ -20,7 +20,7 @@ def populate_sqlite3_db(db_path):
                 firstname integer not null,
                 lastname text not null
             );
-            
+
             create table blogs (
                 blogid integer not null primary key,
                 userid integer not null,
@@ -116,3 +116,24 @@ def pg_conn(postgresql):
 def pg_dsn(pg_conn):
     p = pg_conn.get_dsn_parameters()
     return f"postgres://{p['user']}@{p['host']}:{p['port']}/{p['dbname']}"
+
+
+blogs_files_fn = [
+    ("blogs", "blogs.sql", ["publish_blog", "remove_blog", "get_user_blogs"]),
+    (
+        "blogs",
+        "blogs_pg.sql",
+        ["pg_get_blogs_published_after", "pg_publish_blog", "pg_bulk_publish"],
+    ),
+    ("blogs", "blogs_sqlite.sql", ["sqlite_get_blogs_published_after", "sqlite_bulk_publish"]),
+    ("users", "users.sql", ["get_all", "get_by_username", "get_by_lastname", "get_all_sorted"]),
+]
+
+
+@pytest.mark.parametrize("dir, file, functions", blogs_files_fn)
+def test_introspected_queries_path(sqlite3_conn, queries, dir, file, functions):
+    for fn in functions:
+        assert (
+            queries.__getattribute__(dir).__getattribute__(fn).file_path
+            == Path(__file__).parent / "blogdb" / "sql" / dir / file
+        )
