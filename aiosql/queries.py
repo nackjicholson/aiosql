@@ -60,6 +60,7 @@ def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Cal
     fn.__name__ = query_name
     fn.__doc__ = doc_comments
     fn.sql = sql
+    fn.file_path = file_path
 
     ctx_mgr_method_name = f"{query_name}_cursor"
 
@@ -70,6 +71,7 @@ def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Cal
     ctx_mgr.__name__ = ctx_mgr_method_name
     ctx_mgr.__doc__ = doc_comments
     ctx_mgr.sql = sql
+    ctx_mgr.file_path = file_path
 
     if operation_type == SQLOperationType.SELECT:
         return [(query_name, fn), (ctx_mgr_method_name, ctx_mgr)]
