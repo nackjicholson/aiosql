@@ -17,15 +17,15 @@ RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 
 
 @pytest.fixture()
-def queries():
+def asyncpg_queries():
     dir_path = Path(__file__).parent / "blogdb/sql"
     return aiosql.from_path(dir_path, "asyncpg", RECORD_CLASSES)
 
 
 @pytest.mark.asyncio
-async def test_record_query(pg_dsn, queries):
+async def test_record_query(pg_dsn, asyncpg_queries):
     conn = await asyncpg.connect(pg_dsn)
-    actual = [dict(rec) for rec in await queries.users.get_all(conn)]
+    actual = [dict(rec) for rec in await asyncpg_queries.users.get_all(conn)]
     await conn.close()
 
     assert len(actual) == 3
@@ -38,9 +38,9 @@ async def test_record_query(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
-async def test_parameterized_query(pg_dsn, queries):
+async def test_parameterized_query(pg_dsn, asyncpg_queries):
     conn = await asyncpg.connect(pg_dsn)
-    actual = await queries.blogs.get_user_blogs(conn, userid=1)
+    actual = await asyncpg_queries.blogs.get_user_blogs(conn, userid=1)
     await conn.close()
 
     expected = [("How to make a pie.", date(2018, 11, 23)), ("What I did Today", date(2017, 7, 28))]
@@ -48,9 +48,9 @@ async def test_parameterized_query(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
-async def test_parameterized_record_query(pg_dsn, queries):
+async def test_parameterized_record_query(pg_dsn, asyncpg_queries):
     conn = await asyncpg.connect(pg_dsn)
-    records = await queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
+    records = await asyncpg_queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
     actual = [dict(rec) for rec in records]
     await conn.close()
 
@@ -63,9 +63,9 @@ async def test_parameterized_record_query(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
-async def test_record_class_query(pg_dsn, queries):
+async def test_record_class_query(pg_dsn, asyncpg_queries):
     conn = await asyncpg.connect(pg_dsn)
-    actual = await queries.blogs.get_user_blogs(conn, userid=1)
+    actual = await asyncpg_queries.blogs.get_user_blogs(conn, userid=1)
     await conn.close()
 
     expected = [
@@ -78,9 +78,9 @@ async def test_record_class_query(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
-async def test_select_cursor_context_manager(pg_dsn, queries):
+async def test_select_cursor_context_manager(pg_dsn, asyncpg_queries):
     conn = await asyncpg.connect(pg_dsn)
-    async with queries.blogs.get_user_blogs_cursor(conn, userid=1) as cursor:
+    async with asyncpg_queries.blogs.get_user_blogs_cursor(conn, userid=1) as cursor:
         actual = [tuple(rec) async for rec in cursor]
         expected = [
             ("How to make a pie.", date(2018, 11, 23)),
@@ -91,17 +91,17 @@ async def test_select_cursor_context_manager(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
-async def test_select_one(pg_dsn, queries):
+async def test_select_one(pg_dsn, asyncpg_queries):
     conn = await asyncpg.connect(pg_dsn)
-    actual = await queries.users.get_by_username(conn, username="johndoe")
+    actual = await asyncpg_queries.users.get_by_username(conn, username="johndoe")
     expected = (2, "johndoe", "John", "Doe")
     assert actual == expected
 
 
 @pytest.mark.asyncio
-async def test_insert_returning(pg_dsn, queries):
+async def test_insert_returning(pg_dsn, asyncpg_queries):
     async with asyncpg.create_pool(pg_dsn) as pool:
-        blogid, title = await queries.blogs.pg_publish_blog(
+        blogid, title = await asyncpg_queries.blogs.pg_publish_blog(
             pool,
             userid=2,
             title="My first blog",
@@ -124,21 +124,21 @@ async def test_insert_returning(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
-async def test_delete(pg_dsn, queries):
+async def test_delete(pg_dsn, asyncpg_queries):
     # Removing the "janedoe" blog titled "Testing"
     conn = await asyncpg.connect(pg_dsn)
 
-    actual = await queries.blogs.remove_blog(conn, blogid=2)
+    actual = await asyncpg_queries.blogs.remove_blog(conn, blogid=2)
     assert actual is None
 
-    janes_blogs = await queries.blogs.get_user_blogs(conn, userid=3)
+    janes_blogs = await asyncpg_queries.blogs.get_user_blogs(conn, userid=3)
     assert len(janes_blogs) == 0
 
     await conn.close()
 
 
 @pytest.mark.asyncio
-async def test_insert_many(pg_dsn, queries):
+async def test_insert_many(pg_dsn, asyncpg_queries):
     blogs = [
         {
             "userid": 2,
@@ -160,10 +160,10 @@ async def test_insert_many(pg_dsn, queries):
         },
     ]
     conn = await asyncpg.connect(pg_dsn)
-    actual = await queries.blogs.pg_bulk_publish(conn, blogs)
+    actual = await asyncpg_queries.blogs.pg_bulk_publish(conn, blogs)
     assert actual is None
 
-    johns_blogs = await queries.blogs.get_user_blogs(conn, userid=2)
+    johns_blogs = await asyncpg_queries.blogs.get_user_blogs(conn, userid=2)
     assert johns_blogs == [
         ("Blog Part 3", date(2018, 12, 6)),
         ("Blog Part 2", date(2018, 12, 5)),
@@ -173,10 +173,10 @@ async def test_insert_many(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
-async def test_async_methods(pg_dsn, queries):
+async def test_async_methods(pg_dsn, asyncpg_queries):
     async with asyncpg.create_pool(pg_dsn) as pool:
         users, sorted_users = await asyncio.gather(
-            queries.users.get_all(pool), queries.users.get_all_sorted(pool)
+            asyncpg_queries.users.get_all(pool), asyncpg_queries.users.get_all_sorted(pool)
         )
 
     assert [dict(u) for u in users] == [

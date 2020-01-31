@@ -17,15 +17,15 @@ RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 
 
 @pytest.fixture()
-def queries():
+def psycopg2_queries():
     dir_path = Path(__file__).parent / "blogdb" / "sql"
     return aiosql.from_path(dir_path, "psycopg2", RECORD_CLASSES)
 
 
-def test_record_query(pg_conn, queries):
+def test_record_query(pg_conn, psycopg2_queries):
     dsn = pg_conn.get_dsn_parameters()
     with psycopg2.connect(**dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
-        actual = queries.users.get_all(conn)
+        actual = psycopg2_queries.users.get_all(conn)
 
     assert len(actual) == 3
     assert actual[0] == {
@@ -36,16 +36,16 @@ def test_record_query(pg_conn, queries):
     }
 
 
-def test_parameterized_query(pg_conn, queries):
-    actual = queries.users.get_by_lastname(pg_conn, lastname="Doe")
+def test_parameterized_query(pg_conn, psycopg2_queries):
+    actual = psycopg2_queries.users.get_by_lastname(pg_conn, lastname="Doe")
     expected = [(3, "janedoe", "Jane", "Doe"), (2, "johndoe", "John", "Doe")]
     assert actual == expected
 
 
-def test_parameterized_record_query(pg_conn, queries):
+def test_parameterized_record_query(pg_conn, psycopg2_queries):
     dsn = pg_conn.get_dsn_parameters()
     with psycopg2.connect(**dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
-        actual = queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
+        actual = psycopg2_queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
 
     expected = [
         {"title": "How to make a pie.", "username": "bobsmith", "published": "2018-11-23 00:00"},
@@ -55,8 +55,8 @@ def test_parameterized_record_query(pg_conn, queries):
     assert actual == expected
 
 
-def test_record_class_query(pg_conn, queries):
-    actual = queries.blogs.get_user_blogs(pg_conn, userid=1)
+def test_record_class_query(pg_conn, psycopg2_queries):
+    actual = psycopg2_queries.blogs.get_user_blogs(pg_conn, userid=1)
     expected = [
         UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
         UserBlogSummary(title="What I did Today", published=date(2017, 7, 28)),
@@ -66,8 +66,8 @@ def test_record_class_query(pg_conn, queries):
     assert actual == expected
 
 
-def test_select_cursor_context_manager(pg_conn, queries):
-    with queries.blogs.get_user_blogs_cursor(pg_conn, userid=1) as cursor:
+def test_select_cursor_context_manager(pg_conn, psycopg2_queries):
+    with psycopg2_queries.blogs.get_user_blogs_cursor(pg_conn, userid=1) as cursor:
         actual = cursor.fetchall()
         expected = [
             ("How to make a pie.", date(2018, 11, 23)),
@@ -76,15 +76,15 @@ def test_select_cursor_context_manager(pg_conn, queries):
         assert actual == expected
 
 
-def test_select_one(pg_conn, queries):
-    actual = queries.users.get_by_username(pg_conn, username="johndoe")
+def test_select_one(pg_conn, psycopg2_queries):
+    actual = psycopg2_queries.users.get_by_username(pg_conn, username="johndoe")
     expected = (2, "johndoe", "John", "Doe")
     assert actual == expected
 
 
-def test_insert_returning(pg_conn, queries):
+def test_insert_returning(pg_conn, psycopg2_queries):
     with pg_conn:
-        blogid, title = queries.blogs.pg_publish_blog(
+        blogid, title = psycopg2_queries.blogs.pg_publish_blog(
             pg_conn,
             userid=2,
             title="My first blog",
@@ -106,16 +106,16 @@ def test_insert_returning(pg_conn, queries):
     assert (blogid, title) == expected
 
 
-def test_delete(pg_conn, queries):
+def test_delete(pg_conn, psycopg2_queries):
     # Removing the "janedoe" blog titled "Testing"
-    actual = queries.blogs.remove_blog(pg_conn, blogid=2)
+    actual = psycopg2_queries.blogs.remove_blog(pg_conn, blogid=2)
     assert actual is None
 
-    janes_blogs = queries.blogs.get_user_blogs(pg_conn, userid=3)
+    janes_blogs = psycopg2_queries.blogs.get_user_blogs(pg_conn, userid=3)
     assert len(janes_blogs) == 0
 
 
-def test_insert_many(pg_conn, queries):
+def test_insert_many(pg_conn, psycopg2_queries):
     blogs = [
         {
             "userid": 2,
@@ -138,10 +138,10 @@ def test_insert_many(pg_conn, queries):
     ]
 
     with pg_conn:
-        actual = queries.blogs.pg_bulk_publish(pg_conn, blogs)
+        actual = psycopg2_queries.blogs.pg_bulk_publish(pg_conn, blogs)
         assert actual is None
 
-        johns_blogs = queries.blogs.get_user_blogs(pg_conn, userid=2)
+        johns_blogs = psycopg2_queries.blogs.get_user_blogs(pg_conn, userid=2)
         assert johns_blogs == [
             ("Blog Part 3", date(2018, 12, 6)),
             ("Blog Part 2", date(2018, 12, 5)),
