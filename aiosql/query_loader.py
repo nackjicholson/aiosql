@@ -17,7 +17,7 @@ class QueryLoader:
         self.driver_adapter = driver_adapter
         self.record_classes = record_classes if record_classes is not None else {}
 
-    def _make_query_datum(self, query_str: str):
+    def _make_query_datum(self, query_str: str, file_path: Path):
         lines = query_str.strip().splitlines()
         query_name = lines[0].replace("-", "_")
 
@@ -65,18 +65,18 @@ class QueryLoader:
         sql = self.driver_adapter.process_sql(query_name, operation_type, sql)
         record_class = self.record_classes.get(record_class_name)
 
-        return QueryDatum(query_name, doc_comments, operation_type, sql, record_class)
+        return QueryDatum(query_name, doc_comments, operation_type, sql, file_path, record_class)
 
-    def load_query_data_from_sql(self, sql: str) -> List[QueryDatum]:
+    def load_query_data_from_sql(self, sql: str, file_path: Path) -> List[QueryDatum]:
         query_data = []
         for query_sql_str in query_name_definition_pattern.split(sql):
             if not empty_pattern.match(query_sql_str):
-                query_data.append(self._make_query_datum(query_sql_str))
+                query_data.append(self._make_query_datum(query_sql_str, file_path))
         return query_data
 
     def load_query_data_from_file(self, file_path: Path) -> List[QueryDatum]:
         with file_path.open() as fp:
-            return self.load_query_data_from_sql(fp.read())
+            return self.load_query_data_from_sql(fp.read(), file_path)
 
     def load_query_data_from_dir_path(self, dir_path) -> QueryDataTree:
         if not dir_path.is_dir():

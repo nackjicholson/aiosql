@@ -5,7 +5,7 @@ from .types import QueryDatum, QueryDataTree, SQLOperationType
 
 
 def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Callable]]:
-    query_name, doc_comments, operation_type, sql, record_class = query_datum
+    query_name, doc_comments, operation_type, sql, file_path, record_class = query_datum
 
     if is_aio:
 

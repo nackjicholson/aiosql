@@ -1,4 +1,5 @@
 from enum import Enum
+from pathlib import Path
 from typing import Dict, Union, NamedTuple, Any
 
 
@@ -19,6 +20,7 @@ class QueryDatum(NamedTuple):
     doc_comments: str
     operation_type: SQLOperationType
     sql: str
+    file_path: Path
     record_class: Any = None
 
 
