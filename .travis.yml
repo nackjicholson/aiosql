@@ -5,6 +5,12 @@ matrix:
   include:
     - python: '3.6'
       env: TOXENV=py36
+    - addons:
+        postgresql: "10"
+        apt:
+          packages:
+            - postgresql10
+            - postgresql-client-10
 before_install:
   - pip install -U pip
   - pip install poetry
