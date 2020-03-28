@@ -9,7 +9,7 @@ matrix:
         postgresql: "10"
         apt:
           packages:
-            - postgresql10
+            - postgresql-10
             - postgresql-client-10
 before_install:
   - pip install -U pip
