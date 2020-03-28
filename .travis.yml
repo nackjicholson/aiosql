@@ -1,14 +1,10 @@
 language: python
-services:
-  - postgresql
 python:
   - "3.6"
   - "3.7"
   - "3.8"
 matrix:
   include:
-    - addons:
-        postgresql: "10"
     - addons:
         postgresql: "11"
         apt:
