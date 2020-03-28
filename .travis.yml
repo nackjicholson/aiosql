@@ -1,6 +1,6 @@
 language: python
 services:
-- postgresql
+  - postgresql
 matrix:
   include:
     - python: '3.6'
@@ -13,8 +13,8 @@ before_script:
 install: poetry install
 script: pytest tests
 before_deploy:
-- poetry install
-- poetry run invoke docs
+  - poetry install
+  - poetry run invoke docs
 deploy:
   provider: pages
   skip-cleanup: true
@@ -24,6 +24,6 @@ deploy:
   on:
     branch: master
 env:
-  - POSTGRES_DSN="postgresql://localhost/test_database"
   global:
     secure: D1uoEHKEuZ2rYjYVbJVYtoeNBqyRKFglFLj0An0jDbxPuj5zQ8bcX5bmZ91vkucGqWS9TQzDF2l6DHLHqzSSaCeKb+lj/AGeC+7Bssxpm8iNgtv9ITXbUhnnc4VKay1jpR1MrXgHySeHSyHPN0Zq3LIADsAB6NbF+KB6k9zRS8t5fFlpY+zNY8VmknP7Q9excrmVb5xotCUQCcAs5P1BqJWf+lTVNQzCSMQxYPna6SxVsJv3FBXwWUn1kFlOIedvZrSXml3x7Kh47ceR8Z6/5EmOekFejp02qT6jMSttgNFEaPHIL94kJSyTeTUkFp5MJap8LvJPTOimSWdgggm6AQXsc8v8uSHGHZ1ECZThOqW3cncvUigK7qOtpCzzQ0shPI2ARMX8+//ADRIvyY5OVoHbJTk/09f8aAj0pszOw25wKYb+ngarPoholCnGMLsEuIuIDcFXPYbouTmah+2gdmtsdQSdN7tJDrGKVoq9TrYaNGikplZjBJltQtPBoO6ThEtkkZEgL0SFYsI5LOYAjodjr82Zd5b62l3wfJNO4m1BearEoKVmXVRtsjW0h0tE95Cfl10WMUwRy8m19eMUZSfkxPVok+X5vR7Qb0ldyoLkJvfLsCgFZ6sJ24n29/nynWdWJd2SOUbHwh3iU4Nx474kMoO09lnhoEry3wx0d3k=
+    POSTGRES_DSN: postgresql://localhost/test_database
