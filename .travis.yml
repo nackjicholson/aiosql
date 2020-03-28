@@ -8,11 +8,11 @@ python:
 matrix:
   include:
     - addons:
-      postgresql: "10"
+        postgresql: "10"
     - addons:
-      postgresql: "11"
+        postgresql: "11"
     - addons:
-      postgresql: "12"
+        postgresql: "12"
 before_install:
   - pip install -U pip
   - pip install poetry
