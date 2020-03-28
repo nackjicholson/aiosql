@@ -9,4 +9,5 @@ fi
 set -x
 
 black aiosql tests --check
+flake8
 PYTHONPATH=. pytest --ignore venv -W ignore::DeprecationWarning

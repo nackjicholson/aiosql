@@ -125,7 +125,7 @@ def pg_conn():
                     );"""
                 )
             except Exception as e:
-                logger.error(f"error in creating tables")
+                logger.error(f"error in creating tables: {e}")
         with conn.cursor() as cur:
             try:
                 with USERS_DATA_PATH.open() as fp:
@@ -137,7 +137,7 @@ def pg_conn():
                         fp, "blogs", sep=",", columns=["userid", "title", "content", "published"]
                     )
             except Exception as e:
-                logger.error(f"error in feeding tables")
+                logger.error(f"error in feeding tables: {e}")
         logger.debug("about to yield conn")
     yield conn
     logger.debug("end yield")
