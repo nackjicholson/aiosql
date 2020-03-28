@@ -8,6 +8,8 @@ matrix:
 before_install:
   - pip install -U pip
   - pip install poetry
+before_script:
+  - psql -c 'create database test_database;' -U postgres
 install: poetry install
 script: pytest tests
 before_deploy:
