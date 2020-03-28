@@ -14,11 +14,13 @@ matrix:
         apt:
           packages:
             - postgresql-11
+            - postgresql-client-11
     - addons:
         postgresql: "12"
         apt:
           packages:
             - postgresql-12
+            - postgresql-client-12
 before_install:
   - pip install -U pip
   - pip install poetry
