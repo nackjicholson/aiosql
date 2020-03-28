@@ -91,12 +91,16 @@ def pg_conn():
         # Loads data from blogdb fixture data
         with conn.cursor() as cur:
             try:
-                cur.execute("""
+                cur.execute(
+                    """
             drop table if exists users cascade ;
-            """)
-                cur.execute("""
+            """
+                )
+                cur.execute(
+                    """
             drop table if exists blogs cascade;
-            """)
+            """
+                )
             except Exception as e:
                 logger.error(e)
 
@@ -125,12 +129,12 @@ def pg_conn():
         with conn.cursor() as cur:
             try:
                 with USERS_DATA_PATH.open() as fp:
-                    cur.copy_from(fp, "users", sep=",",
-                                  columns=["username", "firstname", "lastname"])
+                    cur.copy_from(
+                        fp, "users", sep=",", columns=["username", "firstname", "lastname"]
+                    )
                 with BLOGS_DATA_PATH.open() as fp:
                     cur.copy_from(
-                        fp, "blogs", sep=",",
-                        columns=["userid", "title", "content", "published"]
+                        fp, "blogs", sep=",", columns=["userid", "title", "content", "published"]
                     )
             except Exception as e:
                 logger.error(f"error in feeding tables")
