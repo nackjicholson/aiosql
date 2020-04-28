@@ -1,25 +1,18 @@
 from datetime import date
 from pathlib import Path
-from typing import NamedTuple
 
 import aiosql
 import psycopg2
 import psycopg2.extras
 import pytest
 
-
-class UserBlogSummary(NamedTuple):
-    title: str
-    published: date
-
-
-RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
+from conftest import UserBlogSummary
 
 
 @pytest.fixture()
-def queries():
+def queries(record_classes):
     dir_path = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(dir_path, "psycopg2", RECORD_CLASSES)
+    return aiosql.from_path(dir_path, "psycopg2", record_classes)
 
 
 def test_record_query(pg_conn, queries):

@@ -1,6 +1,7 @@
 import csv
 import sqlite3
 from pathlib import Path
+from typing import NamedTuple
 
 import pytest
 
@@ -116,3 +117,14 @@ def pg_conn(postgresql):
 def pg_dsn(pg_conn):
     p = pg_conn.get_dsn_parameters()
     return f"postgres://{p['user']}@{p['host']}:{p['port']}/{p['dbname']}"
+
+
+class UserBlogSummary(NamedTuple):
+    title: str
+    published: str
+
+
+@pytest.fixture
+def record_classes():
+    return {"UserBlogSummary": UserBlogSummary}
+
