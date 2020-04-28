@@ -125,6 +125,18 @@ class UserBlogSummary(NamedTuple):
 
 
 @pytest.fixture
-def record_classes():
+def _record_classes():
     return {"UserBlogSummary": UserBlogSummary}
 
+
+@pytest.fixture(params=["class", "import_path"])
+def record_classes(request, _record_classes):
+    if request.param == "class":
+        return _record_classes
+
+    elif request.param == "import_path":
+        return {
+            name: f"{klass.__module__}.{klass.__name__}" for name, klass in _record_classes.items()
+        }
+
+    raise RuntimeError("Unknown record_class type")

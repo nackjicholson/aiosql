@@ -1,3 +1,4 @@
+import importlib
 from types import MethodType
 from typing import Callable, List, Tuple
 
@@ -7,10 +8,21 @@ from .types import QueryDatum, QueryDataTree, SQLOperationType
 def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Callable]]:
     query_name, doc_comments, operation_type, sql, record_class = query_datum
 
+    def get_recordclass():
+        nonlocal record_class
+        if isinstance(record_class, str):
+            modpath, classname = record_class.rsplit(".", 1)
+            module = importlib.import_module(modpath)
+            record_class = getattr(module, classname)
+
+        return record_class
+
     if is_aio:
 
         async def fn(self, conn, *args, **kwargs):
             parameters = kwargs if len(kwargs) > 0 else args
+            record_class = get_recordclass()
+
             if operation_type == SQLOperationType.INSERT_RETURNING:
                 return await self.driver_adapter.insert_returning(conn, query_name, sql, parameters)
             elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE:
@@ -38,6 +50,8 @@ def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Cal
 
         def fn(self, conn, *args, **kwargs):
             parameters = kwargs if len(kwargs) > 0 else args
+            record_class = get_recordclass()
+
             if operation_type == SQLOperationType.INSERT_RETURNING:
                 return self.driver_adapter.insert_returning(conn, query_name, sql, parameters)
             elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE:
