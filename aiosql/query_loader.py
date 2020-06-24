@@ -62,7 +62,7 @@ class QueryLoader:
                 sql += line + "\n"
 
         doc_comments = doc_comments.strip()
-        sql = self.driver_adapter.process_sql(query_name, operation_type, sql)
+        sql = self.driver_adapter.process_sql(query_name, operation_type, sql.strip())
         record_class = self.record_classes.get(record_class_name)
 
         return QueryDatum(query_name, doc_comments, operation_type, sql, record_class)
