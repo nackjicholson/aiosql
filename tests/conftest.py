@@ -20,7 +20,7 @@ def populate_sqlite3_db(db_path):
                 firstname integer not null,
                 lastname text not null
             );
-            
+
             create table blogs (
                 blogid integer not null primary key,
                 userid integer not null,
@@ -76,7 +76,7 @@ def sqlite3_conn(sqlite3_db_path):
 
 @pytest.fixture
 def pg_conn(postgresql):
-    """Runs the sqitch plan and loads seed data before returning db connection.
+    """Loads seed data before returning db connection.
     """
     with postgresql:
         # Loads data from blogdb fixture data
