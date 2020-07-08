@@ -12,22 +12,17 @@ keywords = ["SQL", "asyncio", "PostgreSQL", "sqlite", "psycopg2"]
 python = "^3.6"
 
 [tool.poetry.dev-dependencies]
-black = "^18.3-alpha.0"
-flake8 = "^3.6"
-pytest = "^3.10"
-aiosqlite = "^0.8.0"
-pytest-postgresql = "^1.3"
-psycopg2 = "^2.7"
-asyncpg = "^0.18.2"
+black = "19.10b0"
+flake8 = "^3.8"
+pytest = "^5.4.3"
+aiosqlite = "^0.13.0"
+pytest-postgresql = "^2.4.0"
+asyncpg = "^0.20.1"
 sphinx = "^1.8"
 invoke = "^1.2"
-pytest-asyncio = "^0.9.0"
+pytest-asyncio = "^0.14.0"
+psycopg2-binary = "^2.8.5"
 
 [tool.black]
 line-length = 100
-py36 = true
-
-[build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
-
+target-version = ["py36"]

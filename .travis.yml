@@ -1,25 +1,26 @@
 language: python
 services:
-- postgresql
+  - postgresql
 addons:
-  postgresql: '10'
+  postgresql: "12"
   apt:
     packages:
-    - postgresql-10
-    - postgresql-client-10
-    - postgresql-server-dev-10
-matrix:
-  include:
-    - python: '3.6'
-      env: TOXENV=py36
+    - postgresql-12
+    - postgresql-client-12
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
 before_install:
   - pip install -U pip
   - pip install poetry
 install: poetry install
-script: pytest tests
+script:
+  - black aiosql tests --check
+  - pytest tests
 before_deploy:
-- poetry install
-- poetry run invoke docs
+  - poetry install
+  - poetry run invoke docs
 deploy:
   provider: pages
   skip-cleanup: true
