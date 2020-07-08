@@ -56,6 +56,8 @@ def from_str(
         record_classes (dict|None): Mapping of strings used in "record_class" declarations to the
                                     python classes which aiosql should use when marshaling SQL
                                     results.
+        loader_cls (QueryLoader): Custom constructor for QueryLoader extensions.
+        queries_cls (Queries): Custom constructor for Queries extensions.
 
     Returns:
         Queries
@@ -107,6 +109,8 @@ def from_path(
         record_classes (dict|None): Mapping of strings used in "record_class" declarations to the
                                     python classes which aiosql should use when marshaling SQL
                                     results.
+        loader_cls (QueryLoader): Custom constructor for QueryLoader extensions.
+        queries_cls (Queries): Custom constructor for Queries extensions.
 
     Returns:
         Queries: Queries object.
