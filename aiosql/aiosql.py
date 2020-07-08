@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Union, Any, Optional
+from typing import Dict, Union, Any, Optional, Type
 
 from .adapters.aiosqlite import AioSQLiteAdapter
 from .adapters.asyncpg import AsyncPGAdapter
@@ -37,7 +37,14 @@ def _make_driver_adapter(driver_adapter: Union[str, Any]):
     return driver_adapter()
 
 
-def from_str(sql, driver_adapter, record_classes=None):
+def from_str(
+    sql,
+    driver_adapter,
+    record_classes=None,
+    *,
+    loader_cls: Type[QueryLoader] = QueryLoader,
+    queries_cls: Type[Queries] = Queries,
+):
     """Load queries from a SQL string.
 
     Args:
@@ -76,15 +83,18 @@ def from_str(sql, driver_adapter, record_classes=None):
 
     """
     driver_adapter = _make_driver_adapter(driver_adapter)
-    query_loader = QueryLoader(driver_adapter, record_classes)
+    query_loader = loader_cls(driver_adapter, record_classes)
     query_data = query_loader.load_query_data_from_sql(sql)
-    return Queries(driver_adapter).load_from_list(query_data)
+    return queries_cls(driver_adapter).load_from_list(query_data)
 
 
 def from_path(
     sql_path: Union[str, Path],
     driver_adapter: Union[str, Any],
     record_classes: Optional[Dict] = None,
+    *,
+    loader_cls: Type[QueryLoader] = QueryLoader,
+    queries_cls: Type[Queries] = Queries,
 ):
     """Load queries from a ``.sql`` file, or directory of ``.sql`` files.
 
@@ -114,13 +124,13 @@ def from_path(
         raise SQLLoadException(f"File does not exist: {path}")
 
     driver_adapter = _make_driver_adapter(driver_adapter)
-    query_loader = QueryLoader(driver_adapter, record_classes)
+    query_loader = loader_cls(driver_adapter, record_classes)
 
     if path.is_file():
         query_data = query_loader.load_query_data_from_file(path)
-        return Queries(driver_adapter).load_from_list(query_data)
+        return queries_cls(driver_adapter).load_from_list(query_data)
     elif path.is_dir():
         query_data_tree = query_loader.load_query_data_from_dir_path(path)
-        return Queries(driver_adapter).load_from_tree(query_data_tree)
+        return queries_cls(driver_adapter).load_from_tree(query_data_tree)
     else:
         raise SQLLoadException(f"The sql_path must be a directory or file, got {sql_path}")
