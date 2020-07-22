@@ -1,0 +1,15 @@
+site_name: aiosql docs
+site_description: Simple SQL in Python
+site_author: William Vaughn
+copyright: Copyright 2018-2020, William Vaughn
+site_url: https://nackjicholson.github.io/aiosql/
+repo_url: https://github.com/nackjicholson/aiosql/
+theme: readthedocs
+nav:
+  - Intro: index.md
+  - Getting Started: getting-started.md
+markdown_extensions:
+- admonition
+- footnotes
+- toc:
+    permalink: true
