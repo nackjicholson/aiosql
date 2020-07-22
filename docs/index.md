@@ -46,7 +46,7 @@ import aiosql
 import aiosqlite
 
 
-queries = aiosql.from_path("usage.sql", "aiosqlite")
+queries = aiosql.from_path("./greetings.sql", "aiosqlite")
 
 
 async def main():
@@ -57,10 +57,10 @@ async def main():
             queries.get_user_by_username(conn, username="willvaughn")
         )
         # greetings = [(1, "Hi"), (2, "Aloha"), (3, "Hola")]
-        # user = sqllite3.Row(1, "willvaughn", "William")
+        # user = (1, "willvaughn", "William")
 
         for _, greeting in greetings:
-            print(f"{greeting}, {user['name']}!")
+            print(f"{greeting}, {user[2]}!")
         # Hi, William!
         # Aloha, William!
         # Hola, William!
