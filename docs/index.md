@@ -14,7 +14,7 @@ This project supports standard and [asyncio](https://docs.python.org/3/library/a
 pip install aiosql
 ```
 
-Or if you you use [poetry](https://poetry.eustace.io/):
+Or if you you use [poetry](https://python-poetry.org):
 
 ```sh
 poetry add aiosql

@@ -1,16 +1,16 @@
 # aiosql
 
-Simple SQL in Python.
+Simple SQL in Python
 
-SQL is code, you should be able to write it, version control it, comment on it, and use it in database tools
-like `psql` as you would any other SQL. But, you also want to be able to use it from your python
-applications, and that's where `aiosql` can help. With `aiosql` you can organize your SQL statements in `.sql`
-files and load them into a python object as methods to call.
+SQL is code, you should be able to write it, version control it, comment it, and run it using files. Writing your SQL code in Python programs as strings doesn't allow you to easily reuse your SQL in database GUI tools or CLI tools like psql. With aiosql you can organize your SQL statements in _.sql_ files, load them into your python application as methods to call without losing the ability to use them as you would any other SQL file.
 
-This project supports sync and asyncio based drivers for SQLite (`sqlite3`, `aiosqlite`) and PostgreSQL
-(`psycopg2`, `asyncpg`) out of the box, and can be extended to support other database drivers by you! The ``asyncio``
-support restricts this package to python versions >3.6. If you are using older versions of python please see the
-related [anosql](https://github.com/honza/anosql) package which this project is based on.
+This project supports standard and [asyncio](https://docs.python.org/3/library/asyncio.html) based drivers for SQLite and PostgreSQL out of the box ([sqlite3](https://docs.python.org/3/library/sqlite3.html), [aiosqlite](https://aiosqlite.omnilib.dev/en/latest/?badge=latest), [psycopg2](https://www.psycopg.org/docs/), [asyncpg](https://magicstack.github.io/asyncpg/current/)). Extensions to support other database drivers can be written by you!
+
+If you are using python versions <3.6 please see the related [anosql](https://github.com/honza/anosql) package which this project is based on.
+
+## Documentation
+
+Project and API docs https://nackjicholson.github.io/aiosql
 
 ## Install
 
@@ -18,15 +18,13 @@ related [anosql](https://github.com/honza/anosql) package which this project is 
 pip install aiosql
 ```
 
-Or if you you use [poetry](https://poetry.eustace.io/):
+Or if you you use [poetry](https://python-poetry.org):
 
 ```
 poetry add aiosql
 ```
 
-## Getting Started
-
-#### Basic Usage
+## Usage
 
 Given you have a SQL file like the one below called `users.sql`
 
@@ -62,75 +60,18 @@ users = queries.get_user_by_username(conn, username="nackjicholson")
 # >>> [(1, "nackjicholson", "William", "Vaughn")
 ```
 
-This is pretty nice, we're able to define our methods in SQL and use them as methods from python!
+Writing SQL in a file and executing it from methods in python!
 
-#### Query Operators to define different types of SQL actions
+## Why you might want to use this
 
-`aiosql` can help you do even more by allowing you to declare in the SQL how you would like a query to be executed
-and returned in python. For instance, the `get-user-by-username` query above should really only return a single result
-instead of a list containing one user. With the raw `sqlite3` driver in python we would probably have used 
-`cur.fetchone()` instead of `cur.fetchall()` to retrieve a single row. We can inform `aiosql` to select a single row
-by using the `^` (select one) operator on the end of our query name.
+- You think SQL is pretty good, and writing SQL is an important part of your applications.
+- You don't want to write your SQL in strings intermixed with your python code.
+- You're not using an ORM like SQLAlchemy or Django, and you don't need to.
+- You want to be able to reuse your SQL in other contexts. Loading it into psql or other database tools.
 
-```sql
--- name: get-user-by-username^
--- Get user with the given username field.
-select userid,
-       username,
-       firstname,
-       lastname
-  from users
- where username = :username;
-```
+## Why you might _NOT_ want to use this
 
-```python
-nack = queries.get_user_by_username(conn, username="nackjicholson")
-# >>> (1, "nackjicholson", "William", "Vaughn")
-```
-
-#### Using your own python types for SQL data.
-
-By declaring a `record_class` directive in our SQL file we can inform `aiosql` to automatically marshal our data to a
-custom class we've defined in python. In python3.7 a good choice for this is the new `dataclass` package.
-
-```sql
--- name: get-user-by-username^
--- record_class: User
--- Get user with the given username field.
-select userid,
-       username,
-       firstname,
-       lastname
-  from users
- where username = :username;
-```
-
-All we have to do is provide our custom type to `aiosql` when we load our queries via the `record_classes` argument.
-
-```python
-import aiosql
-import sqlite3
-from dataclasses import dataclass
-
-
-@dataclass
-class User:
-    userid: int
-    username: str
-    firstname: str
-    lastname: str
-
-
-conn = sqlite3.connect("myapp.db")
-queries = aiosql.from_path("users.sql", "sqlite3", record_classes={"User": User})
-
-nack = queries.get_user_by_username(conn, username="nackjicholson")
-# >>> User(userid=1, username="nackjicholson", firstname="William", lastname="Vaughn")
-```
-
-Hopefully this is enough to intrigue you and entice you to give aiosql a try. Check the documentation site for more
-information, and more features. Happy SQLing!
-
-## Documentation
-
-Project and API docs https://nackjicholson.github.io/aiosql
+- You're looking for an ORM.
+- You aren't comfortable writing SQL code.
+- You don't have anything in your application that requires complicated SQL beyond basic CRUD operations.
+- Dynamically loaded objects built at runtime really bother you.
