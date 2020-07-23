@@ -6,9 +6,9 @@ site_url: https://nackjicholson.github.io/aiosql/
 repo_url: https://github.com/nackjicholson/aiosql/
 theme: readthedocs
 nav:
-  - Usage: index.md
+  - Home: index.md
+  - Getting Started: getting-started.md
   - Defining SQL Queries: defining-sql-queries.md
-  - Using SQL in Python: using-sql-in-python.md
   - Advanced Topics: advanced-topics.md
   - Database Driver Adapters: database-driver-adapters.md
 markdown_extensions:
