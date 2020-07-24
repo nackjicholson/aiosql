@@ -132,3 +132,9 @@ def test_insert_many(sqlite3_conn, queries):
             ("Blog Part 2", "2018-12-05"),
             ("Blog Part 1", "2018-12-04"),
         ]
+
+
+def test_select_value(sqlite3_conn, queries):
+    actual = queries.users.get_count(sqlite3_conn)
+    expected = 3
+    assert actual == expected

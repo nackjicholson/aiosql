@@ -31,6 +31,10 @@ def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Cal
                 return await self.driver_adapter.select_one(
                     conn, query_name, sql, parameters, record_class
                 )
+            elif operation_type == SQLOperationType.SELECT_VALUE:
+                return await self.driver_adapter.select_value(
+                    conn, query_name, sql, parameters, record_class
+                )
             else:
                 raise ValueError(f"Unknown op_type: {operation_type}")
 
@@ -52,6 +56,10 @@ def _create_methods(query_datum: QueryDatum, is_aio=True) -> List[Tuple[str, Cal
                 return self.driver_adapter.select(conn, query_name, sql, parameters, record_class)
             elif operation_type == SQLOperationType.SELECT_ONE:
                 return self.driver_adapter.select_one(
+                    conn, query_name, sql, parameters, record_class
+                )
+            elif operation_type == SQLOperationType.SELECT_VALUE:
+                return self.driver_adapter.select_value(
                     conn, query_name, sql, parameters, record_class
                 )
             else:

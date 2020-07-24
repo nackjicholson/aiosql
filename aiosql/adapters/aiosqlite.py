@@ -38,6 +38,17 @@ class AioSQLiteAdapter:
         return result
 
     @staticmethod
+    async def select_value(conn, _query_name, sql, parameters, record_class=None):
+        async with conn.execute(sql, parameters) as cur:
+            result = await cur.fetchone()
+            if record_class is None:
+                result = result[0] if result else None
+            elif result is not None:
+                column_names = [c[0] for c in cur.description]
+                result = record_class(**dict(zip(column_names, result)))
+        return result
+
+    @staticmethod
     @aiocontextmanager
     async def select_cursor(conn, _query_name, sql, parameters):
         async with conn.execute(sql, parameters) as cur:

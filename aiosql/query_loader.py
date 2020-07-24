@@ -36,6 +36,9 @@ class QueryLoader:
         elif query_name.endswith("^"):
             operation_type = SQLOperationType.SELECT_ONE
             query_name = query_name[:-1]
+        elif query_name.endswith("$"):
+            operation_type = SQLOperationType.SELECT_VALUE
+            query_name = query_name[:-1]
         else:
             operation_type = SQLOperationType.SELECT
 

@@ -166,3 +166,12 @@ async def test_async_methods(sqlite3_db_path, queries):
         {"userid": 3, "username": "janedoe", "firstname": "Jane", "lastname": "Doe"},
         {"userid": 2, "username": "johndoe", "firstname": "John", "lastname": "Doe"},
     ]
+
+
+@pytest.mark.asyncio
+async def test_select_value(sqlite3_db_path, queries):
+    async with aiosqlite.connect(sqlite3_db_path) as conn:
+        actual = await queries.users.get_count(conn)
+
+    expected = 3
+    assert actual == expected

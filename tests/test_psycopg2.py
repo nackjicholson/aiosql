@@ -147,3 +147,9 @@ def test_insert_many(pg_conn, queries):
             ("Blog Part 2", date(2018, 12, 5)),
             ("Blog Part 1", date(2018, 12, 4)),
         ]
+
+
+def test_select_value(pg_conn, queries):
+    actual = queries.users.get_count(pg_conn)
+    expected = 3
+    assert actual == expected

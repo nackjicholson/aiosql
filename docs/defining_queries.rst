@@ -57,7 +57,7 @@ by the database driver.
 Select One Row with ``^``
 -------------------------
 
-The ``^`` operator will execute the query, and only return the first row of a result set. If there are now rows in the
+The ``^`` operator will execute the query, and only return the first row of a result set. If there are no rows in the
 result set it returns ``None``. When using a raw driver this is usually done with ``cur.fetchone()`` vs
 ``cur.fetchall()``. This is useful when you know there should be one, and exactly one record for your query. For
 instance, if you have a unique index on the username field in your users table so that no two users should ever share
@@ -75,6 +75,22 @@ list of rows with length of 1.
 The method generated is:
 
     - ``get_user_by_username(conn, username: str)``
+
+Select Single Value with ``$``
+------------------------------
+The ``$`` operator will execute the query, and only return the first value of the first row of a result set. If there
+are no rows in the result set it returns ``None``. This is implemented by returing the first element of the tuple
+returned by ``cur.fetchone()``. This is mostly useful for queries returning IDs, COUNTs or other aggregates.
+
+.. code-block:: sql
+
+    -- name: get-count$
+    select count(*) from users
+
+The method generated is:
+
+    - ``get_count(conn)``
+
 
 Insert/Update/Delete with ``!``
 -------------------------------

@@ -12,6 +12,7 @@ class SQLOperationType(Enum):
     SCRIPT = 3
     SELECT = 4
     SELECT_ONE = 5
+    SELECT_VALUE = 6
 
 
 class QueryDatum(NamedTuple):

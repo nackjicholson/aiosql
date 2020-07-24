@@ -189,3 +189,11 @@ async def test_async_methods(pg_dsn, queries):
         {"userid": 3, "username": "janedoe", "firstname": "Jane", "lastname": "Doe"},
         {"userid": 2, "username": "johndoe", "firstname": "John", "lastname": "Doe"},
     ]
+
+
+@pytest.mark.asyncio
+async def test_select_value(pg_dsn, queries):
+    conn = await asyncpg.connect(pg_dsn)
+    actual = await queries.users.get_count(conn)
+    expected = 3
+    assert actual == expected

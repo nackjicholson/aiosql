@@ -24,3 +24,7 @@ order by username asc;
 -- name: get-all-sorted
 -- Get all user records sorted by username
 select * from users order by username asc;
+
+-- name: get-count$
+-- Get number of users
+select count(*) from users;
