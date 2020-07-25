@@ -302,6 +302,14 @@ tests = ["pytest", "pytest-cov", "python-daemon"]
 
 [[package]]
 category = "dev"
+description = "AutoDoc for MarkDown"
+name = "mkautodoc"
+optional = false
+python-versions = ">=3.6"
+version = "0.1.0"
+
+[[package]]
+category = "dev"
 description = "Project documentation with Markdown."
 name = "mkdocs"
 optional = false
@@ -680,7 +688,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "fe13e2dd2e5815f8e5da5708228e8de1ec0648a5820d7f164e18e34f00120ef2"
+content-hash = "cb39cea71f9ba722d5bc754490b9033fb3a0fc0407d19bef2c1799fc071b22f3"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -835,6 +843,9 @@ mccabe = [
 mirakuru = [
     {file = "mirakuru-2.3.0-py3-none-any.whl", hash = "sha256:1f89b9e5f23cec4181aa0225622b1996786848d830f51a12aa9c863bbfc2acc6"},
     {file = "mirakuru-2.3.0.tar.gz", hash = "sha256:cb90f587ebd2ca5b8c9c61ce025be86ec123522a8b100b2a419bc7e8d28259f0"},
+]
+mkautodoc = [
+    {file = "mkautodoc-0.1.0.tar.gz", hash = "sha256:7c2595f40276b356e576ce7e343338f8b4fa1e02ea904edf33fadf82b68ca67c"},
 ]
 mkdocs = [
     {file = "mkdocs-1.1.2-py3-none-any.whl", hash = "sha256:096f52ff52c02c7e90332d2e53da862fde5c062086e1b5356a6e392d5d60f5e9"},

@@ -11,8 +11,12 @@ nav:
   - Defining SQL Queries: defining-sql-queries.md
   - Advanced Topics: advanced-topics.md
   - Database Driver Adapters: database-driver-adapters.md
+  - API: api.md
 markdown_extensions:
 - admonition
 - footnotes
+- mkautodoc
 - toc:
     permalink: true
+extra_css:
+    - css/custom.css
