@@ -7,29 +7,10 @@ from typing import NamedTuple
 import aiosql
 
 
-class User(NamedTuple):
-    userid: int
-    username: str
-    firstname: str
-    lastname: str
-
-
-class UserBlog(NamedTuple):
-    blogid: int
-    author: str
-    title: str
-    published: datetime
-
-    def __post_init__(self):
-        self.published = datetime.strptime(self.publised, "%Y-%m-%d %H:%M")
-
-
 dir_path = Path(__file__).parent
 sql_path = dir_path / "sql"
 db_path = dir_path / "exampleblog.db"
-queries = aiosql.from_path(
-    dir_path / "sql", "sqlite3", record_classes={"User": User, "UserBlog": UserBlog}
-)
+queries = aiosql.from_path(dir_path / "sql", "sqlite3")
 
 
 users = [("bobsmith", "Bob", "Smith"), ("johndoe", "John", "Doe"), ("janedoe", "Jane", "Doe")]
@@ -66,8 +47,16 @@ Is this thing on?
 ]
 
 
+def get_conn() -> sqlite3.Connection:
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
 def createdb():
-    conn = sqlite3.connect(dir_path / "exampleblog.db")
+    if db_path.exists():
+        raise SystemExit(f"Database at {db_path} already exists.")
+    conn = get_conn()
     print("Inserting users and blogs data.")
     with conn:
         queries.create_schema(conn)
@@ -78,24 +67,29 @@ def createdb():
 
 
 def deletedb():
-    print(f"deleting the {db_path} file")
+    print(f"Deleting the {db_path} file")
     if db_path.exists():
         db_path.unlink()
 
 
 def get_users():
-    conn = sqlite3.connect(dir_path / "exampleblog.db")
+    conn = get_conn()
     for user in queries.users.get_all(conn):
-        print(user)
+        s = "{"
+        for k in user.keys():
+            s += f"{k}: {user[k]}, "
+        s = s[:-2]
+        s += "}"
+        print(s)
 
 
 def get_user_blogs(username):
-    conn = sqlite3.connect(dir_path / "exampleblog.db")
+    conn = get_conn()
     user_blogs = queries.blogs.get_user_blogs(conn, username=username)
     for user_blog in user_blogs:
         print("------")
-        print(f'"{user_blog.title}"')
-        print(f"by {user_blog.author} at {user_blog.published}")
+        print(f"{user_blog['title']}")
+        print(f"by {user_blog['author']} at {user_blog['published']}")
 
 
 if __name__ == "__main__":
