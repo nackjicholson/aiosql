@@ -27,7 +27,12 @@ Below is an example of a _blogs.sql_ file that defines a few queries to load.
 
 ```sql
 -- name: get_all_blogs
-select * from blogs;
+select blogid,
+       userid,
+       title,
+       content,
+       published
+  from blogs;
 
 -- name: get_user_blogs
 -- Get blogs with a fancy formatted published date and author field

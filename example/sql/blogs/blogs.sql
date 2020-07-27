@@ -1,5 +1,10 @@
 -- name: get_all_blogs
-select * from blogs;
+select blogid,
+       userid,
+       title,
+       content,
+       published
+  from blogs;
 
 -- name: publish_blog<!
 insert into blogs(userid, title, content) values (:userid, :title, :content);

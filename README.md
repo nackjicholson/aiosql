@@ -31,10 +31,14 @@ Given you have a SQL file like the one below called `users.sql`
 ```sql
 -- name: get-all-users
 -- Get all user records
-select * from users;
+select userid,
+       username,
+       firstname,
+       lastname
+  from users;
 
 
--- name: get-user-by-username
+-- name: get-user-by-username^
 -- Get user with the given username field.
 select userid,
        username,
@@ -57,7 +61,7 @@ users = queries.get_all_users(conn)
 # >>> [(1, "nackjicholson", "William", "Vaughn"), (2, "johndoe", "John", "Doe"), ...]
 
 users = queries.get_user_by_username(conn, username="nackjicholson")
-# >>> [(1, "nackjicholson", "William", "Vaughn")
+# >>> (1, "nackjicholson", "William", "Vaughn")
 ```
 
 Writing SQL in a file and executing it from methods in python!
