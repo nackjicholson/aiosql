@@ -44,13 +44,11 @@ def from_str(
     **Parameters:**
 
     * **sql** - A string containing SQL statements and aiosql name.
-    * **driver_adapter** - Either a string to designate one of the aiosql built-in
-                                  database driver adapters. One of "sqlite3", "psycopg2",
-                                  "aiosqlite", or "asyncpg". If you have defined your own adapter
-                                  class, you can pass it's constructor.
-    * **record_classes** - *(optional)* Mapping of strings used in "record_class" declarations to the
-                                    python classes which aiosql should use when marshaling SQL
-                                    results.
+    * **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
+    adapters. One of "sqlite3", "psycopg2", "aiosqlite", or "asyncpg". If you have defined your
+    own adapter class, you can pass it's constructor.
+    * **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
+    declarations to the python classes which aiosql should use when marshaling SQL results.
     * **loader_cls** - *(optional)* Custom constructor for QueryLoader extensions.
     * **queries_cls** - *(optional)* Custom constructor for Queries extensions.
 

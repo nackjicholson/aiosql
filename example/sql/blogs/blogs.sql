@@ -9,7 +9,6 @@ insert into blogs(userid, title, content, published) values (?, ?, ?, ?);
 
 
 -- name: get_user_blogs
--- record_class: UserBlog
 -- Get blogs with a fancy formatted published date and author field
     select b.blogid,
            b.title,
