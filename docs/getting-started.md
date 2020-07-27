@@ -17,6 +17,58 @@ aiosql doesn't solve any of these problems directly either, your application is 
 
 The documentation for projects like [SQLAlchemy](https://www.sqlalchemy.org/) and [Django DB](https://docs.djangoproject.com/en/3.0/topics/db/) will give you the complete run down on why ORMs are a valuable and productive way to develop. I urge you to choose these projects over aiosql if you find that they fit the needs of your application better. If you're still here, great! Keep reading to learn how to write SQL you can load into python.
 
+## Loading Queries
+
+There are a few different ways to load queries into aiosql. You need to know the basics of how to define your queries so aiosql can find them, and how aiosql turns them into methods on a dynamic [`Queries`]() object. For more information reference the [Defining SQL Queries](./defining-sql-queries.md) docs.
+
+### From a SQL File
+
+Below is an example of a _blogs.sql_ file that defines a few queries to load.
+
+```sql
+-- name: get_all_blogs
+select * from blogs;
+
+-- name: get_user_blogs
+-- Get blogs with a fancy formatted published date and author field
+    select b.blogid,
+           b.title,
+           strftime('%Y-%m-%d %H:%M', b.published) as published,
+           u.username as author
+      from blogs b
+inner join users u on b.userid = u.userid
+     where u.username = :username
+  order by b.published desc;
+```
+
+The two things to notice in this file are the `--name: <name_of_method>` comments and the `:username` substitution variable. The comments that start with `--name:` are the magic of aiosql. They are used by [`aiosql.from_path`](./api.md#aiosqlfrom_path) to parse the file into separate methods by name. In the case of _blogs.sql_ we expect two methods that look like this.
+
+```python
+def get_all_blogs(self) -> List:
+    pass
+
+def get_user_blogs(self, username: str) -> List:
+    pass
+```
+
+The `username` parameter of `get_user_blogs` will substitute in for the `:username` variable in the SQL.
+
+### From Directories of SQL Files
+
+### From a SQL String
+
+## Calling Query Methods
+
+Assuming a database with data exists, here is how to use these methods with the `sqlite3` driver of the python standard library.
+
+```python
+>>> import sqlite3
+>>> import aiosql
+>>> conn = sqlite3.connect("./mydb.sql")
+>>> queries = aiosql.from_path("./blogs.sql", "sqlite3")
+>>> queries.get_user_blogs(conn, username="bobsmith")
+[(3, 'How to make a pie.', '2018-11-23 00:00', 'bobsmith'), (1, 'What I did Today', '2017-07-28 00:00', 'bobsmith')]
+```
 
 Visuraque terras! Est vocat causa, tribusque ille, ingens, cui et perque
 nemorum? Amori Lyncides praeside ipse, cum, quae, latices agros corpora donec
@@ -28,7 +80,7 @@ manibus [opem Iovis](http://www.ferut.net/) sermone, litora.
 - Erat sed
 - Ubi Pygmalion alios ignarus non ignotae pati
 
-## Longius et tactis ferrum contingere Phoebus suis
+## Handling Results
 
 Feriente advolat suo, [percussit Sparten Memnonis](http://mollia-dat.com/)
 Icare, spectabilis. Plangere *videretur Lucifero*, bis manes, in videndi
@@ -57,43 +109,3 @@ Icare, spectabilis. Plangere *videretur Lucifero*, bis manes, in videndi
     } else {
         cableSrgb -= 249984;
     }
-
-## Tellure et aut
-
-*Clarum Clyton ventorumque* modo **pendentia petitur** oscula ut una regemque
-oppressit cuspis super habitabile usum his animo erit. Agenore Acrisius ministro
-metum Babylonia istum, mariti crinales *graviore*, deme tange non Abas pars, nec
-antiquam. Nos Melas Cinyra fixumque vidit. Ferunt iuventus viribus raptu, veni
-spicea Epidauria ignoscat bubo nam, voce undas, *est eurus quam* aut,
-marmoreoque. Placui vocis succinctae eodem rogabat tibi pennas truncaque coniuge
-Procnes; et ius Phoebo, tibi Vestaque manifesta munere?
-
-    if (halfServerFirmware != textScriptHtml + throughputSocketBespoke) {
-        goodput_development_primary = bar.hddPrebinding(page, display(3));
-    } else {
-        undoMenu += tutorial_postscript_zebibyte;
-        leopard_control_vaporware.thermistor = 750040;
-    }
-    var middlewareLinuxSystem = 3;
-    var wheel_output = offline_netbios_internal(bitrate + capsMultiplatformBare,
-            networking_log(diskBaseDisk + dvr,
-            analyst_card_matrix.lockSrgb.icann(1, boot, 179534)));
-    if (205600 + 5) {
-        mode(wordart_disk / mailItunes);
-        hertzMemory(mini_card_card, twain);
-        asp_sip.footerCompile(digital, 4 + sharewarePramSkyscraper);
-    }
-    if (socketInteractive * laptop.repositorySan.carrier_checksum(uri,
-            telnetThin)) {
-        click_copy_motherboard += rtWindowsMnemonic + panel;
-        youtube_daemon = parse;
-        clock -= registryFddi;
-    } else {
-        ircGnutellaTag.fileMouseMyspace = -4;
-    }
-
-Rursus *stimulatus adsensere* trahitur. Tui magni supplice iniquis adversos arma
-fugamque Pelasgas facit hoc aequoris, matrum, rex malorum *tangere et*. Mortis
-inludens postquam pavor tria **lacrimas** in membris labori iacet. Non adest
-silvis requiris argentea, admovitque, guttura regia Atlantiades vulgus
-committere, tum sive me.
