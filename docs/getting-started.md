@@ -2,11 +2,11 @@
 
 ## Philosophy
 
-The aiosql project is for writing SQL to interact with a database. Most database libraries are intended to reduce the amount of SQL developers need to write. This project doesn't take that approach and here is why.
+The aiosql project is for writing SQL to interact with a database. Most database libraries are intended to reduce the amount of SQL developers need to write, aiosql takes an alternative approach. Why?
 
-* Alternatives are good. No approach, no matter how predominant, can fit all use cases.
+* Alternatives are good. No approach fits all use cases, no matter how predominant.
 * SQL is the most expressive and performant way to interact with a SQL database.
-* Identifying where a query came from is simpler when it is source controlled, named, and written by a human.
+* Investigating where a query came from is simpler when it is source controlled, named, and written by a human.
 * Writing SQL in files gives you built-in compatibility with powerful SQL tools like [DataGrip](https://www.jetbrains.com/datagrip/) and [psql](https://www.postgresql.org/docs/12/app-psql.html).
 
 ### About ORMs
@@ -23,7 +23,7 @@ This section goes over the three ways to make SQL queries available for executio
 
 ### From a SQL File
 
-Below is an example of a _blogs.sql_ file that defines two queries to load.
+Below is a _blogs.sql_ file that defines two queries.
 
 ```sql
 -- name: get_all_blogs
@@ -62,58 +62,9 @@ def get_user_blogs(self, username: str) -> List:
     pass
 ```
 
-### From a Directory of SQL Files
-
-Loading a directory of SQL files will load all of the queries defined in those files into a single object.
-
-!!! danger
-    
-    Beware, don't name queries the same in different files and load them into the same object at the same level. The last one loaded will win. See [Subdirectories](./#subdirectories)
-
-Take for example this simple directory with three `.sql` files. It can be loaded using [`aiosql.from_path`](./api.md#aiosqlfrom_path) by passing the path of the directory and the driver type.
-
-```
-example/sql
-├── blogs.sql
-├── create_schema.sql
-└── users.sql
-```
-
-```python
-queries = aiosql.from_path("example/sql", "sqlite3")
-```
-
-The resulting `queries` object will have a mixture of methods from all the files.
-
-#### Subdirectories
-
-Introducing subdirectories allows namspacing queries. In this case even if two files for `blogs` and `users` have the same query named `--name: get_all`, they can still be accessible on different properties of the queries object.
-
-Assume the _blogs.sql_ and _users.sql_ files both contain a `get_all` query.
-
-```
-example/sql
-├── blogs
-│   └── blogs.sql
-├── create_schema.sql
-└── users
-    └── users.sql
-```
-
-```python
-queries = aiosql.from_path("example/sql", "sqlite3")
-```
-
-The `Queries` object has two nested `get_all` methods accessible on properties which take their names from the name of the subdirectories loaded.
-
-```python
-queries.blogs.get_all(conn)
-queries.users.get_all(conn)
-```
-
 ### From a SQL String
 
-In the simplest case SQL can be loaded from a string. This is useful in the REPL. It could be useful in projects with a lot of pre-existing SQL strings too. The result below is the same as the first example above that loads from a SQL file.
+SQL can be loaded from a string as well. The result below is the same as the first example above that loads from a SQL file.
 
 ```python
 sql_str = """
@@ -145,6 +96,53 @@ The `Queries` object here will have two methods:
 ```python
 queries.get_all_blogs(conn)
 queries.get_user_blogs(conn, username="johndoe")
+```
+
+### From a Directory of SQL Files
+
+Loading a directory of SQL files loads all of the queries defined in those files into a single object. The `example/sql` directory below contains three `.sql` files and can be loaded using [`aiosql.from_path`](./api.md#aiosqlfrom_path).
+
+```
+example/sql
+├── blogs.sql
+├── create_schema.sql
+└── users.sql
+```
+
+```python
+queries = aiosql.from_path("example/sql", "sqlite3")
+```
+
+The resulting `queries` object will have a mixture of methods from all the files.
+
+!!! warning
+    
+    Don't name queries the same in various files in the same directory. The last one loaded will win. See [Subdirectories](./#subdirectories) below to namespace queries.
+
+#### Subdirectories
+
+Introducing subdirectories allows namspacing queries. This means two files for `blogs` and `users` can have the same query name defined but still make them accessible on distinct properties of the queries object.
+
+Assume the _blogs.sql_ and _users.sql_ files both contain a `--name: get_all` query.
+
+```
+example/sql
+├── blogs
+│   └── blogs.sql
+├── create_schema.sql
+└── users
+    └── users.sql
+```
+
+```python
+queries = aiosql.from_path("example/sql", "sqlite3")
+```
+
+The `Queries` object has two nested `get_all` methods accessible on attributes `.blogs` and `.users`. The attributes reflect the names of the subdirectories.
+
+```python
+queries.blogs.get_all(conn)
+queries.users.get_all(conn)
 ```
 
 ## Calling Query Methods
