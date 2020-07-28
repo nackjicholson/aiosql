@@ -2,10 +2,10 @@
 
 ## Query Names
 
-Name definitions are how aiosql determines the name of the methods that SQL code blocks are accessible by. A query name is defined by a SQL comment of the form "-- name: <query-name>". You can use `-` or `_` in your query names, but the methods in python will always be valid python names using underscores.
+Name definitions are how aiosql determines the name of the methods that SQL code blocks are accessible by. A query name is defined by a SQL comment of the form "-- name: <query-name>".
 
 ```sql
--- name: get-all-blogs
+-- name: get_all_blogs
 select * from blogs;
 ```
 
@@ -16,7 +16,7 @@ This query will be available in aiosql under the python method name `.get_all_bl
 _./sql/blogs.sql_
 
 ```sql
--- name: get-all-blogs
+-- name: get_all_blogs
 -- Fetch all fields for every blog in the database.
 select * from blogs;
 ```
@@ -45,7 +45,7 @@ This section describes the usage of various query operator symbols that you can 
 In the above [Query Names](#query-names) section the `get-all-blogs` name is written without any trailing operators.
 
 ```sql
--- name: get-all-blogs
+-- name: get_all_blogs
 ```
 
 The lack of an operator is actually the most basic operator used by default for your queries. This tells aiosql to execute the query and to return all the results. In the case of `get-all-blogs` that means a `select` statement will be executed and a list of rows will be returned. When writing your application you will often need to perform other operations besides `select`, like `insert`, `delete`, and perhaps bulk operations. The operators detailed in the other sections of this doc let you declare in your SQL code how that query should be executed by a python database driver.
@@ -57,7 +57,7 @@ The `^` operator executes a query and returns the first row of a result set. Whe
 As an example, if you have a unique constraint on the `username` field in your `users` table which makes it impossible for two users to share the same username, you could use `^` to direct aiosql to select a single user rather than a list of rows of length 1.
 
 ```sql
--- name: get-user-by-username^
+-- name: get_user_by_username^
 select userid,
        username,
        name
@@ -77,10 +77,10 @@ queries.get_user_by_username(conn, username="willvaughn")
 The `!` operator executes SQL without returning any results. It is meant for statements that use `insert`, `update`, and `delete` to make modifications to database rows without a necessary return value.
 
 ```sql
--- name: publish-blog!
+-- name: publish_blog!
 insert into blogs(userid, title, content) values (:userid, :title, :content);
 
--- name: remove-blog!
+-- name: remove_blog!
 -- Remove a blog from the database
 delete from blogs where blogid = :blogid;
 ```
@@ -101,7 +101,7 @@ When performing a modification of rows, or adding new rows, sometimes it is nece
 When using SQLite this operator will return the id of the inserted row using [`cur.lastrowid`](https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.lastrowid).
 
 ```sql
--- name: publish-blog<!
+-- name: publish_blog<!
 insert into blogs(userid, title, content) values (:userid, :title, :content);
 ```
 
@@ -116,13 +116,13 @@ blogid = queries.publish_blog(conn, userid=1, title="Hi" content="blah blah.")
 PostgreSQL allows returning multiple values via the `returning` clause of queries. This same query using `psycopg2` might look like the following.
 
 ```sql
--- name: publish-blog<!
+-- name: publish_blog<!
 insert into (userid, title, content)
      values (:userid, :title, :content)
   returning blogid, title;
 ```
 
-In python we will get a tuple back with the `blogid` and `title` of the inserted row. This is
+In python a tuple is returned with the `blogid` and `title` of the inserted row.
 
 ```python
 queries = aiosql.from_path("blogs.sql", "psycopg2")
@@ -137,7 +137,7 @@ The `*!` operator directs aiosql to execute a SQL statement over all items of a 
 In aiosql we can use this for a bulk publish method that operates over a list of blog entries.
 
 ```sql
--- name: bulk-publish*!
+-- name: bulk_publish*!
 -- Insert many blogs at once
 insert into blogs (userid, title, content, published)
 values (:userid, :title, :content, :published);
@@ -159,7 +159,7 @@ queries.bulk_publish(conn, blogs)
 Using this operarator will execute sql statements as a script. You can't do variable substitution with the `#` operator. An example usecase is using data definition statements like create table in order to setup a database.
 
 ```sql
--- name: create-schema#
+-- name: create_schema#
 create table users (
     userid integer not null primary key,
     username text not null,
