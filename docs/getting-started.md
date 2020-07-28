@@ -46,7 +46,13 @@ inner join users u on b.userid = u.userid
   order by b.published desc;
 ```
 
-Notice the `--name: <name_of_method>` comments and the `:username` substitution variable. The comments that start with `--name:` are the magic of aiosql. They are used by [`aiosql.from_path`](./api.md#aiosqlfrom_path) to parse the file into separate methods accessible by the name. In the case of _blogs.sql_ we expect the following two methods to be available.
+Notice the `--name: <name_of_method>` comments and the `:username` substitution variable. The comments that start with `--name:` are the magic of aiosql. They are used by [`aiosql.from_path`](./api.md#aiosqlfrom_path) to parse the file into separate methods accessible by the name. The `aiosql.from_path` function takes a path to a sql file or directory and the name of the database driver intended for use with the methods. 
+
+```python
+queries = aiosql.from_path("blogs.sql", "sqlite3")
+```
+
+In the case of _blogs.sql_ we expect the following two methods to be available. The `username` parameter of `get_user_blogs` will substitute in for the `:username` variable in the SQL.
 
 ```python
 def get_all_blogs(self) -> List:
@@ -56,11 +62,90 @@ def get_user_blogs(self, username: str) -> List:
     pass
 ```
 
-The `username` parameter of `get_user_blogs` will substitute in for the `:username` variable in the SQL.
-
 ### From a Directory of SQL Files
 
+Loading a directory of SQL files will load all of the queries defined in those files into a single object.
+
+!!! danger
+    
+    Beware, don't name queries the same in different files and load them into the same object at the same level. The last one loaded will win. See [Subdirectories](./#subdirectories)
+
+Take for example this simple directory with three `.sql` files. It can be loaded using [`aiosql.from_path`](./api.md#aiosqlfrom_path) by passing the path of the directory and the driver type.
+
+```
+example/sql
+├── blogs.sql
+├── create_schema.sql
+└── users.sql
+```
+
+```python
+queries = aiosql.from_path("example/sql", "sqlite3")
+```
+
+The resulting `queries` object will have a mixture of methods from all the files.
+
+#### Subdirectories
+
+Introducing subdirectories allows namspacing queries. In this case even if two files for `blogs` and `users` have the same query named `--name: get_all`, they can still be accessible on different properties of the queries object.
+
+Assume the _blogs.sql_ and _users.sql_ files both contain a `get_all` query.
+
+```
+example/sql
+├── blogs
+│   └── blogs.sql
+├── create_schema.sql
+└── users
+    └── users.sql
+```
+
+```python
+queries = aiosql.from_path("example/sql", "sqlite3")
+```
+
+The `Queries` object has two nested `get_all` methods accessible on properties which take their names from the name of the subdirectories loaded.
+
+```python
+queries.blogs.get_all(conn)
+queries.users.get_all(conn)
+```
+
 ### From a SQL String
+
+In the simplest case SQL can be loaded from a string. This is useful in the REPL. It could be useful in projects with a lot of pre-existing SQL strings too. The result below is the same as the first example above that loads from a SQL file.
+
+```python
+sql_str = """
+-- name: get_all_blogs
+select blogid,
+       userid,
+       title,
+       content,
+       published
+  from blogs;
+
+-- name: get_user_blogs
+-- Get blogs with a fancy formatted published date and author field
+    select b.blogid,
+           b.title,
+           strftime('%Y-%m-%d %H:%M', b.published) as published,
+           u.username as author
+      from blogs b
+inner join users u on b.userid = u.userid
+     where u.username = :username
+  order by b.published desc;
+"""
+
+queries = aiosql.from_str(sql_str, "sqlite3")
+```
+
+The `Queries` object here will have two methods:
+
+```python
+queries.get_all_blogs(conn)
+queries.get_user_blogs(conn, username="johndoe")
+```
 
 ## Calling Query Methods
 
