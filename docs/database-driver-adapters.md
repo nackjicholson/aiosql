@@ -1,45 +1,39 @@
-# Tamen incursant radicibus Ilios
+# Database Driver Adapters
 
-## Caput omnes stipite magis crescunt
+Database driver adapters in aiosql allow extension of the library to support additional database drivers. If you are using a driver other than the ones currently supported by built-in driver adapters (`sqlite3`, `aiosqlite`, `psycopg2`, `asyncpg`) then you will need to make your own. A database driver adapter is a duck-typed class with the following interface.
 
-Lorem markdownum Aenean fudit levius parvo est lapis, et spectes suam, ait bella
-fronte ad cupit. Adiit spem herba. Volantes quaesierat; victa qui, et flexerat,
-Iovis ossa alimenta animo temptaretque conclamat [nobilitate
-geminis](http://illuc.io/aeaciden.html), de. Teneram cadunt et adspexere ut
-oculis hos recludi cristata canit nantemque loqui, demittant carebis tempusque
-feras tuta vela. Frugiferas **dixerat** iussae hoc.
+```python
+class DriverAdapter:
+    def process_sql(self, name, op_type, sql):
+        ...
 
-- Hoc credit unguibus imagine
-- Fixo septem persequitur laetitiae duorum caput lateri
-- Naribus erile
+    def select(self, conn, sql, parameters, row_class=None):
+        ...
 
-Avertere deus saltu sub. Serpit sic crescere nebulas, exaudire vincere fulva
-peregit sui quidem appellantque memoris medio Parthenopeia sonitu perque
-plurima. Idcirco nec quos origo, manu est, ut procul restant utque superos
-ingreditur in mens sinumque res vecta vestigia.
+    def select_one(self, conn, sql, parameters, row_class=None):
+        ...
 
-Terra de saxo nescisse, Aegeus [memoresque ire aethere](http://www.quae.io/eum),
-ursae. Clamore Phene habet.
+    @contextmanager
+    def select_cursor(self, conn, sql, parameters):
+        ...
 
-## Deum induruit quo arma hunc ita meruisse
+    def insert_update_delete(self, conn, sql, parameters):
+        ...
 
-*Curvamine nomina*, refringit est populorum nixus; consedit erravit ad tangit
-adventus *at* et quoque, ferro ut Echionides. Crines solet, Ulixis mensuraque
-quam duram flumen [fraude o](http://www.aitumbra.com/totum.html) super. Herbis
-urbs populusque aconita venientia foliis est, arte grave temporis montis aut
-erant antra! Certamina illic haut carpitur, scitis, **ora** ita pecudesque. Tunc
-muros dis est, et fluit prohibes, cum tellus repercusso quod; timor.
+    def insert_update_delete_many(self, conn, sql, parameters):
+        ...
 
-1. Ferrum fovet
-2. Rerum nemo illis
-3. Ni munere in frutex amata flumine
+    def insert_returning(self, conn, sql, parameters):
+        ...
 
-Orbe faveat aberant, hospitio rogat nequit fluctus, cadit **Orithyia** Saturnia
-detur. Sui [sortemque abesse](http://barbaraforet.org/te) consolante agitasse,
-dare de armis vestigia incidere at caelum, iam lacertis. Femineo manusque
-ignara: haec [offer summam vitamque](http://www.reseminet.io/) robigine
-exclamant lacrimisque et se **vis** vocem non tanget evocat.
+    def execute_script(self, conn, sql):
+        ...
+```
 
-Prius cepisse nescia non **morte**, plantas paveant. Per orat ponit inserere.
-Quercum cecidere edidit se habet: facta ipse iras expulit nivosos concepit
-pedicis, et.
+Looking at the source of the builtin [adapters/](https://github.com/nackjicholson/aiosql/tree/master/aiosql/adapters) is a great place to start seeing how you may write your own database driver adapter.
+
+To use the adapter pass it's constructor or factory as the driver_adapter argument when building Queries.
+
+```python
+queries = aiosql.from_path("foo.sql", driver_adapter=MyDbAdapter)
+```
