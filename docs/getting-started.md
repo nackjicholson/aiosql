@@ -147,53 +147,74 @@ queries.users.get_all(conn)
 
 ## Calling Query Methods
 
-Assuming a database with data exists, here is how to use these methods with the `sqlite3` driver of the python standard library.
+### Connections
+
+The connection or `conn` is always the first argument to an aiosql method. The `conn` is an open connection to a database driver that your aiosql method can use for executing the sql it contains. Controlling connections outside of aiosql queries means you can call multiple queries and control them under one transaction, or otherwise set connection level properties that affect driver behavior. 
+
+!!! Note
+    
+    For more see: [Leveraging Driver Specific Features](./advanced-topics.md#leveraging-driver-specific-features).
+
+In the examples throughout this page a `conn` object has been passed. Here is a more code complete example that shows the connection creation and call to [`aiosql.from_path`](./api.md#aiosqlfrom_path) that make a queries object.
+
+```python
+>>> import sqlite3
+>>> import aiosql
+>>> conn = sqlite3.connect("./mydb.sql")
+>>> # Note the "sqlite3" driver_adapter argument is what tells 
+>>> # aiosql it should be expecting a sqlite3 connection object.
+>>> queries = aiosql.from_path("./blogs.sql", "sqlite3")
+>>> queries.get_all_blogs(conn)
+[(1,
+  1,
+  'What I did Today',
+  'I mowed the lawn, washed some clothes, and ate a burger.\n'
+  '\n'
+  'Until next time,\n'
+  'Bob',
+  '2017-07-28'),
+ (2, 3, 'Testing', 'Is this thing on?\n', '2018-01-01'),
+ (3,
+  1,
+  'How to make a pie.',
+  '1. Make crust\n2. Fill\n3. Bake\n4. Eat\n',
+  '2018-11-23')]
+```
+
+### Passing Parameters
+
+```sql
+-- name: get_user_blogs
+-- Get blogs with a fancy formatted published date and author field
+    select b.blogid,
+           b.title,
+           strftime('%Y-%m-%d %H:%M', b.published) as published,
+           u.username as author
+      from blogs b
+inner join users u on b.userid = u.userid
+     where u.username = :username
+  order by b.published desc;
+```
+
+aiosql allows paremeterization of queries by parsing values like `:username` in the above query and having the resultant method expect an inbound argument to substitute for `:username`.
+
+You can call the `get_user_blogs` function with plain arguments or keyword arguments with the name of the subsitution variable.
 
 ```python
 >>> import sqlite3
 >>> import aiosql
 >>> conn = sqlite3.connect("./mydb.sql")
 >>> queries = aiosql.from_path("./blogs.sql", "sqlite3")
+>>>
+>>> # Using keyword args
 >>> queries.get_user_blogs(conn, username="bobsmith")
 [(3, 'How to make a pie.', '2018-11-23 00:00', 'bobsmith'), (1, 'What I did Today', '2017-07-28 00:00', 'bobsmith')]
+>>>
+>>> # Using positional argument
+>>> queries.get_user_blogs(conn, "janedoe")
+[(2, 'Testing', '2018-01-01 00:00', 'janedoe')]
 ```
 
-Visuraque terras! Est vocat causa, tribusque ille, ingens, cui et perque
-nemorum? Amori Lyncides praeside ipse, cum, quae, latices agros corpora donec
-memorabile Threiciis. Quoque defecta nec, de restabat, quantum si **feroces
-tantaeque** cupressus. Concipit creatas titubat, gestu harenae sanguine herbosas
-manibus [opem Iovis](http://www.ferut.net/) sermone, litora.
+!!! Warning
 
-- Hausit atque rutilos
-- Erat sed
-- Ubi Pygmalion alios ignarus non ignotae pati
-
-## Handling Results
-
-Feriente advolat suo, [percussit Sparten Memnonis](http://mollia-dat.com/)
-Icare, spectabilis. Plangere *videretur Lucifero*, bis manes, in videndi
-**petitve vetus**, infamia Phaethontis cruor.
-
-    if (readme - dotAutoresponder(fileVle, -1, tweakBarSwitch.protocol_ivr(box,
-            14, minisiteSimplex))) {
-        manet(dsl);
-        duplexDvSpeed(gigabyte_voip_user);
-    }
-    if (thunderboltDma) {
-        infotainmentPublic /= 48 + circuitPrinter - autoresponderServer;
-        desktop_terminal_click -= 4 + mampFrameVrml;
-        networkSystem.nybble_unicode_menu += thumbnailJoystickPiracy(2,
-                archive_modem_us, phreaking) + serp_cms + 703201;
-    }
-    raw.rate_encoding_e.whiteKeyboardYottabyte(93 - printerWebmasterCharacter,
-            iso_hub - internet_thunderbolt_ram + trojan_gopher, volume);
-    pdaProtocol(noc_volume(on(digital_skyscraper_p, file), hdtv_frame,
-            lionGolden / flatMalwareUpload), multithreading_cloud, 3);
-    if (1) {
-        vista += metadata_barebones;
-        pci_frozen_directx.word_registry.netiquette_samba_white(
-                title.recordBurnWord.access(rom_cpa_dos, design, avatarPlain));
-        host_javascript_alpha *= 2;
-    } else {
-        cableSrgb -= 249984;
-    }
+    When passing positional arguments aiosql will apply them in the order that the substitutions appear in your SQL. This can be convenient and clear in some cases, but confusing in others. You might want to choose to always name your arguments for clarity.
