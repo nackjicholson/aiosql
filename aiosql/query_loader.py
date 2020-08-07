@@ -18,7 +18,7 @@ class QueryLoader:
         self.record_classes = record_classes if record_classes is not None else {}
 
     def _make_query_datum(self, query_str: str):
-        lines = query_str.strip().splitlines()
+        lines = [l.strip() for l in query_str.strip().splitlines()]
         query_name = lines[0].replace("-", "_")
 
         if query_name.endswith("<!"):
