@@ -4,6 +4,7 @@ from unittest import mock
 import pytest
 import aiosql
 
+from aiosql.exceptions import SQLParseException
 from aiosql.queries import Queries
 from aiosql.query_loader import QueryLoader
 
@@ -49,3 +50,14 @@ def test_fromstr_queryloader_cls(sql):
     aiosql.from_str(sql, "aiosqlite", loader_cls=mock_loader)
 
     assert mock_loader.called
+
+
+def test_trailing_space_on_lines_does_not_error():
+    # There is whitespace in this string after the line ends
+    sql_str = "-- name: trailing-space^    \n"
+    sql_str += "select * from test;     \n"
+
+    try:
+        aiosql.from_str(sql_str, "aiosqlite")
+    except SQLParseException:
+        pytest.fail("Raised SQLParseException due to trailing space in query.")
