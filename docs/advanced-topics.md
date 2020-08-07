@@ -2,7 +2,11 @@
 
 ## Leveraging Driver Specific Features
 
+Todo
+
 ## Access the `cursor` object
+
+Todo
 
 ## Accessing prepared SQL as a string
 
@@ -43,4 +47,100 @@ This example adapts the example usage from psycopg2's documentation for [`execut
 
 ## Sync & Async
 
+Below are two example of a program which can print `"{greeting}, {world_name}!"` from data held in a minimal SQLite database containing greetings and worlds. They use this same sql.
+
+_greetings.sql_
+
+```sql
+-- name: get-all-greetings
+-- Get all the greetings in the database
+select greeting_id,
+       greeting
+  from greetings;
+
+-- name: get-worlds-by-name^
+-- Get the world record from the database.
+select world_id,
+       world_name
+  from worlds
+ where world_name = :world_name;
+```
+
+Notice there is a usage of the [`^` Select One Query Operator](./defining-sql-queries.md#select-one). Adding this to the SQL comment `--name: get-world-by-name^` indicates to aiosql that `queries.get_world_by_name()` will return a single row back.
+
+### Sync with sqlite3
+
+Here we've set up our `sqlite3` connection. Using the `sqlite3.Row` type for our records to make it easy to access values by column names rather than as tuple indices. The program works, it does two queries sqequentially then loops over their results to print greetings.
+
+```python
+import sqlite3
+import aiosql
+
+queries = aiosql.from_path("greetings.sql", driver_adapter="sqlite3")
+
+conn = sqlite3.connect("greetings.db")
+conn.row_factory = sqlite3.Row
+
+# greetings = [
+#     <Row greeting_id=1, greeting="Hi">,
+#     <Row greeting_id=2, greeting="Aloha">,
+#     <Row greeting_id=3, greeting="Hola">
+# ]
+greetings = queries.get_greetings(conn)
+
+# world = <Row world_id=1, world_name="Earth">
+world = queries.get_worlds_by_name(conn, world_name="Earth")
+
+# Hi, Earth!
+# Aloha, Earth!
+# Hola, Earth!
+for greeting_row in greetings:
+    print(f"{greeting_row['greeting']}, {world['world_name']}!")
+
+conn.close()
+```
+
+### Asyncio with aiosqlite
+
+This program is only a little bit different. It let's us leverage [`asyncio.gather`](https://docs.python.org/3/library/asyncio-task.html#asyncio.gather) to make both queries for greetings and worlds in parallel!
+
+```python
+import asyncio
+
+import aiosql
+import aiosqlite
+
+
+queries = aiosql.from_path("greetings.sql", driver_adapter="aiosqlite")
+
+async def main():
+    with async aiosqlite.connect("greetings.db") as conn:
+        conn.row_factory = aiosqlite.Row
+        # Parallel queries!!!
+        #
+        # greetings = [
+        #     <Row greeting_id=1, greeting="Hi">,
+        #     <Row greeting_id=2, greeting="Aloha">,
+        #     <Row greeting_id=3, greeting="Hola">
+        # ]
+        # world = <Row world_id=1, world_name="Earth">
+        greeting_rows, world = await asyncio.gather(
+            queries.get_all_greetings(conn),
+            queries.get_world_by_name(conn, world_name="Earth")
+        )
+
+        # Hi, Earth!
+        # Aloha, Earth!
+        # Hola, Earth!
+        for greeting_row in greeting_rows:
+            print(f"{greeting_row['greeting']}, {world['world_name']}!")
+
+
+asyncio.run(main())
+```
+
+Slightly different usage with [aiosqlite](https://github.com/omnilib/aiosqlite) but I hope this has demonstrated in a small way the big power and performance possibilities with asyncronous queries using the async driver types.
+
 ## Type Hinting Queries with Protocols
+
+Todo
