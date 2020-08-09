@@ -23,7 +23,7 @@ This section goes over the three ways to make SQL queries available for executio
 
 ### From a SQL File
 
-Below is a _blogs.sql_ file that defines two queries.
+SQL can be loaded by providing a path to a `.sql` file. Below is a _blogs.sql_ file that defines two queries.
 
 ```sql
 -- name: get_all_blogs
@@ -121,7 +121,7 @@ The resulting `queries` object will have a mixture of methods from all the files
 
 #### Subdirectories
 
-Introducing subdirectories allows namspacing queries. This means two files for `blogs` and `users` can have the same query name defined but still make them accessible on distinct properties of the queries object.
+Introducing subdirectories allows namspacing queries. This provides a way to further organize and group queries conceptually. For instance, you could define blog queries separate from user queries access them on distinct properties of the queries object.
 
 Assume the _blogs.sql_ and _users.sql_ files both contain a `--name: get_all` query.
 
