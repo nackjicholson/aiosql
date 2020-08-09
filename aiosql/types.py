@@ -22,4 +22,6 @@ class QueryDatum(NamedTuple):
     record_class: Any = None
 
 
-QueryDataTree = Dict[str, Union[QueryDatum, "QueryDataTree"]]
+# Can't make this a recursive type in terms of itself
+# QueryDataTree = Dict[str, Union[QueryDatum, 'QueryDataTree']]
+QueryDataTree = Dict[str, Union[QueryDatum, Dict]]

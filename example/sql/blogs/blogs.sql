@@ -1,5 +1,10 @@
 -- name: get_all_blogs
-select * from blogs;
+select blogid,
+       userid,
+       title,
+       content,
+       published
+  from blogs;
 
 -- name: publish_blog<!
 insert into blogs(userid, title, content) values (:userid, :title, :content);
@@ -9,7 +14,6 @@ insert into blogs(userid, title, content, published) values (?, ?, ?, ?);
 
 
 -- name: get_user_blogs
--- record_class: UserBlog
 -- Get blogs with a fancy formatted published date and author field
     select b.blogid,
            b.title,

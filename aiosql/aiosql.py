@@ -20,13 +20,7 @@ _ADAPTERS = {
 
 
 def _make_driver_adapter(driver_adapter: Union[str, Any]):
-    """Get the driver adapter instance registered by the ``driver_name``.
-
-    Args:
-        driver_adapter (str|Any): The database driver name.
-
-    Returns:
-        object: A driver adapter class.
+    """Get the driver adapter instance registered by the `driver_name`.
     """
     if isinstance(driver_adapter, str):
         try:
@@ -38,51 +32,51 @@ def _make_driver_adapter(driver_adapter: Union[str, Any]):
 
 
 def from_str(
-    sql,
-    driver_adapter,
-    record_classes=None,
+    sql: str,
+    driver_adapter: Union[str, Any],
+    record_classes: Optional[Dict] = None,
     *,
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
 ):
     """Load queries from a SQL string.
 
-    Args:
-        sql (str) A string containing SQL statements and aiosql name:
-        driver_adapter (str|Any): Either a string to designate one of the aiosql built-in
-                                  database driver adapters. One of "sqlite3", "psycopg2",
-                                  "aiosqlite", or "asyncpg". If you have defined your own adapter
-                                  class, you can pass it's constructor.
-        record_classes (dict|None): Mapping of strings used in "record_class" declarations to the
-                                    python classes which aiosql should use when marshaling SQL
-                                    results.
-        loader_cls (QueryLoader): Custom constructor for QueryLoader extensions.
-        queries_cls (Queries): Custom constructor for Queries extensions.
+    **Parameters:**
 
-    Returns:
-        Queries
+    * **sql** - A string containing SQL statements and aiosql name.
+    * **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
+    adapters. One of "sqlite3", "psycopg2", "aiosqlite", or "asyncpg". If you have defined your
+    own adapter class, you can pass it's constructor.
+    * **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
+    declarations to the python classes which aiosql should use when marshaling SQL results.
+    * **loader_cls** - *(optional)* Custom constructor for QueryLoader extensions.
+    * **queries_cls** - *(optional)* Custom constructor for Queries extensions.
 
-    Example:
-        Loading queries from a SQL string::
+    **Returns:** `Queries`
 
-            import sqlite3
-            import aiosql
+    Usage:
 
-            sql_text = \"""
-            -- name: get-all-greetings
-            -- Get all the greetings in the database
-            select * from greetings;
+    Loading queries from a SQL string.
 
-            -- name: get-user-by-username^
-            -- Get all the users from the database,
-            -- and return it as a dict
-            select * from users where username =:username;
-            \"""
+    ```python
+    import sqlite3
+    import aiosql
 
-            queries = aiosql.from_str(sql_text, "sqlite3")
-            queries.get_all_greetings(conn)
-            queries.get_user_by_username(conn, username="willvaughn")
+    sql_text = \"""
+    -- name: get-all-greetings
+    -- Get all the greetings in the database
+    select * from greetings;
 
+    -- name: get-user-by-username^
+    -- Get all the users from the database,
+    -- and return it as a dict
+    select * from users where username = :username;
+    \"""
+
+    queries = aiosql.from_str(sql_text, "sqlite3")
+    queries.get_all_greetings(conn)
+    queries.get_user_by_username(conn, username="willvaughn")
+    ```
     """
     driver_adapter = _make_driver_adapter(driver_adapter)
     query_loader = loader_cls(driver_adapter, record_classes)
@@ -98,29 +92,27 @@ def from_path(
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
 ):
-    """Load queries from a ``.sql`` file, or directory of ``.sql`` files.
+    """Load queries from a `.sql` file, or directory of `.sql` files.
 
-    Args:
-        sql_path (str|Path): Path to a ``.sql`` file or directory containing ``.sql`` files.
-        driver_adapter (str|Any): Either a string to designate one of the aiosql built-in
-                                  database driver adapters. One of "sqlite3", "psycopg2",
-                                  "aiosqlite", or "asyncpg". If you have defined your own adapter
-                                  class, you can pass it's constructor.
-        record_classes (dict|None): Mapping of strings used in "record_class" declarations to the
-                                    python classes which aiosql should use when marshaling SQL
-                                    results.
-        loader_cls (QueryLoader): Custom constructor for QueryLoader extensions.
-        queries_cls (Queries): Custom constructor for Queries extensions.
+    **Parameters:**
 
-    Returns:
-        Queries: Queries object.
+    * **sql_path** - Path to a `.sql` file or directory containing `.sql` files.
+    * **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
+    adapters. One of "sqlite3", "psycopg2", "aiosqlite", or "asyncpg". If you have defined your own
+    adapter class, you may pass its constructor.
+    * **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
+    declarations to the python classes which aiosql should use when marshaling SQL results.
+    * **loader_cls** - *(optional)* Custom constructor for `QueryLoader` extensions.
+    * **queries_cls** - *(optional)* Custom constructor for `Queries` extensions.
 
-    Example::
+    **Returns:** `Queries`
 
-        >>> aiosql.from_path("./sql", "pscycopg2")
-        >>> aiosql.from_path("./sql", MyDBAdapter)
-        >>> aiosql.from_path("./sql/users.sql", "aiosqlite", record_classes={"User": User})
+    Usage:
 
+    ```python
+    >>> queries = aiosql.from_path("./sql", "pscycopg2")
+    >>> queries = aiosql.from_path("./sql", MyDBAdapter)
+    ```
     """
     path = Path(sql_path)
 
