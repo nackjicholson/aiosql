@@ -1,24 +1,17 @@
 import asyncio
 from pathlib import Path
-from typing import NamedTuple
 
 import aiosql
 import aiosqlite
 import pytest
 
-
-class UserBlogSummary(NamedTuple):
-    title: str
-    published: str
-
-
-RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
+from conftest import UserBlogSummary
 
 
 @pytest.fixture()
-def queries():
+def queries(record_classes):
     dir_path = Path(__file__).parent / "blogdb/sql"
-    return aiosql.from_path(dir_path, "aiosqlite", RECORD_CLASSES)
+    return aiosql.from_path(dir_path, "aiosqlite", record_classes)
 
 
 def dict_factory(cursor, row):

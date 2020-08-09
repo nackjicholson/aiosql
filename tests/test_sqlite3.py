@@ -1,16 +1,9 @@
 from pathlib import Path
-from typing import NamedTuple
 
 import aiosql
 import pytest
 
-
-class UserBlogSummary(NamedTuple):
-    title: str
-    published: str
-
-
-RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
+from conftest import UserBlogSummary
 
 
 def dict_factory(cursor, row):
@@ -21,9 +14,9 @@ def dict_factory(cursor, row):
 
 
 @pytest.fixture()
-def queries():
+def queries(record_classes):
     p = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(p, "sqlite3", RECORD_CLASSES)
+    return aiosql.from_path(p, "sqlite3", record_classes)
 
 
 def test_record_query(sqlite3_conn, queries):
