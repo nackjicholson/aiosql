@@ -16,12 +16,13 @@ before_install:
   - pip install poetry
 install: poetry install
 script:
+  - mypy .
   - black aiosql tests --check
   - pytest tests
 stages:
   - test
   - name: deploy
-    if: branch = master
+    if: branch = master AND type != pull_request
 jobs:
   include:
     - stage: deploy
