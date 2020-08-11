@@ -1,5 +1,6 @@
+from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Union, NamedTuple, Any
+from typing import Dict, Union, Any
 
 
 class SQLOperationType(Enum):
@@ -14,7 +15,8 @@ class SQLOperationType(Enum):
     SELECT_ONE = 5
 
 
-class QueryDatum(NamedTuple):
+@dataclass
+class QueryDatum:
     query_name: str
     doc_comments: str
     operation_type: SQLOperationType

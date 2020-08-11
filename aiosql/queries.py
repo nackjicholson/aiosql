@@ -11,59 +11,66 @@ def _params(args, kwargs):
         return args
 
 
-def _make_sync_fn(query_datum):
-    query_name, doc_comments, operation_type, sql, record_class = query_datum
-    if operation_type == SQLOperationType.INSERT_RETURNING:
+def _make_sync_fn(query_datum: QueryDatum):
+    if query_datum.operation_type == SQLOperationType.INSERT_RETURNING:
 
         def fn(self, conn, *args, **kwargs):
             return self.driver_adapter.insert_returning(
-                conn, query_name, sql, _params(args, kwargs)
+                conn, query_datum.query_name, query_datum.sql, _params(args, kwargs)
             )
 
-    elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE:
+    elif query_datum.operation_type == SQLOperationType.INSERT_UPDATE_DELETE:
 
         def fn(self, conn, *args, **kwargs):
             return self.driver_adapter.insert_update_delete(
-                conn, query_name, sql, _params(args, kwargs)
+                conn, query_datum.query_name, query_datum.sql, _params(args, kwargs)
             )
 
-    elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
+    elif query_datum.operation_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
 
         def fn(self, conn, *args, **kwargs):
             return self.driver_adapter.insert_update_delete_many(
-                conn, query_name, sql, *_params(args, kwargs)
+                conn, query_datum.query_name, query_datum.sql, *_params(args, kwargs)
             )
 
-    elif operation_type == SQLOperationType.SCRIPT:
+    elif query_datum.operation_type == SQLOperationType.SCRIPT:
 
         def fn(self, conn, *args, **kwargs):
-            return self.driver_adapter.execute_script(conn, sql)
+            return self.driver_adapter.execute_script(conn, query_datum.sql)
 
-    elif operation_type == SQLOperationType.SELECT:
+    elif query_datum.operation_type == SQLOperationType.SELECT:
 
         def fn(self, conn, *args, **kwargs):
             return self.driver_adapter.select(
-                conn, query_name, sql, _params(args, kwargs), record_class
+                conn,
+                query_datum.query_name,
+                query_datum.sql,
+                _params(args, kwargs),
+                query_datum.record_class,
             )
 
-    elif operation_type == SQLOperationType.SELECT_ONE:
+    elif query_datum.operation_type == SQLOperationType.SELECT_ONE:
 
         def fn(self, conn, *args, **kwargs):
             return self.driver_adapter.select_one(
-                conn, query_name, sql, _params(args, kwargs), record_class
+                conn,
+                query_datum.query_name,
+                query_datum.sql,
+                _params(args, kwargs),
+                query_datum.record_class,
             )
 
     else:
-        raise ValueError(f"Unknown operation_type: {operation_type}")
+        raise ValueError(f"Unknown operation_type: {query_datum.operation_type}")
 
-    fn.__name__ = query_name
-    fn.__doc__ = doc_comments
-    fn.sql = sql  # type: ignore
+    fn.__name__ = query_datum.query_name
+    fn.__doc__ = query_datum.doc_comments
+    fn.sql = query_datum.sql  # type: ignore
 
     return fn
 
 
-def _make_async_fn(fn):
+def _make_async_fn(fn: Callable) -> Callable:
     async def afn(self, conn, *args, **kwargs):
         return await fn(self, conn, *args, **kwargs)
 

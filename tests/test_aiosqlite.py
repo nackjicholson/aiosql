@@ -1,13 +1,14 @@
 import asyncio
+from dataclasses import dataclass
 from pathlib import Path
-from typing import NamedTuple
 
 import aiosql
 import aiosqlite
 import pytest
 
 
-class UserBlogSummary(NamedTuple):
+@dataclass
+class UserBlogSummary:
     title: str
     published: str
 
@@ -47,7 +48,10 @@ async def test_record_query(sqlite3_db_path, queries):
 async def test_parameterized_query(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
         actual = await queries.blogs.get_user_blogs(conn, userid=1)
-        expected = [("How to make a pie.", "2018-11-23"), ("What I did Today", "2017-07-28")]
+        expected = [
+            UserBlogSummary(title="How to make a pie.", published="2018-11-23"),
+            UserBlogSummary(title="What I did Today", published="2017-07-28"),
+        ]
         assert actual == expected
 
 
@@ -142,9 +146,9 @@ async def test_insert_many(sqlite3_db_path, queries):
 
         johns_blogs = await queries.blogs.get_user_blogs(conn, userid=2)
         assert johns_blogs == [
-            ("Blog Part 3", "2018-12-06"),
-            ("Blog Part 2", "2018-12-05"),
-            ("Blog Part 1", "2018-12-04"),
+            UserBlogSummary(title="Blog Part 3", published="2018-12-06"),
+            UserBlogSummary(title="Blog Part 2", published="2018-12-05"),
+            UserBlogSummary(title="Blog Part 1", published="2018-12-04"),
         ]
 
 
