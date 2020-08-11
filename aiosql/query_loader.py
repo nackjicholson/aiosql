@@ -9,11 +9,11 @@ from .patterns import (
     query_name_definition_pattern,
     valid_query_name_pattern,
 )
-from .types import QueryDatum, QueryDataTree, SQLOperationType
+from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
 
 
 class QueryLoader:
-    def __init__(self, driver_adapter, record_classes: Optional[Dict]):
+    def __init__(self, driver_adapter: DriverAdapterProtocol, record_classes: Optional[Dict]):
         self.driver_adapter = driver_adapter
         self.record_classes = record_classes if record_classes is not None else {}
 
