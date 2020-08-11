@@ -1,7 +1,7 @@
 from types import MethodType
-from typing import Callable, List, Tuple
+from typing import Callable, List, Tuple, Set
 
-from .types import QueryDatum, QueryDataTree, SQLOperationType
+from .types import DriverAdapterProtocol, QueryDatum, QueryDataTree, SQLOperationType
 
 
 def _params(args, kwargs):
@@ -15,40 +15,40 @@ def _make_sync_fn(query_datum):
     query_name, doc_comments, operation_type, sql, record_class = query_datum
     if operation_type == SQLOperationType.INSERT_RETURNING:
 
-        def fn(self, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):
             return self.driver_adapter.insert_returning(
                 conn, query_name, sql, _params(args, kwargs)
             )
 
     elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE:
 
-        def fn(self, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):
             return self.driver_adapter.insert_update_delete(
                 conn, query_name, sql, _params(args, kwargs)
             )
 
     elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
 
-        def fn(self, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):
             return self.driver_adapter.insert_update_delete_many(
                 conn, query_name, sql, *_params(args, kwargs)
             )
 
     elif operation_type == SQLOperationType.SCRIPT:
 
-        def fn(self, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):
             return self.driver_adapter.execute_script(conn, sql)
 
     elif operation_type == SQLOperationType.SELECT:
 
-        def fn(self, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):
             return self.driver_adapter.select(
                 conn, query_name, sql, _params(args, kwargs), record_class
             )
 
     elif operation_type == SQLOperationType.SELECT_ONE:
 
-        def fn(self, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):
             return self.driver_adapter.select_one(
                 conn, query_name, sql, _params(args, kwargs), record_class
             )
@@ -63,8 +63,8 @@ def _make_sync_fn(query_datum):
     return fn
 
 
-def _make_async_fn(fn):
-    async def afn(self, conn, *args, **kwargs):
+def _make_async_fn(fn: Callable):
+    async def afn(self: Queries, conn, *args, **kwargs):
         return await fn(self, conn, *args, **kwargs)
 
     afn.__name__ = fn.__name__
@@ -106,10 +106,10 @@ class Queries:
     own adapter class, you can pass it's constructor.
     """
 
-    def __init__(self, driver_adapter):
-        self.driver_adapter = driver_adapter
-        self.is_aio = getattr(driver_adapter, "is_aio_driver", False)
-        self._available_queries = set()
+    def __init__(self, driver_adapter: DriverAdapterProtocol):
+        self.driver_adapter: DriverAdapterProtocol = driver_adapter
+        self.is_aio: bool = getattr(driver_adapter, "is_aio_driver", False)
+        self._available_queries: Set[str] = set()
 
     @property
     def available_queries(self) -> List[str]:

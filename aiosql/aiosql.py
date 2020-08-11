@@ -1,17 +1,17 @@
 from pathlib import Path
-from typing import Dict, Union, Any, Optional, Type
+from typing import Callable, Dict, Optional, Type, Union
 
 from .adapters.aiosqlite import AioSQLiteAdapter
 from .adapters.asyncpg import AsyncPGAdapter
 from .adapters.psycopg2 import PsycoPG2Adapter
 from .adapters.sqlite3 import SQLite3DriverAdapter
 from .exceptions import SQLLoadException
-
 from .queries import Queries
 from .query_loader import QueryLoader
+from .types import DriverAdapterProtocol
 
 
-_ADAPTERS = {
+_ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,
     "asyncpg": AsyncPGAdapter,
     "psycopg2": PsycoPG2Adapter,
@@ -19,7 +19,9 @@ _ADAPTERS = {
 }
 
 
-def _make_driver_adapter(driver_adapter: Union[str, Any]):
+def _make_driver_adapter(
+    driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]]
+) -> DriverAdapterProtocol:
     """Get the driver adapter instance registered by the `driver_name`.
     """
     if isinstance(driver_adapter, str):
@@ -33,7 +35,7 @@ def _make_driver_adapter(driver_adapter: Union[str, Any]):
 
 def from_str(
     sql: str,
-    driver_adapter: Union[str, Any],
+    driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
     record_classes: Optional[Dict] = None,
     *,
     loader_cls: Type[QueryLoader] = QueryLoader,
@@ -78,15 +80,15 @@ def from_str(
     queries.get_user_by_username(conn, username="willvaughn")
     ```
     """
-    driver_adapter = _make_driver_adapter(driver_adapter)
-    query_loader = loader_cls(driver_adapter, record_classes)
+    adapter = _make_driver_adapter(driver_adapter)
+    query_loader = loader_cls(adapter, record_classes)
     query_data = query_loader.load_query_data_from_sql(sql)
-    return queries_cls(driver_adapter).load_from_list(query_data)
+    return queries_cls(adapter).load_from_list(query_data)
 
 
 def from_path(
     sql_path: Union[str, Path],
-    driver_adapter: Union[str, Any],
+    driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
     record_classes: Optional[Dict] = None,
     *,
     loader_cls: Type[QueryLoader] = QueryLoader,
@@ -119,14 +121,14 @@ def from_path(
     if not path.exists():
         raise SQLLoadException(f"File does not exist: {path}")
 
-    driver_adapter = _make_driver_adapter(driver_adapter)
-    query_loader = loader_cls(driver_adapter, record_classes)
+    adapter = _make_driver_adapter(driver_adapter)
+    query_loader = loader_cls(adapter, record_classes)
 
     if path.is_file():
         query_data = query_loader.load_query_data_from_file(path)
-        return queries_cls(driver_adapter).load_from_list(query_data)
+        return queries_cls(adapter).load_from_list(query_data)
     elif path.is_dir():
         query_data_tree = query_loader.load_query_data_from_dir_path(path)
-        return queries_cls(driver_adapter).load_from_tree(query_data_tree)
+        return queries_cls(adapter).load_from_tree(query_data_tree)
     else:
         raise SQLLoadException(f"The sql_path must be a directory or file, got {sql_path}")

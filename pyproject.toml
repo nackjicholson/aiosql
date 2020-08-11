@@ -10,6 +10,7 @@ keywords = ["SQL", "asyncio", "PostgreSQL", "sqlite", "psycopg2"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
+typing_extensions = "^3.7.4"
 
 [tool.poetry.dev-dependencies]
 black = "19.10b0"

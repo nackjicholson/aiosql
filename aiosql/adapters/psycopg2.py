@@ -51,9 +51,9 @@ class PsycoPG2Adapter:
             cur.execute(sql, parameters)
 
     @staticmethod
-    def insert_update_delete_many(conn, _query_name, sql, parmeters):
+    def insert_update_delete_many(conn, _query_name, sql, parameters):
         with conn.cursor() as cur:
-            cur.executemany(sql, parmeters)
+            cur.executemany(sql, parameters)
 
     @staticmethod
     def insert_returning(conn, _query_name, sql, parameters):
