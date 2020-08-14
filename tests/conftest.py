@@ -2,11 +2,73 @@ import csv
 import sqlite3
 from pathlib import Path
 
+import apsw
 import pytest
 
 BLOGDB_PATH = Path(__file__).parent / "blogdb"
 USERS_DATA_PATH = BLOGDB_PATH / "data/users_data.csv"
 BLOGS_DATA_PATH = BLOGDB_PATH / "data/blogs_data.csv"
+
+
+def populate_apsw_db(db_path):
+    conn = apsw.Connection(db_path)
+    cur = conn.cursor()
+    cur.execute(
+        """
+            create table users (
+                userid integer not null primary key,
+                username text not null,
+                firstname integer not null,
+                lastname text not null
+            );
+
+            create table blogs (
+                blogid integer not null primary key,
+                userid integer not null,
+                title text not null,
+                content text not null,
+                published date not null default CURRENT_DATE,
+                foreign key(userid) references users(userid)
+            );
+            """
+    )
+
+    with USERS_DATA_PATH.open() as fp:
+        users = list(csv.reader(fp))
+        cur.executemany(
+            """
+               insert into users (
+                    username,
+                    firstname,
+                    lastname
+               ) values (?, ?, ?);""",
+            users,
+        )
+    with BLOGS_DATA_PATH.open() as fp:
+        blogs = list(csv.reader(fp))
+        cur.executemany(
+            """
+                insert into blogs (
+                    userid,
+                    title,
+                    content,
+                    published
+                ) values (?, ?, ?, ?);""",
+            blogs,
+        )
+
+
+@pytest.fixture()
+def apsw_db_path(tmpdir):
+    db_path = str(Path(tmpdir.strpath) / "blogdb.db")
+    populate_apsw_db(db_path)
+    return db_path
+
+
+@pytest.fixture()
+def apsw_conn(apsw_db_path):
+    conn = apsw.Connection(apsw_db_path)
+    yield conn
 
 
 def populate_sqlite3_db(db_path):

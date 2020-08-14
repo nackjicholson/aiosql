@@ -102,8 +102,8 @@ class Queries:
     **Parameters:**
 
     * **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
-    adapters. One of "sqlite3", "psycopg2", "aiosqlite", or "asyncpg". If you have defined your
-    own adapter class, you can pass it's constructor.
+    adapters. One of "apsw", "sqlite3", "psycopg2", "aiosqlite", or "asyncpg". If you have defined
+    your own adapter class, you can pass it's constructor.
     """
 
     def __init__(self, driver_adapter: DriverAdapterProtocol):

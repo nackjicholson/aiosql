@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Callable, Dict, Optional, Type, Union
 
 from .adapters.aiosqlite import AioSQLiteAdapter
+from .adapters.apsw import APSWDriverAdapter
 from .adapters.asyncpg import AsyncPGAdapter
 from .adapters.psycopg2 import PsycoPG2Adapter
 from .adapters.sqlite3 import SQLite3DriverAdapter
@@ -13,6 +14,7 @@ from .types import DriverAdapterProtocol
 
 _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,
+    "apsw": APSWDriverAdapter,
     "asyncpg": AsyncPGAdapter,
     "psycopg2": PsycoPG2Adapter,
     "sqlite3": SQLite3DriverAdapter,
@@ -100,8 +102,8 @@ def from_path(
 
     * **sql_path** - Path to a `.sql` file or directory containing `.sql` files.
     * **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
-    adapters. One of "sqlite3", "psycopg2", "aiosqlite", or "asyncpg". If you have defined your own
-    adapter class, you may pass its constructor.
+    adapters. One of "apsw", "sqlite3", "psycopg2", "aiosqlite", or "asyncpg". If you have defined
+    your own adapter class, you may pass its constructor.
     * **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
     declarations to the python classes which aiosql should use when marshaling SQL results.
     * **loader_cls** - *(optional)* Custom constructor for `QueryLoader` extensions.
