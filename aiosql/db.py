@@ -32,10 +32,12 @@ class DB:
         # database connection
         SQLITE = ('sqlite3', 'sqlite')
         POSTGRES = ('pg', 'postgres', 'postgresql', 'psycopg2')
-        self._db = 'sqlite3' if db in SQLITE else \
-            'psycopg2' if db in POSTGRES else \
-            None
-        assert self._db is not None, f"database {db} is supported"
+        if db in SQLITE:
+            self._db = 'sqlite3'
+        elif db in POSTGRES:
+            self._db = 'psycopg2'
+        else:
+            raise Exception(f"database {db} is supported")
         self._conn_str = conn
         self._queries_file = queries
         # accept connection options as they are
