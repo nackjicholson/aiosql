@@ -1,9 +1,10 @@
 import pytest
 import re
 
+from pathlib import Path
 from aiosql import DB
 
-SQL = 'test_db.sql'
+SQL = Path(__file__).parent / 'test_db.sql'
 
 def run_42(db: DB):
 	assert db is not None
