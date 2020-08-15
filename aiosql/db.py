@@ -15,9 +15,16 @@ class DB:
     and SQL execution methods from aiosql.
     """
 
-    def __init__(self, db: str, conn: str, queries: str = None,
-                 options: Any = None, auto_reconnect: bool = True,
-                 debug: bool = False, **conn_options):
+    def __init__(
+        self,
+        db: str,
+        conn: str,
+        queries: str = None,
+        options: Any = None,
+        auto_reconnect: bool = True,
+        debug: bool = False,
+        **conn_options,
+    ):
         """DB constructor
 
         - db: database engine, `sqlite` or `postgres`
@@ -30,12 +37,12 @@ class DB:
         """
         log.info(f"creating DB for {db}")
         # database connection
-        SQLITE = ('sqlite3', 'sqlite')
-        POSTGRES = ('pg', 'postgres', 'postgresql', 'psycopg2')
+        SQLITE = ("sqlite3", "sqlite")
+        POSTGRES = ("pg", "postgres", "postgresql", "psycopg2")
         if db in SQLITE:
-            self._db = 'sqlite3'
+            self._db = "sqlite3"
         elif db in POSTGRES:
-            self._db = 'psycopg2'
+            self._db = "psycopg2"
         else:
             raise Exception(f"database {db} is supported")
         self._conn_str = conn
@@ -46,6 +53,7 @@ class DB:
             pass
         elif isinstance(options, str):
             import ast
+
             self._conn_options.update(ast.literal_eval(options))
         elif isinstance(options, dict):
             self._conn_options.update(options)
@@ -88,8 +96,7 @@ class DB:
                 log.warning(f"DB {self._db} rollback failed: {rolerr}")
             # detect a connection error for psycopg2, to attempt a reconnection
             # should more cases be handled?
-            if hasattr(self._conn, 'closed') and self._conn.closed == 2 and \
-               self._auto_reconnect:
+            if hasattr(self._conn, "closed") and self._conn.closed == 2 and self._auto_reconnect:
                 self._reconn = True
             raise error
 
@@ -99,8 +106,7 @@ class DB:
         for q in queries.available_queries:
             f = getattr(queries, q)
             if callable(f):
-                setattr(self, q,
-                        ft.partial(self._call_fn, q, getattr(queries, q)))
+                setattr(self, q, ft.partial(self._call_fn, q, getattr(queries, q)))
                 self._available_queries.add(q)
                 self._count[q] = 0
 
@@ -115,11 +121,13 @@ class DB:
     def _connect(self):
         """Create a database connection."""
         log.info(f"DB {self._db}: connecting")
-        if self._db == 'sqlite3':
+        if self._db == "sqlite3":
             import sqlite3 as db
+
             return db.connect(self._conn_str, **self._conn_options)
-        elif self._db == 'psycopg2':
+        elif self._db == "psycopg2":
             import psycopg2 as db  # type: ignore
+
             return db.connect(self._conn_str, **self._conn_options)
         else:
             # note: anosql currently supports sqlite & postgres
