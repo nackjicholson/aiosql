@@ -23,4 +23,4 @@ UPDATE Foo SET val = :val WHERE pk = :pk;
 DELETE FROM Foo WHERE pk = :pk;
 
 -- name: delete-foo-all!
-DELETE FROM Foo WHERE TRUE;
+DELETE FROM Foo;
