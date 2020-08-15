@@ -9,3 +9,8 @@
 
 ::: aiosql.from_str
     :docstring:
+
+## aiosql.DB
+
+::: aiosql.DB
+    :docstring:
