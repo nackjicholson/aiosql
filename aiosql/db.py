@@ -71,7 +71,7 @@ class DB:
             self.add_queries_from_path(queries)
 
     def _call_fn(self, query, fn, *args, **kwargs):
-        """Forward method call to anosql query
+        """Forward method call to aiosql query
 
         On connection failure, it will try to reconnect on the next call
         if auto_reconnect was specified.
@@ -130,7 +130,7 @@ class DB:
 
             return db.connect(self._conn_str, **self._conn_options)
         else:
-            # note: anosql currently supports sqlite & postgres
+            # note: aiosql currently supports sqlite & postgres
             raise Exception(f"unexpected db {self._db}")
 
     def _reconnect(self):
