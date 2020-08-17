@@ -72,18 +72,18 @@ class DB:
         # connection function
         if isinstance(conn, str):
             if self._db == "sqlite3":
-                import sqlite3 as db
+                import sqlite3 as dbd
 
                 def cf(self):
-                    return db.connect(conn, **self._conn_options)
+                    return dbd.connect(conn, **self._conn_options)
             elif self._db == 'psycopg2':
-                import psycopg2 as db  # type: ignore
+                import psycopg2 as dbd  # type: ignore
 
                 def cf(self):
                     return db.connect(conn, **self._conn_options)
             else:
                 raise Exception(f"cannot create connection for db {self._db}")
-        elif isinstance(conn, Callable):
+        elif callable(conn):
             def cf(self):
                 return conn(**self._conn_options)
         else:
@@ -148,6 +148,9 @@ class DB:
     def add_queries_from_str(self, qs: str):
         """Load queries from a string."""
         self._create_fns(sql.from_str(qs, self._db))
+
+    def _connect(self):
+        raise Exception(f"method to be replaced dynamically")
 
     def _reconnect(self):
         """Try to reconnect to database."""
