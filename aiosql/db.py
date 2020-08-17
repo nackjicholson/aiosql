@@ -16,7 +16,7 @@ class DB:
 
     ```Python
     import aiosql
-    db = DB('sqlite', 'blogs.db', 'blogs.sql')
+    db = aiosql.DB('sqlite', 'blogs.db', 'blogs.sql')
     db.publish_blogs(userid=1, title='hello', content='world', published='2020-08-17')
     …
     db.close()
@@ -40,7 +40,7 @@ class DB:
 
         - db: database engine, `sqlite` or `postgres`
         - conn: database-specific connection string, or connection generator function
-        - queries: file holding queries for `aiosql`
+        - queries: file holding queries for `aiosql`, or None
         - options: database-specific options in various forms
         - auto_reconnect: whether to reconnect on connection errors
         - debug: debug mode generate more logs through `logging`
@@ -92,14 +92,15 @@ class DB:
 
         else:
             raise Exception(f"cannot create connection for {conn}")
+        # overwrite predefined _connect
         setattr(DB, "_connect", cf)
         # queries
         self._queries_file = queries
         self._debug = debug
         self._auto_reconnect = auto_reconnect
-        self._reconn = False
+        self._conn = None
+        self._reconn = True
         self._count: Dict[str, int] = {}
-        self._conn = self._connect()
         self._queries: List[sql.aiosql.Queries] = []
         self._available_queries: Set[str] = set()
         if queries is not None:
@@ -182,6 +183,7 @@ class DB:
 
         This allow to do some raw SQL.
         """
+        self.connect()
         return self._conn.cursor()
 
     def commit(self):
