@@ -81,7 +81,7 @@ class DB:
                 import psycopg2 as dbd  # type: ignore
 
                 def cf(self):
-                    return db.connect(conn, **self._conn_options)
+                    return dbd.connect(conn, **self._conn_options)
 
             else:
                 raise Exception(f"cannot create connection for db {self._db}")
