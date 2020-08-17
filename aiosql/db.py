@@ -2,7 +2,7 @@
 # This marvelous code is Public Domain.
 #
 
-from typing import Any, Dict, Set, List
+from typing import Any, Dict, Set, List, Union, Callable
 import logging as log
 import functools as ft
 import aiosql as sql  # type: ignore
@@ -12,15 +12,26 @@ class DB:
     """Hides database connection and queries in here.
 
     The class provides the DB-API 2.0 connection methods,
-    and SQL execution methods from aiosql.
+    and SQL execution methods from `aiosql`.
+
+    ```Python
+    import aiosql
+    db = DB('sqlite', 'blogs.db', 'blogs.sql')
+    db.publish_blogs(userid=1, title='hello', content='world', published='2020-08-17')
+    …
+    db.close()
+    db.connect()
+    db.publish_blogs(userid=2, title='hi', content='bonjour', published='2038-01-19')
+    db.close
+    ```
     """
 
     def __init__(
         self,
         db: str,
-        conn: str,
-        queries: str = None,
-        options: Any = None,
+        conn: Union[str, Callable],
+        queries: Union[str, None] = None,
+        options: Union[None, str, Dict[str, Any]] = None,
         auto_reconnect: bool = True,
         debug: bool = False,
         **conn_options,
@@ -28,7 +39,7 @@ class DB:
         """DB constructor
 
         - db: database engine, `sqlite` or `postgres`
-        - conn: database-specific connection string
+        - conn: database-specific connection string, or connection generator function
         - queries: file holding queries for `aiosql`
         - options: database-specific options in various forms
         - auto_reconnect: whether to reconnect on connection errors
@@ -43,11 +54,8 @@ class DB:
             self._db = "sqlite3"
         elif db in POSTGRES:
             self._db = "psycopg2"
-        # add other supported drivers here
-        else:
-            raise Exception(f"database {db} is not supported by DB")
-        self._conn_str = conn
-        self._queries_file = queries
+        else:  # keep it as is, trusting that some adapter is available
+            self._db = db
         # accept connection options as they are
         self._conn_options: Dict[str, Any] = {}
         if options is None:
@@ -61,6 +69,28 @@ class DB:
         else:
             raise Exception(f"unexpected type for options: {type(options)}")
         self._conn_options.update(conn_options)
+        # connection function
+        if isinstance(conn, str):
+            if self._db == "sqlite3":
+                import sqlite3 as db
+
+                def cf(self):
+                    return db.connect(conn, **self._conn_options)
+            elif self._db == 'psycopg2':
+                import psycopg2 as db  # type: ignore
+
+                def cf(self):
+                    return db.connect(conn, **self._conn_options)
+            else:
+                raise Exception(f"cannot create connection for db {self._db}")
+        elif isinstance(conn, Callable):
+            def cf(self):
+                return conn(**self._conn_options)
+        else:
+            raise Exception(f"cannot create connection for {conn}")
+        setattr(DB, '_connect', cf)
+        # queries
+        self._queries_file = queries
         self._debug = debug
         self._auto_reconnect = auto_reconnect
         self._reconn = False
@@ -119,20 +149,6 @@ class DB:
         """Load queries from a string."""
         self._create_fns(sql.from_str(qs, self._db))
 
-    def _connect(self):
-        """Create a database connection."""
-        log.info(f"DB {self._db}: connecting")
-        if self._db == "sqlite3":
-            import sqlite3 as db
-
-            return db.connect(self._conn_str, **self._conn_options)
-        elif self._db == "psycopg2":
-            import psycopg2 as db  # type: ignore
-
-            return db.connect(self._conn_str, **self._conn_options)
-        else:
-            raise Exception(f"cannot create connection for {self._db}")
-
     def _reconnect(self):
         """Try to reconnect to database."""
         log.info(f"DB {self._db}: reconnecting")
@@ -146,29 +162,38 @@ class DB:
         self._reconn = False
 
     def connect(self):
-        """Create database connection if needed."""
+        """Create database connection, if needed.
+
+        It can be closed with `close`.
+        """
         if self._conn is None:
             self._conn = self._connect()
 
     def cursor(self):
-        """Get a cursor on the current connection."""
+        """Get a cursor on the current connection.
+
+        This allow to do some raw SQL.
+        """
         return self._conn.cursor()
 
     def commit(self):
-        """Commit database transaction."""
+        """Commit current database transaction."""
         self._conn.commit()
 
     def rollback(self):
-        """Rollback database transaction."""
+        """Rollback current database transaction."""
         self._conn.rollback()
 
     def close(self):
-        """Close underlying database connection."""
+        """Close underlying database connection.
+
+        The database connection can be re-created with `connect`.
+        """
         self._conn.close()
         self._conn = None
 
     def __str__(self):
-        return f"connection to {self._db} database ({self._conn_str})"
+        return f"connection to {self._db} database"
 
     def __del__(self):
         if self._conn is not None:

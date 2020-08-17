@@ -54,6 +54,15 @@ def test_sqlite():
     db.close()
 
 
+def test_connfunc():
+    import sqlite3
+    def cf():
+        return sqlite3.connect(":memory:", check_same_thread=False)
+    db = DB("sqlite", cf, SQL)
+    run_stuff(db)
+    db.close()
+
+
 def test_options():
     db = DB("sqlite", ":memory:", SQL, timeout=10, check_same_thread=False, isolation_level=None)
     run_42(db)
