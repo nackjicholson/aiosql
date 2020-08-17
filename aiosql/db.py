@@ -150,6 +150,7 @@ class DB:
         self._create_fns(sql.from_str(qs, self._db))
 
     def _connect(self):
+        """Create an actual connection."""
         raise Exception(f"method to be replaced dynamically")
 
     def _reconnect(self):
