@@ -56,8 +56,10 @@ def test_sqlite():
 
 def test_connfunc():
     import sqlite3
+
     def cf():
         return sqlite3.connect(":memory:", check_same_thread=False)
+
     db = DB("sqlite", cf, SQL)
     run_stuff(db)
     db.close()

@@ -76,19 +76,23 @@ class DB:
 
                 def cf(self):
                     return dbd.connect(conn, **self._conn_options)
-            elif self._db == 'psycopg2':
+
+            elif self._db == "psycopg2":
                 import psycopg2 as dbd  # type: ignore
 
                 def cf(self):
                     return db.connect(conn, **self._conn_options)
+
             else:
                 raise Exception(f"cannot create connection for db {self._db}")
         elif callable(conn):
+
             def cf(self):
                 return conn(**self._conn_options)
+
         else:
             raise Exception(f"cannot create connection for {conn}")
-        setattr(DB, '_connect', cf)
+        setattr(DB, "_connect", cf)
         # queries
         self._queries_file = queries
         self._debug = debug
