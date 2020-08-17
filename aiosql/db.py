@@ -43,8 +43,9 @@ class DB:
             self._db = "sqlite3"
         elif db in POSTGRES:
             self._db = "psycopg2"
+        # add other supported drivers here
         else:
-            raise Exception(f"database {db} is supported")
+            raise Exception(f"database {db} is not supported by DB")
         self._conn_str = conn
         self._queries_file = queries
         # accept connection options as they are
@@ -130,8 +131,7 @@ class DB:
 
             return db.connect(self._conn_str, **self._conn_options)
         else:
-            # note: aiosql currently supports sqlite & postgres
-            raise Exception(f"unexpected db {self._db}")
+            raise Exception(f"cannot create connection for {self._db}")
 
     def _reconnect(self):
         """Try to reconnect to database."""
