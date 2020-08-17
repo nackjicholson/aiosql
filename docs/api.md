@@ -13,4 +13,4 @@
 ## aiosql.DB
 
 ::: aiosql.DB
-    :docstring:
+    :members:
