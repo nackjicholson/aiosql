@@ -181,7 +181,7 @@ class DB:
     def cursor(self):
         """Get a cursor on the current connection.
 
-        This allow to do some raw SQL.
+        This allows to do some raw SQL.
         """
         self.connect()
         return self._conn.cursor()
