@@ -1,13 +1,16 @@
 from setuptools import setup, find_packages
+from pathlib import Path
 import re
 
-with open("README.md", "r") as fh:
+DIR = Path(__file__).parent
+
+with open(DIR / "README.md", "r") as fh:
     long_description = fh.read()
 
 def extract(prop, text):
     return re.search(f"{prop} = \"(.*)\"", text).group(1)
 
-with open("pyproject.toml") as ph:
+with open(DIR / "pyproject.toml") as ph:
     text = ph.read()
     name = extract("name", text)
     version = extract("version", text)
