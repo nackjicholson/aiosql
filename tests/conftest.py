@@ -3,10 +3,15 @@ import sqlite3
 from pathlib import Path
 
 import pytest
+from pytest_postgresql import factories
 
 BLOGDB_PATH = Path(__file__).parent / "blogdb"
 USERS_DATA_PATH = BLOGDB_PATH / "data/users_data.csv"
 BLOGS_DATA_PATH = BLOGDB_PATH / "data/blogs_data.csv"
+
+
+def pytest_addoption(parser):
+    parser.addoption("--postgresql-detached", action="store_true")
 
 
 def populate_sqlite3_db(db_path):
@@ -74,13 +79,21 @@ def sqlite3_conn(sqlite3_db_path):
     conn.close()
 
 
+postgresqlnoop = factories.postgresql("postgresql_nooproc")
+
+
 @pytest.fixture
-def pg_conn(postgresql):
+def pg_conn(request):
     """Loads seed data before returning db connection.
     """
-    with postgresql:
+    if request.config.getoption("postgresql_detached"):
+        conn = request.getfixturevalue("postgresqlnoop")
+    else:
+        conn = request.getfixturevalue("postgresql")
+
+    with conn:
         # Loads data from blogdb fixture data
-        with postgresql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute(
                 """
                 create table users (
@@ -101,7 +114,7 @@ def pg_conn(postgresql):
                 );"""
             )
 
-        with postgresql.cursor() as cur:
+        with conn.cursor() as cur:
             with USERS_DATA_PATH.open() as fp:
                 cur.copy_from(fp, "users", sep=",", columns=["username", "firstname", "lastname"])
             with BLOGS_DATA_PATH.open() as fp:
@@ -109,10 +122,11 @@ def pg_conn(postgresql):
                     fp, "blogs", sep=",", columns=["userid", "title", "content", "published"]
                 )
 
-    return postgresql
+    return conn
 
 
 @pytest.fixture()
-def pg_dsn(pg_conn):
+def pg_dsn(request, pg_conn):
     p = pg_conn.get_dsn_parameters()
-    return f"postgres://{p['user']}@{p['host']}:{p['port']}/{p['dbname']}"
+    pw = request.config.getoption("postgresql_password")
+    return f"postgres://{p['user']}:{pw}@{p['host']}:{p['port']}/{p['dbname']}"

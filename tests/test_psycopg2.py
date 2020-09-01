@@ -22,9 +22,8 @@ def queries():
     return aiosql.from_path(dir_path, "psycopg2", RECORD_CLASSES)
 
 
-def test_record_query(pg_conn, queries):
-    dsn = pg_conn.get_dsn_parameters()
-    with psycopg2.connect(**dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+def test_record_query(pg_dsn, queries):
+    with psycopg2.connect(dsn=pg_dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
         actual = queries.users.get_all(conn)
 
     assert len(actual) == 3
@@ -42,9 +41,8 @@ def test_parameterized_query(pg_conn, queries):
     assert actual == expected
 
 
-def test_parameterized_record_query(pg_conn, queries):
-    dsn = pg_conn.get_dsn_parameters()
-    with psycopg2.connect(**dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+def test_parameterized_record_query(pg_dsn, queries):
+    with psycopg2.connect(dsn=pg_dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
         actual = queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
 
     expected = [
