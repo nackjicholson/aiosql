@@ -49,7 +49,7 @@ class SyncDriverAdapterProtocol(Protocol):
         query_name: str,
         sql: str,
         parameters: Union[List, Dict],
-        record_class=Optional[Callable],
+        record_class: Optional[Callable],
     ) -> List:
         ...
 
@@ -59,7 +59,7 @@ class SyncDriverAdapterProtocol(Protocol):
         query_name: str,
         sql: str,
         parameters: Union[List, Dict],
-        record_class=Optional[Callable],
+        record_class: Optional[Callable],
     ) -> Optional[Any]:
         ...
 
@@ -100,7 +100,7 @@ class AsyncDriverAdapterProtocol(Protocol):
         query_name: str,
         sql: str,
         parameters: Union[List, Dict],
-        record_class=Optional[Callable],
+        record_class: Optional[Callable],
     ) -> List:
         ...
 
@@ -110,7 +110,7 @@ class AsyncDriverAdapterProtocol(Protocol):
         query_name: str,
         sql: str,
         parameters: Union[List, Dict],
-        record_class=Optional[Callable],
+        record_class: Optional[Callable],
     ) -> Optional[Any]:
         ...
 
