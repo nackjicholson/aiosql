@@ -76,8 +76,7 @@ def _make_async_fn(fn: Callable):
 
 def _make_ctx_mgr(fn: Callable):
     def ctx_mgr(self, conn, *args, **kwargs):
-        parameters = kwargs if len(kwargs) > 0 else args
-        return self.driver_adapter.select_cursor(conn, fn.__name__, fn.sql, parameters)
+        return self.driver_adapter.select_cursor(conn, fn.__name__, fn.sql, _params(args, kwargs))
 
     ctx_mgr.__name__ = f"{fn.__name__}_cursor"
     ctx_mgr.__doc__ = fn.__doc__
