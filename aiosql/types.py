@@ -34,6 +34,14 @@ class QueryDatum(NamedTuple):
     record_class: Any = None
 
 
+class QueryFn(Protocol):
+    __name__: str
+    sql: str
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        ...
+
+
 # Can't make this a recursive type in terms of itself
 # QueryDataTree = Dict[str, Union[QueryDatum, 'QueryDataTree']]
 QueryDataTree = Dict[str, Union[QueryDatum, Dict]]
