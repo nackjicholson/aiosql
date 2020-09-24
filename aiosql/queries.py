@@ -74,11 +74,7 @@ def _make_async_fn(fn: Callable):
     return afn
 
 
-def _create_methods(query_datum: QueryDatum, is_aio: bool) -> List[Tuple[str, Callable]]:
-    fn = _make_sync_fn(query_datum)
-    if is_aio:
-        fn = _make_async_fn(fn)
-
+def _make_ctx_mgr(fn: Callable):
     def ctx_mgr(self, conn, *args, **kwargs):
         parameters = kwargs if len(kwargs) > 0 else args
         return self.driver_adapter.select_cursor(conn, fn.__name__, fn.sql, parameters)
@@ -86,6 +82,16 @@ def _create_methods(query_datum: QueryDatum, is_aio: bool) -> List[Tuple[str, Ca
     ctx_mgr.__name__ = f"{fn.__name__}_cursor"
     ctx_mgr.__doc__ = fn.__doc__
     ctx_mgr.sql = fn.sql  # type: ignore
+
+    return ctx_mgr
+
+
+def _create_methods(query_datum: QueryDatum, is_aio: bool) -> List[Tuple[str, Callable]]:
+    fn = _make_sync_fn(query_datum)
+    if is_aio:
+        fn = _make_async_fn(fn)
+
+    ctx_mgr = _make_ctx_mgr(fn)
 
     if query_datum.operation_type == SQLOperationType.SELECT:
         return [(fn.__name__, fn), (ctx_mgr.__name__, ctx_mgr)]
