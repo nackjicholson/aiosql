@@ -69,3 +69,4 @@ class PsycoPG2Adapter:
     def execute_script(conn, sql):
         with conn.cursor() as cur:
             cur.execute(sql)
+            return cur.statusmessage

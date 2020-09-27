@@ -145,3 +145,9 @@ def test_insert_many(pg_conn, queries):
             ("Blog Part 2", date(2018, 12, 5)),
             ("Blog Part 1", date(2018, 12, 4)),
         ]
+
+
+def test_execute_script(pg_conn, queries):
+    with pg_conn:
+        actual = queries.comments.pg_create_comments_table(pg_conn)
+        assert actual == "CREATE TABLE"
