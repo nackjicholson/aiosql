@@ -53,6 +53,11 @@ def _make_sync_fn(query_datum):
                 conn, query_name, sql, _params(args, kwargs), record_class
             )
 
+    elif operation_type == SQLOperationType.SELECT_VALUE:
+
+        def fn(self: Queries, conn, *args, **kwargs):
+            return self.driver_adapter.select_value(conn, query_name, sql, _params(args, kwargs))
+
     else:
         raise ValueError(f"Unknown operation_type: {operation_type}")
 

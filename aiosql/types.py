@@ -24,6 +24,7 @@ class SQLOperationType(Enum):
     SCRIPT = 3
     SELECT = 4
     SELECT_ONE = 5
+    SELECT_VALUE = 6
 
 
 class QueryDatum(NamedTuple):
@@ -60,6 +61,11 @@ class SyncDriverAdapterProtocol(Protocol):
         sql: str,
         parameters: Union[List, Dict],
         record_class: Optional[Callable],
+    ) -> Optional[Any]:
+        ...
+
+    def select_value(
+        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict],
     ) -> Optional[Any]:
         ...
 
@@ -110,6 +116,11 @@ class AsyncDriverAdapterProtocol(Protocol):
         sql: str,
         parameters: Union[List, Dict],
         record_class: Optional[Callable],
+    ) -> Optional[Any]:
+        ...
+
+    async def select_value(
+        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict],
     ) -> Optional[Any]:
         ...
 

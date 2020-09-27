@@ -39,6 +39,13 @@ class PsycoPG2Adapter:
         return result
 
     @staticmethod
+    def select_value(conn, _query_name, sql, parameters):
+        with conn.cursor() as cur:
+            cur.execute(sql, parameters)
+            result = cur.fetchone()
+        return result[0] if result else None
+
+    @staticmethod
     @contextmanager
     def select_cursor(conn, _query_name, sql, parameters):
         with conn.cursor() as cur:

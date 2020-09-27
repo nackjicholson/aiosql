@@ -38,6 +38,12 @@ class AioSQLiteAdapter:
         return result
 
     @staticmethod
+    async def select_value(conn, _query_name, sql, parameters):
+        async with conn.execute(sql, parameters) as cur:
+            result = await cur.fetchone()
+        return result[0] if result else None
+
+    @staticmethod
     @aiocontextmanager
     async def select_cursor(conn, _query_name, sql, parameters):
         async with conn.execute(sql, parameters) as cur:
