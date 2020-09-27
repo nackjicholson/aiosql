@@ -85,8 +85,7 @@ class SyncDriverAdapterProtocol(Protocol):
     ) -> Optional[Any]:
         ...
 
-    # TODO: Next major version introduce a return? Optional return?
-    def execute_script(self, conn: Any, sql: str) -> None:
+    def execute_script(self, conn: Any, sql: str) -> str:
         ...
 
 
@@ -136,8 +135,7 @@ class AsyncDriverAdapterProtocol(Protocol):
     ) -> Optional[Any]:
         ...
 
-    # TODO: Next major version introduce a return? Optional return?
-    async def execute_script(self, conn: Any, sql: str) -> None:
+    async def execute_script(self, conn: Any, sql: str) -> str:
         ...
 
 
