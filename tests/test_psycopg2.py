@@ -80,6 +80,12 @@ def test_select_one(pg_conn, queries):
     assert actual == expected
 
 
+def test_select_value(pg_conn, queries):
+    actual = queries.users.get_count(pg_conn)
+    expected = 3
+    assert actual == expected
+
+
 def test_insert_returning(pg_conn, queries):
     with pg_conn:
         blogid, title = queries.blogs.pg_publish_blog(

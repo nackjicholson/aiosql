@@ -81,6 +81,12 @@ def test_select_one(sqlite3_conn, queries):
     assert actual == expected
 
 
+def test_select_value(sqlite3_conn, queries):
+    actual = queries.users.get_count(sqlite3_conn)
+    expected = 3
+    assert actual == expected
+
+
 def test_insert_returning(sqlite3_conn, queries):
     with sqlite3_conn:
         blogid = queries.blogs.publish_blog(

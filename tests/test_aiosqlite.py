@@ -101,6 +101,15 @@ async def test_select_one(sqlite3_db_path, queries):
 
 
 @pytest.mark.asyncio
+async def test_select_value(sqlite3_db_path, queries):
+    async with aiosqlite.connect(sqlite3_db_path) as conn:
+        actual = await queries.users.get_count(conn)
+
+    expected = 3
+    assert actual == expected
+
+
+@pytest.mark.asyncio
 async def test_insert_returning(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
         blogid = await queries.blogs.publish_blog(

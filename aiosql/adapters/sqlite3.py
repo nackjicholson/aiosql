@@ -41,6 +41,14 @@ class SQLite3DriverAdapter:
         return result
 
     @staticmethod
+    def select_value(conn, _query_name, sql, parameters):
+        cur = conn.cursor()
+        cur.execute(sql, parameters)
+        result = cur.fetchone()
+        cur.close()
+        return result[0] if result else None
+
+    @staticmethod
     @contextmanager
     def select_cursor(conn, _query_name, sql, parameters):
         cur = conn.cursor()

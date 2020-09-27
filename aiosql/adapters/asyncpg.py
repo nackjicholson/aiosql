@@ -86,6 +86,11 @@ class AsyncPGAdapter:
                 result = record_class(**dict(result))
         return result
 
+    async def select_value(self, conn, query_name, sql, parameters):
+        parameters = self.maybe_order_params(query_name, parameters)
+        async with MaybeAcquire(conn) as connection:
+            return await connection.fetchval(sql, *parameters)
+
     @aiocontextmanager
     async def select_cursor(self, conn, query_name, sql, parameters):
         parameters = self.maybe_order_params(query_name, parameters)
