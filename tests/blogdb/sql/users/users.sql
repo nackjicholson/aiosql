@@ -1,3 +1,6 @@
+-- SQL COMMENT THAT SHOULD BE ALLOWED
+-- WAS BREAKING IN THIS ISSUE https://github.com/nackjicholson/aiosql/issues/35
+
 -- name: get-all
 -- Get all user records
 select * from users;

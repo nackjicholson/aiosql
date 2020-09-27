@@ -73,9 +73,13 @@ class QueryLoader:
 
     def load_query_data_from_sql(self, sql: str) -> List[QueryDatum]:
         query_data = []
-        for query_sql_str in query_name_definition_pattern.split(sql):
-            if not empty_pattern.match(query_sql_str):
-                query_data.append(self._make_query_datum(query_sql_str))
+        query_sql_strs = query_name_definition_pattern.split(sql)
+
+        # Drop the first item in the split. It is anything above the first query definition.
+        # This may be SQL comments or empty lines.
+        # See: https://github.com/nackjicholson/aiosql/issues/35
+        for query_sql_str in query_sql_strs[1:]:
+            query_data.append(self._make_query_datum(query_sql_str))
         return query_data
 
     def load_query_data_from_file(self, file_path: Path) -> List[QueryDatum]:
