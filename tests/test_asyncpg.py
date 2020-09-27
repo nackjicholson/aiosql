@@ -189,3 +189,10 @@ async def test_async_methods(pg_dsn, queries):
         {"userid": 3, "username": "janedoe", "firstname": "Jane", "lastname": "Doe"},
         {"userid": 2, "username": "johndoe", "firstname": "John", "lastname": "Doe"},
     ]
+
+
+@pytest.mark.asyncio
+async def test_execute_script(pg_dsn, queries):
+    async with asyncpg.create_pool(pg_dsn) as pool:
+        actual = await queries.comments.pg_create_comments_table(pool)
+        assert actual == "CREATE TABLE"
