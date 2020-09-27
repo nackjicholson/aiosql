@@ -116,4 +116,4 @@ class AsyncPGAdapter:
     @staticmethod
     async def execute_script(conn, sql):
         async with MaybeAcquire(conn) as connection:
-            await connection.execute(sql)
+            return await connection.execute(sql)

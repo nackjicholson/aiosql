@@ -132,3 +132,9 @@ def test_insert_many(sqlite3_conn, queries):
             ("Blog Part 2", "2018-12-05"),
             ("Blog Part 1", "2018-12-04"),
         ]
+
+
+def test_execute_script(sqlite3_conn, queries):
+    with sqlite3_conn:
+        actual = queries.comments.sqlite_create_comments_table(sqlite3_conn)
+        assert actual == "DONE"

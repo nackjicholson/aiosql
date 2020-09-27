@@ -69,3 +69,4 @@ class SQLite3DriverAdapter:
     @staticmethod
     def execute_script(conn, sql):
         conn.executescript(sql)
+        return "DONE"

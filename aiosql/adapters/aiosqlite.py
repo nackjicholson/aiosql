@@ -61,3 +61,4 @@ class AioSQLiteAdapter:
     @staticmethod
     async def execute_script(conn, sql):
         await conn.executescript(sql)
+        return "DONE"
