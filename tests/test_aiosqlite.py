@@ -166,3 +166,10 @@ async def test_async_methods(sqlite3_db_path, queries):
         {"userid": 3, "username": "janedoe", "firstname": "Jane", "lastname": "Doe"},
         {"userid": 2, "username": "johndoe", "firstname": "John", "lastname": "Doe"},
     ]
+
+
+@pytest.mark.asyncio
+async def test_execute_script(sqlite3_db_path, queries):
+    async with aiosqlite.connect(sqlite3_db_path) as conn:
+        actual = await queries.comments.sqlite_create_comments_table(conn)
+        assert actual == "DONE"
