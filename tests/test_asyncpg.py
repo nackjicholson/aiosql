@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from datetime import date
 from pathlib import Path
 from typing import NamedTuple
@@ -6,6 +7,11 @@ from typing import NamedTuple
 import aiosql
 import asyncpg
 import pytest
+
+
+pytestmark = pytest.mark.skipif(
+    sys.version_info < (3, 7), reason="requires Python 3.7 or higher", allow_module_level=True
+)
 
 
 class UserBlogSummary(NamedTuple):

@@ -16,7 +16,7 @@ before_install:
   - pip install poetry
 install: poetry install
 script:
-  - mypy .
+  - if [[ $TRAVIS_PYTHON_VERSION != "3.6" ]]; then mypy .; fi
   - black aiosql tests --check
   - pytest tests
 stages:
