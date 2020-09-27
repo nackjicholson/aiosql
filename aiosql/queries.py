@@ -1,7 +1,7 @@
 from types import MethodType
-from typing import Callable, List, Tuple, Set
+from typing import Any, Callable, List, Optional, Tuple, Set, cast
 
-from .types import DriverAdapterProtocol, QueryDatum, QueryDataTree, SQLOperationType
+from .types import DriverAdapterProtocol, QueryDatum, QueryDataTree, QueryFn, SQLOperationType
 
 
 def _params(args, kwargs):
@@ -11,7 +11,15 @@ def _params(args, kwargs):
         return args
 
 
-def _make_sync_fn(query_datum):
+def _query_fn(fn: Callable[..., Any], name: str, doc: Optional[str], sql: str) -> QueryFn:
+    qfn = cast(QueryFn, fn)
+    qfn.__name__ = name
+    qfn.__doc__ = doc
+    qfn.sql = sql
+    return qfn
+
+
+def _make_sync_fn(query_datum: QueryDatum) -> QueryFn:
     query_name, doc_comments, operation_type, sql, record_class = query_datum
     if operation_type == SQLOperationType.INSERT_RETURNING:
 
@@ -61,36 +69,29 @@ def _make_sync_fn(query_datum):
     else:
         raise ValueError(f"Unknown operation_type: {operation_type}")
 
-    fn.__name__ = query_name
-    fn.__doc__ = doc_comments
-    fn.sql = sql  # type: ignore
-
-    return fn
+    return _query_fn(fn, query_name, doc_comments, sql)
 
 
-def _make_async_fn(fn: Callable):
+def _make_async_fn(fn: QueryFn) -> QueryFn:
     async def afn(self: Queries, conn, *args, **kwargs):
         return await fn(self, conn, *args, **kwargs)
 
-    afn.__name__ = fn.__name__
-    afn.__doc__ = fn.__doc__
-    afn.sql = fn.sql  # type: ignore
-
-    return afn
+    return _query_fn(afn, fn.__name__, fn.__doc__, fn.sql)
 
 
-def _create_methods(query_datum: QueryDatum, is_aio: bool) -> List[Tuple[str, Callable]]:
+def _make_ctx_mgr(fn: QueryFn) -> QueryFn:
+    def ctx_mgr(self, conn, *args, **kwargs):
+        return self.driver_adapter.select_cursor(conn, fn.__name__, fn.sql, _params(args, kwargs))
+
+    return _query_fn(ctx_mgr, f"{fn.__name__}_cursor", fn.__doc__, fn.sql)
+
+
+def _create_methods(query_datum: QueryDatum, is_aio: bool) -> List[Tuple[str, QueryFn]]:
     fn = _make_sync_fn(query_datum)
     if is_aio:
         fn = _make_async_fn(fn)
 
-    def ctx_mgr(self, conn, *args, **kwargs):
-        parameters = kwargs if len(kwargs) > 0 else args
-        return self.driver_adapter.select_cursor(conn, fn.__name__, fn.sql, parameters)
-
-    ctx_mgr.__name__ = f"{fn.__name__}_cursor"
-    ctx_mgr.__doc__ = fn.__doc__
-    ctx_mgr.sql = fn.sql  # type: ignore
+    ctx_mgr = _make_ctx_mgr(fn)
 
     if query_datum.operation_type == SQLOperationType.SELECT:
         return [(fn.__name__, fn), (ctx_mgr.__name__, ctx_mgr)]
@@ -138,7 +139,7 @@ class Queries:
         setattr(self, query_name, fn)
         self._available_queries.add(query_name)
 
-    def add_queries(self, queries: List[Tuple[str, Callable]]):
+    def add_queries(self, queries: List[Tuple[str, QueryFn]]):
         """Add query methods to `Queries` instance."""
         for query_name, fn in queries:
             self.add_query(query_name, MethodType(fn, self))
