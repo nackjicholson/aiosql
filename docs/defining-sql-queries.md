@@ -72,6 +72,22 @@ queries.get_user_by_username(conn, username="willvaughn")
 # => (1, "willvaughn", "William Vaughn") or None
 ```
 
+### `$` Select Value
+
+The `$` operator will execute the query, and only return the first value of the first row of a result set. If there are no rows in the result set it returns `None`. This is implemented by returing the first element of the tuple returned by `cur.fetchone()` of the underlying driver. This is mostly useful for queries returning IDs, COUNTs or other aggregates.
+
+```sql
+-- name: get-count$
+select count(*) from users
+```
+
+When used from Python:
+
+```python
+queries.get_count(conn)
+# => 3
+```
+
 ### `!` Insert/Update/Delete
 
 The `!` operator executes SQL without returning any results. It is meant for statements that use `insert`, `update`, and `delete` to make modifications to database rows without a necessary return value.
