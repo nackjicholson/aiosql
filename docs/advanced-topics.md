@@ -6,7 +6,52 @@ Todo
 
 ## Access the `cursor` object
 
-Todo
+The cursor is a temporary object created in memory that allows you to perform row-by-row operations on your data and use handy methods such as `.description`, `.fetchall()` and `.fetchone()`. As long as you are running a SQL `SELECT` query, you can access the cursor object by appending `_cursor` to the end of the queries name. For example, say you have the following query named `get-all-greetings` in a `sql` file:
+
+```sql
+-- greetings.sql
+
+-- name: get-all-greetings
+-- Get all the greetings in the database
+SELECT
+    greeting_id,
+    greeting
+FROM greetings;
+```
+
+With this query, you can get all `greeting_id`'s and `greeting`'s, access the cursor object, and print the column names with the following code:
+```python
+import asyncio
+import aiosql
+import aiosqlite
+import os
+from typing import List
+
+SQL_FILE = os.path.abspath('greetings.sql')
+DB_FILE = os.path.abspath('greetings.db')
+queries = aiosql.from_path(SQL_FILE, "aiosqlite")
+
+
+def getColNames(cursor_description: List) -> List[str]:
+    """return a tables column names."""
+    return [col_info[0] for col_info in cursor_description]
+
+async def accessCursor():
+    async with aiosqlite.connect(DB_FILE) as conn:
+        # append _cursor after query name
+        async with queries.get_all_greetings_cursor(conn) as cur:
+            print(getColNames(cur.description)) # list of column names
+            first_row = await cur.fetchone() 
+            all_data = await cur.fetchall()
+            print(f"ALL DATA: {all_data}") # tuple of first row data
+            print(f"FIRST ROW: {first_row}") # list of tuples 
+
+
+asyncio.run(accessCursor())
+# [greeting_id, greeting]
+# ALL DATA: [(1, hi), (2, aloha), (3, hola)]
+# FIRST ROW: (1, hi)
+```
 
 ## Accessing prepared SQL as a string
 
@@ -86,7 +131,7 @@ conn.row_factory = sqlite3.Row
 #     <Row greeting_id=2, greeting="Aloha">,
 #     <Row greeting_id=3, greeting="Hola">
 # ]
-greetings = queries.get_greetings(conn)
+greetings = queries.get_all_greetings(conn)
 
 # world = <Row world_id=1, world_name="Earth">
 world = queries.get_worlds_by_name(conn, world_name="Earth")
@@ -126,7 +171,7 @@ async def main():
         # world = <Row world_id=1, world_name="Earth">
         greeting_rows, world = await asyncio.gather(
             queries.get_all_greetings(conn),
-            queries.get_world_by_name(conn, world_name="Earth")
+            queries.get_worlds_by_name(conn, world_name="Earth")
         )
 
         # Hi, Earth!
