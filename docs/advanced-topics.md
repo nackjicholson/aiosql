@@ -20,34 +20,27 @@ FROM greetings;
 ```
 
 With this query, you can get all `greeting_id`'s and `greeting`'s, access the cursor object, and print the column names with the following code:
+
 ```python
 import asyncio
 import aiosql
 import aiosqlite
-import os
 from typing import List
 
-SQL_FILE = os.path.abspath('greetings.sql')
-DB_FILE = os.path.abspath('greetings.db')
-queries = aiosql.from_path(SQL_FILE, "aiosqlite")
+queries = aiosql.from_path("greetings.sql", "aiosqlite")
 
-
-def getColNames(cursor_description: List) -> List[str]:
-    """return a tables column names."""
-    return [col_info[0] for col_info in cursor_description]
-
-async def accessCursor():
-    async with aiosqlite.connect(DB_FILE) as conn:
+async def access_cursor():
+    async with aiosqlite.connect("greetings.db") as conn:
         # append _cursor after query name
         async with queries.get_all_greetings_cursor(conn) as cur:
-            print(getColNames(cur.description)) # list of column names
-            first_row = await cur.fetchone() 
+            print([col_info[0] for col_info in cur.description])
+            first_row = await cur.fetchone()
             all_data = await cur.fetchall()
-            print(f"ALL DATA: {all_data}") # tuple of first row data
-            print(f"FIRST ROW: {first_row}") # list of tuples 
+            print(f"ALL DATA: {all_data}") # list of tuples
+            print(f"FIRST ROW: {first_row}") # tuple of first row data
 
 
-asyncio.run(accessCursor())
+asyncio.run(access_cursor())
 # [greeting_id, greeting]
 # ALL DATA: [(1, hi), (2, aloha), (3, hola)]
 # FIRST ROW: (1, hi)
@@ -66,7 +59,7 @@ This example adapts the example usage from psycopg2's documentation for [`execut
 >>> sql_str = """
 ... -- name: create_schema#
 ... create table test (id int primary key, v1 int, v2 int);
-... 
+...
 ... -- name: insert!
 ... INSERT INTO test (id, v1, v2) VALUES %s;
 ...
@@ -85,7 +78,7 @@ This example adapts the example usage from psycopg2's documentation for [`execut
 >>> cur = conn.cursor()
 >>> execute_values(cur, queries.insert.sql, [(1, 2, 3), (4, 5, 6), (7, 8, 9)])
 >>> execute_values(cur, queries.update.sql, [(1, 20), (4, 50)])
->>> 
+>>>
 >>> queries.getem(conn)
 [(1, 20, 3), (4, 50, 6), (7, 8, 9)])
 ```
