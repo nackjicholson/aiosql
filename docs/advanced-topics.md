@@ -6,7 +6,45 @@ Todo
 
 ## Access the `cursor` object
 
-Todo
+The cursor is a temporary object created in memory that allows you to perform row-by-row operations on your data and use handy methods such as `.description`, `.fetchall()` and `.fetchone()`. As long as you are running a SQL `SELECT` query, you can access the cursor object by appending `_cursor` to the end of the queries name. For example, say you have the following query named `get-all-greetings` in a `sql` file:
+
+```sql
+-- greetings.sql
+
+-- name: get-all-greetings
+-- Get all the greetings in the database
+SELECT
+    greeting_id,
+    greeting
+FROM greetings;
+```
+
+With this query, you can get all `greeting_id`'s and `greeting`'s, access the cursor object, and print the column names with the following code:
+
+```python
+import asyncio
+import aiosql
+import aiosqlite
+from typing import List
+
+queries = aiosql.from_path("greetings.sql", "aiosqlite")
+
+async def access_cursor():
+    async with aiosqlite.connect("greetings.db") as conn:
+        # append _cursor after query name
+        async with queries.get_all_greetings_cursor(conn) as cur:
+            print([col_info[0] for col_info in cur.description])
+            first_row = await cur.fetchone()
+            all_data = await cur.fetchall()
+            print(f"ALL DATA: {all_data}") # list of tuples
+            print(f"FIRST ROW: {first_row}") # tuple of first row data
+
+
+asyncio.run(access_cursor())
+# [greeting_id, greeting]
+# ALL DATA: [(1, hi), (2, aloha), (3, hola)]
+# FIRST ROW: (1, hi)
+```
 
 ## Accessing prepared SQL as a string
 
@@ -21,7 +59,7 @@ This example adapts the example usage from psycopg2's documentation for [`execut
 >>> sql_str = """
 ... -- name: create_schema#
 ... create table test (id int primary key, v1 int, v2 int);
-... 
+...
 ... -- name: insert!
 ... INSERT INTO test (id, v1, v2) VALUES %s;
 ...
@@ -40,7 +78,7 @@ This example adapts the example usage from psycopg2's documentation for [`execut
 >>> cur = conn.cursor()
 >>> execute_values(cur, queries.insert.sql, [(1, 2, 3), (4, 5, 6), (7, 8, 9)])
 >>> execute_values(cur, queries.update.sql, [(1, 20), (4, 50)])
->>> 
+>>>
 >>> queries.getem(conn)
 [(1, 20, 3), (4, 50, 6), (7, 8, 9)])
 ```
@@ -86,7 +124,7 @@ conn.row_factory = sqlite3.Row
 #     <Row greeting_id=2, greeting="Aloha">,
 #     <Row greeting_id=3, greeting="Hola">
 # ]
-greetings = queries.get_greetings(conn)
+greetings = queries.get_all_greetings(conn)
 
 # world = <Row world_id=1, world_name="Earth">
 world = queries.get_worlds_by_name(conn, world_name="Earth")
@@ -126,7 +164,7 @@ async def main():
         # world = <Row world_id=1, world_name="Earth">
         greeting_rows, world = await asyncio.gather(
             queries.get_all_greetings(conn),
-            queries.get_world_by_name(conn, world_name="Earth")
+            queries.get_worlds_by_name(conn, world_name="Earth")
         )
 
         # Hi, Earth!
