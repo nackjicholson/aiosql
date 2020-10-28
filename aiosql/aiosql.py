@@ -1,8 +1,7 @@
+import sys
 from pathlib import Path
 from typing import Callable, Dict, Optional, Type, Union
 
-from .adapters.aiosqlite import AioSQLiteAdapter
-from .adapters.asyncpg import AsyncPGAdapter
 from .adapters.psycopg2 import PsycoPG2Adapter
 from .adapters.sqlite3 import SQLite3DriverAdapter
 from .exceptions import SQLLoadException
@@ -12,11 +11,15 @@ from .types import DriverAdapterProtocol
 
 
 _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
-    "aiosqlite": AioSQLiteAdapter,
-    "asyncpg": AsyncPGAdapter,
     "psycopg2": PsycoPG2Adapter,
     "sqlite3": SQLite3DriverAdapter,
 }
+
+if sys.version_info >= (3, 7):
+    from .adapters.aiosqlite import AioSQLiteAdapter
+    from .adapters.asyncpg import AsyncPGAdapter
+
+    _ADAPTERS.update({"aiosqlite": AioSQLiteAdapter, "asyncpg": AsyncPGAdapter})  # type: ignore
 
 
 def _make_driver_adapter(

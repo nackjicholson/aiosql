@@ -1,6 +1,6 @@
 from collections import defaultdict
+from contextlib import asynccontextmanager
 
-from ..aioctxlib import aiocontextmanager
 from ..patterns import var_pattern
 
 
@@ -91,7 +91,7 @@ class AsyncPGAdapter:
         async with MaybeAcquire(conn) as connection:
             return await connection.fetchval(sql, *parameters)
 
-    @aiocontextmanager
+    @asynccontextmanager
     async def select_cursor(self, conn, query_name, sql, parameters):
         parameters = self.maybe_order_params(query_name, parameters)
         async with MaybeAcquire(conn) as connection:

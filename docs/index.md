@@ -6,7 +6,7 @@ This project supports standard and [asyncio](https://docs.python.org/3/library/a
 
 !!! danger
     
-    This project supports [asyncio](https://docs.python.org/3/library/asyncio.html) based drivers and requires python versions >3.6.
+    This project supports [asyncio](https://docs.python.org/3/library/asyncio.html) based drivers; these drivers require Python versions >= 3.7.
 
 ## Installation
 
