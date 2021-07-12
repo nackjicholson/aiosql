@@ -25,3 +25,7 @@ delete from blogs where blogid = :blogid;
     from blogs
    where userid = :userid
 order by published desc;
+
+
+-- name: search
+select title from blogs where title = :title and published = :published;
