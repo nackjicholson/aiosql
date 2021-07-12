@@ -15,8 +15,7 @@ from typing_extensions import Protocol
 
 
 class SQLOperationType(Enum):
-    """Enumeration of aiosql operation types.
-    """
+    """Enumeration of aiosql operation types."""
 
     INSERT_RETURNING = 0
     INSERT_UPDATE_DELETE = 1
@@ -73,7 +72,7 @@ class SyncDriverAdapterProtocol(Protocol):
         ...
 
     def select_value(
-        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict],
+        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> Optional[Any]:
         ...
 
@@ -128,7 +127,7 @@ class AsyncDriverAdapterProtocol(Protocol):
         ...
 
     async def select_value(
-        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict],
+        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> Optional[Any]:
         ...
 
