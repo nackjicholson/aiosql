@@ -1,5 +1,5 @@
 from types import MethodType
-from typing import Any, Callable, List, Optional, Tuple, Set, cast
+from typing import Any, Callable, List, Optional, Set, cast
 
 from .types import DriverAdapterProtocol, QueryDatum, QueryDataTree, QueryFn, SQLOperationType
 
@@ -89,7 +89,7 @@ def _make_ctx_mgr(fn: QueryFn) -> QueryFn:
     return _query_fn(ctx_mgr, f"{fn.__name__}_cursor", fn.__doc__, fn.sql, fn.operation)
 
 
-def _create_methods(query_datum: QueryDatum, is_aio: bool) -> List[Tuple[str, QueryFn]]:
+def _create_methods(query_datum: QueryDatum, is_aio: bool) -> List[QueryFn]:
     fn = _make_sync_fn(query_datum)
     if is_aio:
         fn = _make_async_fn(fn)
@@ -97,9 +97,9 @@ def _create_methods(query_datum: QueryDatum, is_aio: bool) -> List[Tuple[str, Qu
     ctx_mgr = _make_ctx_mgr(fn)
 
     if query_datum.operation_type == SQLOperationType.SELECT:
-        return [(fn.__name__, fn), (ctx_mgr.__name__, ctx_mgr)]
+        return [fn, ctx_mgr]
     else:
-        return [(fn.__name__, fn)]
+        return [fn]
 
 
 class Queries:
@@ -142,9 +142,10 @@ class Queries:
         setattr(self, query_name, fn)
         self._available_queries.add(query_name)
 
-    def add_queries(self, queries: List[Tuple[str, QueryFn]]):
+    def add_queries(self, queries: List[QueryFn]):
         """Add query methods to `Queries` instance."""
-        for query_name, fn in queries:
+        for fn in queries:
+            query_name = fn.__name__.rpartition(".")[2]
             self.add_query(query_name, MethodType(fn, self))
 
     def add_child_queries(self, child_name: str, child_queries: "Queries"):
