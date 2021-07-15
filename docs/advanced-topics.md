@@ -80,7 +80,41 @@ This example adapts the example usage from psycopg2's documentation for [`execut
 >>> execute_values(cur, queries.update.sql, [(1, 20), (4, 50)])
 >>>
 >>> queries.getem(conn)
-[(1, 20, 3), (4, 50, 6), (7, 8, 9)])
+[(1, 20, 3), (4, 50, 6), (7, 8, 9)]
+```
+
+## Accessing the SQL Operation Type
+
+Query functions also provide access to the SQL Operation Type you define in your library.
+
+This can be useful for observability (such as metrics, tracing, or logging), or
+customizing how you manage different operations within your codebase. Extending from the
+above example:
+
+```python
+>>> import logging
+>>> import contextlib
+>>> 
+>>> reporter = logging.getLogger("metrics")
+>>>
+>>> def report_metrics(op, sql, op_time):
+...     reporter.info(f"Operation: {op.name!r}\nSQL: {sql!r} \nTime (ms): {op_time}")
+... 
+>>>
+>>> @contextlib.contextmanager
+... def observe_query(func):
+...     op = func.operation
+...     sql = func.sql
+...     start = time.time()
+...     yield
+...     end = time.time()
+...     op_time = end - start
+...     report_metrics(op, sql, op_time)
+...
+>>> with observe_query(queries.getem):
+...     queries.getem(conn)
+... 
+[(1, 20, 3), (4, 50, 6), (7, 8, 9)]
 ```
 
 ## Sync & Async

@@ -37,6 +37,7 @@ class QueryDatum(NamedTuple):
 class QueryFn(Protocol):
     __name__: str
     sql: str
+    operation: SQLOperationType
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         ...
