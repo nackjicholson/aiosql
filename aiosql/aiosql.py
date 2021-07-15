@@ -22,8 +22,7 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
 def _make_driver_adapter(
     driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]]
 ) -> DriverAdapterProtocol:
-    """Get the driver adapter instance registered by the `driver_name`.
-    """
+    """Get the driver adapter instance registered by the `driver_name`."""
     if isinstance(driver_adapter, str):
         try:
             driver_adapter = _ADAPTERS[driver_adapter]

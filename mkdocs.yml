@@ -11,6 +11,7 @@ nav:
   - Defining SQL Queries: defining-sql-queries.md
   - Advanced Topics: advanced-topics.md
   - Database Driver Adapters: database-driver-adapters.md
+  - Contributing: contributing.md
   - API: api.md
 markdown_extensions:
 - admonition
