@@ -8,6 +8,10 @@ This project supports standard and [asyncio](https://docs.python.org/3/library/a
 
 If you are using python versions <3.6 please see the related [anosql](https://github.com/honza/anosql) package which this project is based on.
 
+## Badges
+
+![master build](https://github.com/nackjicholson/aiosql/actions/workflows/aiosql-package.yml/badge.svg?branch=master)
+
 ## Documentation
 
 Project and API docs https://nackjicholson.github.io/aiosql
