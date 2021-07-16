@@ -48,6 +48,18 @@ The requirements file format is compatible with `pip` directly. Simply, `pip ins
 pip-sync requirments.txt dev-requirements.txt
 ```
 
+4. Install aiosql
+
+```sh
+python -m pip install -e .
+```
+
+5. Run tests
+
+```sh
+pytest
+```
+
 ## Dependency Management
 
 Read much more at [pip-tools](https://github.com/jazzband/pip-tools).
