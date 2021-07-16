@@ -28,7 +28,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip pip-tools
         pip-sync requirements.txt dev-requirements.txt
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        python -m pip install .
     - name: Check types with mypy
       run: mypy .
     - name: Lint with black
