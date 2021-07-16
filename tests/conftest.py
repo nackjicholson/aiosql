@@ -84,8 +84,7 @@ postgresqlnoop = factories.postgresql("postgresql_nooproc")
 
 @pytest.fixture
 def pg_conn(request):
-    """Loads seed data before returning db connection.
-    """
+    """Loads seed data before returning db connection."""
     if request.config.getoption("postgresql_detached"):
         conn = request.getfixturevalue("postgresqlnoop")
     else:
