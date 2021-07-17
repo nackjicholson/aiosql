@@ -1,4 +1,4 @@
-from ..aioctxlib import aiocontextmanager
+from contextlib2 import asynccontextmanager
 
 
 class AioSQLiteAdapter:
@@ -44,7 +44,7 @@ class AioSQLiteAdapter:
         return result[0] if result else None
 
     @staticmethod
-    @aiocontextmanager
+    @asynccontextmanager
     async def select_cursor(conn, _query_name, sql, parameters):
         async with conn.execute(sql, parameters) as cur:
             yield cur
