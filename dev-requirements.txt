@@ -241,8 +241,9 @@ pytest-asyncio==0.15.1 \
     --hash=sha256:2564ceb9612bbd560d19ca4b41347b54e7835c2f792c504f698e05395ed63f6f \
     --hash=sha256:3042bcdf1c5d978f6b74d96a151c4cfb9dcece65006198389ccd7e6c60eb1eea
     # via -r dev-requirements.in
-pytest-postgresql==2.6.1 \
-    --hash=sha256:5e24cc87d3a955a5ebe919ee5c1c15bd7300823a362269327b63526e6718cbdb
+pytest-postgresql==3.1.1 \
+    --hash=sha256:4dc29241d5ab673b4e11f4464a6c8f714210ad6e82b7f5fa4ce0beb7c924cab3 \
+    --hash=sha256:b690548d1c1df7ca933a50b32c565fe59925a4ddee49fe7683daf20c708bf644
     # via -r dev-requirements.in
 python-dateutil==2.8.2 \
     --hash=sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86 \

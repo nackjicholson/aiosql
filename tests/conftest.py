@@ -79,14 +79,14 @@ def sqlite3_conn(sqlite3_db_path):
     conn.close()
 
 
-postgresqlnoop = factories.postgresql("postgresql_nooproc")
+postgresqlnoproc = factories.postgresql("postgresql_noproc")
 
 
 @pytest.fixture
 def pg_conn(request):
     """Loads seed data before returning db connection."""
     if request.config.getoption("postgresql_detached"):
-        conn = request.getfixturevalue("postgresqlnoop")
+        conn = request.getfixturevalue("postgresqlnoproc")
     else:
         conn = request.getfixturevalue("postgresql")
 
