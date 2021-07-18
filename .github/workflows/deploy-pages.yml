@@ -15,15 +15,15 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install -U pip
-          python -m pip install mkdocs mkautodoc
+          python -m pip install sphinx sphinx-rtd-theme
           python -m pip install .
-      - name: Generate mkdocs site
-        run: mkdocs build
+      - name: Generate documentation
+        run: .github/scripts/docs.sh
       - name: Deploy to GitHub Pages
         if: success()
         uses: crazy-max/ghaction-github-pages@v2
         with:
           target_branch: gh-pages
-          build_dir: site
+          build_dir: docs/build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
