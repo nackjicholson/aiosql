@@ -52,7 +52,7 @@ The requirements file format is compatible with ``pip`` directly. Simply, ``pip 
 
     pip-sync requirments.txt dev-requirements.txt
 
-5. Run tests
+4. Run tests
 
 .. code:: sh
 
@@ -66,11 +66,10 @@ Read much more at `pip-tools <https://github.com/jazzband/pip-tools>`__.
 .. code:: sh
 
     # When you've changed a dependency in setup.cfg/setup.py
-    $ pip-compile --generate-hashes
+    $ pip-compile
 
     # When you've updated a development dependency.
-    $ pip-compile --generate-hashes dev-requirements.in
+    $ pip-compile dev-requirements.in
 
     # Upgrading packages
-    $ pip-compile --upgrade-package django --upgrade-package requests==2.0.0
-
+    $ pip-compile --upgrade-package test-extensions --upgrade-package contextlib2==21.6.0
