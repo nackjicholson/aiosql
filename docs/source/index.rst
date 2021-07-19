@@ -6,17 +6,6 @@
 aiosql - Simple SQL in Python
 ==================================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-   Getting Started <getting-started>
-   Defining SQL Queries <defining-sql-queries>
-   Advanced Topics <advanced-topics>
-   Database Driver Adapters <database-driver-adapters>
-   Contributing <contributing>
-   API <pydoc/modules>
-
 SQL is code. Write it, version control it, comment it, and run it using files. Writing your SQL code in Python programs as strings doesn't allow you to easily reuse them in SQL GUIs or CLI tools like psql. With aiosql you can organize your SQL statements in *.sql* files, load them into your python application as methods to call without losing the ability to use them as you would any other SQL file.
 
 This project supports standard and `asyncio <https://docs.python.org/3/library/asyncio.html>`__ based
@@ -132,6 +121,20 @@ Async Usage
     asyncio.run(main())
 
 This example has an imaginary SQLite database with greetings and users. It prints greetings in various languages to the user and showcases the basic feature of being able to load queries from a sql file and call them by name in python code. It also happens to do two SQL queries in parallel using ``aiosqlite`` and asyncio.
+
+Table of Contents
+=================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   Getting Started <getting-started>
+   Defining SQL Queries <defining-sql-queries>
+   Advanced Topics <advanced-topics>
+   Database Driver Adapters <database-driver-adapters>
+   Contributing <contributing>
+   API <pydoc/modules>
 
 Indices and tables
 ==================
