@@ -15,6 +15,11 @@ drivers for SQLite and PostgreSQL out of the box (`sqlite3 <https://docs.python.
 
     This project supports `asyncio <https://docs.python.org/3/library/asyncio.html>`__ based drivers and requires python versions >3.6.
 
+Badges
+------
+
+.. image:: https://github.com/nackjicholson/aiosql/actions/workflows/aiosql-package.yml/badge.svg?branch=master
+
 Installation
 ------------
 
@@ -122,8 +127,24 @@ Async Usage
 
 This example has an imaginary SQLite database with greetings and users. It prints greetings in various languages to the user and showcases the basic feature of being able to load queries from a sql file and call them by name in python code. It also happens to do two SQL queries in parallel using ``aiosqlite`` and asyncio.
 
+Why you might want to use this
+------------------------------
+
+* You think SQL is pretty good, and writing SQL is an important part of your applications.
+* You don't want to write your SQL in strings intermixed with your python code.
+* You're not using an ORM like SQLAlchemy or Django, and you don't need to.
+* You want to be able to reuse your SQL in other contexts. Loading it into psql or other database tools.
+
+Why you might NOT want to use this
+----------------------------------
+
+* You're looking for an ORM.
+* You aren't comfortable writing SQL code.
+* You don't have anything in your application that requires complicated SQL beyond basic CRUD operations.
+* Dynamically loaded objects built at runtime really bother you.
+
 Table of Contents
-=================
+-----------------
 
 .. toctree::
    :maxdepth: 2
@@ -135,10 +156,3 @@ Table of Contents
    Database Driver Adapters <database-driver-adapters>
    Contributing <contributing>
    API <pydoc/modules>
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
