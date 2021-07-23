@@ -204,3 +204,22 @@ async def test_execute_script(pg_dsn, queries):
     async with asyncpg.create_pool(pg_dsn) as pool:
         actual = await queries.comments.pg_create_comments_table(pool)
         assert actual == "CREATE TABLE"
+
+
+@pytest.mark.asyncio
+async def test_variable_replacment(pg_dsn, queries):
+    # Addresses bug reported in the following github issue:
+    # https://github.com/nackjicholson/aiosql/issues/51
+    #
+    # When the test fails the users_sql below will fail to increment the $2
+    # variable for lastname.
+    async with asyncpg.create_pool(pg_dsn) as pool:
+        blogs_sql = "select title from blogs where title = $1 and published = $2;"
+        assert queries.blogs.search.sql == blogs_sql
+        users_sql = "select username from users where firstname = $1 and lastname = $2;"
+        assert queries.users.search.sql == users_sql
+
+        blogs_res = await queries.blogs.search(pool, title="Testing", published=date(2018, 1, 1))
+        users_res = await queries.users.search(pool, title="John", lastname="Doe")
+        assert blogs_res == [("Testing",)]
+        assert users_res == [("johndoe",)]

@@ -17,7 +17,7 @@ class QueryLoader:
         self.driver_adapter = driver_adapter
         self.record_classes = record_classes if record_classes is not None else {}
 
-    def _make_query_datum(self, query_str: str):
+    def _make_query_datum(self, query_str: str, ns_parts: List):
         lines = [line.strip() for line in query_str.strip().splitlines()]
         query_name = lines[0].replace("-", "_")
 
@@ -65,13 +65,19 @@ class QueryLoader:
             else:
                 sql += line + "\n"
 
+        query_fqn = ".".join(ns_parts + [query_name])
         doc_comments = doc_comments.strip()
-        sql = self.driver_adapter.process_sql(query_name, operation_type, sql.strip())
+        sql = self.driver_adapter.process_sql(query_fqn, operation_type, sql.strip())
+        # TODO: Probably will want this to be a class, marshal in, and marshal out
         record_class = self.record_classes.get(record_class_name)
 
-        return QueryDatum(query_name, doc_comments, operation_type, sql, record_class)
+        return QueryDatum(query_fqn, doc_comments, operation_type, sql, record_class)
 
-    def load_query_data_from_sql(self, sql: str) -> List[QueryDatum]:
+    def load_query_data_from_sql(
+        self, sql: str, ns_parts: Optional[List] = None
+    ) -> List[QueryDatum]:
+        if ns_parts is None:
+            ns_parts = []
         query_data = []
         query_sql_strs = query_name_definition_pattern.split(sql)
 
@@ -79,30 +85,35 @@ class QueryLoader:
         # This may be SQL comments or empty lines.
         # See: https://github.com/nackjicholson/aiosql/issues/35
         for query_sql_str in query_sql_strs[1:]:
-            query_data.append(self._make_query_datum(query_sql_str))
+            query_data.append(self._make_query_datum(query_sql_str, ns_parts))
         return query_data
 
-    def load_query_data_from_file(self, file_path: Path) -> List[QueryDatum]:
+    def load_query_data_from_file(
+        self, file_path: Path, ns_parts: Optional[List] = None
+    ) -> List[QueryDatum]:
+        if ns_parts is None:
+            ns_parts = []
+
         with file_path.open() as fp:
-            return self.load_query_data_from_sql(fp.read())
+            return self.load_query_data_from_sql(fp.read(), ns_parts)
 
     def load_query_data_from_dir_path(self, dir_path) -> QueryDataTree:
         if not dir_path.is_dir():
             raise ValueError(f"The path {dir_path} must be a directory")
 
-        def _recurse_load_query_data_tree(path):
-            # queries = Queries()
+        def _recurse_load_query_data_tree(path, ns_parts=None):
+            if ns_parts is None:
+                ns_parts = []
+
             query_data_tree = {}
             for p in path.iterdir():
                 if p.is_file() and p.suffix != ".sql":
                     continue
                 elif p.is_file() and p.suffix == ".sql":
-                    for query_datum in self.load_query_data_from_file(p):
+                    for query_datum in self.load_query_data_from_file(p, ns_parts):
                         query_data_tree[query_datum.query_name] = query_datum
                 elif p.is_dir():
-                    child_name = p.relative_to(dir_path).name
-                    child_query_data_tree = _recurse_load_query_data_tree(p)
-                    query_data_tree[child_name] = child_query_data_tree
+                    query_data_tree[p.name] = _recurse_load_query_data_tree(p, ns_parts + [p.name])
                 else:
                     # This should be practically unreachable.
                     raise SQLLoadException(f"The path must be a directory or file, got {p}")
