@@ -23,7 +23,7 @@ author = "William Vaughn <vaughnwilld@gmail.com>"
 github_doc_root = "https://github.com/nackjicholson/aiosql/tree/master/docs/source/"
 
 # The full version, including alpha/beta/rc tags
-release = "3.3.0"
+release = "3.3.1"
 
 
 # -- General configuration ---------------------------------------------------
