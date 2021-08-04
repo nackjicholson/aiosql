@@ -25,7 +25,7 @@ class AsyncPGAdapter:
     is_aio_driver = True
 
     def __init__(self):
-        self.var_replacements = defaultdict(dict)
+        self.var_sorted = defaultdict(list)
 
     def process_sql(self, query_name, _op_type, sql):
         count = 0
@@ -38,12 +38,11 @@ class AsyncPGAdapter:
                 continue
 
             var_name = gd["var_name"]
-            if var_name in self.var_replacements[query_name]:
-                replacement = f"${self.var_replacements[query_name][var_name]}"
+            if var_name in self.var_sorted[query_name]:
+                replacement = f"${self.var_sorted.index(query_name)+1}"
             else:
-                count += 1
-                replacement = f"${count}"
-                self.var_replacements[query_name][var_name] = count
+                replacement = f"${len(self.var_sorted[query_name])+1}"
+                self.var_sorted[query_name].append(var_name)
 
             start = match.start() + len(gd["lead"]) + adj
             end = match.end() - len(gd["trail"]) + adj
@@ -62,9 +61,7 @@ class AsyncPGAdapter:
 
     def maybe_order_params(self, query_name, parameters):
         if isinstance(parameters, dict):
-            xs = [(self.var_replacements[query_name][k], v) for k, v in parameters.items()]
-            xs = sorted(xs, key=lambda x: x[0])
-            return [x[1] for x in xs]
+            return [parameters[rk] for rk in self.var_sorted[query_name]]
         elif isinstance(parameters, tuple):
             return parameters
         else:
