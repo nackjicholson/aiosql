@@ -1,3 +1,4 @@
+import inspect
 from enum import Enum
 from typing import (
     Any,
@@ -32,10 +33,12 @@ class QueryDatum(NamedTuple):
     operation_type: SQLOperationType
     sql: str
     record_class: Any = None
+    signature: Optional[inspect.Signature] = None
 
 
 class QueryFn(Protocol):
     __name__: str
+    __signature__: Optional[inspect.Signature]
     sql: str
     operation: SQLOperationType
 
