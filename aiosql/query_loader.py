@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple, Type, Sequence
 
 from .exceptions import SQLParseException, SQLLoadException
 from .patterns import (
@@ -17,10 +17,19 @@ class QueryLoader:
         self.driver_adapter = driver_adapter
         self.record_classes = record_classes if record_classes is not None else {}
 
-    def _make_query_datum(self, query_str: str, ns_parts: List):
+    def _make_query_datum(self, query_str: str, ns_parts: List) -> QueryDatum:
         lines = [line.strip() for line in query_str.strip().splitlines()]
-        query_name = lines[0].replace("-", "_")
+        operation_type, query_name = self._extract_operation_type(lines[0])
+        record_class = self._extract_record_class(lines[1])
+        line_offset = 2 if record_class else 1
+        doc_comments, sql = self._extract_docstring(lines[line_offset:])
+        query_fqn = ".".join(ns_parts + [query_name])
+        sql = self.driver_adapter.process_sql(query_fqn, operation_type, sql)
+        return QueryDatum(query_fqn, doc_comments, operation_type, sql, record_class)
 
+    @staticmethod
+    def _extract_operation_type(text: str) -> Tuple[SQLOperationType, str]:
+        query_name = text.replace("-", "_")
         if query_name.endswith("<!"):
             operation_type = SQLOperationType.INSERT_RETURNING
             query_name = query_name[:-2]
@@ -47,29 +56,32 @@ class QueryLoader:
                 f'name must convert to valid python variable, got "{query_name}".'
             )
 
-        record_class_match = query_record_class_definition_pattern.match(lines[1])
+        return operation_type, query_name
+
+    def _extract_record_class(self, text: str) -> Optional[Type]:
+        record_class_match = query_record_class_definition_pattern.match(text)
         record_class_name: Optional[str]
         if record_class_match:
-            line_offset = 2
             record_class_name = record_class_match.group(1)
         else:
-            line_offset = 1
             record_class_name = None
 
+        # TODO: Probably will want this to be a class, marshal in, and marshal out
+        record_class = self.record_classes.get(record_class_name)
+        return record_class
+
+    @staticmethod
+    def _extract_docstring(lines: Sequence[str]) -> Tuple[str, str]:
         doc_comments = ""
         sql = ""
-        for line in lines[line_offset:]:
+        for line in lines:
             doc_match = doc_comment_pattern.match(line)
             if doc_match:
                 doc_comments += doc_match.group(1) + "\n"
             else:
                 sql += line + "\n"
 
-        query_fqn = ".".join(ns_parts + [query_name])
-        doc_comments = doc_comments.strip()
-        sql = self.driver_adapter.process_sql(query_fqn, operation_type, sql.strip())
-        # TODO: Probably will want this to be a class, marshal in, and marshal out
-        record_class = self.record_classes.get(record_class_name)
+        return doc_comments.rstrip(), sql.strip()
 
         return QueryDatum(query_fqn, doc_comments, operation_type, sql, record_class)
 
