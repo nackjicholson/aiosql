@@ -1,13 +1,14 @@
+import inspect
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Type, Sequence
 
 from .exceptions import SQLParseException, SQLLoadException
 from .patterns import (
     doc_comment_pattern,
-    empty_pattern,
     query_record_class_definition_pattern,
     query_name_definition_pattern,
     valid_query_name_pattern,
+    var_pattern,
 )
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
 
@@ -23,9 +24,10 @@ class QueryLoader:
         record_class = self._extract_record_class(lines[1])
         line_offset = 2 if record_class else 1
         doc_comments, sql = self._extract_docstring(lines[line_offset:])
+        signature = self._extract_signature(sql)
         query_fqn = ".".join(ns_parts + [query_name])
         sql = self.driver_adapter.process_sql(query_fqn, operation_type, sql)
-        return QueryDatum(query_fqn, doc_comments, operation_type, sql, record_class)
+        return QueryDatum(query_fqn, doc_comments, operation_type, sql, record_class, signature)
 
     @staticmethod
     def _extract_operation_type(text: str) -> Tuple[SQLOperationType, str]:
@@ -83,7 +85,22 @@ class QueryLoader:
 
         return doc_comments.rstrip(), sql.strip()
 
-        return QueryDatum(query_fqn, doc_comments, operation_type, sql, record_class)
+    @staticmethod
+    def _extract_signature(sql: str) -> Optional[inspect.Signature]:
+        params = []
+        self = inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)
+        for match in var_pattern.finditer(sql):
+            gd = match.groupdict()
+            if gd["quote"] or gd["dblquote"] or gd["var_name"].isdigit():
+                continue
+            name = gd["var_name"]
+            params.append(
+                inspect.Parameter(
+                    name=name,
+                    kind=inspect.Parameter.KEYWORD_ONLY,
+                )
+            )
+        return inspect.Signature(parameters=[self] + params) if params else None
 
     def load_query_data_from_sql(
         self, sql: str, ns_parts: Optional[List] = None
