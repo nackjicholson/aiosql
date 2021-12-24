@@ -2,7 +2,7 @@
 -e file:.
 build
 twine
-black==20.8b1
+black==21.12b0
 pytest>=6,<7
 pytest-postgresql>=3,<4
 aiosqlite>=0.16.0,<1
