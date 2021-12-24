@@ -52,3 +52,31 @@ def test_var_pattern_does_not_require_semicolon_trail():
 
     expected = {"dblquote": None, "lead": " ", "quote": None, "trail": "", "var_name": "a"}
     assert groupdicts[0] == expected
+
+
+def test_var_pattern_handles_empty_sql_string_literals():
+    """Make sure SQL '' are treated correctly and don't cause a substitution to be skipped."""
+    sql = """
+        select blah
+          from foo
+         where lower(regexp_replace(blah,'\W','','g')) = lower(regexp_replace(:blah,'\W','','g'));"""
+
+    groupdicts = [m.groupdict() for m in var_pattern.finditer(sql)]
+
+    expected_single_quote_match = {
+        "dblquote": None,
+        "lead": None,
+        "quote": "''",
+        "trail": None,
+        "var_name": None,
+    }
+    assert groupdicts[1] == expected_single_quote_match
+
+    expected_var_match = {
+        "dblquote": None,
+        "lead": "(",
+        "quote": None,
+        "trail": ",",
+        "var_name": "blah",
+    }
+    assert groupdicts[3] == expected_var_match
