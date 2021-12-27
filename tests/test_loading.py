@@ -74,3 +74,14 @@ def test_loading_query_signature():
             inspect.Parameter("bar", kind=inspect.Parameter.KEYWORD_ONLY),
         ]
     )
+
+
+def test_loading_query_signature_with_duplicate_parameter():
+    sql_str = "-- name: get^\n" "select * from test where foo=:foo and foo=:foo"
+    queries = aiosql.from_str(sql_str, "aiosqlite")
+    assert queries.get.__signature__ == inspect.Signature(
+        [
+            inspect.Parameter("self", kind=inspect.Parameter.POSITIONAL_OR_KEYWORD),
+            inspect.Parameter("foo", kind=inspect.Parameter.KEYWORD_ONLY),
+        ]
+    )

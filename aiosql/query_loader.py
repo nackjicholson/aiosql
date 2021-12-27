@@ -88,12 +88,16 @@ class QueryLoader:
     @staticmethod
     def _extract_signature(sql: str) -> Optional[inspect.Signature]:
         params = []
+        names = set()
         self = inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)
         for match in var_pattern.finditer(sql):
             gd = match.groupdict()
-            if gd["quote"] or gd["dblquote"] or gd["var_name"].isdigit():
+            if gd["quote"] or gd["dblquote"]:
                 continue
             name = gd["var_name"]
+            if name.isdigit() or name in names:
+                continue
+            names.add(name)
             params.append(
                 inspect.Parameter(
                     name=name,
