@@ -15,6 +15,7 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,
     "asyncpg": AsyncPGAdapter,
     "psycopg2": PsycoPG2Adapter,
+    "psycopg": PsycoPG2Adapter,
     "sqlite3": SQLite3DriverAdapter,
 }
 
