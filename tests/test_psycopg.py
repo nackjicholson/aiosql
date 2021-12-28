@@ -4,8 +4,8 @@ from typing import NamedTuple
 import re
 
 import aiosql
-import psycopg2
-import psycopg2.extras
+import psycopg
+from psycopg.rows import dict_row
 import pytest
 
 
@@ -17,19 +17,28 @@ class UserBlogSummary(NamedTuple):
 RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 
 
-def test_version():
-    assert re.match(r"^2\.", psycopg2.__version__)
-
-
 @pytest.fixture()
 def queries():
     dir_path = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(dir_path, "psycopg2", RECORD_CLASSES)
+    return aiosql.from_path(dir_path, "psycopg", RECORD_CLASSES)
+
+
+def get_parameters(pg_conn):
+    if hasattr(pg_conn, 'get_dsn_parameters'):
+        dsn = pg_conn.get_dsn_parameters()
+    else:
+        dsn = pg_conn.info.get_parameters()
+    del dsn['tty']
+    return dsn
+
+
+def test_version():
+    assert re.match(r"^3\.", psycopg.__version__)
 
 
 def test_record_query(pg_conn, queries):
-    dsn = pg_conn.get_dsn_parameters()
-    with psycopg2.connect(**dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+    dsn = get_parameters(pg_conn)
+    with psycopg.connect(**dsn, row_factory=dict_row) as conn:
         actual = queries.users.get_all(conn)
 
     assert len(actual) == 3
@@ -48,8 +57,8 @@ def test_parameterized_query(pg_conn, queries):
 
 
 def test_parameterized_record_query(pg_conn, queries):
-    dsn = pg_conn.get_dsn_parameters()
-    with psycopg2.connect(**dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+    dsn = get_parameters(pg_conn)
+    with psycopg.connect(**dsn, row_factory=dict_row) as conn:
         actual = queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
 
     expected = [

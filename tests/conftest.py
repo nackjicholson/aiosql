@@ -74,6 +74,9 @@ def sqlite3_conn(sqlite3_db_path):
     conn.close()
 
 
+def is_psycopg2(conn):
+    return hasattr(conn, "get_dsn_parameters")
+
 @pytest.fixture
 def pg_conn(postgresql):
     """Loads seed data before returning db connection.
@@ -101,18 +104,29 @@ def pg_conn(postgresql):
                 );"""
             )
 
+        # guess whether we have a psycopg 2 or 3 connection
         with postgresql.cursor() as cur:
-            with USERS_DATA_PATH.open() as fp:
-                cur.copy_from(fp, "users", sep=",", columns=["username", "firstname", "lastname"])
-            with BLOGS_DATA_PATH.open() as fp:
-                cur.copy_from(
-                    fp, "blogs", sep=",", columns=["userid", "title", "content", "published"]
-                )
+            if is_psycopg2(postgresql):
+                with USERS_DATA_PATH.open() as fp:
+                    cur.copy_from(fp, "users", sep=",", columns=["username", "firstname", "lastname"])
+                with BLOGS_DATA_PATH.open() as fp:
+                    cur.copy_from(
+                        fp, "blogs", sep=",", columns=["userid", "title", "content", "published"]
+                    )
+            else:  # assume psycopg 3
+                import psycopg as pg
+                fn = pg.sql.Literal(str(USERS_DATA_PATH)).as_string(None)
+                cur.copy(f"COPY users FROM {fn} FORMAT CSV");
+                fn = pg.sql.Literal(str(BLOGS_DATA_PATH)).as_string(None)
+                cur.copy(f"COPY blogs FROM {fn} FORMAT CSV");
 
     return postgresql
 
 
 @pytest.fixture()
 def pg_dsn(pg_conn):
-    p = pg_conn.get_dsn_parameters()
+    if is_psycopg2(pg_conn):
+        p = pg_conn.get_dsn_parameters()
+    else:  # assume psycopg 3
+        p = pg_conn.info.get_parameters()
     return f"postgres://{p['user']}@{p['host']}:{p['port']}/{p['dbname']}"
