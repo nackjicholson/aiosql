@@ -69,13 +69,19 @@ keyring==23.5.0
 markupsafe==2.1.1
     # via jinja2
 mirakuru==2.4.2
-    # via pytest-postgresql
+    # via
+    #   pytest-mysql
+    #   pytest-postgresql
 mypy==0.942
     # via -r dev-requirements.in
 mypy-extensions==0.4.3
     # via
     #   black
     #   mypy
+mysqlclient==2.1.0
+    # via
+    #   -r dev-requirements.in
+    #   pytest-mysql
 packaging==21.3
     # via
     #   bleach
@@ -95,8 +101,12 @@ pluggy==1.0.0
 port-for==0.6.2
     # via pytest-postgresql
 psutil==5.9.0
-    # via mirakuru
+    # via
+    #   pytest-mysql
+    #   pytest-postgresql
 psycopg==3.0.11
+    # via -r dev-requirements.in
+psycopg2==2.9.3
     # via -r dev-requirements.in
 psycopg2-binary==2.9.3
     # via -r dev-requirements.in
@@ -109,16 +119,21 @@ pygments==2.11.2
     #   readme-renderer
     #   rich
     #   sphinx
+pymysql==1.0.2
+    # via -r dev-requirements.in
 pyparsing==3.0.7
     # via packaging
 pytest==6.2.5
     # via
     #   -r dev-requirements.in
     #   pytest-asyncio
+    #   pytest-mysql
     #   pytest-postgresql
 pytest-asyncio==0.18.3
     # via -r dev-requirements.in
 pytest-postgresql==4.1.1
+    # via -r dev-requirements.in
+pytest-mysql==2.2.0
     # via -r dev-requirements.in
 pytz==2022.1
     # via babel

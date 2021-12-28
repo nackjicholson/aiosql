@@ -2,12 +2,12 @@ import inspect
 from pathlib import Path
 from unittest import mock
 
-import pytest
 import aiosql
-
 from aiosql.exceptions import SQLParseException
 from aiosql.queries import Queries
 from aiosql.query_loader import QueryLoader
+
+import pytest
 
 
 @pytest.fixture
@@ -94,12 +94,33 @@ def test_loading_query_signature_with_duplicate_parameter():
     )
 
 
-def test_no_adapter():
+def test_adapters():
     try:
         aiosql.aiosql._make_driver_adapter("no-such-driver-adapter")
         assert False, "must raise an exception"  # pragma: no cover
     except ValueError as e:
         assert "unregistered driver_adapter" in str(e)
+
+    class PyFormatConnector:
+        paramstyle = "pyformat"
+
+    a = aiosql.aiosql._make_driver_adapter(PyFormatConnector)
+    assert type(a) == aiosql.adapters.PyFormatAdapter
+
+    class NamedConnector:
+        paramstyle = "named"
+
+    a = aiosql.aiosql._make_driver_adapter(NamedConnector)
+    assert type(a) == aiosql.adapters.GenericAdapter
+
+    class NoSuchConnector:
+        paramstyle = "no-such-style"
+
+    try:
+        aiosql.aiosql._make_driver_adapter(NoSuchConnector)
+        assert False, "must raise an exception"  # pragma: no cover
+    except ValueError as e:
+        assert "Unexpected driver_adapter" in str(e)
 
 
 def test_no_such_path():

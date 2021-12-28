@@ -16,8 +16,10 @@ from .types import DriverAdapterProtocol
 _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore
     "asyncpg": AsyncPGAdapter,  # type: ignore
+    "mysqldb": PyFormatAdapter,
     "psycopg": PsycoPGAdapter,
     "psycopg2": PsycoPGAdapter,
+    "pymysql": PyFormatAdapter,
     "sqlite3": SQLite3Adapter,
 }
 

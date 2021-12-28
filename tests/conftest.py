@@ -3,8 +3,12 @@ import sqlite3
 from pathlib import Path
 
 import pytest
-from pytest_postgresql import factories
+from pytest_postgresql import factories as pg_factories
+from pytest_mysql import factories as my_factories
 
+import aiosql
+
+# CSV data file paths
 BLOGDB_PATH = Path(__file__).parent / "blogdb"
 USERS_DATA_PATH = BLOGDB_PATH / "data/users_data.csv"
 BLOGS_DATA_PATH = BLOGDB_PATH / "data/blogs_data.csv"
@@ -14,53 +18,65 @@ def pytest_addoption(parser):
     parser.addoption("--postgresql-detached", action="store_true")
 
 
-def populate_sqlite3_db(db_path):
-    conn = sqlite3.connect(db_path)
-    cur = conn.cursor()
-    cur.executescript(
-        """
-            create table users (
-                userid integer not null primary key,
+def create_user_blogs(db):
+    assert db in ("sqlite", "pgsql", "mysql")
+    serial = (
+        "serial" if db == "pgsql" else "integer" if db == "sqlite" else "integer auto_increment"
+    )
+    return (
+        f"""create table users (
+                userid {serial} primary key,
                 username text not null,
-                firstname integer not null,
-                lastname text not null
-            );
-
-            create table blogs (
-                blogid integer not null primary key,
+                firstname text not null,
+                lastname text not null);""",
+        f"""create table blogs (
+                blogid {serial} primary key,
                 userid integer not null,
                 title text not null,
                 content text not null,
-                published date not null default CURRENT_DATE,
-                foreign key(userid) references users(userid)
-            );
-            """
+                published date not null default (CURRENT_DATE),
+                foreign key (userid) references users(userid));""",
     )
 
+
+def fill_user_blogs(cur, db):
+    assert db in ("sqlite", "mysql")
+    param = "?" if db == "sqlite" else "%s"
     with USERS_DATA_PATH.open() as fp:
         users = list(csv.reader(fp))
         cur.executemany(
-            """
+            f"""
                insert into users (
                     username,
                     firstname,
                     lastname
-               ) values (?, ?, ?);""",
+               ) values ({param}, {param}, {param});""",
             users,
         )
     with BLOGS_DATA_PATH.open() as fp:
         blogs = list(csv.reader(fp))
         cur.executemany(
-            """
+            f"""
                 insert into blogs (
                     userid,
                     title,
                     content,
                     published
-                ) values (?, ?, ?, ?);""",
+                ) values ({param}, {param}, {param}, {param});""",
             blogs,
         )
 
+
+#
+# SQLite stuff
+#
+
+
+def populate_sqlite3_db(db_path):
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+    cur.executescript("\n".join(create_user_blogs("sqlite")))
+    fill_user_blogs(cur, "sqlite")
     conn.commit()
     conn.close()
 
@@ -79,7 +95,12 @@ def sqlite3_conn(sqlite3_db_path):
     conn.close()
 
 
-postgresqlnoproc = factories.postgresql("postgresql_noproc")
+#
+# Postgres stuff
+#
+
+# NOT USED
+# postgresqlnoproc = pg_factories.postgresql("postgresql_noproc")
 
 
 # guess psycopg version
@@ -91,33 +112,15 @@ def is_psycopg2(conn):
 def pg_conn(request):
     """Loads seed data before returning db connection."""
     if request.config.getoption("postgresql_detached"):  # pragma: no cover
-        conn = request.getfixturevalue("postgresqlnoproc")
+        conn = request.getfixturevalue("postgresql_noproc")
     else:
         conn = request.getfixturevalue("postgresql")
 
     # Loads data from blogdb fixture data
     with conn.cursor() as cur:
 
-        cur.execute(
-            """
-            create table users (
-                userid serial not null primary key,
-                username varchar(32) not null,
-                firstname varchar(255) not null,
-                lastname varchar(255) not null
-            );"""
-        )
-
-        cur.execute(
-            """
-            create table blogs (
-                blogid serial not null primary key,
-                userid integer not null references users(userid),
-                title varchar(255) not null,
-                content text not null,
-                published date not null default CURRENT_DATE
-            );"""
-        )
+        for tc in create_user_blogs("pgsql"):
+            cur.execute(tc)
 
         # guess whether we have a psycopg 2 or 3 connection
         with USERS_DATA_PATH.open() as fp:
@@ -146,10 +149,49 @@ def pg_conn(request):
 
 
 @pytest.fixture()
-def pg_dsn(request, pg_conn):
+def pg_params(pg_conn):
     if is_psycopg2(pg_conn):  # pragma: no cover
-        p = pg_conn.get_dsn_parameters()
-    else:  # assume psycopg 3
-        p = pg_conn.info.get_parameters()
+        dsn = pg_conn.get_dsn_parameters()
+        del dsn["tty"]
+    else:  # assume psycopg 3.x
+        dsn = pg_conn.info.get_parameters()
+    return dsn
+
+
+@pytest.fixture()
+def pg_dsn(request, pg_params):
+    p = pg_params
     pw = request.config.getoption("postgresql_password")
     yield f"postgres://{p['user']}:{pw}@{p['host']}:{p['port']}/{p['dbname']}"
+
+
+#
+# MySQL stuff
+#
+# NOTE pytest-mysql does not seem to work with mariadb on my box
+#
+
+
+@pytest.fixture
+def my_dsn(mysql_proc):
+    mp = mysql_proc
+    assert mp.host == "localhost"
+    yield {
+        "user": mp.user,
+        # "password": mp.password,
+        "host": mp.host,
+        "port": mp.port,
+        # "database": mp.dbname,
+    }
+
+
+@pytest.fixture
+def my_db(mysql):
+    with mysql.cursor() as cur:
+        for tc in create_user_blogs("mysql"):
+            cur.execute(tc)
+        mysql.commit()
+        fill_user_blogs(cur, "mysql")
+        mysql.commit()
+    yield mysql
+    # FIXME mysql.commit()
