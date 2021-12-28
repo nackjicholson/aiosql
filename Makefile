@@ -8,7 +8,7 @@ SHELL	= /bin/bash
 .ONESHELL:
 
 PYTHON	= python
-PYTEST	= pytest --log-level=debug --capture=tee-sys
+PYTEST	= pytest --log-level=debug --capture=tee-sys --asyncio-mode=auto
 PYTOPT	=
 
 VENV	= venv

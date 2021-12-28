@@ -3,8 +3,10 @@ from typing import Callable, Dict, Optional, Type, Union
 
 from .adapters.aiosqlite import AioSQLiteAdapter
 from .adapters.asyncpg import AsyncPGAdapter
-from .adapters.psycopg2 import PsycoPG2Adapter
-from .adapters.sqlite3 import SQLite3DriverAdapter
+from .adapters.psycopg import PsycoPGAdapter
+from .adapters.pyformat import PyFormatAdapter
+from .adapters.generic import GenericAdapter
+from .adapters.sqlite3 import SQLite3Adapter
 from .exceptions import SQLLoadException
 from .queries import Queries
 from .query_loader import QueryLoader
@@ -12,10 +14,11 @@ from .types import DriverAdapterProtocol
 
 
 _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
-    "aiosqlite": AioSQLiteAdapter,
-    "asyncpg": AsyncPGAdapter,
-    "psycopg2": PsycoPG2Adapter,
-    "sqlite3": SQLite3DriverAdapter,
+    "aiosqlite": AioSQLiteAdapter,  # type: ignore
+    "asyncpg": AsyncPGAdapter,  # type: ignore
+    "psycopg": PsycoPGAdapter,
+    "psycopg2": PsycoPGAdapter,
+    "sqlite3": SQLite3Adapter,
 }
 
 
@@ -28,6 +31,15 @@ def _make_driver_adapter(
             driver_adapter = _ADAPTERS[driver_adapter]
         except KeyError:
             raise ValueError(f"Encountered unregistered driver_adapter: {driver_adapter}")
+    if callable(driver_adapter):
+        if hasattr(driver_adapter, "paramstyle"):  # pragma: no cover
+            style = getattr(driver_adapter, "paramstyle")
+            if style == "pyformat":
+                driver_adapter = PyFormatAdapter
+            elif style == "named":
+                driver_adapter = GenericAdapter
+            else:
+                raise ValueError(f"Unexpected driver_adapter: {driver_adapter}")
 
     return driver_adapter()
 

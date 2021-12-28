@@ -138,7 +138,7 @@ Executing this query in python will return the ``blogid`` of the inserted row.
     # ... connection code ...
     blogid = queries.publish_blog(conn, userid=1, title="Hi" content="blah blah.")
 
-PostgreSQL allows returning multiple values via the ``returning`` clause of queries. This same query using ``psycopg2`` might look like the following.
+PostgreSQL allows returning multiple values via the ``returning`` clause of queries. This same query using ``psycopg`` or ``psycopg2`` might look like the following.
 
 .. code:: sql
 
