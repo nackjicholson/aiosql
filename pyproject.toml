@@ -9,7 +9,7 @@ readme = "README.md"
 keywords = ["SQL", "asyncio", "PostgreSQL", "sqlite", "psycopg2"]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 typing_extensions = "^3.7.4"
 
 [tool.poetry.dev-dependencies]
