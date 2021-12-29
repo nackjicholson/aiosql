@@ -1,10 +1,11 @@
 from pathlib import Path
-from typing import Callable, Dict, Optional, Type, Union
+from typing import Callable, Dict, Optional, Type, Union, Any
 
 from .adapters.aiosqlite import AioSQLiteAdapter
 from .adapters.asyncpg import AsyncPGAdapter
 from .adapters.psycopg import PsycoPGAdapter
 from .adapters.pyformat import PyFormatAdapter
+from .adapters.generic import GenericAdapter
 from .adapters.sqlite3 import SQLite3Adapter
 from .exceptions import SQLLoadException
 from .queries import Queries
@@ -30,7 +31,7 @@ def _make_driver_adapter(
             driver_adapter = _ADAPTERS[driver_adapter]
         except KeyError:
             raise ValueError(f"Encountered unregistered driver_adapter: {driver_adapter}")
-    if isinstance(driver_adapter, Callable):
+    if callable(driver_adapter):
         if hasattr(driver_adapter, 'paramstyle'):
             style = getattr(driver_adapter, 'paramstyle')
             if style == 'pyformat':

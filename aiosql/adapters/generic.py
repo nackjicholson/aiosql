@@ -38,9 +38,12 @@ class GenericAdapter:
 
     @staticmethod
     def select_value(conn, _query_name, sql, parameters):
-        with conn.cursor() as cur:
+        cur = conn.cursor()
+        try:
             cur.execute(sql, parameters)
             result = cur.fetchone()
+        finally:
+            cur.close()
         return result[0] if result else None
 
     @staticmethod
@@ -75,7 +78,7 @@ class GenericAdapter:
     @staticmethod
     def execute_script(conn, sql):
         cur = conn.cursor()
-        cur.execute(sql, parameters)
+        cur.execute(sql)
         msg = cur.statusmessage
         cur.close()
         return msg
