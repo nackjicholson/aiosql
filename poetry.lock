@@ -343,11 +343,14 @@ dev = ["pre-commit", "tox"]
 
 [[package]]
 name = "port-for"
-version = "0.4"
-description = "Utility that helps with local TCP ports managment. It can find an unused TCP localhost port and remember the association."
+version = "0.6.1"
+description = "Utility that helps with local TCP ports management. It can find an unused TCP localhost port and remember the association."
 category = "dev"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
+
+[package.extras]
+tests = ["pytest", "pytest-cov", "mock"]
 
 [[package]]
 name = "psutil"
@@ -459,11 +462,11 @@ testing = ["async-generator (>=1.3)", "coverage", "hypothesis (>=5.7.1)"]
 
 [[package]]
 name = "pytest-postgresql"
-version = "2.4.0"
+version = "3.1.2"
 description = "Postgresql fixtures and fixture factories for Pytest."
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 
 [package.dependencies]
 mirakuru = ">=2.3.0"
@@ -471,8 +474,7 @@ port-for = "*"
 pytest = ">=3.0.0"
 
 [package.extras]
-docs = ["sphinx"]
-tests = ["pytest-cov (==2.7.1)", "pytest-xdist (==1.29.0)"]
+tests = ["pytest-cov", "pytest-xdist"]
 
 [[package]]
 name = "pyyaml"
@@ -564,7 +566,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "1b9f775adf9c34fedef0adaa8484a7039bbda470d2332ebf5b46810b744e81aa"
+content-hash = "ee6ea46862bf9c067584fd535cf106e52d2e01462933378238c4558155af10a3"
 
 [metadata.files]
 aiosqlite = [
@@ -775,8 +777,8 @@ pluggy = [
     {file = "pluggy-0.13.1.tar.gz", hash = "sha256:15b2acde666561e1298d71b523007ed7364de07029219b604cf808bfa1c765b0"},
 ]
 port-for = [
-    {file = "port-for-0.4.tar.gz", hash = "sha256:47b5cb48f8e036497cd73b96de305cecb4070e9ecbc908724afcbd2224edccde"},
-    {file = "port_for-0.4-py2.py3-none-any.whl", hash = "sha256:247b4db1901aa3d9906258308e40dfbadf65275b27ca77faa0b9a876b7284970"},
+    {file = "port-for-0.6.1.tar.gz", hash = "sha256:aa5dedbc138c614d4cc9d1ff2a56a348f6d98b21a35497987fc60c0b2959f6e4"},
+    {file = "port_for-0.6.1-py3-none-any.whl", hash = "sha256:93cbb9a01c2f64914868f81b49ae618c53fd32ef3231fd2144d3f2b62b58821f"},
 ]
 psutil = [
     {file = "psutil-5.7.0-cp27-none-win32.whl", hash = "sha256:298af2f14b635c3c7118fd9183843f4e73e681bb6f01e12284d4d70d48a60953"},
@@ -852,7 +854,8 @@ pytest-asyncio = [
     {file = "pytest_asyncio-0.14.0-py3-none-any.whl", hash = "sha256:2eae1e34f6c68fc0a9dc12d4bea190483843ff4708d24277c41568d6b6044f1d"},
 ]
 pytest-postgresql = [
-    {file = "pytest_postgresql-2.4.0-py3-none-any.whl", hash = "sha256:d8489199008561ca39373da31ccde481339002cae36f1226068198a25777aa38"},
+    {file = "pytest-postgresql-3.1.2.tar.gz", hash = "sha256:f3582a51506b0aa2dd292bfd12bac5f27982ef9235b516140437d7af8e4b7287"},
+    {file = "pytest_postgresql-3.1.2-py3-none-any.whl", hash = "sha256:32a15caa8cbebb7e8cbccb1c03bda55a00e7de9a2409add8b04dfbfa60f6432b"},
 ]
 pyyaml = [
     {file = "PyYAML-5.3.1-cp27-cp27m-win32.whl", hash = "sha256:74809a57b329d6cc0fdccee6318f44b9b8649961fa73144a98735b0aaf029f1f"},
