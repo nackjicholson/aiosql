@@ -81,8 +81,15 @@ def sqlite3_conn(sqlite3_db_path):
 
 postgresqlnoproc = factories.postgresql("postgresql_noproc")
 
+# guess psycopg version
 def is_psycopg2(conn):
     return hasattr(conn, "get_dsn_parameters")
+
+
+def escapeSQL(s):
+    import psycopg as pg
+    return pg.sql.Literal(str(s)).as_string(None)
+
 
 @pytest.fixture
 def pg_conn(request):
@@ -125,11 +132,8 @@ def pg_conn(request):
                         fp, "blogs", sep=",", columns=["userid", "title", "content", "published"]
                     )
             else:  # assume psycopg 3
-                import psycopg as pg
-                fn = pg.sql.Literal(str(USERS_DATA_PATH)).as_string(None)
-                cur.copy(f"COPY users FROM {fn} FORMAT CSV");
-                fn = pg.sql.Literal(str(BLOGS_DATA_PATH)).as_string(None)
-                cur.copy(f"COPY blogs FROM {fn} FORMAT CSV");
+                cur.copy(f"COPY users FROM {escapeSQL(USERS_DATA_PATH)} FORMAT CSV");
+                cur.copy(f"COPY blogs FROM {escapeSQL(BLOGS_DATA_PATH)} FORMAT CSV");
 
     return conn
 
