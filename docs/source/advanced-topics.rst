@@ -144,7 +144,7 @@ Below are two example of a program which can print ``"{greeting}, {world_name}!"
       from worlds
      where world_name = :world_name;
 
-Notice there is a usage of the ```^`` Select One Query Operator <./defining-sql-queries.md#select-one>`__. Adding this to the SQL comment ``--name: get-world-by-name^`` indicates to aiosql that ``queries.get_world_by_name()`` will return a single row back.
+Notice there is a usage of the ``^`` Select One Query Operator <./defining-sql-queries.md#select-one>`__. Adding this to the SQL comment ``--name: get-world-by-name^`` indicates to aiosql that ``queries.get_world_by_name()`` will return a single row back.
 
 Sync with sqlite3
 ~~~~~~~~~~~~~~~~~
