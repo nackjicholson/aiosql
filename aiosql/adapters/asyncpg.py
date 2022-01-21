@@ -52,7 +52,7 @@ class AsyncPGAdapter:
             replacement_len = len(replacement)
             # the lead ":" char is the reason for the +1
             var_len = len(var_name) + 1
-            if replacement_len < var_len or var_len < replacement_len:
+            if replacement_len != var_len:
                 adj = adj + replacement_len - var_len
             else:
                 adj = adj + var_len - replacement_len
