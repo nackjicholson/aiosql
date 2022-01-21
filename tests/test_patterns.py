@@ -2,7 +2,7 @@ from aiosql.patterns import var_pattern
 
 
 def test_var_pattern_is_quote_aware():
-    sql = """
+    sql = r"""
           select foo_id,
                  bar_id,
                  to_char(created_at, 'YYYY-MM-DD"T"HH24:MI:SSOF')
@@ -40,7 +40,7 @@ def test_var_pattern_does_not_require_semicolon_trail():
     """Make sure keywords ending queries are recognized even without
     semi-colons.
     """
-    sql = """
+    sql = r"""
         select a,
                b,
                c
@@ -56,7 +56,7 @@ def test_var_pattern_does_not_require_semicolon_trail():
 
 def test_var_pattern_handles_empty_sql_string_literals():
     """Make sure SQL '' are treated correctly and don't cause a substitution to be skipped."""
-    sql = """
+    sql = r"""
         select blah
           from foo
          where lower(regexp_replace(blah,'\W','','g')) = lower(regexp_replace(:blah,'\W','','g'));"""
