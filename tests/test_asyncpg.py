@@ -48,6 +48,29 @@ async def test_parameterized_query(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
+async def test_many_replacements(pg_dsn, queries):
+    """If the replacement was longer than the variable, bad SQL was generated.
+
+    The variable replacement code had a bug that caused it to miscalculate where in the
+    original string to put the placeholders.  The SQL below would produce a query that
+    ended with "$8, $9, $10$11:k);" because of this bug.
+
+    This test would fail before the bug was fixed and passes afterward.
+
+    This issue was reported in https://github.com/nackjicholson/aiosql/issues/90.
+    """
+    sql = r"""
+        -- name: test<!
+        INSERT INTO table VALUES (:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k);
+    """
+    actual = aiosql.from_str(sql, 'asyncpg').test.sql
+    expected = (
+        'INSERT INTO table '
+        'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);')
+    assert actual == expected
+
+
+@pytest.mark.asyncio
 async def test_parameterized_record_query(pg_dsn, queries):
     conn = await asyncpg.connect(pg_dsn)
     records = await queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
