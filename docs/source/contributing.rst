@@ -50,7 +50,7 @@ The requirements file format is compatible with ``pip`` directly. Simply, ``pip 
 
 .. code:: sh
 
-    pip-sync requirments.txt dev-requirements.txt
+    pip-sync requirements.txt dev-requirements.txt
 
 4. Run tests
 
