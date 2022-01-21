@@ -43,18 +43,22 @@ class AsyncPGAdapter:
                 replacement = f"${len(self.var_sorted[query_name]) + 1}"
                 self.var_sorted[query_name].append(var_name)
 
+            # Determine the offset of the start and end of the original
+            # variable that we are replacing, taking into account an adjustment
+            # factor based on previous replacements (see the note below).
             start = match.start() + len(gd["lead"]) + adj
             end = match.end() - len(gd["trail"]) + adj
 
             sql = sql[:start] + replacement + sql[end:]
 
-            replacement_len = len(replacement)
-            # the lead ":" char is the reason for the +1
-            var_len = len(var_name) + 1
-            if replacement_len < var_len:
-                adj = adj + replacement_len - var_len
-            else:
-                adj = adj + var_len - replacement_len
+            # If the replacement and original variable were different lengths,
+            # then the offsets of subsequent matches will be wrong by the
+            # difference.  Calculate an adjustment to apply to reconcile those
+            # offsets with the modified string.
+            #
+            # The "- 1" is to account for the leading ":" character in the
+            # original string.
+            adj += len(replacement) - len(var_name) - 1
 
         return sql
 
