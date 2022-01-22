@@ -40,7 +40,7 @@ class AsyncPGAdapter:
             if var_name in self.var_sorted[query_name]:
                 replacement = f"${self.var_sorted[query_name].index(var_name) + 1}"
             else:
-                replacement = f"${len(self.var_sorted[query_name]) +1 }"
+                replacement = f"${len(self.var_sorted[query_name]) + 1}"
                 self.var_sorted[query_name].append(var_name)
 
             start = match.start() + len(gd["lead"]) + adj
