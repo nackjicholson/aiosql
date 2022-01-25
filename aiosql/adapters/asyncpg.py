@@ -28,7 +28,6 @@ class AsyncPGAdapter:
         self.var_sorted = defaultdict(list)
 
     def process_sql(self, query_name, _op_type, sql):
-        count = 0
         adj = 0
 
         for match in var_pattern.finditer(sql):
@@ -39,9 +38,9 @@ class AsyncPGAdapter:
 
             var_name = gd["var_name"]
             if var_name in self.var_sorted[query_name]:
-                replacement = f"${self.var_sorted.index(query_name)+1}"
+                replacement = f"${self.var_sorted[query_name].index(var_name) + 1}"
             else:
-                replacement = f"${len(self.var_sorted[query_name])+1}"
+                replacement = f"${len(self.var_sorted[query_name]) + 1}"
                 self.var_sorted[query_name].append(var_name)
 
             start = match.start() + len(gd["lead"]) + adj
