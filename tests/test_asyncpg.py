@@ -63,10 +63,8 @@ async def test_many_replacements(pg_dsn, queries):
         -- name: test<!
         INSERT INTO table VALUES (:a, :b, :c, :d, :e, :f, :g, :h, :i, :j, :k);
     """
-    actual = aiosql.from_str(sql, 'asyncpg').test.sql
-    expected = (
-        'INSERT INTO table '
-        'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);')
+    actual = aiosql.from_str(sql, "asyncpg").test.sql
+    expected = "INSERT INTO table " "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);"
     assert actual == expected
 
 
