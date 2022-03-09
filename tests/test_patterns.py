@@ -59,7 +59,7 @@ def test_var_pattern_handles_empty_sql_string_literals():
     sql = r"""
         select blah
           from foo
-         where lower(regexp_replace(blah,'\W','','g')) = lower(regexp_replace(:blah,'\W','','g'));"""
+         where lower(regexp_replace(blah,'\\W','','g')) = lower(regexp_replace(:blah,'\\W','','g'));"""
 
     groupdicts = [m.groupdict() for m in var_pattern.finditer(sql)]
 
