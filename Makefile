@@ -59,7 +59,7 @@ dev-requirements.txt: dev-requirements.in venv
 .PHONY: clean clean.venv
 
 clean:
-	$(RM) -r __pycache__ */__pycache__ *.egg-info dist build .mypy_cache .pytest_cache htmlcov
+	$(RM) -r __pycache__ */__pycache__ */*/__pycache__ *.egg-info dist build .mypy_cache .pytest_cache htmlcov
 	$(RM) .coverage
 
 clean.venv: clean
