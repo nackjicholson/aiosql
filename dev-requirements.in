@@ -13,4 +13,4 @@ mypy>=0.790
 sphinx>=4,<5
 sphinx-rtd-theme>=0.5.2
 coverage
-flake8
+# NO: flake8
