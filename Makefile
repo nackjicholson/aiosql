@@ -43,7 +43,7 @@ clean:
 clean.venv: clean
 	$(RM) -r venv
 
-.PHONY: check.pytest check.mypy check.flake8 check coverage
+.PHONY: check.pytest check.mypy check.flake8 check.black check coverage
 check.pytest: venv
 	source venv/bin/activate
 	$(PYTEST) $(PYTOPT) tests/
@@ -56,7 +56,11 @@ check.flake8: venv
 	source venv/bin/activate
 	flake8 aiosql
 
-check: check.pytest check.mypy check.flake8
+check.black: venv
+	source venv/bin/activate
+	black aiosql tests --check
+
+check: check.pytest check.mypy check.flake8 check.black
 
 coverage: venv
 	source venv/bin/activate
