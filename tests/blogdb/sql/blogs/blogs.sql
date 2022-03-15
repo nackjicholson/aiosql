@@ -27,5 +27,19 @@ delete from blogs where blogid = :blogid;
 order by published desc;
 
 
+-- name: get-latest-user-blog^
+-- record_class: UserBlogSummary
+-- Get latest blog by user.
+select title, published
+from blogs
+where userid = :userid
+order by published desc
+limit 1;
+
+
 -- name: search
 select title from blogs where title = :title and published = :published;
+
+
+-- name: square$
+select :val::int * :val::int as squared;

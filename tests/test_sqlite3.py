@@ -67,6 +67,9 @@ def test_record_class_query(sqlite3_conn, queries):
     assert all(isinstance(row, UserBlogSummary) for row in actual)
     assert actual == expected
 
+    one = queries.blogs.get_latest_user_blog(sqlite3_conn, userid=1)
+    assert one == UserBlogSummary(title="How to make a pie.", published="2018-11-23")
+
 
 def test_select_cursor_context_manager(sqlite3_conn, queries):
     with queries.blogs.get_user_blogs_cursor(sqlite3_conn, userid=1) as cursor:

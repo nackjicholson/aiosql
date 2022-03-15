@@ -147,7 +147,7 @@ class QueryLoader:
                         query_data_tree[query_datum.query_name] = query_datum
                 elif p.is_dir():
                     query_data_tree[p.name] = _recurse_load_query_data_tree(p, ns_parts + [p.name])
-                else:
+                else:  # pragma: no cover
                     # This should be practically unreachable.
                     raise SQLLoadException(f"The path must be a directory or file, got {p}")
             return query_data_tree

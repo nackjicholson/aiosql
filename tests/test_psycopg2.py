@@ -63,6 +63,9 @@ def test_record_class_query(pg_conn, queries):
     assert all(isinstance(row, UserBlogSummary) for row in actual)
     assert actual == expected
 
+    one = queries.blogs.get_latest_user_blog(pg_conn, userid=1)
+    assert one == UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23))
+
 
 def test_select_cursor_context_manager(pg_conn, queries):
     with queries.blogs.get_user_blogs_cursor(pg_conn, userid=1) as cursor:
@@ -108,6 +111,10 @@ def test_insert_returning(pg_conn, queries):
             expected = cur.fetchone()
 
     assert (blogid, title) == expected
+
+    with pg_conn:
+        res = queries.blogs.pg_no_publish(pg_conn)
+        assert res is None
 
 
 def test_delete(pg_conn, queries):

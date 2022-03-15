@@ -85,7 +85,7 @@ postgresqlnoproc = factories.postgresql("postgresql_noproc")
 @pytest.fixture
 def pg_conn(request):
     """Loads seed data before returning db connection."""
-    if request.config.getoption("postgresql_detached"):
+    if request.config.getoption("postgresql_detached"):  # pragma: no cover
         conn = request.getfixturevalue("postgresqlnoproc")
     else:
         conn = request.getfixturevalue("postgresql")

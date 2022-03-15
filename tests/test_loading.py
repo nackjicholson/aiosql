@@ -16,8 +16,13 @@ def sql_dir():
 
 
 @pytest.fixture
-def sql(sql_dir):
-    with open(sql_dir / "blogs/blogs.sql") as f:
+def sql_file(sql_dir):
+    return sql_dir / "blogs/blogs.sql"
+
+
+@pytest.fixture
+def sql(sql_file):
+    with open(sql_file) as f:
         return f.read()
 
 
@@ -27,6 +32,8 @@ def test_frompath_queries_cls(sql_dir):
 
     queries = aiosql.from_path(sql_dir, "aiosqlite", queries_cls=TestQueries)
     assert isinstance(queries, TestQueries)
+
+    assert repr(queries).startswith("Queries(")
 
 
 def test_frompath_queryloader_cls(sql_dir):
@@ -60,7 +67,7 @@ def test_trailing_space_on_lines_does_not_error():
 
     try:
         aiosql.from_str(sql_str, "aiosqlite")
-    except SQLParseException:
+    except SQLParseException:  # pragma: no cover
         pytest.fail("Raised SQLParseException due to trailing space in query.")
 
 
@@ -85,3 +92,43 @@ def test_loading_query_signature_with_duplicate_parameter():
             inspect.Parameter("foo", kind=inspect.Parameter.KEYWORD_ONLY),
         ]
     )
+
+
+def test_no_adapter():
+    try:
+        aiosql.aiosql._make_driver_adapter("no-such-driver-adapter")
+        assert False, "must raise an exception"  # pragma: no cover
+    except ValueError as e:
+        assert "unregistered driver_adapter" in str(e)
+
+
+def test_no_such_path():
+    try:
+        aiosql.from_path("/no/such/file", "sqlite3")
+        assert False, "must raise an exception"  # pragma: no cover
+    except aiosql.exceptions.SQLLoadException as e:
+        assert "File does not exist" in str(e)
+
+
+def test_file_loading(sql_file):
+    db = aiosql.from_path(sql_file, "sqlite3")
+    assert "get_user_blogs" in db.__dict__
+
+
+def test_misc(sql_file):
+    try:
+        aiosql.queries._make_sync_fn(("hello", None, -1, "SELECT NULL;", None, None))
+        assert False, "must raise an exception"  # pragma: no cover
+    except ValueError as e:
+        assert "Unknown operation_type" in str(e)
+    try:
+        db = aiosql.from_str("-- name: a*b\nSELECT 'ab'\n", "sqlite3")
+        assert False, "must raise en exception"  # pragma: no cover
+    except Exception as e:
+        assert "must convert to valid python variable" in str(e)
+    ql = aiosql.query_loader.QueryLoader(None, None)
+    try:
+        ql.load_query_data_from_dir_path(sql_file)
+        assert False, "must raise en exception"  # pragma: no cover
+    except ValueError as e:
+        assert "must be a directory" in str(e)

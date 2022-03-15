@@ -87,7 +87,6 @@ async def test_parameterized_record_query(pg_dsn, queries):
 async def test_record_class_query(pg_dsn, queries):
     conn = await asyncpg.connect(pg_dsn)
     actual = await queries.blogs.get_user_blogs(conn, userid=1)
-    await conn.close()
 
     expected = [
         UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
@@ -96,6 +95,11 @@ async def test_record_class_query(pg_dsn, queries):
 
     assert all(isinstance(row, UserBlogSummary) for row in actual)
     assert actual == expected
+
+    one = await queries.blogs.get_latest_user_blog(conn, userid=1)
+    assert one == UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23))
+
+    await conn.close()
 
 
 @pytest.mark.asyncio
@@ -150,6 +154,11 @@ async def test_insert_returning(pg_dsn, queries):
             expected = tuple(record)
 
     assert (blogid, title) == expected
+
+    conn = await asyncpg.connect(pg_dsn)
+    res = await queries.blogs.pg_no_publish(conn)
+    assert res is None
+    await conn.close()
 
 
 @pytest.mark.asyncio
@@ -228,7 +237,7 @@ async def test_execute_script(pg_dsn, queries):
 
 
 @pytest.mark.asyncio
-async def test_variable_replacment(pg_dsn, queries):
+async def test_variable_replacement(pg_dsn, queries):
     # Addresses bug reported in the following github issue:
     # https://github.com/nackjicholson/aiosql/issues/51
     #
@@ -244,3 +253,18 @@ async def test_variable_replacment(pg_dsn, queries):
         users_res = await queries.users.search(pool, title="John", lastname="Doe")
         assert blogs_res == [("Testing",)]
         assert users_res == [("johndoe",)]
+
+        square_sql = "select $1::int * $1::int as squared;"
+        assert queries.blogs.square.sql == square_sql
+
+        square_res = await queries.blogs.square(pool, val=42)
+        assert square_res == 1764
+
+
+def test_maybe_order_params():
+    a = aiosql.adapters.asyncpg.AsyncPGAdapter()
+    try:
+        a.maybe_order_params("foo", "wrong-type-parameter")
+        assert False, "exception should be raised"  # pragma: no cover
+    except ValueError as e:
+        assert "dict or tuple" in str(e)

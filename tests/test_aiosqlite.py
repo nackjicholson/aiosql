@@ -81,6 +81,9 @@ async def test_record_class_query(sqlite3_db_path, queries):
         assert all(isinstance(row, UserBlogSummary) for row in actual)
         assert actual == expected
 
+        one = await queries.blogs.get_latest_user_blog(conn, userid=1)
+        assert one == UserBlogSummary(title="How to make a pie.", published="2018-11-23")
+
 
 @pytest.mark.asyncio
 async def test_select_cursor_context_manager(sqlite3_db_path, queries):

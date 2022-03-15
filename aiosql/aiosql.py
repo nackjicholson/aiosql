@@ -129,5 +129,5 @@ def from_path(
     elif path.is_dir():
         query_data_tree = query_loader.load_query_data_from_dir_path(path)
         return queries_cls(adapter).load_from_tree(query_data_tree)
-    else:
+    else:  # pragma: no cover
         raise SQLLoadException(f"The sql_path must be a directory or file, got {sql_path}")

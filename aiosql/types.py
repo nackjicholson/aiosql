@@ -43,7 +43,7 @@ class QueryFn(Protocol):
     operation: SQLOperationType
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        ...
+        ...  # pragma: no cover
 
 
 # Can't make this a recursive type in terms of itself
@@ -53,7 +53,7 @@ QueryDataTree = Dict[str, Union[QueryDatum, Dict]]
 
 class SyncDriverAdapterProtocol(Protocol):
     def process_sql(self, query_name: str, op_type: SQLOperationType, sql: str) -> str:
-        ...
+        ...  # pragma: no cover
 
     def select(
         self,
@@ -63,7 +63,7 @@ class SyncDriverAdapterProtocol(Protocol):
         parameters: Union[List, Dict],
         record_class: Optional[Callable],
     ) -> List:
-        ...
+        ...  # pragma: no cover
 
     def select_one(
         self,
@@ -73,42 +73,42 @@ class SyncDriverAdapterProtocol(Protocol):
         parameters: Union[List, Dict],
         record_class: Optional[Callable],
     ) -> Optional[Any]:
-        ...
+        ...  # pragma: no cover
 
     def select_value(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> Optional[Any]:
-        ...
+        ...  # pragma: no cover
 
     def select_cursor(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> ContextManager[Any]:
-        ...
+        ...  # pragma: no cover
 
     # TODO: Next major version introduce a return? Optional return?
     def insert_update_delete(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> None:
-        ...
+        ...  # pragma: no cover
 
     # TODO: Next major version introduce a return? Optional return?
     def insert_update_delete_many(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> None:
-        ...
+        ...  # pragma: no cover
 
     def insert_returning(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> Optional[Any]:
-        ...
+        ...  # pragma: no cover
 
     def execute_script(self, conn: Any, sql: str) -> str:
-        ...
+        ...  # pragma: no cover
 
 
 class AsyncDriverAdapterProtocol(Protocol):
     def process_sql(self, query_name: str, op_type: SQLOperationType, sql: str) -> str:
-        ...
+        ...  # pragma: no cover
 
     async def select(
         self,
@@ -118,7 +118,7 @@ class AsyncDriverAdapterProtocol(Protocol):
         parameters: Union[List, Dict],
         record_class: Optional[Callable],
     ) -> List:
-        ...
+        ...  # pragma: no cover
 
     async def select_one(
         self,
@@ -128,37 +128,37 @@ class AsyncDriverAdapterProtocol(Protocol):
         parameters: Union[List, Dict],
         record_class: Optional[Callable],
     ) -> Optional[Any]:
-        ...
+        ...  # pragma: no cover
 
     async def select_value(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> Optional[Any]:
-        ...
+        ...  # pragma: no cover
 
     async def select_cursor(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> AsyncContextManager[Any]:
-        ...
+        ...  # pragma: no cover
 
     # TODO: Next major version introduce a return? Optional return?
     async def insert_update_delete(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> None:
-        ...
+        ...  # pragma: no cover
 
     # TODO: Next major version introduce a return? Optional return?
     async def insert_update_delete_many(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> None:
-        ...
+        ...  # pragma: no cover
 
     async def insert_returning(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> Optional[Any]:
-        ...
+        ...  # pragma: no cover
 
     async def execute_script(self, conn: Any, sql: str) -> str:
-        ...
+        ...  # pragma: no cover
 
 
 DriverAdapterProtocol = Union[SyncDriverAdapterProtocol, AsyncDriverAdapterProtocol]
