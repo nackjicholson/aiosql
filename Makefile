@@ -11,7 +11,7 @@ PYTHON	= python
 PYTEST	= pytest --log-level=debug --capture=tee-sys
 PYTOPT	=
 
-VENV	= venv.dev
+VENV	= venv
 PIP		= venv/bin/pip
 
 .PHONY: help
