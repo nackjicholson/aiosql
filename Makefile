@@ -68,7 +68,7 @@ clean.venv: clean
 #
 # VARIOUS CHECKS
 #
-.PHONY: check.pytest check.mypy check.flake8 check.black check coverage
+.PHONY: check.pytest check.mypy check.flake8 check.black check.coverage check
 
 check.pytest: $(VENV)
 	source venv/bin/activate
@@ -86,9 +86,10 @@ check.black: $(VENV)
 	source venv/bin/activate
 	black aiosql tests --check
 
-check: check.pytest check.mypy check.flake8 check.black
-
-coverage: $(VENV)
+check.coverage: $(VENV)
 	source venv/bin/activate
 	coverage run -m $(PYTEST) $(PYTOPT)
 	coverage html
+	coverage report --fail-under=100
+
+check: check.pytest check.mypy check.flake8 check.black check.coverage
