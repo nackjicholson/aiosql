@@ -29,8 +29,8 @@ help:
 	echo " - check.mypy: run mypy type checker"
 	echo " - check.flake8: run flake8 code style checks"
 	echo " - check.black: run black formatter checks"
+	echo " - check.coverage: run coverage and generate html report"
 	echo " - check: run all above checks"
-	echo " - coverage: generate html coverage report"
 
 #
 # VIRTUAL ENVIRONMENT
