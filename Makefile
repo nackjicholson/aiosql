@@ -59,11 +59,12 @@ dev-requirements.txt: dev-requirements.in venv
 .PHONY: clean clean.venv
 
 clean:
-	$(RM) -r __pycache__ */__pycache__ */*/__pycache__ *.egg-info dist build .mypy_cache .pytest_cache htmlcov
+	find . -type d -name __pycache__ -print0 | xargs -0 rm -rf
+	$(RM) -r dist build .mypy_cache .pytest_cache htmlcov
 	$(RM) .coverage
 
 clean.venv: clean
-	$(RM) -r venv
+	$(RM) -r venv aiosql.egg-info
 
 #
 # VARIOUS CHECKS
