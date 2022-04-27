@@ -1,10 +1,11 @@
 from datetime import date
 from pathlib import Path
 from typing import NamedTuple
+import re
 
 import aiosql
-import psycopg2
-import psycopg2.extras
+import psycopg
+from psycopg.rows import dict_row
 import pytest
 
 
@@ -16,18 +17,28 @@ class UserBlogSummary(NamedTuple):
 RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 
 
-def test_version():
-    assert psycopg2.__version__.startswith("2.")
-
-
 @pytest.fixture()
 def queries():
     dir_path = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(dir_path, "psycopg2", RECORD_CLASSES)
+    return aiosql.from_path(dir_path, "psycopg", RECORD_CLASSES)
 
 
-def test_record_query(pg_dsn, queries):
-    with psycopg2.connect(dsn=pg_dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+def get_parameters(pg_conn):
+    if hasattr(pg_conn, "get_dsn_parameters"):  # pragma: no cover
+        dsn = pg_conn.get_dsn_parameters()
+        del dsn["tty"]
+    else:
+        dsn = pg_conn.info.get_parameters()
+    return dsn
+
+
+def test_version():
+    assert re.match(r"^3\.", psycopg.__version__)
+
+
+def test_record_query(pg_conn, queries):
+    dsn = get_parameters(pg_conn)
+    with psycopg.connect(**dsn, row_factory=dict_row) as conn:
         actual = queries.users.get_all(conn)
 
     assert len(actual) == 3
@@ -45,8 +56,9 @@ def test_parameterized_query(pg_conn, queries):
     assert actual == expected
 
 
-def test_parameterized_record_query(pg_dsn, queries):
-    with psycopg2.connect(dsn=pg_dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+def test_parameterized_record_query(pg_conn, queries):
+    dsn = get_parameters(pg_conn)
+    with psycopg.connect(**dsn, row_factory=dict_row) as conn:
         actual = queries.blogs.pg_get_blogs_published_after(conn, published=date(2018, 1, 1))
 
     expected = [
@@ -67,9 +79,6 @@ def test_record_class_query(pg_conn, queries):
     assert all(isinstance(row, UserBlogSummary) for row in actual)
     assert actual == expected
 
-    one = queries.blogs.get_latest_user_blog(pg_conn, userid=1)
-    assert one == UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23))
-
 
 def test_select_cursor_context_manager(pg_conn, queries):
     with queries.blogs.get_user_blogs_cursor(pg_conn, userid=1) as cursor:
@@ -84,12 +93,6 @@ def test_select_cursor_context_manager(pg_conn, queries):
 def test_select_one(pg_conn, queries):
     actual = queries.users.get_by_username(pg_conn, username="johndoe")
     expected = (2, "johndoe", "John", "Doe")
-    assert actual == expected
-
-
-def test_select_value(pg_conn, queries):
-    actual = queries.users.get_count(pg_conn)
-    expected = 3
     assert actual == expected
 
 
@@ -113,9 +116,6 @@ def test_insert_returning(pg_conn, queries):
                 (blogid,),
             )
             expected = cur.fetchone()
-        # test empty result
-        res = queries.blogs.pg_no_publish(pg_conn)
-        assert res is None
 
     assert (blogid, title) == expected
 
@@ -161,9 +161,3 @@ def test_insert_many(pg_conn, queries):
             ("Blog Part 2", date(2018, 12, 5)),
             ("Blog Part 1", date(2018, 12, 4)),
         ]
-
-
-def test_execute_script(pg_conn, queries):
-    with pg_conn:
-        actual = queries.comments.pg_create_comments_table(pg_conn)
-        assert actual == "CREATE TABLE"
