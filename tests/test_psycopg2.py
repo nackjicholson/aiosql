@@ -93,6 +93,12 @@ def test_select_value(pg_conn, queries):
     assert actual == expected
 
 
+def test_modulo(pg_conn, queries):
+    actual = queries.blogs.pg_get_modulo(pg_conn, left=7, right=3)
+    expected = 7 % 3
+    assert actual == expected
+
+
 def test_insert_returning(pg_conn, queries):
     with pg_conn:
         blogid, title = queries.blogs.pg_publish_blog(

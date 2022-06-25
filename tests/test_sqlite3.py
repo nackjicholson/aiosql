@@ -90,6 +90,12 @@ def test_select_value(sqlite3_conn, queries):
     assert actual == expected
 
 
+def test_modulo(sqlite3_conn, queries):
+    actual = queries.blogs.sqlite_get_modulo(sqlite3_conn, left=7, right=3)
+    expected = 7 % 3
+    assert actual == expected
+
+
 def test_insert_returning(sqlite3_conn, queries):
     with sqlite3_conn:
         blogid = queries.blogs.publish_blog(
