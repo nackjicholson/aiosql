@@ -124,7 +124,7 @@ def test_insert_returning(sqlite3_conn, queries):
 def test_delete(sqlite3_conn, queries):
     # Removing the "janedoe" blog titled "Testing"
     actual = queries.blogs.remove_blog(sqlite3_conn, blogid=2)
-    assert actual is None
+    assert actual == 1
 
     janes_blogs = queries.blogs.get_user_blogs(sqlite3_conn, userid=3)
     assert len(janes_blogs) == 0
@@ -139,7 +139,7 @@ def test_insert_many(sqlite3_conn, queries):
 
     with sqlite3_conn:
         actual = queries.blogs.sqlite_bulk_publish(sqlite3_conn, blogs)
-        assert actual is None
+        assert actual == 3
 
         johns_blogs = queries.blogs.get_user_blogs(sqlite3_conn, userid=2)
         assert johns_blogs == [

@@ -4,11 +4,11 @@ Defining SQL Queries
 Query Names
 -----------
 
-Name definitions are how aiosql determines the name of the methods that SQL code blocks are accessible by. A query name is defined by a SQL comment of the form "-- name: ".
+Name definitions are how aiosql determines the name of the methods that SQL code blocks are accessible by. A query name is defined by a SQL comment of the form "-- name: ". As a readability convenience, dash characters (``-``) in the name are turned into underlines (``_``).
 
 .. code:: sql
 
-    -- name: get_all_blogs
+    -- name: get-all-blogs
     select * from blogs;
 
 This query will be available in aiosql under the python method name ``.get_all_blogs(conn)``
@@ -20,13 +20,13 @@ Query Comments
 
 .. code:: sql
 
-    -- name: get_all_blogs
+    -- name: get-all-blogs
     -- Fetch all fields for every blog in the database.
     select * from blogs;
 
 Any other SQL comments you make between the name definition and your code will be used a the python documentation string for the generated method. You can use ``help()`` in the Python REPL to view these comments while using python.
 
-.. code:: python
+.. code:: ipython
 
     Python 3.8.3 (default, May 17 2020, 18:15:42) 
     [GCC 10.1.0] on linux
@@ -51,7 +51,7 @@ In the above `Query Names <#query-names>`__ section the ``get-all-blogs`` name i
 
 .. code:: sql
 
-    -- name: get_all_blogs
+    -- name: get-all-blogs
 
 The lack of an operator is actually the most basic operator used by default for your queries. This tells aiosql to execute the query and to return all the results. In the case of ``get-all-blogs`` that means a ``select`` statement will be executed and a list of rows will be returned. When writing your application you will often need to perform other operations besides ``select``, like ``insert``, ``delete``, and perhaps bulk operations. The operators detailed in the other sections of this doc let you declare in your SQL code how that query should be executed by a python database driver.
 
@@ -113,10 +113,11 @@ The methods generated are:
 
 .. code:: text
 
-    publish_blog(conn, userid: int, title: str, content: str) -> None:
-    remove_blog(conn, blogid: int) -> None:
+    publish_blog(conn, userid: int, title: str, content: str) -> int:
+    remove_blog(conn, blogid: int) -> int:
 
-Each can be called to alter the database, but both will return ``None``.
+Each can be called to alter the database, and returns the number of affected rows
+if available.
 
 ``<!`` Insert/Update/Delete Returning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,6 +180,8 @@ In aiosql we can use this for a bulk publish method that operates over a list of
         {"userid": 2, "title": "Hey, Hey!", "content": "...", published: datetime(2018, 7, 28)},
     ]
     queries.bulk_publish(conn, blogs)
+
+The methods returns the number of affected rows, if available.
 
 ``#`` Execute Scripts
 ~~~~~~~~~~~~~~~~~~~~~

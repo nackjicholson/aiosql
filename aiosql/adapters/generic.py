@@ -60,13 +60,17 @@ class GenericAdapter:
     def insert_update_delete(conn, _query_name, sql, parameters):
         cur = conn.cursor()
         cur.execute(sql, parameters)
+        rc = cur.rowcount
         cur.close()
+        return rc
 
     @staticmethod
     def insert_update_delete_many(conn, _query_name, sql, parameters):
         cur = conn.cursor()
         cur.executemany(sql, parameters)
+        rc = cur.rowcount
         cur.close()
+        return rc
 
     @staticmethod
     def insert_returning(conn, _query_name, sql, parameters):
