@@ -129,7 +129,7 @@ def test_insert_returning(pg_conn, queries):
 def test_delete(pg_conn, queries):
     # Removing the "janedoe" blog titled "Testing"
     actual = queries.blogs.remove_blog(pg_conn, blogid=2)
-    assert actual is None
+    assert actual == 1
 
     janes_blogs = queries.blogs.get_user_blogs(pg_conn, userid=3)
     assert len(janes_blogs) == 0
@@ -159,7 +159,7 @@ def test_insert_many(pg_conn, queries):
 
     with pg_conn:
         actual = queries.blogs.pg_bulk_publish(pg_conn, blogs)
-        assert actual is None
+        assert actual == 3
 
         johns_blogs = queries.blogs.get_user_blogs(pg_conn, userid=2)
         assert johns_blogs == [

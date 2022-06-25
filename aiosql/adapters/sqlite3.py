@@ -5,14 +5,6 @@ class SQLite3Adapter(GenericAdapter):
     # overwrites some methods using sqlite3-specific non-standard methods
 
     @staticmethod
-    def insert_update_delete(conn, _query_name, sql, parameters):
-        conn.execute(sql, parameters)
-
-    @staticmethod
-    def insert_update_delete_many(conn, _query_name, sql, parameters):
-        conn.executemany(sql, parameters)
-
-    @staticmethod
     def insert_returning(conn, _query_name, sql, parameters):
         cur = conn.cursor()
         try:
