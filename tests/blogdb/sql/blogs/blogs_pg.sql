@@ -45,3 +45,6 @@ values (
   :published
 );
 
+-- name: pg-get-modulo$
+-- escaped percent modulo operator
+SELECT :left %% :right;
