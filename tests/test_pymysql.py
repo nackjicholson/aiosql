@@ -1,0 +1,91 @@
+from datetime import date
+
+import aiosql
+import pymysql as pm
+
+import pytest
+import run_tests as t
+
+pytestmark = pytest.mark.skipif(not t.has_exec("mysqld"), reason="no mysqld")
+
+
+@pytest.fixture()
+def queries():
+    return t.queries("pymysql")
+
+
+@pytest.fixture()
+def pymysql_db_dsn(my_db, my_dsn):
+    my_dsn["database"] = "test"  # FIXME hardcoded
+    yield my_dsn
+
+
+@pytest.fixture()
+def pymysql_db(pymysql_db_dsn):
+    with pm.connect(**pymysql_db_dsn) as conn:
+        yield conn
+        conn.commit()
+
+
+@pytest.fixture
+def pymysql_nodb(my_dsn):
+    with pm.connect(**my_dsn) as conn:
+        yield conn
+        conn.commit()
+
+
+# is pytest-mysql running as expected?
+def test_proc(mysql_proc):
+    assert mysql_proc.running()
+
+
+def test_query_nodb(pymysql_nodb):
+    t.run_something(pymysql_nodb)
+
+
+def test_query_db(pymysql_db):
+    t.run_something(pymysql_db)
+
+
+def test_my_dsn(my_dsn):
+    assert "user" in my_dsn and "host" in my_dsn and "port" in my_dsn
+
+
+def test_record_query(pymysql_db_dsn, queries):
+    with pm.connect(**pymysql_db_dsn, cursorclass=pm.cursors.DictCursor) as conn:
+        t.run_record_query(conn, queries)
+
+
+def test_parameterized_query(pymysql_db, queries):
+    t.run_parameterized_query(pymysql_db, queries)
+
+
+@pytest.mark.skip("pymysql issue when mogrifying because of date stuff %Y")
+def test_parameterized_record_query(pymysql_db_dsn, queries):  # pragma: no cover
+    with pm.connect(**pymysql_db_dsn, cursorclass=pm.cursors.DictCursor) as conn:
+        t.run_parameterized_record_query(conn, queries, "my", date)
+
+
+def test_record_class_query(pymysql_db, queries):
+    t.run_record_class_query(pymysql_db, queries, date)
+
+
+def test_select_cursor_context_manager(pymysql_db, queries):
+    t.run_select_cursor_context_manager(pymysql_db, queries, date)
+
+
+def test_select_one(pymysql_db, queries):
+    t.run_select_one(pymysql_db, queries)
+
+
+@pytest.mark.skip("mysql does not support RETURNING, although mariadb does")
+def test_insert_returning(pymysql_db, queries):  # pragma: no cover
+    t.run_insert_returning(pymysql_db, queries, "my", date)
+
+
+def test_delete(pymysql_db, queries):
+    t.run_delete(pymysql_db, queries)
+
+
+def test_insert_many(pymysql_db, queries):
+    t.run_insert_many(pymysql_db, queries, date)
