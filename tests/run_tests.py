@@ -68,7 +68,7 @@ def run_parameterized_query(conn, queries):
 def run_parameterized_record_query(conn, queries, db, todate):
     fun = (
         queries.blogs.sqlite_get_blogs_published_after
-        if db == "sqlite"
+        if db in ("sqlite", "apsw")
         else queries.blogs.pg_get_blogs_published_after
         if db == "pg"
         else queries.blogs.my_get_blogs_published_after
@@ -117,15 +117,10 @@ def run_select_one(conn, queries):
 def run_insert_returning(conn, queries, db, todate):
     fun = (
         queries.blogs.publish_blog
-        if db == "sqlite"
+        if db in ("sqlite", "apsw")
         else queries.blogs.pg_publish_blog
         if db == "pg"
         else queries.blogs.my_publish_blog
-    )
-    query = (
-        "select blogid, title from blogs where blogid = %s;"
-        if db == "pg"
-        else "select blogid, title from blogs where blogid = ?;"
     )
 
     blogid = fun(
@@ -138,40 +133,31 @@ def run_insert_returning(conn, queries, db, todate):
 
     # sqlite returns a number while pg query returns a tuple
     if isinstance(blogid, tuple):
+        assert db == "pg"
         blogid, title = blogid
     else:
+        assert db in ("sqlite", "apsw")
         blogid, title = blogid, "My first blog"
 
-    def check_cbt(cur, b, t):
-        cur.execute(query, (b,))
-        actual = cur.fetchone()
-        assert actual == (b, t)
+    b2, t2 = queries.blogs.blog_title(conn, blogid=blogid)
 
-    cur = conn.cursor()
-    has_with = hasattr(cur, "__enter__")
-    check_cbt(cur, blogid, title)
-    cur.close()
-
-    # try with if available
-    if has_with:
-        with conn.cursor() as cur:
-            check_cbt(cur, blogid, title)
+    assert (blogid, title) == (b2, t2)
 
     if db == "pg":
         res = queries.blogs.pg_no_publish(conn)
         assert res is None
 
 
-def run_delete(conn, queries):
+def run_delete(conn, queries, expect=1):
     # Removing the "janedoe" blog titled "Testing"
     actual = queries.blogs.remove_blog(conn, blogid=2)
-    assert actual == 1
+    assert actual == expect
 
     janes_blogs = queries.blogs.get_user_blogs(conn, userid=3)
     assert len(janes_blogs) == 0
 
 
-def run_insert_many(conn, queries, todate):
+def run_insert_many(conn, queries, todate, expect=3):
     blogs = [
         {
             "userid": 2,
@@ -194,7 +180,7 @@ def run_insert_many(conn, queries, todate):
     ]
 
     actual = queries.blogs.pg_bulk_publish(conn, blogs)
-    assert actual == 3
+    assert actual == expect
 
     johns_blogs = queries.blogs.get_user_blogs(conn, userid=2)
     assert johns_blogs == [
@@ -204,9 +190,9 @@ def run_insert_many(conn, queries, todate):
     ]
 
 
-def run_select_value(conn, queries):
+def run_select_value(conn, queries, expect=3):
     actual = queries.users.get_count(conn)
-    assert actual == 3
+    assert actual == expect
 
 
 #

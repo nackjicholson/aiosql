@@ -1,5 +1,6 @@
 import csv
 import sqlite3
+import apsw
 from pathlib import Path
 
 import pytest
@@ -91,6 +92,40 @@ def sqlite3_db_path(tmpdir):
 @pytest.fixture()
 def sqlite3_conn(sqlite3_db_path):
     conn = sqlite3.connect(sqlite3_db_path)
+    yield conn
+    conn.close()
+
+
+# FIXME maybe it should look at the connection state?
+class APSWConnection(apsw.Connection):
+    """APSW Connection wrapper with autocommit off."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._begin()
+
+    def _begin(self):
+        self.cursor().execute("BEGIN").close()
+
+    def commit(self):  # pragma: no cover
+        self.cursor().execute("COMMIT").close()
+        self._begin()
+
+    def _rollback(self):
+        self.cursor().execute("ROLLBACK").close()
+
+    def rollback(self):  # pragma: no cover
+        self._rollback()
+        self._begin()
+
+    def close(self):
+        self._rollback()
+        super().close()
+
+
+@pytest.fixture()
+def apsw_conn(sqlite3_db_path):
+    conn = APSWConnection(sqlite3_db_path)
     yield conn
     conn.close()
 
