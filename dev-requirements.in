@@ -2,7 +2,7 @@
 -e file:.
 build
 twine
-black==21.12b0
+black>=22.3.0
 pytest>=6,<7
 pytest-postgresql>=4
 pytest-mysql>=2
@@ -19,3 +19,4 @@ coverage
 # NO: flake8
 mysqlclient>=2
 pymysql>=1
+apsw

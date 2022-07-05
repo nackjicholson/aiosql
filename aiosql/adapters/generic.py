@@ -16,7 +16,7 @@ class GenericAdapter:
         try:
             cur.execute(sql, parameters)
             results = cur.fetchall()
-            if record_class is not None:
+            if record_class is not None and len(results) > 0:
                 column_names = [c[0] for c in cur.description]
                 results = [record_class(**dict(zip(column_names, row))) for row in results]
         finally:
@@ -60,7 +60,7 @@ class GenericAdapter:
     def insert_update_delete(conn, _query_name, sql, parameters):
         cur = conn.cursor()
         cur.execute(sql, parameters)
-        rc = cur.rowcount
+        rc = cur.rowcount if hasattr(cur, "rowcount") else -1
         cur.close()
         return rc
 
@@ -68,21 +68,22 @@ class GenericAdapter:
     def insert_update_delete_many(conn, _query_name, sql, parameters):
         cur = conn.cursor()
         cur.executemany(sql, parameters)
-        rc = cur.rowcount
+        rc = cur.rowcount if hasattr(cur, "rowcount") else -1
         cur.close()
         return rc
 
     @staticmethod
     def insert_returning(conn, _query_name, sql, parameters):
-        with conn.cursor() as cur:
-            cur.execute(sql, parameters)
-            res = cur.fetchone()
-            return res[0] if res and len(res) == 1 else res
+        cur = conn.cursor()
+        cur.execute(sql, parameters)
+        res = cur.fetchone()
+        cur.close()
+        return res[0] if res and len(res) == 1 else res
 
     @staticmethod
     def execute_script(conn, sql):
         cur = conn.cursor()
         cur.execute(sql)
-        msg = cur.statusmessage
+        msg = cur.statusmessage if hasattr(cur, "statusmessage") else "DONE"
         cur.close()
         return msg
