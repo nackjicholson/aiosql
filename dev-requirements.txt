@@ -20,7 +20,7 @@ babel==2.10.3
     # via sphinx
 backports-zoneinfo==0.2.1 ; python_version < '3.9'
     # via psycopg
-black==21.12b0
+black==22.6.0
     # via -r dev-requirements.in
 bleach==5.0.1
     # via readme-renderer
@@ -177,7 +177,7 @@ sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
 toml==0.10.2
     # via pytest
-tomli==1.2.3
+tomli==2.0.1
     # via
     #   black
     #   build
