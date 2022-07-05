@@ -19,6 +19,7 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "apsw": APSWAdapter,
     "asyncpg": AsyncPGAdapter,  # type: ignore
     "mysqldb": PyFormatAdapter,
+    "mysql-connector": PyFormatAdapter,
     "psycopg": PsycoPGAdapter,
     "psycopg2": PsycoPGAdapter,
     "pymysql": PyFormatAdapter,
