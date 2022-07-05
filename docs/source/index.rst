@@ -9,7 +9,7 @@ aiosql - Simple SQL in Python
 SQL is code. Write it, version control it, comment it, and run it using files. Writing your SQL code in Python programs as strings doesn't allow you to easily reuse them in SQL GUIs or CLI tools like psql. With aiosql you can organize your SQL statements in *.sql* files, load them into your python application as methods to call without losing the ability to use them as you would any other SQL file.
 
 This project supports standard and `asyncio <https://docs.python.org/3/library/asyncio.html>`__ based
-drivers for SQLite (`sqlite3 <https://docs.python.org/3/library/sqlite3.html>`__, `aiosqlite <https://aiosqlite.omnilib.dev/en/latest/?badge=latest>`__),
+drivers for SQLite (`sqlite3 <https://docs.python.org/3/library/sqlite3.html>`__, `aiosqlite <https://aiosqlite.omnilib.dev/en/latest/?badge=latest>`__, `apsw <https://pypi.org/project/apsw/>`__),
 PostgreSQL (`psycopg <https://www.psycopg.org/docs/>`__, `asyncpg <https://magicstack.github.io/asyncpg/current/>`__)
 and MySQL (`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__, `mysqlclient <https://pypi.org/project/mysqlclient/>`__) out of the box.
 Extensions to support other database drivers can be written by you! See: `Database Driver Adapters <./database-driver-adapters.md>`__
