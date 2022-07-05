@@ -33,7 +33,8 @@ def run_something(conn):
     def sel12(cur):
         cur.execute("SELECT 1, 'un' UNION SELECT 2, 'deux' ORDER BY 1")
         res = cur.fetchall()
-        assert res == ((1, "un"), (2, "deux"))
+        assert type(res) in (tuple, list), f"unexpected type: {type(res)}"
+        assert res == ((1, "un"), (2, "deux")) or res == [(1, "un"), (2, "deux")]
 
     cur = conn.cursor()
     has_with = hasattr(cur, "__enter__")

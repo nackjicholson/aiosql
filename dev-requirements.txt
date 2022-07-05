@@ -42,7 +42,7 @@ contextlib2==21.6.0
     #   aiosql
 coverage==6.4.1
     # via -r dev-requirements.in
-cryptography==37.0.2
+cryptography==37.0.4
     # via secretstorage
 docutils==0.17.1
     # via
@@ -80,6 +80,8 @@ mypy-extensions==0.4.3
     # via
     #   black
     #   mypy
+mysql-connector==2.2.9
+    # via -r dev-requirements.in
 mysqlclient==2.1.1
     # via
     #   -r dev-requirements.in
