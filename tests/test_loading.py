@@ -1,6 +1,7 @@
 import inspect
 from pathlib import Path
 from unittest import mock
+import re
 
 import aiosql
 from aiosql.exceptions import SQLParseException
@@ -24,6 +25,10 @@ def sql_file(sql_dir):
 def sql(sql_file):
     with open(sql_file) as f:
         return f.read()
+
+
+def test_version():
+    assert re.match(r"\d+\.\d+$", aiosql.__version__)
 
 
 def test_frompath_queries_cls(sql_dir):
