@@ -4,6 +4,8 @@
 # Try `make help` for help.
 #
 
+MODULE	= aiosql
+
 SHELL	= /bin/bash
 .ONESHELL:
 
@@ -31,6 +33,7 @@ help:
 	echo " - check.black: run black formatter checks"
 	echo " - check.coverage: run coverage and generate html report"
 	echo " - check: run all above checks"
+	echo " - publish: publish a new release on pypi (for maintainers)"
 
 #
 # VIRTUAL ENVIRONMENT
@@ -64,7 +67,7 @@ clean:
 	$(RM) .coverage
 
 clean.venv: clean
-	$(RM) -r venv aiosql.egg-info
+	$(RM) -r venv $(MODULE).egg-info
 
 #
 # VARIOUS CHECKS
@@ -77,15 +80,15 @@ check.pytest: $(VENV)
 
 check.mypy: $(VENV)
 	source venv/bin/activate
-	mypy aiosql
+	mypy $(MODULE)
 
 check.flake8: $(VENV)
 	source venv/bin/activate
-	flake8 aiosql
+	flake8 $(MODULE)
 
 check.black: $(VENV)
 	source venv/bin/activate
-	black aiosql tests --check
+	black $(MODULE) tests --check
 
 check.coverage: $(VENV)
 	source venv/bin/activate
@@ -94,3 +97,17 @@ check.coverage: $(VENV)
 	coverage report --fail-under=100
 
 check: check.pytest check.mypy check.flake8 check.black check.coverage
+
+#
+# PYPI PUBLICATION
+#
+
+dist:
+	$(PYTHON) setup.py sdist bdist_wheel
+
+.PHONY: publish
+publish: dist
+	echo "** type 'PUBLISH' to confirm publication **"
+	read confirm
+	[[ $$confirm = 'PUBLISH' ]] || exit 1
+	twine upload --repository $(MODULE) dist/*
