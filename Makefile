@@ -94,7 +94,7 @@ check.coverage: $(VENV)
 	source venv/bin/activate
 	coverage run -m $(PYTEST) $(PYTOPT)
 	coverage html
-	coverage report --fail-under=100
+	coverage report --fail-under=100 --include='$(MODULE)/*'
 
 check: check.pytest check.mypy check.flake8 check.black check.coverage
 
