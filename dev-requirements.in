@@ -21,3 +21,4 @@ mysqlclient>=2
 pymysql>=1
 mysql-connector>=2.2
 apsw
+pg8000

@@ -12,6 +12,8 @@ alabaster==0.7.12
     # via sphinx
 apsw==3.38.5.post1
     # via -r dev-requirements.in
+asn1crypto==1.5.1
+    # via scramp
 asyncpg==0.25.0
     # via -r dev-requirements.in
 attrs==21.4.0
@@ -95,6 +97,8 @@ pathspec==0.9.0
     # via black
 pep517==0.12.0
     # via build
+pg8000==1.29.1
+    # via -r dev-requirements.in
 pkginfo==1.8.3
     # via twine
 platformdirs==2.5.2
@@ -153,6 +157,8 @@ rfc3986==2.0.0
     # via twine
 rich==12.4.4
     # via twine
+scramp==1.4.1
+    # via pg8000
 secretstorage==3.3.2
     # via keyring
 six==1.16.0

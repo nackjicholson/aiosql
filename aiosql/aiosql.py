@@ -7,6 +7,7 @@ from .adapters.psycopg import PsycoPGAdapter
 from .adapters.pyformat import PyFormatAdapter
 from .adapters.generic import GenericAdapter
 from .adapters.sqlite3 import SQLite3Adapter
+from .adapters.pg8000 import Pg8000Adapter
 from .adapters.apsw import APSWAdapter
 from .exceptions import SQLLoadException
 from .queries import Queries
@@ -20,6 +21,7 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "asyncpg": AsyncPGAdapter,  # type: ignore
     "mysqldb": PyFormatAdapter,
     "mysql-connector": PyFormatAdapter,
+    "pg8000": Pg8000Adapter,
     "psycopg": PsycoPGAdapter,
     "psycopg2": PsycoPGAdapter,
     "pymysql": PyFormatAdapter,

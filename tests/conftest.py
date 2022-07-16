@@ -1,11 +1,11 @@
 import csv
-import sqlite3
-import apsw
 from pathlib import Path
 
 import pytest
 from pytest_postgresql import factories as pg_factories
 from pytest_mysql import factories as my_factories
+import sqlite3
+import apsw
 
 import aiosql
 
