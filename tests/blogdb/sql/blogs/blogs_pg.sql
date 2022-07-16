@@ -46,5 +46,9 @@ values (
 );
 
 -- name: pg-get-modulo$
--- escaped percent modulo operator
+-- %-escaped percent modulo operator
 SELECT :left %% :right;
+
+-- name: pg-get-modulo-2$
+-- no-escape modulo + cast
+SELECT :left::INT8 % :right::INT8;

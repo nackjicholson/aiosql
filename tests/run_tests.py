@@ -3,8 +3,12 @@ from typing import NamedTuple
 from datetime import date
 import shutil
 import asyncio
+import logging
 
 import aiosql
+
+log = logging.getLogger("test")
+
 
 # for sqlite3
 def todate(year, month, day):
@@ -24,12 +28,14 @@ RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 
 
 def queries(driver):
+    """Load queries into AioSQL."""
     dir_path = Path(__file__).parent / "blogdb" / "sql"
     return aiosql.from_path(dir_path, driver, RECORD_CLASSES)
 
 
-# run something on a connection without a schema
 def run_something(conn):
+    """Run something on a connection without a schema."""
+
     def sel12(cur):
         cur.execute("SELECT 1, 'un' UNION SELECT 2, 'deux' ORDER BY 1")
         res = cur.fetchall()
@@ -62,8 +68,9 @@ def run_record_query(conn, queries):
 def run_parameterized_query(conn, queries):
     actual = queries.users.get_by_lastname(conn, lastname="Doe")
     expected = [(3, "janedoe", "Jane", "Doe"), (2, "johndoe", "John", "Doe")]
-    # NOTE mysqldb returns a tuple instead of a list, hence the conversion
-    assert list(actual) == expected
+    # NOTE re-conversion needed for mysqldb and pg8000
+    actual = [tuple(i) for i in actual]
+    assert actual == expected
 
 
 def run_parameterized_record_query(conn, queries, db, todate):
@@ -101,16 +108,19 @@ def run_record_class_query(conn, queries, todate):
 
 def run_select_cursor_context_manager(conn, queries, todate):
     with queries.blogs.get_user_blogs_cursor(conn, userid=1) as cursor:
-        actual = cursor.fetchall()
+        # reconversions for mysqldb and pg8000
+        actual = [tuple(r) for r in cursor.fetchall()]
         expected = [
             ("How to make a pie.", todate(2018, 11, 23)),
             ("What I did Today", todate(2017, 7, 28)),
         ]
-        assert list(actual) == expected
+        assert actual == expected
 
 
 def run_select_one(conn, queries):
     actual = queries.users.get_by_username(conn, username="johndoe")
+    # reconversion for pg8000
+    actual = tuple(actual)
     expected = (2, "johndoe", "John", "Doe")
     assert actual == expected
 
@@ -120,7 +130,7 @@ def run_insert_returning(conn, queries, db, todate):
         queries.blogs.publish_blog
         if db in ("sqlite", "apsw")
         else queries.blogs.pg_publish_blog
-        if db == "pg"
+        if db in ("pg", "pg8000")
         else queries.blogs.my_publish_blog
     )
 
@@ -135,6 +145,9 @@ def run_insert_returning(conn, queries, db, todate):
     # sqlite returns a number while pg query returns a tuple
     if isinstance(blogid, tuple):
         assert db == "pg"
+        blogid, title = blogid
+    elif isinstance(blogid, list):
+        assert db == "pg8000"
         blogid, title = blogid
     else:
         assert db in ("sqlite", "apsw")
@@ -184,11 +197,13 @@ def run_insert_many(conn, queries, todate, expect=3):
     assert actual == expect
 
     johns_blogs = queries.blogs.get_user_blogs(conn, userid=2)
-    assert johns_blogs == [
+    expected = [
         ("Blog Part 3", todate(2018, 12, 6)),
         ("Blog Part 2", todate(2018, 12, 5)),
         ("Blog Part 1", todate(2018, 12, 4)),
     ]
+    johns_blogs = [tuple(r) for r in johns_blogs]
+    assert johns_blogs == expected
 
 
 def run_select_value(conn, queries, expect=3):

@@ -10,7 +10,7 @@ SQL is code. Write it, version control it, comment it, and run it using files. W
 
 This project supports standard and `asyncio <https://docs.python.org/3/library/asyncio.html>`__ based
 drivers for SQLite (`sqlite3 <https://docs.python.org/3/library/sqlite3.html>`__, `aiosqlite <https://aiosqlite.omnilib.dev/en/latest/?badge=latest>`__, `apsw <https://pypi.org/project/apsw/>`__),
-PostgreSQL (`psycopg <https://www.psycopg.org/docs/>`__, `asyncpg <https://magicstack.github.io/asyncpg/current/>`__)
+PostgreSQL (`psycopg <https://www.psycopg.org/docs/>`__, `pg8000 <https://pypi.org/project/pg8000/>`__, `asyncpg <https://magicstack.github.io/asyncpg/current/>`__)
 and MySQL (`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__, `mysqlclient <https://pypi.org/project/mysqlclient/>`__, `mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__) out of the box.
 Extensions to support other database drivers can be written by you! See: `Database Driver Adapters <./database-driver-adapters.md>`__
 
