@@ -6,9 +6,8 @@ class APSWAdapter(GenericAdapter):
     APSW Adapter suitable for `named` parameter style and no with support.
     """
 
-    @staticmethod
-    def select(conn, _query_name, sql, parameters, record_class=None):
-        cur = conn.cursor()
+    def select(self, conn, _query_name, sql, parameters, record_class=None):
+        cur = self._cursor(conn)
         try:
             cur.execute(sql, parameters)
             if record_class is None:

@@ -4,9 +4,8 @@ from .generic import GenericAdapter
 class SQLite3Adapter(GenericAdapter):
     # overwrites some methods using sqlite3-specific non-standard methods
 
-    @staticmethod
-    def insert_returning(conn, _query_name, sql, parameters):
-        cur = conn.cursor()
+    def insert_returning(self, conn, _query_name, sql, parameters):
+        cur = self._cursor(conn)
         try:
             cur.execute(sql, parameters)
             results = cur.lastrowid
@@ -14,7 +13,6 @@ class SQLite3Adapter(GenericAdapter):
             cur.close()
         return results
 
-    @staticmethod
-    def execute_script(conn, sql):
+    def execute_script(self, conn, sql):
         conn.executescript(sql)
         return "DONE"

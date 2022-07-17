@@ -5,8 +5,9 @@ from ..patterns import var_pattern
 
 
 class MaybeAcquire:
-    def __init__(self, client):
+    def __init__(self, client, driver=None):
         self.client = client
+        self._driver = driver
 
     async def __aenter__(self):
         if "acquire" in dir(self.client):
@@ -118,7 +119,6 @@ class AsyncPGAdapter:
         async with MaybeAcquire(conn) as connection:
             await connection.executemany(sql, parameters)
 
-    @staticmethod
-    async def execute_script(conn, sql):
+    async def execute_script(self, conn, sql):
         async with MaybeAcquire(conn) as connection:
             return await connection.execute(sql)

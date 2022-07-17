@@ -44,7 +44,7 @@ def _make_driver_adapter(
             elif style == "named":
                 driver_adapter = GenericAdapter
             else:
-                raise ValueError(f"Unexpected driver_adapter: {driver_adapter}")
+                raise ValueError(f"Unexpected driver_adapter: {driver_adapter} ({style})")
 
     return driver_adapter()
 
