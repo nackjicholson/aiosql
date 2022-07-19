@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Callable, Dict, Optional, Type, Union
+import logging
 
 from .adapters.aiosqlite import AioSQLiteAdapter
 from .adapters.asyncpg import AsyncPGAdapter
@@ -14,6 +15,7 @@ from .queries import Queries
 from .query_loader import QueryLoader
 from .types import DriverAdapterProtocol
 
+log = logging.getLogger(__name__)
 
 _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore
@@ -27,6 +29,13 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "pymysql": PyFormatAdapter,
     "sqlite3": SQLite3Adapter,
 }
+
+
+def register_adapter(name: str, adapter: Callable[..., DriverAdapterProtocol]):
+    """Register or override an adapter."""
+    if name in _ADAPTERS:
+        log.warn(f"overriding aiosql adapter {name}")
+    _ADAPTERS[name] = adapter
 
 
 def _make_driver_adapter(
