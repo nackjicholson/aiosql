@@ -109,10 +109,23 @@ Database driver adapters in aiosql allow extension of the library to support add
 
 There isn't much difference between these two protocols besides the ``async def`` syntax for the method definition. There is one more sneaky difference, the aiosql code expects async adapters to have a static class field ``is_aio_driver = True`` so it can tell when to use ``await`` for method returns. Looking at the source of the builtin `adapters/ <https://github.com/nackjicholson/aiosql/tree/master/aiosql/adapters>`__ is a great place to start seeing how you may write your own database driver adapter.
 
-To use the adapter pass its constructor or factory as the ``driver_adapter`` argument when building Queries.
+To use the adapter pass its constructor or factory as the ``driver_adapter`` argument when building Queries:
 
 .. code:: python
 
     queries = aiosql.from_path("foo.sql", driver_adapter=MyDbAdapter)
+
+Alternatively, an adapter can be registered or overriden:
+
+.. code:: python
+
+    # in MyDbAdapter provider, eg module "mydb_aiosql"
+    aiosql.register_adapter("mydb", MyDbAdapter)
+
+    # then use it elsewhere
+    import aiosql
+    import mydb_aiosql
+    queries = aiosql.from_path("some.sql", "mydb")
+
 
 Please ask questions on `GitHub Issues <https://github.com/nackjicholson/aiosql/issues>`__. If the community makes additional adapter add-ons I'll be sure to list them here.
