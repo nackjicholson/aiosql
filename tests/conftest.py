@@ -17,7 +17,7 @@ BLOGS_DATA_PATH = BLOGDB_PATH / "data/blogs_data.csv"
 
 # test adapter registering and overriding
 aiosql.aiosql.register_adapter("named", aiosql.adapters.GenericAdapter)
-aiosql.aiosql.register_adapter("named", aiosql.adapters.GenericAdapter)
+aiosql.register_adapter("named", aiosql.adapters.GenericAdapter)
 
 
 def pytest_addoption(parser):
