@@ -74,6 +74,7 @@ class GenericAdapter:
         return rc
 
     def insert_returning(self, conn, _query_name, sql, parameters):
+        # very similar to select_one but the returned value
         cur = self._cursor(conn)
         cur.execute(sql, parameters)
         res = cur.fetchone()
