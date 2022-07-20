@@ -106,8 +106,6 @@ dist:
 	$(PYTHON) setup.py sdist bdist_wheel
 
 .PHONY: publish
-publish: dist
-	echo "** type 'PUBLISH' to confirm publication **"
-	read confirm
-	[[ $$confirm = 'PUBLISH' ]] || exit 1
-	twine upload --repository $(MODULE) dist/*
+publish: dist check
+	echo "# run twine to publish on pypi"
+	echo twine upload --repository $(MODULE) dist/*
