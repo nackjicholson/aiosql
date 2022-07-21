@@ -124,7 +124,8 @@ psycopg2-binary==2.9.3
     # via -r dev-requirements.in
 py==1.11.0
     # via pytest
-pycodestyle==2.8.0
+pycodestyle==2.8.0 ; python_version >= "3.8"
+pycodestyle<2.8.0 ; python_version <= "3.7"
     # via flake8
 pycparser==2.21
     # via cffi
