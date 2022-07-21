@@ -50,6 +50,8 @@ jobs:
       run: mypy .
     - name: Lint with black
       run: black aiosql tests --check
+    - name: Lint with flake8
+      run: flake8 aiosql
     - name: Test with pytest and databases
       # run: pytest --postgresql-detached --postgresql-password postgres
       run: pytest tests
