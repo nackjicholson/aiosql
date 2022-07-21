@@ -51,7 +51,8 @@ docutils==0.17.1
     #   readme-renderer
     #   sphinx
     #   sphinx-rtd-theme
-flake8==4.0.1
+flake8==4.0.1 ; python_version >= "3.8"
+flake8==3.9.2 ; python_version <= "3.7"
     # via -r dev-requirements.in
 idna==3.3
     # via requests
