@@ -13,7 +13,7 @@ pytest>=6,<7
 pytest-postgresql>=4
 pytest-mysql>=2
 pytest-asyncio>=0.14.0,<1
-# NO: flake8
+flake8
 # drivers
 aiosqlite>=0.16.0,<1
 asyncpg>=0.21.0,<1

@@ -51,6 +51,8 @@ docutils==0.17.1
     #   readme-renderer
     #   sphinx
     #   sphinx-rtd-theme
+flake8==4.0.1
+    # via -r dev-requirements.in
 idna==3.3
     # via requests
 imagesize==1.4.1
@@ -72,6 +74,8 @@ keyring==23.6.0
     # via twine
 markupsafe==2.1.1
     # via jinja2
+mccabe==0.6.1
+    # via flake8
 mirakuru==2.4.2
     # via
     #   pytest-mysql
@@ -119,8 +123,12 @@ psycopg2-binary==2.9.3
     # via -r dev-requirements.in
 py==1.11.0
     # via pytest
+pycodestyle==2.8.0
+    # via flake8
 pycparser==2.21
     # via cffi
+pyflakes==2.4.0
+    # via flake8
 pygments==2.12.0
     # via
     #   readme-renderer
