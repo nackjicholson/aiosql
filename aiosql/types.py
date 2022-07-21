@@ -91,13 +91,13 @@ class SyncDriverAdapterProtocol(Protocol):
     # TODO: Next major version introduce a return? Optional return?
     def insert_update_delete(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
-    ) -> None:
+    ) -> int:
         ...  # pragma: no cover
 
     # TODO: Next major version introduce a return? Optional return?
     def insert_update_delete_many(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
-    ) -> None:
+    ) -> int:
         ...  # pragma: no cover
 
     def insert_returning(
