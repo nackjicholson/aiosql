@@ -26,6 +26,7 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "pg8000": Pg8000Adapter,
     "psycopg": PsycoPGAdapter,
     "psycopg2": PsycoPGAdapter,
+    "pygresql": PyFormatAdapter,
     "pymysql": PyFormatAdapter,
     "sqlite3": SQLite3Adapter,
 }
