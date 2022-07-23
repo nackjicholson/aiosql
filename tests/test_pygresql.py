@@ -1,14 +1,16 @@
 from datetime import date
 
 import aiosql
-import pgdb  # PyGreSQL DB-API driver
+import pgdb as db  # PyGreSQL DB-API driver
 import pytest
 import run_tests as t
+
+DRIVER = "pygresql"
 
 
 @pytest.fixture()
 def queries():
-    return t.queries("pygresql")
+    return t.queries(DRIVER)
 
 
 @pytest.fixture()
@@ -21,13 +23,13 @@ def conn(pg_params):
         del pg_params["port"]
         pg_params["host"] += f":{port}"
     t.log.debug(f"params: {pg_params}")
-    with pgdb.connect(**pg_params) as conn:
+    with db.connect(**pg_params) as conn:
         yield conn
 
 
 @pytest.mark.skip("row factory is not supported")
 def test_record_query(pg_params, queries):
-    with pgdb.connect(**pg_params, row_factory=dict_row) as conn:
+    with db.connect(**pg_params, row_factory=dict_row) as conn:
         t.run_record_query(conn, queries)
 
 
@@ -37,7 +39,7 @@ def test_parameterized_query(conn, queries):
 
 @pytest.mark.skip("row factory is not supported")
 def test_parameterized_record_query(pg_params, queries):
-    with pgdb.connect(**pg_params, row_factory=dict_row) as conn:
+    with db.connect(**pg_params, row_factory=dict_row) as conn:
         t.run_parameterized_record_query(conn, queries, "pg", date)
 
 
@@ -64,7 +66,7 @@ def test_modulo(conn, queries):
 
 
 def test_insert_returning(conn, queries):
-    t.run_insert_returning(conn, queries, "pygresql", date)
+    t.run_insert_returning(conn, queries, DRIVER, date)
 
 
 def test_delete(conn, queries):

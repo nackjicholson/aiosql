@@ -4,9 +4,8 @@ from pathlib import Path
 import pytest
 from pytest_postgresql import factories as pg_factories
 from pytest_mysql import factories as my_factories
-import sqlite3
-import apsw
 
+import sqlite3
 import aiosql
 
 # CSV data file paths
@@ -92,47 +91,6 @@ def sqlite3_db_path(tmpdir):
     db_path = str(Path(tmpdir.strpath) / "blogdb.db")
     populate_sqlite3_db(db_path)
     return db_path
-
-
-@pytest.fixture()
-def sqlite3_conn(sqlite3_db_path):
-    conn = sqlite3.connect(sqlite3_db_path)
-    yield conn
-    conn.close()
-
-
-# FIXME maybe it should look at the connection state?
-class APSWConnection(apsw.Connection):
-    """APSW Connection wrapper with autocommit off."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._begin()
-
-    def _begin(self):
-        self.cursor().execute("BEGIN").close()
-
-    def commit(self):  # pragma: no cover
-        self.cursor().execute("COMMIT").close()
-        self._begin()
-
-    def _rollback(self):
-        self.cursor().execute("ROLLBACK").close()
-
-    def rollback(self):  # pragma: no cover
-        self._rollback()
-        self._begin()
-
-    def close(self):
-        self._rollback()
-        super().close()
-
-
-@pytest.fixture()
-def apsw_conn(sqlite3_db_path):
-    conn = APSWConnection(sqlite3_db_path)
-    yield conn
-    conn.close()
 
 
 #

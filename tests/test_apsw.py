@@ -1,7 +1,9 @@
 import aiosql
-
 import pytest
 import run_tests as t
+import apsw as db
+
+DRIVER = "apsw"
 
 
 def dict_factory(cursor, row):
@@ -13,7 +15,40 @@ def dict_factory(cursor, row):
 
 @pytest.fixture()
 def queries():
-    return t.queries("apsw")
+    return t.queries(DRIVER)
+
+
+class APSWConnection(db.Connection):
+    """APSW Connection wrapper with autocommit off."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._begin()
+
+    def _begin(self):
+        self.cursor().execute("BEGIN").close()
+
+    def commit(self):  # pragma: no cover
+        self.cursor().execute("COMMIT").close()
+        self._begin()
+
+    def _rollback(self):
+        self.cursor().execute("ROLLBACK").close()
+
+    def rollback(self):  # pragma: no cover
+        self._rollback()
+        self._begin()
+
+    def close(self):
+        self._rollback()
+        super().close()
+
+
+@pytest.fixture()
+def apsw_conn(sqlite3_db_path):
+    conn = APSWConnection(sqlite3_db_path)
+    yield conn
+    conn.close()
 
 
 def test_record_query(apsw_conn, queries):
@@ -54,7 +89,7 @@ def test_modulo(apsw_conn, queries):
 
 @pytest.mark.skip("APSW does not support RETURNING?")
 def test_insert_returning(apsw_conn, queries):  # pragma: no cover
-    t.run_insert_returning(apsw_conn, queries, "apsw", t.todate)
+    t.run_insert_returning(apsw_conn, queries, DRIVER, t.todate)
 
 
 def test_delete(apsw_conn, queries):

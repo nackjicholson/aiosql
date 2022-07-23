@@ -1,7 +1,9 @@
 import aiosql
-
 import pytest
 import run_tests as t
+import sqlite3 as db
+
+DRIVER = "sqlite3"
 
 
 def dict_factory(cursor, row):
@@ -13,7 +15,14 @@ def dict_factory(cursor, row):
 
 @pytest.fixture()
 def queries():
-    return t.queries("sqlite3")
+    return t.queries(DRIVER)
+
+
+@pytest.fixture()
+def sqlite3_conn(sqlite3_db_path):
+    conn = db.connect(sqlite3_db_path)
+    yield conn
+    conn.close()
 
 
 def test_record_query(sqlite3_conn, queries):
@@ -27,7 +36,7 @@ def test_parameterized_query(sqlite3_conn, queries):
 
 def test_parameterized_record_query(sqlite3_conn, queries):
     sqlite3_conn.row_factory = dict_factory
-    t.run_parameterized_record_query(sqlite3_conn, queries, "sqlite", t.todate)
+    t.run_parameterized_record_query(sqlite3_conn, queries, DRIVER, t.todate)
 
 
 def test_record_class_query(sqlite3_conn, queries):
@@ -53,7 +62,7 @@ def test_modulo(sqlite3_conn, queries):
 
 
 def test_insert_returning(sqlite3_conn, queries):
-    t.run_insert_returning(sqlite3_conn, queries, "sqlite", t.todate)
+    t.run_insert_returning(sqlite3_conn, queries, DRIVER, t.todate)
 
 
 def test_delete(sqlite3_conn, queries):

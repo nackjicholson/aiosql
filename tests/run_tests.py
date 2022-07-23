@@ -76,7 +76,7 @@ def run_parameterized_query(conn, queries):
 def run_parameterized_record_query(conn, queries, db, todate):
     fun = (
         queries.blogs.sqlite_get_blogs_published_after
-        if db in ("sqlite", "apsw")
+        if db in ("sqlite3", "apsw")
         else queries.blogs.pg_get_blogs_published_after
         if db == "pg"
         else queries.blogs.my_get_blogs_published_after
@@ -128,9 +128,9 @@ def run_select_one(conn, queries):
 def run_insert_returning(conn, queries, db, todate):
     fun = (
         queries.blogs.publish_blog
-        if db in ("sqlite", "apsw")
+        if db in ("sqlite3", "apsw")
         else queries.blogs.pg_publish_blog
-        if db in ("pg", "pg8000")
+        if db in ("pg", "pg8000", "pygresql")
         else queries.blogs.my_publish_blog
     )
 
@@ -144,13 +144,13 @@ def run_insert_returning(conn, queries, db, todate):
 
     # sqlite returns a number while pg query returns a tuple
     if isinstance(blogid, tuple):
-        assert db == "pg"
+        assert db in ("pg", "pygresql")
         blogid, title = blogid
     elif isinstance(blogid, list):
         assert db == "pg8000"
         blogid, title = blogid
     else:
-        assert db in ("sqlite", "apsw")
+        assert db in ("sqlite3", "apsw")
         blogid, title = blogid, "My first blog"
 
     b2, t2 = queries.blogs.blog_title(conn, blogid=blogid)

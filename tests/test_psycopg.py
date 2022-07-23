@@ -1,24 +1,25 @@
 from datetime import date
 
 import aiosql
-import psycopg
+import psycopg as db
 from psycopg.rows import dict_row
-
 import pytest
 import run_tests as t
+
+DRIVER = "psycopg"
 
 
 @pytest.fixture()
 def queries():
-    return t.queries("psycopg")
+    return t.queries(DRIVER)
 
 
 def test_version():
-    assert psycopg.__version__.startswith("3.")
+    assert db.__version__.startswith("3.")
 
 
 def test_record_query(pg_params, queries):
-    with psycopg.connect(**pg_params, row_factory=dict_row) as conn:
+    with db.connect(**pg_params, row_factory=dict_row) as conn:
         t.run_record_query(conn, queries)
 
 
@@ -27,7 +28,7 @@ def test_parameterized_query(pg_conn, queries):
 
 
 def test_parameterized_record_query(pg_params, queries):
-    with psycopg.connect(**pg_params, row_factory=dict_row) as conn:
+    with db.connect(**pg_params, row_factory=dict_row) as conn:
         t.run_parameterized_record_query(conn, queries, "pg", date)
 
 
