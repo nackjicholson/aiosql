@@ -13,6 +13,7 @@ from typing import (
 )
 
 try:
+    # Python 3.8 (PEP 544)
     from typing import Protocol
 except ImportError:  # pragma: no cover
     from typing_extensions import Protocol  # type: ignore
