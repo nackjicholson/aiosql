@@ -1,4 +1,4 @@
-from contextlib2 import asynccontextmanager
+from contextlib import asynccontextmanager
 
 
 class AioSQLiteAdapter:

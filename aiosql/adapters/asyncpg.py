@@ -1,5 +1,5 @@
 from collections import defaultdict
-from contextlib2 import asynccontextmanager
+from contextlib import asynccontextmanager
 
 from ..patterns import var_pattern
 
