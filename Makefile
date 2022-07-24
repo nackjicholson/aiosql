@@ -38,6 +38,12 @@ help:
 #
 # VIRTUAL ENVIRONMENT
 #
+# NOTE: pining module versions is somehow counter productive because we really
+# want to work with multiple versions of python, which all have their own
+# requirements and dependencies and random incompatibilities wrt libraries,
+# so the result is kind of a mess, so we attempt at doing nearly nothing and
+# hope for the bese, i.e. dependencies will not break the library.
+#
 .PHONY: venv.dev venv.prod venv.last
 
 venv:
