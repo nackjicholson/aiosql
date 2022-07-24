@@ -75,7 +75,7 @@ def from_str(
 
     * **sql** - A string containing SQL statements and aiosql name.
     * **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
-    adapters. One of "sqlite3", "psycopg2", "aiosqlite", or "asyncpg". If you have defined your
+    adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your
     own adapter class, you can pass it's constructor.
     * **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
     declarations to the python classes which aiosql should use when marshaling SQL results.
@@ -128,7 +128,7 @@ def from_path(
 
     * **sql_path** - Path to a `.sql` file or directory containing `.sql` files.
     * **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
-    adapters. One of "sqlite3", "psycopg2", "aiosqlite", or "asyncpg". If you have defined your own
+    adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your own
     adapter class, you may pass its constructor.
     * **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
     declarations to the python classes which aiosql should use when marshaling SQL results.
