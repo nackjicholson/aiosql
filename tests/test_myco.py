@@ -1,7 +1,7 @@
 from datetime import date
 
 import aiosql
-import mysql.connector as myco
+import mysql.connector as db
 
 import pytest
 import run_tests as t
@@ -22,7 +22,7 @@ def myco_db_dsn(my_db, my_dsn):
 
 @pytest.fixture()
 def myco_db(myco_db_dsn):
-    conn = myco.connect(**myco_db_dsn)
+    conn = db.connect(**myco_db_dsn)
     yield conn
     conn.commit()
     conn.close()
@@ -30,7 +30,7 @@ def myco_db(myco_db_dsn):
 
 @pytest.fixture
 def myco_nodb(my_dsn):
-    conn = myco.connect(**my_dsn)
+    conn = db.connect(**my_dsn)
     yield conn
     conn.commit()
     conn.close()
@@ -55,7 +55,7 @@ def test_my_dsn(my_dsn):
 
 @pytest.mark.skip("myco cursor handling is unclear")
 def test_record_query(myco_db_dsn, queries):
-    with myco.connect(**myco_db_dsn, cursorclass=myco.cursors.DictCursor) as conn:
+    with db.connect(**myco_db_dsn, cursorclass=myco.cursors.DictCursor) as conn:
         t.run_record_query(conn, queries)
 
 
@@ -65,7 +65,7 @@ def test_parameterized_query(myco_db, queries):
 
 @pytest.mark.skip("myco cursor handling is unclear")
 def test_parameterized_record_query(myco_db_dsn, queries):  # pragma: no cover
-    with myco.connect(**myco_db_dsn, cursorclass=myco.cursors.DictCursor) as conn:
+    with db.connect(**myco_db_dsn, cursorclass=myco.cursors.DictCursor) as conn:
         t.run_parameterized_record_query(conn, queries, "my", date)
 
 
