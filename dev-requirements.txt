@@ -1,4 +1,6 @@
 -e file:.
+# utils
+google-re2
 # building tools
 build
 twine

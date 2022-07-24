@@ -1,4 +1,8 @@
-import re
+# use re2 if available.
+try:
+    import re2 as re
+except ModuleNotFoundError:  # pragma: no cover
+    import re  # type: ignore
 
 query_name_definition_pattern = re.compile(r"--\s*name\s*:\s*")
 """
