@@ -21,8 +21,6 @@ This aiosql repository uses the python standard packaging tools. Read about them
 -  `build <https://pypa-build.readthedocs.io/en/stable/>`__
 -  `twine <https://twine.readthedocs.io/en/latest/#configuration>`__
 
-To help with dependency pinning and build reproduction aiosql leverages `pip-tools <https://github.com/jazzband/pip-tools>`__ to help produce its ``requirements.txt`` and ``dev-requirements.txt`` files.
-
 Development Setup
 -----------------
 
@@ -38,21 +36,17 @@ Development Setup
 
 All subsequent steps will assume you are using python within your activated virtual environment.
 
-2. Install pip-tools
+2. Install your environment to the dependencies defined in ``dev-requirements.in``
+
+Note: different versions of Python may install different versions of dependencies.
+As `aiosql` is more or less expected to work with all these module versions, the
+bare minimum version pinning is done in the requirements file.
 
 .. code:: sh
 
-    python -m pip install pip-tools
+    pip install -r dev-requirements.txt
 
-3. Sync your environment to the dependencies defined in ``dev-requirements.txt``
-
-The requirements file format is compatible with ``pip`` directly. Simply, ``pip install -r dev-requirements.txt``. But, the recommended flow is to use pip-tools to sync your local environment to the exact versions specified.
-
-.. code:: sh
-
-    pip-sync requirements.txt dev-requirements.txt
-
-4. Run tests
+3. Run tests
 
 .. code:: sh
 
@@ -61,15 +55,7 @@ The requirements file format is compatible with ``pip`` directly. Simply, ``pip 
 Dependency Management
 ---------------------
 
-Read much more at `pip-tools <https://github.com/jazzband/pip-tools>`__.
+There is no dependency for using ``aiosql``.
 
-.. code:: sh
-
-    # When you've changed a dependency in setup.cfg/setup.py
-    $ pip-compile
-
-    # When you've updated a development dependency.
-    $ pip-compile dev-requirements.in
-
-    # Upgrading packages
-    $ pip-compile --upgrade-package test-extensions --upgrade-package contextlib2==21.6.0
+For development you need to test with various databases and even more drivers,
+see above for generating a working python environment.
