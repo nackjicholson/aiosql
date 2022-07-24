@@ -1,15 +1,15 @@
 from datetime import date
 
 import aiosql
-import psycopg2
-import psycopg2.extras
+import psycopg2 as db
+from psycopg2.extras import RealDictCursor as DictCursor
 
 import pytest
 import run_tests as t
 
 
 def test_version():
-    assert psycopg2.__version__.startswith("2.")
+    assert db.__version__.startswith("2.")
 
 
 @pytest.fixture()
@@ -18,7 +18,7 @@ def queries():
 
 
 def test_record_query(pg_dsn, queries):
-    with psycopg2.connect(dsn=pg_dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+    with db.connect(dsn=pg_dsn, cursor_factory=DictCursor) as conn:
         t.run_record_query(conn, queries)
 
 
@@ -27,7 +27,7 @@ def test_parameterized_query(pg_conn, queries):
 
 
 def test_parameterized_record_query(pg_dsn, queries):
-    with psycopg2.connect(dsn=pg_dsn, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+    with db.connect(dsn=pg_dsn, cursor_factory=DictCursor) as conn:
         t.run_parameterized_record_query(conn, queries, "pg", date)
 
 

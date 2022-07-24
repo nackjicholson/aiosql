@@ -1,7 +1,7 @@
 from datetime import date
 
 import aiosql
-import MySQLdb as ms
+import MySQLdb as db
 
 import pytest
 import run_tests as t
@@ -34,7 +34,7 @@ def test_my_db(my_db):
 # FIXME
 @pytest.mark.skip("cannot connect obscure issue")
 def test_record_query(my_dsn, queries):  # pragma: no cover
-    with ms.connect(**my_dsn) as conn:
+    with db.connect(**my_dsn) as conn:
         t.run_record_query(conn, queries)
 
 
@@ -45,7 +45,7 @@ def test_parameterized_query(my_db, queries):
 
 @pytest.mark.skip("cannot connect obscure issue")
 def test_parameterized_record_query(my_dsn, queries):  # pragma: no cover
-    with ms.connect(**my_dsn) as conn:
+    with db.connect(**my_dsn) as conn:
         t.run_parameterized_record_query(conn, queries, "my", date)
 
 

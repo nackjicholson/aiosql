@@ -1,7 +1,7 @@
 from datetime import date
 
 import aiosql
-import pymysql as pm
+import pymysql as db
 
 import pytest
 import run_tests as t
@@ -22,14 +22,14 @@ def pymysql_db_dsn(my_db, my_dsn):
 
 @pytest.fixture()
 def pymysql_db(pymysql_db_dsn):
-    with pm.connect(**pymysql_db_dsn) as conn:
+    with db.connect(**pymysql_db_dsn) as conn:
         yield conn
         conn.commit()
 
 
 @pytest.fixture
 def pymysql_nodb(my_dsn):
-    with pm.connect(**my_dsn) as conn:
+    with db.connect(**my_dsn) as conn:
         yield conn
         conn.commit()
 
@@ -52,7 +52,7 @@ def test_my_dsn(my_dsn):
 
 
 def test_record_query(pymysql_db_dsn, queries):
-    with pm.connect(**pymysql_db_dsn, cursorclass=pm.cursors.DictCursor) as conn:
+    with db.connect(**pymysql_db_dsn, cursorclass=db.cursors.DictCursor) as conn:
         t.run_record_query(conn, queries)
 
 
@@ -62,7 +62,7 @@ def test_parameterized_query(pymysql_db, queries):
 
 @pytest.mark.skip("pymysql issue when mogrifying because of date stuff %Y")
 def test_parameterized_record_query(pymysql_db_dsn, queries):  # pragma: no cover
-    with pm.connect(**pymysql_db_dsn, cursorclass=pm.cursors.DictCursor) as conn:
+    with db.connect(**pymysql_db_dsn, cursorclass=db.cursors.DictCursor) as conn:
         t.run_parameterized_record_query(conn, queries, "my", date)
 
 
