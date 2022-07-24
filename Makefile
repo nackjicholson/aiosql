@@ -24,7 +24,6 @@ help:
 	echo " - venv.dev: make venv suitable for development"
 	echo " - venv.prod: make venv suitable for production"
 	echo " - venv.last: fill venv with latests packages"
-	echo " - dev-requirements.txt: regenerate this file from *.in"
 	echo " - clean: clean up various generated files and directories"
 	echo " - clean.venv: also remove the venv directory"
 	echo " - check.pytest: run pytest tests"
@@ -38,7 +37,7 @@ help:
 #
 # VIRTUAL ENVIRONMENT
 #
-# NOTE: pining module versions is somehow counter productive because we really
+# NOTE: pinning module versions is somehow counter productive because we really
 # want to work with multiple versions of python, which all have their own
 # requirements and dependencies and random incompatibilities wrt libraries,
 # so the result is kind of a mess, so we attempt at doing nearly nothing and
@@ -48,19 +47,15 @@ help:
 
 venv:
 	$(PYTHON) -m venv venv
-	$(PIP) install pip-tools
+	$(PIP) install -e .
 
 venv.dev: venv
-	$(PIP)-sync dev-requirements.txt
+	$(PIP) install -r dev-requirements.txt
 
 venv.prod: venv
-	$(PIP)-sync requirements.txt
 
 venv.last:
 	$(PIP) install $$($(PIP) freeze | cut -d= -f1 | grep -v -- '^-e') -U
-
-dev-requirements.txt: dev-requirements.in venv
-	$(PIP)-compile $<
 
 #
 # CLEANUP

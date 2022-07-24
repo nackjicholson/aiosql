@@ -21,8 +21,8 @@ jobs:
     services:
       # Label used to access the service container
       postgres:
-        # Docker Hub image
-        image: postgres:14.4-alpine3.16
+        # GitHub Docker Images: https://github.com/docker-library/official-images/blob/master/library/postgres
+        image: postgres:alpine
         # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: postgres
@@ -43,8 +43,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip pip-tools
-        pip-sync requirements.txt dev-requirements.txt
+        python -m pip install --upgrade pip
+        pip install -r dev-requirements.txt
         python -m pip install .
     - name: Check types with mypy
       run: mypy .
