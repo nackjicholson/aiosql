@@ -4,7 +4,3 @@
 #
 #    pip-compile
 #
-contextlib2==21.6.0
-    # via aiosql (setup.py)
-typing-extensions==4.0.1
-    # via aiosql (setup.py)
