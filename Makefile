@@ -65,7 +65,7 @@ venv.last:
 clean:
 	find . -type d -name __pycache__ -print0 | xargs -0 rm -rf
 	$(RM) -r dist build .mypy_cache .pytest_cache htmlcov
-	$(RM) .coverage
+	$(RM) .coverage poetry.lock
 
 clean.venv: clean
 	$(RM) -r venv $(MODULE).egg-info
@@ -76,23 +76,23 @@ clean.venv: clean
 .PHONY: check.pytest check.mypy check.flake8 check.black check.coverage check
 
 check.pytest: $(VENV)
-	source venv/bin/activate
+	[ "$(VENV)" ] && source venv/bin/activate
 	$(PYTEST) $(PYTOPT) tests/
 
 check.mypy: $(VENV)
-	source venv/bin/activate
+	[ "$(VENV)" ] && source venv/bin/activate
 	mypy $(MODULE)
 
 check.flake8: $(VENV)
-	source venv/bin/activate
+	[ "$(VENV)" ] && source venv/bin/activate
 	flake8 $(MODULE)
 
 check.black: $(VENV)
-	source venv/bin/activate
+	[ "$(VENV)" ] && source venv/bin/activate
 	black $(MODULE) tests --check
 
 check.coverage: $(VENV)
-	source venv/bin/activate
+	[ "$(VENV)" ] && source venv/bin/activate
 	coverage run -m $(PYTEST) $(PYTOPT)
 	coverage html
 	coverage report --fail-under=100 --include='$(MODULE)/*'

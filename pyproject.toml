@@ -1,9 +1,47 @@
-[build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
+[tool.poetry]
+name = "aiosql"
+version = "6.0"
+description = "Simple SQL in Python"
+authors = ["William Vaughn <vaughnwilld@gmail.com>"]
+maintainers = ["Fabien Coelho <aio.sql@coelho.net>"]
+license = "BSD-3-Clause"
+readme = "README.rst"
+homepage = "https://github.com/nackjicholson/aiosql"
+repository = "https://github.com/nackjicholson/aiosql.git"
+documentation = "https://nackjicholson.github.io/aiosql/"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent"
 ]
-build-backend = "setuptools.build_meta"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
+pytest-asyncio = "*"
+pytest-postgresql = "^4"
+pytest-mysql = "^2"
+coverage = "*"
+black = "*"
+flake8 = "*"
+mypy = "*"
+google-re2 = "*"
+psycopg = "^3"
+psycopg2 = "^2"
+pg8000 = "*"
+PyGreSQL = "*"
+PyMySQL = "*"
+mysql-connector = "*"
+mysqlclient = "*"
+apsw = "*"
+asyncpg = "*"
+aiosqlite = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 100
