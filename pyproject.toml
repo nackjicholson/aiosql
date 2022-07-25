@@ -46,3 +46,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.black]
 line-length = 100
 target-version = ["py37"]
+
+[tool.mypy]
+exclude = "(build|venv)/"
+ignore_missing_imports = true
