@@ -48,5 +48,5 @@ line-length = 100
 target-version = ["py37"]
 
 [tool.mypy]
-exclude = "(build|venv)/"
+exclude = ["(build|venv)/", ".*/virtualenvs/.*"]
 ignore_missing_imports = true
