@@ -47,7 +47,11 @@ jobs:
         pip install -r dev-requirements.txt
         python -m pip install .
     - name: Check types with mypy
-      run: mypy .
+      # FIXME for some reason the --ignore-missing-imports option in pyproject.toml
+      # is ignored when run from github CI but ok when run locally.
+      # Try installing types instead.
+      run: |
+        mypy --install-types --non-interactive aiosql
     - name: Lint with black
       run: black aiosql tests --check
     - name: Lint with flake8
