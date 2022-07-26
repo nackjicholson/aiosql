@@ -40,7 +40,8 @@ asyncpg = "*"
 aiosqlite = "*"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+# setuptools needed so that pip works?
+requires = ["poetry-core>=1.0.0", "setuptools"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
