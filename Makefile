@@ -81,7 +81,7 @@ check.pytest: $(VENV)
 
 check.mypy: $(VENV)
 	[ "$(VENV)" ] && source venv/bin/activate
-	mypy $(MODULE)
+	mypy --install-types --non-interactive $(MODULE)
 
 check.flake8: $(VENV)
 	[ "$(VENV)" ] && source venv/bin/activate
