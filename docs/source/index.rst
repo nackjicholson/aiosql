@@ -21,7 +21,60 @@ Extensions to support other database drivers can be written by you! See: `Databa
 Badges
 ------
 
-.. image:: https://github.com/nackjicholson/aiosql/actions/workflows/aiosql-package.yml/badge.svg?branch=master
+..
+   NOTE :target: is needed so that github renders badges in a line.
+
+.. image:: https://img.shields.io/pypi/v/aiosql
+   :alt: Version
+   :target: https://pypi.org/project/aiosql/
+
+.. image:: https://img.shields.io/static/v1?label=drivers&message=10&color=informational
+   :alt: Drivers
+   :target: https://github.com/nackjicholson/aiosql/
+
+.. image:: https://github.com/nackjicholson/aiosql/actions/workflows/aiosql-package.yml/badge.svg?branch=master&style=flat
+   :alt: Build status
+   :target: https://github.com/nackjicholson/aiosql/actions/
+
+..
+   hardcoded coverage, 100% if previous CI status is ok
+
+.. image:: https://img.shields.io/static/v1?label=coverage&message=100%25&color=success
+   :alt: Code Coverage
+   :target: https://github.com/nackjicholson/aiosql/actions/
+
+.. image:: https://img.shields.io/github/issues/nackjicholson/aiosql?style=flat
+   :alt: Issues
+   :target: https://github.com/nackjicholson/aiosql/issues/
+
+.. image:: https://img.shields.io/github/languages/count/nackjicholson/aiosql?style=flat
+   :alt: Language Count
+   :target: https://en.wikipedia.org/wiki/Programming_language
+
+.. image:: https://img.shields.io/github/languages/top/nackjicholson/aiosql?style=flat
+   :alt: Top Language
+   :target: https://en.wikipedia.org/wiki/Python_(programming_language)
+
+.. image:: https://img.shields.io/pypi/pyversions/aiosql?style=flat
+   :alt: Python Versions
+   :target: https://www.python.org/
+
+.. image:: https://img.shields.io/pypi/l/aiosql?style=flat
+   :alt: BSD 3-Clause License
+   :target: https://opensource.org/licenses/BSD-3-Clause
+
+.. image:: https://img.shields.io/github/stars/nackjicholson/aiosql?style=flat&label=Star&maxAge=2592000
+   :alt: Stars
+   :target: https://github.com/nackjicholson/aiosql/stargazers
+
+.. image:: https://img.shields.io/github/contributors/nackjicholson/aiosql
+   :alt: Contributors
+   :target: https://github.com/nackjicholson/aiosql/graphs/contributors
+
+.. image:: https://img.shields.io/pypi/dm/aiosql?style=flat
+   :alt: Pypi Downloads
+   :target: https://pypi.org/project/aiosql/
+
 
 Installation
 ------------
