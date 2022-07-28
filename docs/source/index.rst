@@ -16,7 +16,7 @@ use them as you would any other SQL file.
 This project supports standard and `asyncio <https://docs.python.org/3/library/asyncio.html>`__ based
 drivers for
 SQLite (`sqlite3 <https://docs.python.org/3/library/sqlite3.html>`__, `aiosqlite <https://aiosqlite.omnilib.dev/en/latest/?badge=latest>`__, `apsw <https://pypi.org/project/apsw/>`__),
-PostgreSQL (`psycopg <https://www.psycopg.org/docs/>`__, `pg8000 <https://pypi.org/project/pg8000/>`__, `pygresql <http://www.pygresql.org/>`__, `asyncpg <https://magicstack.github.io/asyncpg/current/>`__)
+PostgreSQL (`psycopg 2 and 3 <https://www.psycopg.org/docs/>`__, `pg8000 <https://pypi.org/project/pg8000/>`__, `pygresql <http://www.pygresql.org/>`__, `asyncpg <https://magicstack.github.io/asyncpg/current/>`__)
 and MySQL (`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__, `mysqlclient <https://pypi.org/project/mysqlclient/>`__, `mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__) out of the box.
 
 Extensions to support other database drivers can be written by you!
@@ -64,7 +64,7 @@ Badges
    :alt: Version
    :target: https://pypi.org/project/aiosql/
 
-.. image:: https://img.shields.io/badge/drivers-10-informational
+.. image:: https://img.shields.io/badge/drivers-11-informational
    :alt: Drivers
    :target: https://github.com/nackjicholson/aiosql/
 
