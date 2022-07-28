@@ -28,7 +28,7 @@ Badges
    :alt: Version
    :target: https://pypi.org/project/aiosql/
 
-.. image:: https://img.shields.io/static/v1?label=drivers&message=10&color=informational
+.. image:: https://img.shields.io/badge/drivers-10-informational
    :alt: Drivers
    :target: https://github.com/nackjicholson/aiosql/
 
@@ -39,7 +39,7 @@ Badges
 ..
    hardcoded coverage, 100% if previous CI status is ok
 
-.. image:: https://img.shields.io/static/v1?label=coverage&message=100%25&color=success
+.. image:: https://img.shields.io/badge/coverage-100%25-success
    :alt: Code Coverage
    :target: https://github.com/nackjicholson/aiosql/actions/
 
