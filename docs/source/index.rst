@@ -6,13 +6,21 @@
 aiosql - Simple SQL in Python
 ==================================
 
-SQL is code. Write it, version control it, comment it, and run it using files. Writing your SQL code in Python programs as strings doesn't allow you to easily reuse them in SQL GUIs or CLI tools like psql. With aiosql you can organize your SQL statements in *.sql* files, load them into your python application as methods to call without losing the ability to use them as you would any other SQL file.
+SQL is code. Write it, version control it, comment it, and run it using files.
+Writing your SQL code in Python programs as strings doesn't allow you to easily
+reuse them in SQL GUIs or CLI tools like psql.
+With aiosql you can organize your SQL statements in *.sql* files, load them
+into your python application as methods to call without losing the ability to
+use them as you would any other SQL file.
 
 This project supports standard and `asyncio <https://docs.python.org/3/library/asyncio.html>`__ based
-drivers for SQLite (`sqlite3 <https://docs.python.org/3/library/sqlite3.html>`__, `aiosqlite <https://aiosqlite.omnilib.dev/en/latest/?badge=latest>`__, `apsw <https://pypi.org/project/apsw/>`__),
+drivers for
+SQLite (`sqlite3 <https://docs.python.org/3/library/sqlite3.html>`__, `aiosqlite <https://aiosqlite.omnilib.dev/en/latest/?badge=latest>`__, `apsw <https://pypi.org/project/apsw/>`__),
 PostgreSQL (`psycopg <https://www.psycopg.org/docs/>`__, `pg8000 <https://pypi.org/project/pg8000/>`__, `pygresql <http://www.pygresql.org/>`__, `asyncpg <https://magicstack.github.io/asyncpg/current/>`__)
 and MySQL (`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__, `mysqlclient <https://pypi.org/project/mysqlclient/>`__, `mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__) out of the box.
-Extensions to support other database drivers can be written by you! See: `Database Driver Adapters <./database-driver-adapters.html>`__
+
+Extensions to support other database drivers can be written by you!
+See: `Database Driver Adapters <./database-driver-adapters.html>`__
 
 .. danger::
 
@@ -191,7 +199,11 @@ Async Usage
 
     asyncio.run(main())
 
-This example has an imaginary SQLite database with greetings and users. It prints greetings in various languages to the user and showcases the basic feature of being able to load queries from a sql file and call them by name in python code. It also happens to do two SQL queries in parallel using ``aiosqlite`` and asyncio.
+This example has an imaginary SQLite database with greetings and users.
+It prints greetings in various languages to the user and showcases the basic
+feature of being able to load queries from a sql file and call them by name
+in python code.
+It also happens to do two SQL queries in parallel using ``aiosqlite`` and asyncio.
 
 Why you might want to use this
 ------------------------------
