@@ -37,10 +37,14 @@ Badges
    :target: https://github.com/nackjicholson/aiosql/actions/
 
 ..
-   hardcoded coverage, 100% if previous CI status is ok
+   hardcoded coverage and tests, 100% and 140/13 if previous CI status is ok
 
 .. image:: https://img.shields.io/badge/coverage-100%25-success
    :alt: Code Coverage
+   :target: https://github.com/nackjicholson/aiosql/actions/
+
+.. image:: https://img.shields.io/badge/tests-140%20ok,13%20n/a-success
+   :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 
 .. image:: https://img.shields.io/github/issues/nackjicholson/aiosql?style=flat
