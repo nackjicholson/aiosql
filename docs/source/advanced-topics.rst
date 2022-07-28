@@ -3,6 +3,7 @@ Advanced Topics
 
 .. _leveraging-driver-specific-features:
 
+
 Leveraging Driver Specific Features
 -----------------------------------
 
@@ -11,7 +12,13 @@ Todo
 Access the ``cursor`` object
 ----------------------------
 
-The cursor is a temporary object created in memory that allows you to perform row-by-row operations on your data and use handy methods such as ``.description``, ``.fetchall()`` and ``.fetchone()``. As long as you are running a SQL ``SELECT`` query, you can access the cursor object by appending ``_cursor`` to the end of the queries name. For example, say you have the following query named ``get-all-greetings`` in a ``sql`` file:
+The cursor is a temporary object created in memory that allows you to perform
+row-by-row operations on your data and use handy methods such as
+``.description``, ``.fetchall()`` and ``.fetchone()``.
+As long as you are running a SQL ``SELECT`` query, you can access the cursor
+object by appending ``_cursor`` to the end of the queries name.
+
+For example, say you have the following query named ``get-all-greetings`` in a ``sql`` file:
 
 .. code:: sql
 
@@ -50,6 +57,7 @@ With this query, you can get all ``greeting_id``'s and ``greeting``'s, access th
     # [greeting_id, greeting]
     # ALL DATA: [(1, hi), (2, aloha), (3, hola)]
     # FIRST ROW: (1, hi)
+
 
 Accessing prepared SQL as a string
 ----------------------------------
