@@ -29,7 +29,7 @@ def test_parameterized_query(pg_conn, queries):
 
 def test_parameterized_record_query(pg_params, queries):
     with db.connect(**pg_params, row_factory=dict_row) as conn:
-        t.run_parameterized_record_query(conn, queries, "pg", date)
+        t.run_parameterized_record_query(conn, queries, DRIVER, date)
 
 
 def test_record_class_query(pg_conn, queries):
@@ -55,7 +55,7 @@ def test_modulo(pg_conn, queries):
 
 
 def test_insert_returning(pg_conn, queries):
-    t.run_insert_returning(pg_conn, queries, "pg", date)
+    t.run_insert_returning(pg_conn, queries, DRIVER, date)
 
 
 def test_delete(pg_conn, queries):
@@ -65,3 +65,6 @@ def test_delete(pg_conn, queries):
 def test_insert_many(pg_conn, queries):
     with pg_conn:
         t.run_insert_many(pg_conn, queries, date)
+
+def test_date_time(pg_conn, queries):
+    t.run_date_time(pg_conn, queries, DRIVER)

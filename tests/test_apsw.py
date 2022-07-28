@@ -101,6 +101,10 @@ def test_insert_many(apsw_conn, queries):
         t.run_insert_many(apsw_conn, queries, t.todate, expect=-1)
 
 
+def test_date_time(apsw_conn, queries):
+    t.run_date_time(apsw_conn, queries, DRIVER)
+
+
 def test_execute_script(apsw_conn, queries):
     with apsw_conn:
         actual = queries.comments.sqlite_create_comments_table(apsw_conn)

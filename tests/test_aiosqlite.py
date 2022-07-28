@@ -4,6 +4,7 @@ import aiosqlite
 import pytest
 import run_tests as t
 
+DRIVER = "aiosqlite"
 
 @pytest.fixture()
 def queries():
@@ -34,7 +35,7 @@ async def test_parameterized_query(sqlite3_db_path, queries):
 async def test_parameterized_record_query(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
         conn.row_factory = dict_factory
-        await t.run_async_parameterized_record_query(conn, queries, "sqlite", t.todate)
+        await t.run_async_parameterized_record_query(conn, queries, DRIVER, t.todate)
 
 
 @pytest.mark.asyncio
@@ -64,7 +65,7 @@ async def test_select_value(sqlite3_db_path, queries):
 @pytest.mark.asyncio
 async def test_insert_returning(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
-        await t.run_async_insert_returning(conn, queries, "sqlite", t.todate)
+        await t.run_async_insert_returning(conn, queries, DRIVER, t.todate)
 
 
 @pytest.mark.asyncio

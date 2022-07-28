@@ -74,6 +74,10 @@ def test_insert_many(sqlite3_conn, queries):
         t.run_insert_many(sqlite3_conn, queries, t.todate)
 
 
+def test_date_time(sqlite3_conn, queries):
+    t.run_date_time(sqlite3_conn, queries, DRIVER)
+
+
 def test_execute_script(sqlite3_conn, queries):
     with sqlite3_conn:
         actual = queries.comments.sqlite_create_comments_table(sqlite3_conn)
