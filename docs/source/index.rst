@@ -22,9 +22,6 @@ and MySQL (`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__, `mysqlclient <http
 Extensions to support other database drivers can be written by you!
 See: `Database Driver Adapters <./database-driver-adapters.html>`__
 
-.. danger::
-
-    This project supports `asyncio <https://docs.python.org/3/library/asyncio.html>`__ based drivers and requires python versions >3.6.
 
 Badges
 ------
@@ -94,6 +91,7 @@ Badges
    :alt: Badges
    :target: https://shields.io/
 
+
 Installation
 ------------
 
@@ -106,6 +104,7 @@ Or if you you use `poetry <https://python-poetry.org>`__:
 .. code:: sh
 
     poetry add aiosql
+
 
 Usage
 -----
@@ -149,6 +148,7 @@ You can use ``aiosql`` to load the queries in this file for use in your Python a
     # >>> (1, "nackjicholson", "William", "Vaughn")
 
 Writing SQL in a file and executing it from methods in python!
+
 
 Async Usage
 -----------
@@ -205,6 +205,7 @@ feature of being able to load queries from a sql file and call them by name
 in python code.
 It also happens to do two SQL queries in parallel using ``aiosqlite`` and asyncio.
 
+
 Why you might want to use this
 ------------------------------
 
@@ -213,6 +214,7 @@ Why you might want to use this
 * You're not using an ORM like SQLAlchemy or Django, and you don't need to.
 * You want to be able to reuse your SQL in other contexts. Loading it into psql or other database tools.
 
+
 Why you might NOT want to use this
 ----------------------------------
 
@@ -220,6 +222,7 @@ Why you might NOT want to use this
 * You aren't comfortable writing SQL code.
 * You don't have anything in your application that requires complicated SQL beyond basic CRUD operations.
 * Dynamically loaded objects built at runtime really bother you.
+
 
 Table of Contents
 -----------------
