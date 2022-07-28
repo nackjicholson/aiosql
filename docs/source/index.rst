@@ -79,6 +79,12 @@ Badges
    :alt: Pypi Downloads
    :target: https://pypi.org/project/aiosql/
 
+..
+   some non-sense badge about badges:-)
+
+.. image:: https://img.shields.io/badge/badges-14-informational
+   :alt: Badges
+   :target: https://shields.io/
 
 Installation
 ------------
