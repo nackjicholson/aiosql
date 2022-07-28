@@ -6,12 +6,13 @@ import mysql.connector as db
 import pytest
 import run_tests as t
 
+DRIVER = "mysql-connector"
 pytestmark = pytest.mark.skipif(not t.has_exec("mysqld"), reason="no mysqld")
 
 
 @pytest.fixture()
 def queries():
-    return t.queries("mysql-connector")
+    return t.queries(DRIVER)
 
 
 @pytest.fixture()
@@ -66,7 +67,7 @@ def test_parameterized_query(myco_db, queries):
 @pytest.mark.skip("myco cursor handling is unclear")
 def test_parameterized_record_query(myco_db_dsn, queries):  # pragma: no cover
     with db.connect(**myco_db_dsn, cursorclass=myco.cursors.DictCursor) as conn:
-        t.run_parameterized_record_query(conn, queries, "my", date)
+        t.run_parameterized_record_query(conn, queries, DRIVER, date)
 
 
 def test_record_class_query(myco_db, queries):
@@ -83,7 +84,7 @@ def test_select_one(myco_db, queries):
 
 @pytest.mark.skip("mysql does not support RETURNING, although mariadb does")
 def test_insert_returning(myco_db, queries):  # pragma: no cover
-    t.run_insert_returning(myco_db, queries, "my", date)
+    t.run_insert_returning(myco_db, queries, DRIVER, date)
 
 
 def test_delete(myco_db, queries):
@@ -92,3 +93,7 @@ def test_delete(myco_db, queries):
 
 def test_insert_many(myco_db, queries):
     t.run_insert_many(myco_db, queries, date)
+
+
+def test_date_time(myco_db, queries):
+    t.run_date_time(myco_db, queries, DRIVER)

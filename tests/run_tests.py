@@ -4,6 +4,7 @@ from datetime import date
 import shutil
 import asyncio
 import logging
+import re
 
 import aiosql
 
@@ -12,7 +13,7 @@ log = logging.getLogger("test")
 
 # for sqlite3
 def todate(year, month, day):
-    return f"{year}-{month:02}-{day:02}"
+    return f"{year:04}-{month:02}-{day:02}"
 
 
 def has_exec(cmd):
@@ -22,6 +23,22 @@ def has_exec(cmd):
 class UserBlogSummary(NamedTuple):
     title: str
     published: date
+
+
+# map drivers to databases
+_DB = {
+    "sqlite3": "sqlite3",
+    "apsw": "sqlite3",
+    "aiosqlite": "sqlite3",
+    "psycopg": "postgres",
+    "psycopg2": "postgres",
+    "asyncpg": "postgres",
+    "pygresql": "postgres",
+    "pg8000": "postgres",
+    "pymysql": "mysql",
+    "mysql-connector": "mysql",
+    "mysqldb": "mysql",
+}
 
 
 RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
@@ -74,12 +91,15 @@ def run_parameterized_query(conn, queries):
 
 
 def run_parameterized_record_query(conn, queries, db, todate):
+    # this black-generated indentation is a joke…
     fun = (
         queries.blogs.sqlite_get_blogs_published_after
-        if db in ("sqlite3", "apsw")
+        if _DB[db] == "sqlite3"
         else queries.blogs.pg_get_blogs_published_after
-        if db == "pg"
+        if _DB[db] == "postgres"
         else queries.blogs.my_get_blogs_published_after
+        if _DB[db] == "mysql"
+        else None
     )
 
     actual = fun(conn, published=todate(2018, 1, 1))
@@ -128,10 +148,12 @@ def run_select_one(conn, queries):
 def run_insert_returning(conn, queries, db, todate):
     fun = (
         queries.blogs.publish_blog
-        if db in ("sqlite3", "apsw")
+        if _DB[db] == "sqlite3"
         else queries.blogs.pg_publish_blog
-        if db in ("pg", "pg8000", "pygresql")
+        if _DB[db] == "postgres"
         else queries.blogs.my_publish_blog
+        if _DB[db] == "mysql"
+        else None
     )
 
     blogid = fun(
@@ -144,7 +166,7 @@ def run_insert_returning(conn, queries, db, todate):
 
     # sqlite returns a number while pg query returns a tuple
     if isinstance(blogid, tuple):
-        assert db in ("pg", "pygresql")
+        assert db in ("psycopg", "psycopg2", "pygresql")
         blogid, title = blogid
     elif isinstance(blogid, list):
         assert db == "pg8000"
@@ -157,7 +179,7 @@ def run_insert_returning(conn, queries, db, todate):
 
     assert (blogid, title) == (b2, t2)
 
-    if db == "pg":
+    if db in ("psycopg", "psycopg2"):
         res = queries.blogs.pg_no_publish(conn)
         assert res is None
 
@@ -211,10 +233,21 @@ def run_select_value(conn, queries, expect=3):
     assert actual == expect
 
 
+def run_date_time(conn, queries, db):
+    if _DB[db] == "sqlite3":
+        now = queries.misc.get_now_date_time(conn)
+    elif _DB[db] == "postgres":
+        now = queries.misc.pg_get_now_date_time(conn)
+    elif _DB[db] == "mysql":
+        now = queries.misc.my_get_now_date_time(conn)
+    else:
+        assert False, f"unexpected driver: {db}"
+    assert re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", now)
+
+
 #
 # Asynchronous tests
 #
-
 
 async def run_async_record_query(conn, queries):
     actual = [dict(r) for r in await queries.users.get_all(conn)]
@@ -240,8 +273,10 @@ async def run_async_parameterized_query(conn, queries, todate):
 async def run_async_parameterized_record_query(conn, queries, db, todate):
     fun = (
         queries.blogs.pg_get_blogs_published_after
-        if db == "pg"
+        if _DB[db] == "postgres"
         else queries.blogs.sqlite_get_blogs_published_after
+        if _DB[db] == "sqlite3"
+        else None
     )
     records = await fun(conn, published=todate(2018, 1, 1))
 
@@ -294,7 +329,9 @@ async def run_async_select_value(conn, queries):
 
 async def run_async_insert_returning(conn, queries, db, todate):
 
-    fun = queries.blogs.pg_publish_blog if db == "pg" else queries.blogs.publish_blog
+    is_pg = _DB[db] == "postgres"
+
+    fun = queries.blogs.pg_publish_blog if is_pg else queries.blogs.publish_blog
 
     blogid = await fun(
         conn,
@@ -304,12 +341,12 @@ async def run_async_insert_returning(conn, queries, db, todate):
         published=todate(2018, 12, 4),
     )
 
-    if db == "pg":
+    if is_pg:
         blogid, title = blogid
     else:
         blogid, title = blogid, "My first blog"
 
-    if db == "pg":
+    if is_pg:
         query = "select blogid, title from blogs where blogid = $1;"
         actual = tuple(
             await conn.fetchrow(

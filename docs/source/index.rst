@@ -40,7 +40,7 @@ Badges
    :alt: Code Coverage
    :target: https://github.com/nackjicholson/aiosql/actions/
 
-.. image:: https://img.shields.io/badge/tests-140%20ok,13%20n/a-success
+.. image:: https://img.shields.io/badge/tests-3%20KO,%20146%20ok,%2013%20n/a-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 

@@ -72,3 +72,7 @@ def test_delete(conn, queries):
 
 def test_insert_many(conn, queries):
     t.run_insert_many(conn, queries, date)
+
+
+def test_date_time(conn, queries):
+    t.run_date_time(conn, queries, DRIVER)

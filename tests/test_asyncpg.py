@@ -6,10 +6,12 @@ import asyncpg
 import pytest
 import run_tests as t
 
+DRIVER = "asyncpg"
+
 
 @pytest.fixture()
 def queries():
-    return t.queries("asyncpg")
+    return t.queries(DRIVER)
 
 
 @pytest.mark.asyncio
@@ -50,7 +52,7 @@ async def test_many_replacements(pg_dsn, queries):
 @pytest.mark.asyncio
 async def test_parameterized_record_query(pg_dsn, queries):
     conn = await asyncpg.connect(pg_dsn)
-    await t.run_async_parameterized_record_query(conn, queries, "pg", date)
+    await t.run_async_parameterized_record_query(conn, queries, DRIVER, date)
     await conn.close()
 
 
@@ -86,7 +88,7 @@ async def test_select_value(pg_dsn, queries):
 async def test_insert_returning(pg_dsn, queries):
     async with asyncpg.create_pool(pg_dsn) as pool:
         async with pool.acquire() as conn:
-            await t.run_async_insert_returning(conn, queries, "pg", date)
+            await t.run_async_insert_returning(conn, queries, DRIVER, date)
 
     conn = await asyncpg.connect(pg_dsn)
     res = await queries.blogs.pg_no_publish(conn)

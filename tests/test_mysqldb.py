@@ -7,11 +7,12 @@ import pytest
 import run_tests as t
 
 pytestmark = pytest.mark.skipif(not t.has_exec("mysqld"), reason="no mysqld")
+DRIVER = "mysqldb"
 
 
 @pytest.fixture()
 def queries():
-    return t.queries("mysqldb")
+    return t.queries(DRIVER)
 
 
 # is pytest-mysql running as expected?
@@ -46,7 +47,7 @@ def test_parameterized_query(my_db, queries):
 @pytest.mark.skip("cannot connect obscure issue")
 def test_parameterized_record_query(my_dsn, queries):  # pragma: no cover
     with db.connect(**my_dsn) as conn:
-        t.run_parameterized_record_query(conn, queries, "my", date)
+        t.run_parameterized_record_query(conn, queries, DRIVER, date)
 
 
 def test_record_class_query(my_db, queries):
@@ -71,7 +72,7 @@ def test_select_value(my_db, queries):
 
 @pytest.mark.skip("mysql does not support RETURNING, but mariadb yes")
 def test_insert_returning(my_db, queries):  # pragma: no cover
-    t.run_insert_returning(my_db, queries, "my", date)
+    t.run_insert_returning(my_db, queries, DRIVER, date)
     my_db.commit()  # or fail on teardown
 
 
@@ -82,4 +83,9 @@ def test_delete(my_db, queries):
 
 def test_insert_many(my_db, queries):
     t.run_insert_many(my_db, queries, date)
+    my_db.commit()
+
+
+def test_date_time(my_db, queries):
+    t.run_date_time(my_db, queries, DRIVER)
     my_db.commit()
