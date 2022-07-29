@@ -8,4 +8,4 @@ SELECT strftime('%Y-%m-%d %H:%M:%S', datetime());
 SELECT to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS');
 
 -- name: my_get_now_date_time$
-SELECT date_format('%Y-%m-%d %H:%i:%S', NOW());
+SELECT date_format(NOW(), '%Y-%m-%d %H:%i:%S');
