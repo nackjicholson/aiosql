@@ -66,5 +66,6 @@ def test_insert_many(pg_conn, queries):
     with pg_conn:
         t.run_insert_many(pg_conn, queries, date)
 
+
 def test_date_time(pg_conn, queries):
     t.run_date_time(pg_conn, queries, DRIVER)
