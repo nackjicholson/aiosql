@@ -32,7 +32,7 @@ separate and independent from each other so they can change independently.
 The architecture of your application and the boundaries you choose between it and the database is left to you.
 
 The documentation for projects like `SQLAlchemy <https://www.sqlalchemy.org/>`__ and
-`Django DB <https://docs.djangoproject.com/en/3.0/topics/db/>`__ can give you a better vision
+`Django DB <https://www.djangoproject.com/>`__ can give you a better vision
 for the class of problems that ORMs do solve and the productivity gains they intend.
 Please choose these projects over ``aiosql`` if you find that they fit the needs of your application better.
 
@@ -135,7 +135,8 @@ From a Directory of SQL Files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Loading a directory of SQL files loads all of the queries defined in those files into a single object.
-The ``example/sql`` directory below contains three ``.sql`` files and can be loaded using ```aiosql.from_path`` <./api.md#aiosqlfrom_path>`__.
+The ``example/sql`` directory below contains three ``.sql`` files and can be loaded using
+``aiosql.from_path`` `<./api.md#aiosqlfrom_path>`__.
 
 ::
 
@@ -204,7 +205,8 @@ or otherwise set connection level properties that affect driver behavior.
     For more see: :ref:`leveraging-driver-specific-features`.
 
 In the examples throughout this page a ``conn`` object has been passed.
-Here is a more code complete example that shows the connection creation and call to ```aiosql.from_path`` <./api.md#aiosqlfrom_path>`__ that make a queries object.
+Here is a more code complete example that shows the connection creation and call to
+``aiosql.from_path`` `<./api.md#aiosqlfrom_path>`__ that make a queries object.
 
 .. code:: ipython
 
