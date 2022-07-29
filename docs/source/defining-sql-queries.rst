@@ -4,7 +4,11 @@ Defining SQL Queries
 Query Names
 -----------
 
-Name definitions are how aiosql determines the name of the methods that SQL code blocks are accessible by. A query name is defined by a SQL comment of the form "-- name: ". As a readability convenience, dash characters (``-``) in the name are turned into underlines (``_``).
+Name definitions are how aiosql determines the name of the methods that SQL
+code blocks are accessible by.
+A query name is defined by a SQL comment of the form "-- name: ".
+As a readability convenience, dash characters (``-``) in the name are turned
+into underlines (``_``).
 
 .. code:: sql
 
@@ -24,7 +28,9 @@ Query Comments
     -- Fetch all fields for every blog in the database.
     select * from blogs;
 
-Any other SQL comments you make between the name definition and your code will be used a the python documentation string for the generated method. You can use ``help()`` in the Python REPL to view these comments while using python.
+Any other SQL comments you make between the name definition and your code will
+be used a the python documentation string for the generated method.
+You can use ``help()`` in the Python REPL to view these comments while using python.
 
 .. code:: ipython
 
@@ -42,25 +48,40 @@ Any other SQL comments you make between the name definition and your code will b
 Operators
 ---------
 
-This section describes the usage of various query operator symbols that you can annotate query names with in order to direct how aiosql will execute and return results.
+This section describes the usage of various query operator symbols that you can
+annotate query names with in order to direct how aiosql will execute and return
+results.
 
 No Operator (Default)
 ~~~~~~~~~~~~~~~~~~~~~
 
-In the above `Query Names <#query-names>`__ section the ``get-all-blogs`` name is written without any trailing operators.
+In the above `Query Names <#query-names>`__ section the ``get-all-blogs``
+name is written without any trailing operators.
 
 .. code:: sql
 
     -- name: get-all-blogs
 
-The lack of an operator is actually the most basic operator used by default for your queries. This tells aiosql to execute the query and to return all the results. In the case of ``get-all-blogs`` that means a ``select`` statement will be executed and a list of rows will be returned. When writing your application you will often need to perform other operations besides ``select``, like ``insert``, ``delete``, and perhaps bulk operations. The operators detailed in the other sections of this doc let you declare in your SQL code how that query should be executed by a python database driver.
+The lack of an operator is actually the most basic operator used by default for
+your queries. This tells aiosql to execute the query and to return all the results.
+In the case of ``get-all-blogs`` that means a ``select`` statement will be executed
+and a list of rows will be returned. When writing your application you will often
+need to perform other operations besides ``select``, like ``insert``, ``delete``,
+and perhaps bulk operations. The operators detailed in the other sections of this
+doc let you declare in your SQL code how that query should be executed by a python
+database driver.
 
 ``^`` Select One
 ~~~~~~~~~~~~~~~~
 
-The ``^`` operator executes a query and returns the first row of a result set. When there are no rows in the result set it returns ``None``. This is useful when you know there should be one, and exactly one result from your query.
+The ``^`` operator executes a query and returns the first row of a result set.
+When there are no rows in the result set it returns ``None``.
+This is useful when you know there should be one, and exactly one result from your query.
 
-As an example, if you have a unique constraint on the ``username`` field in your ``users`` table which makes it impossible for two users to share the same username, you could use ``^`` to direct aiosql to select a single user rather than a list of rows of length 1.
+As an example, if you have a unique constraint on the ``username`` field in your
+``users`` table which makes it impossible for two users to share the same username,s
+ you could use ``^`` to direct aiosql to select a single user rather than a list of
+rows of length 1.
 
 .. code:: sql
 
@@ -81,7 +102,11 @@ When used from Python this query will either return ``None`` or the singular sel
 ``$`` Select Value
 ~~~~~~~~~~~~~~~~~~
 
-The ``$`` operator will execute the query, and only return the first value of the first row of a result set. If there are no rows in the result set it returns ``None``. This is implemented by returing the first element of the tuple returned by ``cur.fetchone()`` of the underlying driver. This is mostly useful for queries returning IDs, COUNTs or other aggregates.
+The ``$`` operator will execute the query, and only return the first value of the first row
+of a result set. If there are no rows in the result set it returns ``None``.
+This is implemented by returing the first element of the tuple returned by ``cur.fetchone()``
+from the underlying driver. This is mostly useful for queries returning IDs, COUNTs or
+other aggregates.
 
 .. code:: sql
 
@@ -98,7 +123,9 @@ When used from Python:
 ``!`` Insert/Update/Delete
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``!`` operator executes SQL without returning any results. It is meant for statements that use ``insert``, ``update``, and ``delete`` to make modifications to database rows without a necessary return value.
+The ``!`` operator executes SQL without returning any results.
+It is meant for statements that use ``insert``, ``update``, and ``delete`` to make
+modifications to database rows without a necessary return value.
 
 .. code:: sql
 
@@ -122,9 +149,12 @@ if available.
 ``<!`` Insert/Update/Delete Returning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When performing a modification of rows, or adding new rows, sometimes it is necessary to return values using the ``returning`` clause where available. With the ``<!`` operator aiosql can execute a query and return values.
+When performing a modification of rows, or adding new rows, sometimes it is
+necessary to return values using the ``returning`` clause where available.
+With the ``<!`` operator aiosql can execute a query and return values.
 
-When using SQLite this operator will return the id of the inserted row using ```cur.lastrowid`` <https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.lastrowid>`__.
+When using SQLite this operator will return the id of the inserted row
+using ```cur.lastrowid`` <https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.lastrowid>`__.
 
 .. code:: sql
 
@@ -139,7 +169,8 @@ Executing this query in python will return the ``blogid`` of the inserted row.
     # ... connection code ...
     blogid = queries.publish_blog(conn, userid=1, title="Hi" content="blah blah.")
 
-PostgreSQL allows returning multiple values via the ``returning`` clause of queries. This same query using ``psycopg`` or ``psycopg2`` might look like the following.
+PostgreSQL allows returning multiple values via the ``RETURNING`` clause of queries.
+This same query using ``psycopg`` or ``psycopg2`` might look like the following.
 
 .. code:: sql
 
@@ -156,10 +187,15 @@ In python a tuple is returned with the ``blogid`` and ``title`` of the inserted 
     # ... connection code ...
     blogid, title = queries.publish_blog(conn, userid=1, title="Hi" content="blah blah.")
 
+Note that ``INSERT … RETURNING`` basically behaves as a ``SELECT``, so using ``^`` or ``$``
+would work as well.
+
 ``*!`` Insert/Update/Delete Many
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``*!`` operator directs aiosql to execute a SQL statement over all items of a given sequence. Under the hood this calls the ``executemany`` method of many database drivers. See `sqlite3 Cursor.executemany <https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.executemany>`__ for an example.
+The ``*!`` operator directs aiosql to execute a SQL statement over all items of a given sequence.
+Under the hood this calls the ``executemany`` method of many database drivers.
+See `sqlite3 Cursor.executemany <https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.executemany>`__ for an example.
 
 In aiosql we can use this for a bulk publish method that operates over a list of blog entries.
 
@@ -186,7 +222,9 @@ The methods returns the number of affected rows, if available.
 ``#`` Execute Scripts
 ~~~~~~~~~~~~~~~~~~~~~
 
-Using this operarator will execute sql statements as a script. You can't do variable substitution with the ``#`` operator. An example usecase is using data definition statements like create table in order to setup a database.
+Using this operarator will execute sql statements as a script.
+You can't do variable substitution with the ``#`` operator.
+An example usecase is using data definition statements like create table in order to setup a database.
 
 .. code:: sql
 
@@ -212,4 +250,3 @@ Using this operarator will execute sql statements as a script. You can't do vari
     queries = aiosql.from_path("create_schema.sql", "sqlite3")
     # ... connection code ...
     queries.create_schema(conn)
-
