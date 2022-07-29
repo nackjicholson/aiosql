@@ -64,6 +64,10 @@ Badges
    :alt: Version
    :target: https://pypi.org/project/aiosql/
 
+.. image:: https://img.shields.io/badge/databases-3-informational
+   :alt: Databases
+   :target: https://github.com/nackjicholson/aiosql/
+
 .. image:: https://img.shields.io/badge/drivers-11-informational
    :alt: Drivers
    :target: https://github.com/nackjicholson/aiosql/
@@ -83,7 +87,7 @@ Badges
 ..
    some non-sense badge about badges:-)
 
-.. image:: https://img.shields.io/badge/badges-14-informational
+.. image:: https://img.shields.io/badge/badges-15-informational
    :alt: Badges
    :target: https://shields.io/
 
