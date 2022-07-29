@@ -1,13 +1,16 @@
 Contributing
 ============
 
-First, thank you for considering to make a contribution to this project. Spending your valuable time helping make this project better is deeply appreciated. All kinds of contributions are helpful and welcome.
+First, thank you for considering to make a contribution to this project.
+Spending your valuable time helping make this project better is deeply appreciated.
+All kinds of contributions are helpful and welcome.
 
 -  Report issues `<https://github.com/nackjicholson/aiosql/issues>`__
 -  Review or make your own pull requests `<https://github.com/nackjicholson/aiosql/pulls>`__
 -  Write documentation `<https://github.com/nackjicholson/aiosql/tree/master/docs>`__
 
 Whether you have an idea for a feature improvement or have found a troubling bug, thank you for being here.
+
 
 Packaging & Distribution
 ------------------------
@@ -20,6 +23,7 @@ This aiosql repository uses the python standard packaging tools. Read about them
 -  `setuptools <https://setuptools.readthedocs.io/en/latest/index.html>`__
 -  `build <https://pypa-build.readthedocs.io/en/stable/>`__
 -  `twine <https://twine.readthedocs.io/en/latest/#configuration>`__
+
 
 Development Setup
 -----------------
@@ -36,7 +40,7 @@ Development Setup
 
 All subsequent steps will assume you are using python within your activated virtual environment.
 
-2. Install your environment to the dependencies defined in ``dev-requirements.in``
+2. Install your environment to the dependencies defined in ``dev-requirements.txt``
 
 Note: different versions of Python may install different versions of dependencies.
 As `aiosql` is more or less expected to work with all these module versions, the
@@ -51,6 +55,17 @@ bare minimum version pinning is done in the requirements file.
 .. code:: sh
 
     pytest
+
+Alternatively, there is a `Makefile` to automate some of the above tasks:
+
+.. code:: sh
+
+    make venv.dev  # install dev virtualenv
+    source venv/bin/activate
+    make check  # run all checks: pytest, black, flake8, coverage…
+
+Also, there is a working `poetry` setup in `pyproject.toml`.
+
 
 Dependency Management
 ---------------------
