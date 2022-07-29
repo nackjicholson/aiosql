@@ -6,6 +6,7 @@ import run_tests as t
 
 DRIVER = "aiosqlite"
 
+
 @pytest.fixture()
 def queries():
     return t.queries("aiosqlite")

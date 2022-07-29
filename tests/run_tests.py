@@ -249,6 +249,7 @@ def run_date_time(conn, queries, db):
 # Asynchronous tests
 #
 
+
 async def run_async_record_query(conn, queries):
     actual = [dict(r) for r in await queries.users.get_all(conn)]
 
