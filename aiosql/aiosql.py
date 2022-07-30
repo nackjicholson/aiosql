@@ -4,7 +4,6 @@ import logging
 
 from .adapters.aiosqlite import AioSQLiteAdapter
 from .adapters.asyncpg import AsyncPGAdapter
-from .adapters.psycopg import PsycoPGAdapter
 from .adapters.pyformat import PyFormatAdapter
 from .adapters.mysql import BrokenMySQLAdapter
 from .adapters.generic import GenericAdapter
@@ -25,8 +24,8 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "mysqldb": BrokenMySQLAdapter,
     "mysql-connector": PyFormatAdapter,
     "pg8000": Pg8000Adapter,
-    "psycopg": PsycoPGAdapter,
-    "psycopg2": PsycoPGAdapter,
+    "psycopg": PyFormatAdapter,
+    "psycopg2": PyFormatAdapter,
     "pygresql": PyFormatAdapter,
     "pymysql": BrokenMySQLAdapter,
     "sqlite3": SQLite3Adapter,
