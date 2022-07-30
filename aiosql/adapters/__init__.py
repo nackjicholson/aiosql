@@ -2,7 +2,6 @@
 from .pyformat import PyFormatAdapter
 from .generic import GenericAdapter
 from .sqlite3 import SQLite3Adapter
-from .psycopg import PsycoPGAdapter
 
 # async adapters
 from .aiosqlite import AioSQLiteAdapter
@@ -13,7 +12,6 @@ _ALL = [
     PyFormatAdapter,
     GenericAdapter,
     SQLite3Adapter,
-    PsycoPGAdapter,
     AioSQLiteAdapter,
     AsyncPGAdapter,
 ]
