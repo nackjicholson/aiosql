@@ -59,3 +59,7 @@ jobs:
     - name: Test with pytest and databases
       # run: pytest --postgresql-detached --postgresql-password postgres
       run: pytest tests
+    - name: Coverage tests
+      run: |
+        coverage run -m pytest --log-level=debug --capture=tee-sys --asyncio-mode=auto
+        coverage report --fail-under=100 --include='aiosql/*'
