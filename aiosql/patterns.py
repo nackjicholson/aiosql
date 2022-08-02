@@ -1,4 +1,5 @@
 # use re2 if available.
+# FIXME strange issue on debian buster with py3.7 apache wsgi flask… loading re2 "freezes" aiosql
 try:
     import re2 as re
 except ModuleNotFoundError:  # pragma: no cover
