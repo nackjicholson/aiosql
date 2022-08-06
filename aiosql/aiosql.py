@@ -34,9 +34,9 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
 
 def register_adapter(name: str, adapter: Callable[..., DriverAdapterProtocol]):
     """Register or override an adapter."""
-    if name in _ADAPTERS:
+    if name.lower() in _ADAPTERS:
         log.warning(f"overriding aiosql adapter {name}")
-    _ADAPTERS[name] = adapter
+    _ADAPTERS[name.lower()] = adapter
 
 
 def _make_driver_adapter(
@@ -45,7 +45,7 @@ def _make_driver_adapter(
     """Get the driver adapter instance registered by the `driver_name`."""
     if isinstance(driver_adapter, str):
         try:
-            driver_adapter = _ADAPTERS[driver_adapter]
+            driver_adapter = _ADAPTERS[driver_adapter.lower()]
         except KeyError:
             raise ValueError(f"Encountered unregistered driver_adapter: {driver_adapter}")
     if callable(driver_adapter):
