@@ -107,67 +107,54 @@ Installation
 Usage
 -----
 
-*users.sql*
+Consider writing SQL in a file and executing it from methods in python,
+for instance this *greetings.sql* file:
 
 .. code:: sql
 
-    -- name: get-all-users
-    -- Get all user records
-    select userid,
-           username,
-           firstname,
-           lastname
-      from users;
+    -- name: get_all_greetings
+    -- Get all the greetings in the database
+    select greeting_id, greeting
+      from greetings;
 
-
-    -- name: get-user-by-username^
-    -- Get user with the given username field.
-    select userid,
-           username,
-           firstname,
-           lastname
+    -- name: get_user_by_username^
+    -- Get a user from the database using a named parameter
+    select user_id, username, name
       from users
      where username = :username;
 
-You can use ``aiosql`` to load the queries in this file for use in your Python application:
+
+This example has an imaginary SQLite database with greetings and users.
+It prints greetings in various languages to the user and showcases the basic
+feature of being able to load queries from a sql file and call them by name
+in python code.
+
+You can use ``aiosql`` to load the queries in this file for use in your Python
+application:
 
 .. code:: python
 
     import aiosql
     import sqlite3
 
-    conn = sqlite3.connect("myapp.db")
     queries = aiosql.from_path("users.sql", "sqlite3")
 
-    users = queries.get_all_users(conn)
-    # >>> [(1, "nackjicholson", "William", "Vaughn"), (2, "johndoe", "John", "Doe"), ...]
+    with sqlite3.connect("myapp.db") as conn:
 
-    users = queries.get_user_by_username(conn, username="nackjicholson")
-    # >>> (1, "nackjicholson", "William", "Vaughn")
+        user = queries.get_user_by_username(conn, username="willvaughn")
+        # user: (1, "willvaughn", "William")
 
-Writing SQL in a file and executing it from methods in python!
+        for _, greeting in queries.get_all_greetings(conn):
+            # scan [(1, "Hi"), (2, "Aloha"), (3, "Hola"), …]
+            print(f"{greeting} {user[2]}")
+
+        # Hi, William!
+        # Aloha, William!
+        # …
 
 
-Async Usage
------------
-
-*greetings.sql*
-
-.. code:: sql
-
-    -- name: get_all_greetings
-    -- Get all the greetings in the database
-    select greeting_id, greeting from greetings;
-
-    -- name: get_user_by_username^
-    -- Get a user from the database
-    select user_id,
-           username,
-           name
-      from users
-     where username = :username;
-
-*example.py*
+Or even in an asynchroneous way, with two SQL queries running in parallel
+using ``aiosqlite`` and ``asyncio``:
 
 .. code:: python
 
@@ -175,9 +162,7 @@ Async Usage
     import aiosql
     import aiosqlite
 
-
     queries = aiosql.from_path("./greetings.sql", "aiosqlite")
-
 
     async def main():
         # Parallel queries!!!
@@ -186,22 +171,11 @@ Async Usage
                 queries.get_all_greetings(conn),
                 queries.get_user_by_username(conn, username="willvaughn")
             )
-            # greetings = [(1, "Hi"), (2, "Aloha"), (3, "Hola")]
-            # user = (1, "willvaughn", "William")
 
             for _, greeting in greetings:
                 print(f"{greeting}, {user[2]}!")
-            # Hi, William!
-            # Aloha, William!
-            # Hola, William!
 
     asyncio.run(main())
-
-This example has an imaginary SQLite database with greetings and users.
-It prints greetings in various languages to the user and showcases the basic
-feature of being able to load queries from a sql file and call them by name
-in python code.
-It also happens to do two SQL queries in parallel using ``aiosqlite`` and asyncio.
 
 
 Why you might want to use this
