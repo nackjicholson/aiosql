@@ -48,15 +48,18 @@ def _make_driver_adapter(
             driver_adapter = _ADAPTERS[driver_adapter.lower()]
         except KeyError:
             raise ValueError(f"Encountered unregistered driver_adapter: {driver_adapter}")
-    if callable(driver_adapter):
-        if hasattr(driver_adapter, "paramstyle"):  # pragma: no cover
-            style = getattr(driver_adapter, "paramstyle")
-            if style == "pyformat":
-                driver_adapter = PyFormatAdapter
-            elif style == "named":
-                driver_adapter = GenericAdapter
-            else:
-                raise ValueError(f"Unexpected driver_adapter: {driver_adapter} ({style})")
+    # try some guessing if it is a PEP249 module
+    elif hasattr(driver_adapter, "paramstyle"):
+        style = getattr(driver_adapter, "paramstyle")  # avoid mypy warning?
+        if style == "pyformat":
+            driver_adapter = PyFormatAdapter
+        elif style == "named":
+            driver_adapter = GenericAdapter
+        else:
+            raise ValueError(f"Unexpected driver_adapter: {driver_adapter} ({style})")
+    # so, can we just call it?
+    if not callable(driver_adapter):
+        raise ValueError(f"Unexpected driver_adapter: {driver_adapter}")
 
     return driver_adapter()
 
