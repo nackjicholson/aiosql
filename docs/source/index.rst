@@ -137,7 +137,7 @@ application:
     import aiosql
     import sqlite3
 
-    queries = aiosql.from_path("users.sql", "sqlite3")
+    queries = aiosql.from_path("greetings.sql", "sqlite3")
 
     with sqlite3.connect("myapp.db") as conn:
 
