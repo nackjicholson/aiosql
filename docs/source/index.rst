@@ -103,12 +103,6 @@ Installation
 
     pip install aiosql
 
-Or if you you use `poetry <https://python-poetry.org>`__:
-
-.. code:: sh
-
-    poetry add aiosql
-
 
 Usage
 -----
