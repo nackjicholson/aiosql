@@ -1,7 +1,8 @@
 -- name: get_all_greetings
 -- Get all the greetings in the database
 select greeting_id, greeting
-  from greetings;
+  from greetings
+ order by 1;
 
 -- name: get_user_by_username^
 -- Get a user from the database using a named parameter
