@@ -18,12 +18,12 @@
 # -- Project information -----------------------------------------------------
 
 project = "aiosql"
-copyright = "2021, William Vaughn"
+copyright = "2022, William Vaughn"
 author = "William Vaughn <vaughnwilld@gmail.com>"
 github_doc_root = "https://github.com/nackjicholson/aiosql/tree/master/docs/source/"
 
 # The full version, including alpha/beta/rc tags
-release = "6.2"
+release = "6.3"
 
 
 # -- General configuration ---------------------------------------------------
