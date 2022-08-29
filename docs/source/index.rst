@@ -92,8 +92,8 @@ Badges
    :target: https://shields.io/
 
 .. image:: https://img.shields.io/pypi/l/aiosql?style=flat
-   :alt: BSD 3-Clause License
-   :target: https://opensource.org/licenses/BSD-3-Clause
+   :alt: BSD 2-Clause License
+   :target: https://opensource.org/licenses/BSD-2-Clause
 
 
 Installation
