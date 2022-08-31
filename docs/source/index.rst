@@ -182,14 +182,15 @@ Why you might want to use this
 
 * You think SQL is pretty good, and writing SQL is an important part of your applications.
 * You don't want to write your SQL in strings intermixed with your python code.
-* You're not using an ORM like SQLAlchemy or Django, and you don't need to.
+* You're not using an ORM like `SQLAlchemy <https://www.sqlalchemy.org/>`__ or
+  `Django <https://www.djangoproject.com/>`__, and you don't need to.
 * You want to be able to reuse your SQL in other contexts. Loading it into psql or other database tools.
 
 
 Why you might NOT want to use this
 ----------------------------------
 
-* You're looking for an ORM.
+* You're looking for an `ORM <https://en.wikipedia.org/wiki/Object-relational_mapping>`__.
 * You aren't comfortable writing SQL code.
 * You don't have anything in your application that requires complicated SQL beyond basic CRUD operations.
 * Dynamically loaded objects built at runtime really bother you.
