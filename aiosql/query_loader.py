@@ -1,6 +1,6 @@
 import inspect
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Type, Sequence
+from typing import Dict, List, Optional, Tuple, Type, Sequence, Union
 
 from .exceptions import SQLParseException, SQLLoadException
 from .patterns import (
@@ -18,7 +18,7 @@ class QueryLoader:
         self.driver_adapter = driver_adapter
         self.record_classes = record_classes if record_classes is not None else {}
 
-    def _make_query_datum(self, query_str: str, ns_parts: List) -> QueryDatum:
+    def _make_query_datum(self, query_str: str, ns_parts: List, query_fname: Optional[Path] = None) -> QueryDatum:
         lines = [line.strip() for line in query_str.strip().splitlines()]
         operation_type, query_name = self._extract_operation_type(lines[0])
         record_class = self._extract_record_class(lines[1])
@@ -27,7 +27,7 @@ class QueryLoader:
         signature = self._extract_signature(sql)
         query_fqn = ".".join(ns_parts + [query_name])
         sql = self.driver_adapter.process_sql(query_fqn, operation_type, sql)
-        return QueryDatum(query_fqn, doc_comments, operation_type, sql, record_class, signature)
+        return QueryDatum(query_fqn, doc_comments, operation_type, sql, record_class, signature, query_fname)
 
     @staticmethod
     def _extract_operation_type(text: str) -> Tuple[SQLOperationType, str]:
@@ -107,28 +107,32 @@ class QueryLoader:
         return inspect.Signature(parameters=[self] + params) if params else None
 
     def load_query_data_from_sql(
-        self, sql: str, ns_parts: Optional[List] = None
+        self, sql: Union[str, Path], ns_parts: Optional[List] = None
     ) -> List[QueryDatum]:
+        sql_fname: Optional[Path] = None
+        if isinstance(sql, Path):
+            with sql.open() as fp:
+                sql_str = fp.read()
+            sql_fname = sql
+        else:
+            sql_str = sql
+
         if ns_parts is None:
             ns_parts = []
         query_data = []
-        query_sql_strs = query_name_definition_pattern.split(sql)
+        query_sql_strs = query_name_definition_pattern.split(sql_str)
 
         # Drop the first item in the split. It is anything above the first query definition.
         # This may be SQL comments or empty lines.
         # See: https://github.com/nackjicholson/aiosql/issues/35
         for query_sql_str in query_sql_strs[1:]:
-            query_data.append(self._make_query_datum(query_sql_str, ns_parts))
+            query_data.append(self._make_query_datum(query_sql_str, ns_parts, sql_fname))
         return query_data
 
     def load_query_data_from_file(
         self, file_path: Path, ns_parts: Optional[List] = None
     ) -> List[QueryDatum]:
-        if ns_parts is None:
-            ns_parts = []
-
-        with file_path.open() as fp:
-            return self.load_query_data_from_sql(fp.read(), ns_parts)
+        return self.load_query_data_from_sql(file_path, ns_parts)
 
     def load_query_data_from_dir_path(self, dir_path) -> QueryDataTree:
         if not dir_path.is_dir():
