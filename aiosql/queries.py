@@ -1,4 +1,5 @@
 import inspect
+from pathlib import Path
 from types import MethodType
 from typing import Any, Callable, List, Optional, Set, Tuple, cast
 
@@ -19,10 +20,13 @@ def _query_fn(
     sql: str,
     operation: SQLOperationType,
     signature: Optional[inspect.Signature],
+    fname: Optional[Path] = None
 ) -> QueryFn:
     qfn = cast(QueryFn, fn)
     qfn.__name__ = name
     qfn.__doc__ = doc
+    if fname:
+        qfn.__code__ = qfn.__code__.replace(co_filename=str(fname), co_firstlineno=1)
     qfn.__signature__ = signature
     qfn.sql = sql
     qfn.operation = operation
@@ -30,7 +34,7 @@ def _query_fn(
 
 
 def _make_sync_fn(query_datum: QueryDatum) -> QueryFn:
-    query_name, doc_comments, operation_type, sql, record_class, signature = query_datum
+    query_name, doc_comments, operation_type, sql, record_class, signature, fname = query_datum
     if operation_type == SQLOperationType.INSERT_RETURNING:
 
         def fn(self: Queries, conn, *args, **kwargs):
@@ -79,7 +83,7 @@ def _make_sync_fn(query_datum: QueryDatum) -> QueryFn:
     else:
         raise ValueError(f"Unknown operation_type: {operation_type}")
 
-    return _query_fn(fn, query_name, doc_comments, sql, operation_type, signature)
+    return _query_fn(fn, query_name, doc_comments, sql, operation_type, signature, fname)
 
 
 def _make_async_fn(fn: QueryFn) -> QueryFn:

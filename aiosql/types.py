@@ -1,5 +1,6 @@
 import inspect
 from enum import Enum
+from pathlib import Path
 from typing import (
     Any,
     AsyncContextManager,
@@ -38,6 +39,7 @@ class QueryDatum(NamedTuple):
     sql: str
     record_class: Any = None
     signature: Optional[inspect.Signature] = None
+    fname: Optional[Path] = None
 
 
 class QueryFn(Protocol):
