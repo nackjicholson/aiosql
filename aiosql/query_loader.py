@@ -18,7 +18,9 @@ class QueryLoader:
         self.driver_adapter = driver_adapter
         self.record_classes = record_classes if record_classes is not None else {}
 
-    def _make_query_datum(self, query_str: str, ns_parts: List, query_fname: Optional[Path] = None) -> QueryDatum:
+    def _make_query_datum(
+        self, query_str: str, ns_parts: List, query_fname: Optional[Path] = None
+    ) -> QueryDatum:
         lines = [line.strip() for line in query_str.strip().splitlines()]
         operation_type, query_name = self._extract_operation_type(lines[0])
         record_class = self._extract_record_class(lines[1])
@@ -27,7 +29,9 @@ class QueryLoader:
         signature = self._extract_signature(sql)
         query_fqn = ".".join(ns_parts + [query_name])
         sql = self.driver_adapter.process_sql(query_fqn, operation_type, sql)
-        return QueryDatum(query_fqn, doc_comments, operation_type, sql, record_class, signature, query_fname)
+        return QueryDatum(
+            query_fqn, doc_comments, operation_type, sql, record_class, signature, query_fname
+        )
 
     @staticmethod
     def _extract_operation_type(text: str) -> Tuple[SQLOperationType, str]:

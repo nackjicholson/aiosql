@@ -149,7 +149,7 @@ def test_file_loading(sql_file):
 
 def test_misc(sql_file):
     try:
-        aiosql.queries._make_sync_fn(("hello", None, -1, "SELECT NULL;", None, None))
+        aiosql.queries._make_sync_fn(("hello", None, -1, "SELECT NULL;", None, None, None))
         assert False, "must raise an exception"  # pragma: no cover
     except ValueError as e:
         assert "Unknown operation_type" in str(e)

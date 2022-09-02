@@ -1,3 +1,4 @@
+import sys
 import inspect
 from pathlib import Path
 from types import MethodType
@@ -20,10 +21,12 @@ def _query_fn(
     sql: str,
     operation: SQLOperationType,
     signature: Optional[inspect.Signature],
-    fname: Optional[Path] = None
+    fname: Optional[Path] = None,
 ) -> QueryFn:
-    if fname:
-        fn.__code__ = fn.__code__.replace(co_filename=str(fname), co_firstlineno=1)
+    # TODO remove version workaround and pragmas when 3.7 support is dropped
+    # FIXME should get the lineno as well?
+    if fname and sys.version_info >= (3, 8, 0):  # pragma: no cover
+        fn.__code__ = fn.__code__.replace(co_filename=str(fname), co_firstlineno=1)  # type: ignore
     qfn = cast(QueryFn, fn)
     qfn.__name__ = name
     qfn.__doc__ = doc
@@ -33,51 +36,52 @@ def _query_fn(
     return qfn
 
 
+# FIXME coverage?
 def _make_sync_fn(query_datum: QueryDatum) -> QueryFn:
     query_name, doc_comments, operation_type, sql, record_class, signature, fname = query_datum
     if operation_type == SQLOperationType.INSERT_RETURNING:
 
-        def fn(self: Queries, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):  # pragma: no cover
             return self.driver_adapter.insert_returning(
                 conn, query_name, sql, _params(args, kwargs)
             )
 
     elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE:
 
-        def fn(self: Queries, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):  # pragma: no cover
             return self.driver_adapter.insert_update_delete(
                 conn, query_name, sql, _params(args, kwargs)
             )
 
     elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
 
-        def fn(self: Queries, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):  # pragma: no cover
             return self.driver_adapter.insert_update_delete_many(
                 conn, query_name, sql, *_params(args, kwargs)
             )
 
     elif operation_type == SQLOperationType.SCRIPT:
 
-        def fn(self: Queries, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):  # pragma: no cover
             return self.driver_adapter.execute_script(conn, sql)
 
     elif operation_type == SQLOperationType.SELECT:
 
-        def fn(self: Queries, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):  # pragma: no cover
             return self.driver_adapter.select(
                 conn, query_name, sql, _params(args, kwargs), record_class
             )
 
     elif operation_type == SQLOperationType.SELECT_ONE:
 
-        def fn(self: Queries, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):  # pragma: no cover
             return self.driver_adapter.select_one(
                 conn, query_name, sql, _params(args, kwargs), record_class
             )
 
     elif operation_type == SQLOperationType.SELECT_VALUE:
 
-        def fn(self: Queries, conn, *args, **kwargs):
+        def fn(self: Queries, conn, *args, **kwargs):  # pragma: no cover
             return self.driver_adapter.select_value(conn, query_name, sql, _params(args, kwargs))
 
     else:
