@@ -22,11 +22,11 @@ def _query_fn(
     signature: Optional[inspect.Signature],
     fname: Optional[Path] = None
 ) -> QueryFn:
+    if fname:
+        fn.__code__ = fn.__code__.replace(co_filename=str(fname), co_firstlineno=1)
     qfn = cast(QueryFn, fn)
     qfn.__name__ = name
     qfn.__doc__ = doc
-    if fname:
-        qfn.__code__ = qfn.__code__.replace(co_filename=str(fname), co_firstlineno=1)
     qfn.__signature__ = signature
     qfn.sql = sql
     qfn.operation = operation
