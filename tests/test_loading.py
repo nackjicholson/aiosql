@@ -168,7 +168,7 @@ def test_misc(sql_file):
         db = aiosql.from_str("-- name: a*b\nSELECT 'ab'\n", "sqlite3")
         assert False, "must raise en exception"  # pragma: no cover
     except Exception as e:
-        assert "must convert to valid python variable" in str(e)
+        assert "invalid query name and operation" in str(e)
     ql = aiosql.query_loader.QueryLoader(None, None)
     try:
         ql.load_query_data_from_dir_path(sql_file)
