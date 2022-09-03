@@ -1,4 +1,4 @@
-from aiosql.patterns import var_pattern
+from aiosql.patterns import VAR_REF
 
 
 def test_var_pattern_is_quote_aware():
@@ -13,7 +13,7 @@ def test_var_pattern_is_quote_aware():
              and foo_mark > :foo_mark
         order by created_at desc, source_name asc;
     """
-    groupdicts = [m.groupdict() for m in var_pattern.finditer(sql)]
+    groupdicts = [m.groupdict() for m in VAR_REF.finditer(sql)]
     assert len(groupdicts) == 3
 
     expected = [
@@ -47,7 +47,7 @@ def test_var_pattern_does_not_require_semicolon_trail():
           FROM foo
          WHERE a = :a"""
 
-    groupdicts = [m.groupdict() for m in var_pattern.finditer(sql)]
+    groupdicts = [m.groupdict() for m in VAR_REF.finditer(sql)]
     assert len(groupdicts) == 1
 
     expected = {"dblquote": None, "lead": " ", "quote": None, "trail": "", "var_name": "a"}
@@ -61,7 +61,7 @@ def test_var_pattern_handles_empty_sql_string_literals():
           from foo
          where lower(regexp_replace(blah,'\\W','','g')) = lower(regexp_replace(:blah,'\\W','','g'));"""
 
-    groupdicts = [m.groupdict() for m in var_pattern.finditer(sql)]
+    groupdicts = [m.groupdict() for m in VAR_REF.finditer(sql)]
 
     expected_single_quote_match = {
         "dblquote": None,

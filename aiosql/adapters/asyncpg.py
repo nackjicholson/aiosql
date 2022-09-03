@@ -1,7 +1,7 @@
 from collections import defaultdict
 from contextlib import asynccontextmanager
 
-from ..patterns import var_pattern
+from ..patterns import VAR_REF
 
 
 class MaybeAcquire:
@@ -31,7 +31,7 @@ class AsyncPGAdapter:
     def process_sql(self, query_name, _op_type, sql):
         adj = 0
 
-        for match in var_pattern.finditer(sql):
+        for match in VAR_REF.finditer(sql):
             gd = match.groupdict()
             # Do nothing if the match is found within quotes.
             if gd["dblquote"] is not None or gd["quote"] is not None:

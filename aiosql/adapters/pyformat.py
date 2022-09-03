@@ -1,4 +1,4 @@
-from ..patterns import var_pattern
+from ..patterns import VAR_REF
 from .generic import GenericAdapter
 
 
@@ -16,4 +16,4 @@ class PyFormatAdapter(GenericAdapter):
     """Convert from named to pyformat parameter style"""
 
     def process_sql(self, _query_name, _op_type, sql):
-        return var_pattern.sub(_replacer, sql)
+        return VAR_REF.sub(_replacer, sql)

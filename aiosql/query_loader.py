@@ -3,15 +3,41 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Type, Sequence, Union
 
 from .exceptions import SQLParseException, SQLLoadException
-from .patterns import (
-    doc_comment_pattern,
-    query_record_class_definition_pattern,
-    query_name_definition_pattern,
-    query_nameop_pattern,
-    forbidden_query_name_prefix,
-    var_pattern,
-)
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
+from .patterns import VAR_REF
+
+# use re2 if available.
+# FIXME strange issue on debian buster with py3.7 apache wsgi flask… loading re2 "freezes" aiosql
+try:
+    import re2 as re
+except ModuleNotFoundError:  # pragma: no cover
+    import re  # type: ignore
+
+_QUERY_DEF = re.compile(r"--\s*name\s*:\s*")
+"""
+Pattern: Identifies name definition comments.
+"""
+
+_RECORD_DEF = re.compile(r"--\s*record_class\s*:\s*(\w+)\s*")
+"""
+Pattern: Identifies record_class definition comments.
+"""
+
+# FIXME this accepts "1st" but seems to reject "é"
+_NAME_OP = re.compile(r"^(\w+)(|\^|\$|!|<!|\*!|#)$")
+"""
+Pattern: Enforces names are valid python variable names followed by operation.
+"""
+
+_BAD_PREFIX = re.compile(r"^\d")
+"""
+Pattern: not these as a first query name character.
+"""
+
+_SQL_COMMENT = re.compile(r"\s*--\s*(.*)$")
+"""
+Pattern: Identifies SQL comments.
+"""
 
 _OP_TYPES = {
     "<!": SQLOperationType.INSERT_RETURNING,
@@ -49,49 +75,40 @@ class QueryLoader:
     @staticmethod
     def _extract_operation_type(text: str) -> Tuple[SQLOperationType, str]:
         query_name = text.replace("-", "_")
-        nameop = query_nameop_pattern.match(query_name)
-        if not nameop:
+        nameop = _NAME_OP.match(query_name)
+        if not nameop or _BAD_PREFIX.match(query_name):
             raise SQLParseException(f'invalid query name and operation spec: "{query_name}"')
         query_name, operation = nameop.group(1, 2)
         assert operation in _OP_TYPES
         operation_type = _OP_TYPES[operation]
 
-        if forbidden_query_name_prefix.match(query_name):
-            raise SQLParseException(f'invalid query name prefix: "{query_name}".')
-
         return operation_type, query_name
 
     def _extract_record_class(self, text: str) -> Optional[Type]:
-        record_class_match = query_record_class_definition_pattern.match(text)
-        record_class_name: Optional[str]
-        if record_class_match:
-            record_class_name = record_class_match.group(1)
-        else:
-            record_class_name = None
-
+        rc_match = _RECORD_DEF.match(text)
+        record_class_name = rc_match.group(1) if rc_match else None
         # TODO: Probably will want this to be a class, marshal in, and marshal out
         record_class = self.record_classes.get(record_class_name)
         return record_class
 
     @staticmethod
     def _extract_docstring(lines: Sequence[str]) -> Tuple[str, str]:
-        doc_comments = ""
-        sql = ""
+        doc, sql = "", ""
         for line in lines:
-            doc_match = doc_comment_pattern.match(line)
+            doc_match = _SQL_COMMENT.match(line)
             if doc_match:
-                doc_comments += doc_match.group(1) + "\n"
+                doc += doc_match.group(1) + "\n"
             else:
                 sql += line + "\n"
 
-        return doc_comments.rstrip(), sql.strip()
+        return doc.rstrip(), sql.strip()
 
     @staticmethod
     def _extract_signature(sql: str) -> Optional[inspect.Signature]:
         params = []
         names = set()
         self = inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)
-        for match in var_pattern.finditer(sql):
+        for match in VAR_REF.finditer(sql):
             gd = match.groupdict()
             if gd["quote"] or gd["dblquote"]:
                 continue
@@ -121,7 +138,7 @@ class QueryLoader:
         if ns_parts is None:
             ns_parts = []
         query_data = []
-        query_sql_strs = query_name_definition_pattern.split(sql_str)
+        query_sql_strs = _QUERY_DEF.split(sql_str)
 
         # Drop the first item in the split. It is anything above the first query definition.
         # This may be SQL comments or empty lines.
