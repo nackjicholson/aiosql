@@ -20,9 +20,15 @@ empty_pattern = re.compile(r"^\s*$")
 Pattern: Identifies empty lines.
 """
 
+# FIXME this accepts "1st" but seems to reject "é"
 valid_query_name_pattern = re.compile(r"^\w+$")
 """
 Pattern: Enforces names are valid python variable names.
+"""
+
+forbidden_query_name_prefix = re.compile(r"^\d")
+"""
+Pattern: not these as a first query name character.
 """
 
 doc_comment_pattern = re.compile(r"\s*--\s*(.*)$")
