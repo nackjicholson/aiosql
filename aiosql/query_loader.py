@@ -7,11 +7,21 @@ from .patterns import (
     doc_comment_pattern,
     query_record_class_definition_pattern,
     query_name_definition_pattern,
-    valid_query_name_pattern,
+    query_nameop_pattern,
     forbidden_query_name_prefix,
     var_pattern,
 )
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
+
+_OP_TYPES = {
+    "<!": SQLOperationType.INSERT_RETURNING,
+    "*!": SQLOperationType.INSERT_UPDATE_DELETE_MANY,
+    "!": SQLOperationType.INSERT_UPDATE_DELETE,
+    "#": SQLOperationType.SCRIPT,
+    "^": SQLOperationType.SELECT_ONE,
+    "$": SQLOperationType.SELECT_VALUE,
+    "": SQLOperationType.SELECT,
+}
 
 
 class QueryLoader:
@@ -20,50 +30,34 @@ class QueryLoader:
         self.record_classes = record_classes if record_classes is not None else {}
 
     def _make_query_datum(
-        self, query_str: str, ns_parts: List, query_fname: Optional[Path] = None
+        self, query: str, ns_parts: List[str], fname: Optional[Path] = None
     ) -> QueryDatum:
-        lines = [line.strip() for line in query_str.strip().splitlines()]
-        operation_type, query_name = self._extract_operation_type(lines[0])
+        # Build a query datum
+        # - query: the spec and name ("query-name!\n-- comments\nSQL;\n")
+        # - ns_parts: name space parts, i.e. subdirectories of loaded files
+        # - fname: name of file the query was extracted from
+        lines = [line.strip() for line in query.strip().splitlines()]
+        optype, qname = self._extract_operation_type(lines[0])
         record_class = self._extract_record_class(lines[1])
         line_offset = 2 if record_class else 1
-        doc_comments, sql = self._extract_docstring(lines[line_offset:])
+        doc, sql = self._extract_docstring(lines[line_offset:])
         signature = self._extract_signature(sql)
-        query_fqn = ".".join(ns_parts + [query_name])
-        sql = self.driver_adapter.process_sql(query_fqn, operation_type, sql)
-        return QueryDatum(
-            query_fqn, doc_comments, operation_type, sql, record_class, signature, query_fname
-        )
+        query_fqn = ".".join(ns_parts + [qname])
+        sql = self.driver_adapter.process_sql(query_fqn, optype, sql)
+        return QueryDatum(query_fqn, doc, optype, sql, record_class, signature, fname)
 
     @staticmethod
     def _extract_operation_type(text: str) -> Tuple[SQLOperationType, str]:
         query_name = text.replace("-", "_")
-        if query_name.endswith("<!"):
-            operation_type = SQLOperationType.INSERT_RETURNING
-            query_name = query_name[:-2]
-        elif query_name.endswith("*!"):
-            operation_type = SQLOperationType.INSERT_UPDATE_DELETE_MANY
-            query_name = query_name[:-2]
-        elif query_name.endswith("!"):
-            operation_type = SQLOperationType.INSERT_UPDATE_DELETE
-            query_name = query_name[:-1]
-        elif query_name.endswith("#"):
-            operation_type = SQLOperationType.SCRIPT
-            query_name = query_name[:-1]
-        elif query_name.endswith("^"):
-            operation_type = SQLOperationType.SELECT_ONE
-            query_name = query_name[:-1]
-        elif query_name.endswith("$"):
-            operation_type = SQLOperationType.SELECT_VALUE
-            query_name = query_name[:-1]
-        else:
-            operation_type = SQLOperationType.SELECT
+        nameop = query_nameop_pattern.match(query_name)
+        if not nameop:
+            raise SQLParseException(f'invalid query name and operation spec: "{query_name}"')
+        query_name, operation = nameop.group(1, 2)
+        assert operation in _OP_TYPES
+        operation_type = _OP_TYPES[operation]
 
-        if not valid_query_name_pattern.match(query_name) or forbidden_query_name_prefix.match(
-            query_name
-        ):
-            raise SQLParseException(
-                f'name must convert to valid python variable, got "{query_name}".'
-            )
+        if forbidden_query_name_prefix.match(query_name):
+            raise SQLParseException(f'invalid query name prefix: "{query_name}".')
 
         return operation_type, query_name
 

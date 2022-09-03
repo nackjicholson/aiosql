@@ -21,9 +21,9 @@ Pattern: Identifies empty lines.
 """
 
 # FIXME this accepts "1st" but seems to reject "é"
-valid_query_name_pattern = re.compile(r"^\w+$")
+query_nameop_pattern = re.compile(r"^(\w+)(|\^|\$|!|<!|\*!|#)$")
 """
-Pattern: Enforces names are valid python variable names.
+Pattern: Enforces names are valid python variable names followed by operation.
 """
 
 forbidden_query_name_prefix = re.compile(r"^\d")
