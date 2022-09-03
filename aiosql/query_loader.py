@@ -8,6 +8,7 @@ from .patterns import (
     query_record_class_definition_pattern,
     query_name_definition_pattern,
     valid_query_name_pattern,
+    forbidden_query_name_prefix,
     var_pattern,
 )
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
@@ -57,7 +58,9 @@ class QueryLoader:
         else:
             operation_type = SQLOperationType.SELECT
 
-        if not valid_query_name_pattern.match(query_name):
+        if not valid_query_name_pattern.match(query_name) or forbidden_query_name_prefix.match(
+            query_name
+        ):
             raise SQLParseException(
                 f'name must convert to valid python variable, got "{query_name}".'
             )

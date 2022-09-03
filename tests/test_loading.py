@@ -88,6 +88,17 @@ def test_loading_query_signature():
     )
 
 
+def test_names():
+    try:
+        queries = aiosql.from_str("-- name: 1st\nSELECT 1;\n", "sqlite3")
+        assert False, "'1st' should be rejected"
+    except SQLParseException as e:
+        assert '"1st"' in str(e)
+    # - is okay because mapped to _
+    queries = aiosql.from_str("-- name: -dash\nSELECT 1;\n", "sqlite3")
+    assert "_dash" in queries.available_queries
+
+
 def test_loading_query_signature_with_duplicate_parameter():
     sql_str = "-- name: get^\n" "select * from test where foo=:foo and foo=:foo"
     queries = aiosql.from_str(sql_str, "aiosqlite")
