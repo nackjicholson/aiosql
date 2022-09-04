@@ -1,6 +1,6 @@
 import inspect
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Type, Sequence, Union
+from typing import Dict, List, Optional, Tuple, Type, Sequence, Any
 
 from .exceptions import SQLParseException, SQLLoadException
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
@@ -22,6 +22,7 @@ _BAD_PREFIX = re.compile(r"^\d")
 # get SQL comment contents
 _SQL_COMMENT = re.compile(r"\s*--\s*(.*)$")
 
+# map operation suffixes to their type
 _OP_TYPES = {
     "<!": SQLOperationType.INSERT_RETURNING,
     "*!": SQLOperationType.INSERT_UPDATE_DELETE_MANY,
@@ -34,7 +35,9 @@ _OP_TYPES = {
 
 
 class QueryLoader:
-    def __init__(self, driver_adapter: DriverAdapterProtocol, record_classes: Optional[Dict]):
+    def __init__(
+        self, driver_adapter: DriverAdapterProtocol, record_classes: Optional[Dict[str, Any]]
+    ):
         self.driver_adapter = driver_adapter
         self.record_classes = record_classes if record_classes is not None else {}
 
@@ -46,36 +49,31 @@ class QueryLoader:
         # - ns_parts: name space parts, i.e. subdirectories of loaded files
         # - fname: name of file the query was extracted from
         lines = [line.strip() for line in query.strip().splitlines()]
-        optype, qname = self._extract_operation_type(lines[0])
-        record_class = self._extract_record_class(lines[1])
-        line_offset = 2 if record_class else 1
-        doc, sql = self._extract_docstring(lines[line_offset:])
-        signature = self._extract_signature(sql)
+        qname, qop = self._get_name_op(lines[0])
+        record_class = self._get_record_class(lines[1])
+        sql, doc = self._get_sql_doc(lines[2 if record_class else 1 :])
+        signature = self._build_signature(sql)
         query_fqn = ".".join(ns_parts + [qname])
-        sql = self.driver_adapter.process_sql(query_fqn, optype, sql)
-        return QueryDatum(query_fqn, doc, optype, sql, record_class, signature, fname)
+        sql = self.driver_adapter.process_sql(query_fqn, qop, sql)
+        return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, fname)
 
     @staticmethod
-    def _extract_operation_type(text: str) -> Tuple[SQLOperationType, str]:
-        query_name = text.replace("-", "_")
-        nameop = _NAME_OP.match(query_name)
-        if not nameop or _BAD_PREFIX.match(query_name):
-            raise SQLParseException(f'invalid query name and operation spec: "{query_name}"')
-        query_name, operation = nameop.group(1, 2)
-        assert operation in _OP_TYPES
-        operation_type = _OP_TYPES[operation]
+    def _get_name_op(text: str) -> Tuple[str, SQLOperationType]:
+        qname_spec = text.replace("-", "_")
+        nameop = _NAME_OP.match(qname_spec)
+        if not nameop or _BAD_PREFIX.match(qname_spec):
+            raise SQLParseException(f'invalid query name and operation spec: "{qname_spec}"')
+        qname, qop = nameop.group(1, 2)
+        return qname, _OP_TYPES[qop]
 
-        return operation_type, query_name
-
-    def _extract_record_class(self, text: str) -> Optional[Type]:
+    def _get_record_class(self, text: str) -> Optional[Type]:
         rc_match = _RECORD_DEF.match(text)
-        record_class_name = rc_match.group(1) if rc_match else None
+        rc_name = rc_match.group(1) if rc_match else None
         # TODO: Probably will want this to be a class, marshal in, and marshal out
-        record_class = self.record_classes.get(record_class_name)
-        return record_class
+        return self.record_classes.get(rc_name)
 
     @staticmethod
-    def _extract_docstring(lines: Sequence[str]) -> Tuple[str, str]:
+    def _get_sql_doc(lines: Sequence[str]) -> Tuple[str, str]:
         doc, sql = "", ""
         for line in lines:
             doc_match = _SQL_COMMENT.match(line)
@@ -84,13 +82,12 @@ class QueryLoader:
             else:
                 sql += line + "\n"
 
-        return doc.rstrip(), sql.strip()
+        return sql.strip(), doc.rstrip()
 
     @staticmethod
-    def _extract_signature(sql: str) -> Optional[inspect.Signature]:
-        params = []
+    def _build_signature(sql: str) -> Optional[inspect.Signature]:
+        params = [inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)]
         names = set()
-        self = inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)
         for match in VAR_REF.finditer(sql):
             gd = match.groupdict()
             if gd["quote"] or gd["dblquote"]:
@@ -105,44 +102,26 @@ class QueryLoader:
                     kind=inspect.Parameter.KEYWORD_ONLY,
                 )
             )
-        return inspect.Signature(parameters=[self] + params) if params else None
+        return inspect.Signature(parameters=params) if params else None
 
     def load_query_data_from_sql(
-        self, sql: Union[str, Path], ns_parts: Optional[List] = None
+        self, sql: str, ns_parts: List[str] = [], fname: Optional[Path] = None
     ) -> List[QueryDatum]:
-        sql_fname: Optional[Path] = None
-        if isinstance(sql, Path):
-            with sql.open() as fp:
-                sql_str = fp.read()
-            sql_fname = sql
-        else:
-            sql_str = sql
-
-        if ns_parts is None:
-            ns_parts = []
-        query_data = []
-        query_sql_strs = _QUERY_DEF.split(sql_str)
-
         # Drop the first item in the split. It is anything above the first query definition.
-        # This may be SQL comments or empty lines.
+        # This may be SQL comments or empty lines or whatever.
         # See: https://github.com/nackjicholson/aiosql/issues/35
-        for query_sql_str in query_sql_strs[1:]:
-            query_data.append(self._make_query_datum(query_sql_str, ns_parts, sql_fname))
-        return query_data
+        return [
+            self._make_query_datum(qspec, ns_parts, fname) for qspec in _QUERY_DEF.split(sql)[1:]
+        ]
 
-    def load_query_data_from_file(
-        self, file_path: Path, ns_parts: Optional[List] = None
-    ) -> List[QueryDatum]:
-        return self.load_query_data_from_sql(file_path, ns_parts)
+    def load_query_data_from_file(self, path: Path, ns_parts: List[str] = []) -> List[QueryDatum]:
+        return self.load_query_data_from_sql(path.read_text(), ns_parts, path)
 
     def load_query_data_from_dir_path(self, dir_path) -> QueryDataTree:
         if not dir_path.is_dir():
             raise ValueError(f"The path {dir_path} must be a directory")
 
-        def _recurse_load_query_data_tree(path, ns_parts=None):
-            if ns_parts is None:
-                ns_parts = []
-
+        def _recurse_load_query_data_tree(path, ns_parts=[]):
             query_data_tree = {}
             for p in path.iterdir():
                 if p.is_file() and p.suffix != ".sql":
