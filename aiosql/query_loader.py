@@ -42,7 +42,7 @@ class QueryLoader:
         self.record_classes = record_classes if record_classes is not None else {}
 
     def _make_query_datum(
-        self, query: str, ns_parts: List[str], fname: Optional[Path] = None
+        self, query: str, ns_parts: List[str], floc: Optional[Tuple[Path, int]] = None
     ) -> QueryDatum:
         # Build a query datum
         # - query: the spec and name ("query-name!\n-- comments\nSQL;\n")
@@ -55,7 +55,7 @@ class QueryLoader:
         signature = self._build_signature(sql)
         query_fqn = ".".join(ns_parts + [qname])
         sql = self.driver_adapter.process_sql(query_fqn, qop, sql)
-        return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, fname)
+        return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, floc)
 
     def _get_name_op(self, text: str) -> Tuple[str, SQLOperationType]:
         qname_spec = text.replace("-", "_")
@@ -104,10 +104,14 @@ class QueryLoader:
     def load_query_data_from_sql(
         self, sql: str, ns_parts: List[str] = [], fname: Optional[Path] = None
     ) -> List[QueryDatum]:
+        qdefs = _QUERY_DEF.split(sql)
+        lineno = 1 + qdefs[0].count("\n")
+        data = []
         # first item is anything before the first query definition, drop it!
-        return [
-            self._make_query_datum(qspec, ns_parts, fname) for qspec in _QUERY_DEF.split(sql)[1:]
-        ]
+        for qdef in qdefs[1:]:
+            data.append(self._make_query_datum(qdef, ns_parts, (fname, lineno) if fname else None))
+            lineno += qdef.count("\n")
+        return data
 
     def load_query_data_from_file(self, path: Path, ns_parts: List[str] = []) -> List[QueryDatum]:
         return self.load_query_data_from_sql(path.read_text(), ns_parts, path)

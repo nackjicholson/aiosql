@@ -11,6 +11,7 @@ from typing import (
     NamedTuple,
     Optional,
     Union,
+    Tuple,
 )
 
 try:
@@ -39,7 +40,7 @@ class QueryDatum(NamedTuple):
     sql: str
     record_class: Any = None
     signature: Optional[inspect.Signature] = None
-    fname: Optional[Path] = None
+    floc: Optional[Tuple[Path, int]] = None
 
 
 class QueryFn(Protocol):
