@@ -1,6 +1,6 @@
 -- this part before the first description
 is expected
-TO BE IGNORED SILENTLY
+TO BE IGNORED SILENTLY…
 
 -- name: publish-blog<!
 insert into blogs (
