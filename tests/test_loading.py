@@ -94,6 +94,11 @@ def test_names():
         assert False, "'1st' should be rejected"
     except SQLParseException as e:
         assert '"1st"' in str(e)
+    try:
+        queries = aiosql.from_str("-- name: one$garbage\nSELECT 1;\n", "sqlite3")
+        assert False, "garbage should be rejected"
+    except SQLParseException as e:
+        assert 'garbage"' in str(e)
     # - is okay because mapped to _
     queries = aiosql.from_str("-- name: -dash\nSELECT 1;\n", "sqlite3")
     assert "_dash" in queries.available_queries
