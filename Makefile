@@ -73,7 +73,11 @@ clean.venv: clean
 #
 # VARIOUS CHECKS
 #
-.PHONY: check.pytest check.mypy check.flake8 check.black check.coverage check
+.PHONY: check.pytest check.mypy check.flake8 check.black check.coverage check.rstcheck check
+
+check.rstcheck: $(VENV)
+	[ "$(VENV)" ] && source venv/bin/activate
+	rstcheck docs/source/*.rst
 
 check.pytest: $(VENV)
 	[ "$(VENV)" ] && source venv/bin/activate

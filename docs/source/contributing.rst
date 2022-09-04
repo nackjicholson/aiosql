@@ -40,7 +40,7 @@ Development Setup
 
 All subsequent steps will assume you are using python within your activated virtual environment.
 
-2. Install your environment to the dependencies defined in ``dev-requirements.txt``
+1. Install your environment to the dependencies defined in ``dev-requirements.txt``
 
 Note: different versions of Python may install different versions of dependencies.
 As `aiosql` is more or less expected to work with all these module versions, the
@@ -50,7 +50,7 @@ bare minimum version pinning is done in the requirements file.
 
     pip install -r dev-requirements.txt
 
-3. Run tests
+1. Run tests
 
 .. code:: sh
 
