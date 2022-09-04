@@ -57,8 +57,7 @@ class QueryLoader:
         sql = self.driver_adapter.process_sql(query_fqn, qop, sql)
         return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, fname)
 
-    @staticmethod
-    def _get_name_op(text: str) -> Tuple[str, SQLOperationType]:
+    def _get_name_op(self, text: str) -> Tuple[str, SQLOperationType]:
         qname_spec = text.replace("-", "_")
         nameop = _NAME_OP.match(qname_spec)
         if not nameop or _BAD_PREFIX.match(qname_spec):
@@ -72,8 +71,7 @@ class QueryLoader:
         # TODO: Probably will want this to be a class, marshal in, and marshal out
         return self.record_classes.get(rc_name)
 
-    @staticmethod
-    def _get_sql_doc(lines: Sequence[str]) -> Tuple[str, str]:
+    def _get_sql_doc(self, lines: Sequence[str]) -> Tuple[str, str]:
         doc, sql = "", ""
         for line in lines:
             doc_match = _SQL_COMMENT.match(line)
@@ -84,8 +82,7 @@ class QueryLoader:
 
         return sql.strip(), doc.rstrip()
 
-    @staticmethod
-    def _build_signature(sql: str) -> Optional[inspect.Signature]:
+    def _build_signature(self, sql: str) -> inspect.Signature:
         params = [inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)]
         names = set()
         for match in VAR_REF.finditer(sql):
@@ -102,7 +99,7 @@ class QueryLoader:
                     kind=inspect.Parameter.KEYWORD_ONLY,
                 )
             )
-        return inspect.Signature(parameters=params) if params else None
+        return inspect.Signature(parameters=params)
 
     def load_query_data_from_sql(
         self, sql: str, ns_parts: List[str] = [], fname: Optional[Path] = None
