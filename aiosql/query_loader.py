@@ -104,9 +104,7 @@ class QueryLoader:
     def load_query_data_from_sql(
         self, sql: str, ns_parts: List[str] = [], fname: Optional[Path] = None
     ) -> List[QueryDatum]:
-        # Drop the first item in the split. It is anything above the first query definition.
-        # This may be SQL comments or empty lines or whatever.
-        # See: https://github.com/nackjicholson/aiosql/issues/35
+        # first item is anything before the first query definition, drop it!
         return [
             self._make_query_datum(qspec, ns_parts, fname) for qspec in _QUERY_DEF.split(sql)[1:]
         ]
