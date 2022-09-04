@@ -157,7 +157,6 @@ The resulting ``queries`` object will have a mixture of methods from all the fil
     The last one loaded will win.
     See :ref:`subdirectories` below to namespace queries.
 
-.. _subdirectories:
 
 Subdirectories
 ^^^^^^^^^^^^^^

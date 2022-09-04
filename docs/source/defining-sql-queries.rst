@@ -79,8 +79,8 @@ When there are no rows in the result set it returns ``None``.
 This is useful when you know there should be one, and exactly one result from your query.
 
 As an example, if you have a unique constraint on the ``username`` field in your
-``users`` table which makes it impossible for two users to share the same username,s
- you could use ``^`` to direct aiosql to select a single user rather than a list of
+``users`` table which makes it impossible for two users to share the same username,
+you could use ``^`` to direct aiosql to select a single user rather than a list of
 rows of length 1.
 
 .. code:: sql
@@ -167,7 +167,7 @@ Executing this query in python will return the ``blogid`` of the inserted row.
 
     queries = aiosql.from_path("blogs.sql", "sqlite3")
     # ... connection code ...
-    blogid = queries.publish_blog(conn, userid=1, title="Hi" content="blah blah.")
+    blogid = queries.publish_blog(conn, userid=1, title="Hi", content="blah blah.")
 
 PostgreSQL allows returning multiple values via the ``RETURNING`` clause of queries.
 This same query using ``psycopg`` or ``psycopg2`` might look like the following.
@@ -185,7 +185,7 @@ In python a tuple is returned with the ``blogid`` and ``title`` of the inserted 
 
     queries = aiosql.from_path("blogs.sql", "psycopg2")
     # ... connection code ...
-    blogid, title = queries.publish_blog(conn, userid=1, title="Hi" content="blah blah.")
+    blogid, title = queries.publish_blog(conn, userid=1, title="Hi", content="blah blah.")
 
 Note that ``INSERT … RETURNING`` basically behaves as a ``SELECT``, so using ``^`` or ``$``
 would work as well.

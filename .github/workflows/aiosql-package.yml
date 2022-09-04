@@ -63,3 +63,5 @@ jobs:
       run: |
         coverage run -m pytest --log-level=debug --capture=tee-sys --asyncio-mode=auto
         coverage report --fail-under=100 --include='aiosql/*'
+    - name: Check RST files
+      run: rstcheck docs/source/*.rst

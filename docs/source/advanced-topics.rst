@@ -1,13 +1,10 @@
 Advanced Topics
 ===============
 
-.. _leveraging-driver-specific-features:
-
-
 Leveraging Driver Specific Features
 -----------------------------------
 
-Todo
+TODO
 
 Access the ``cursor`` object
 ----------------------------
@@ -203,7 +200,7 @@ This program is only a little bit different. It let's us leverage `asyncio.gathe
     queries = aiosql.from_path("greetings.sql", driver_adapter="aiosqlite")
 
     async def main():
-        with async aiosqlite.connect("greetings.db") as conn:
+        async with aiosqlite.connect("greetings.db") as conn:
             conn.row_factory = aiosqlite.Row
             # Parallel queries!!!
             #
