@@ -4,40 +4,23 @@ from typing import Dict, List, Optional, Tuple, Type, Sequence, Union
 
 from .exceptions import SQLParseException, SQLLoadException
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
-from .patterns import VAR_REF
+from .patterns import VAR_REF, re
 
-# use re2 if available.
-# FIXME strange issue on debian buster with py3.7 apache wsgi flask… loading re2 "freezes" aiosql
-try:
-    import re2 as re
-except ModuleNotFoundError:  # pragma: no cover
-    import re  # type: ignore
-
+# identifies name definition comments
 _QUERY_DEF = re.compile(r"--\s*name\s*:\s*")
-"""
-Pattern: Identifies name definition comments.
-"""
 
+# identifies record class definition comments
 _RECORD_DEF = re.compile(r"--\s*record_class\s*:\s*(\w+)\s*")
-"""
-Pattern: Identifies record_class definition comments.
-"""
 
+# extract a valid query name followed by an optional operation spec
 # FIXME this accepts "1st" but seems to reject "é"
 _NAME_OP = re.compile(r"^(\w+)(|\^|\$|!|<!|\*!|#)$")
-"""
-Pattern: Enforces names are valid python variable names followed by operation.
-"""
 
+# forbid numbers as first character
 _BAD_PREFIX = re.compile(r"^\d")
-"""
-Pattern: not these as a first query name character.
-"""
 
+# get SQL comment contents
 _SQL_COMMENT = re.compile(r"\s*--\s*(.*)$")
-"""
-Pattern: Identifies SQL comments.
-"""
 
 _OP_TYPES = {
     "<!": SQLOperationType.INSERT_RETURNING,
