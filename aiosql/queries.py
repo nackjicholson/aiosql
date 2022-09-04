@@ -37,7 +37,9 @@ def _query_fn(
     return qfn
 
 
-# FIXME coverage?
+# NOTE about coverage: because __code__ is set to reflect the actual SQL file
+# source, coverage does note detect that the "fn" functions are actually called,
+# hence the "no cover" hints.
 def _make_sync_fn(query_datum: QueryDatum) -> QueryFn:
     query_name, doc_comments, operation_type, sql, record_class, signature, floc = query_datum
     if operation_type == SQLOperationType.INSERT_RETURNING:
