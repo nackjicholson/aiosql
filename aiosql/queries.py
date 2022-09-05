@@ -109,7 +109,7 @@ def _make_ctx_mgr(fn: QueryFn) -> QueryFn:
     )
 
 
-def _create_methods(query_datum: QueryDatum, is_aio: bool) -> List[Tuple[str, QueryFn]]:
+def _create_methods(query_datum: QueryDatum, is_aio: bool) -> List[QueryFn]:
     """Internal function to feed add_queries."""
     fn = _make_sync_fn(query_datum)
     if is_aio:
@@ -117,13 +117,10 @@ def _create_methods(query_datum: QueryDatum, is_aio: bool) -> List[Tuple[str, Qu
 
     ctx_mgr = _make_ctx_mgr(fn)
 
-    # TODO in a later release?
-    # The return can and should be simplified to List[QueryFn]
-    # i.e. "return [fn, ctx_mgr] and [fn]"
     if query_datum.operation_type == SQLOperationType.SELECT:
-        return [(fn.__name__, fn), (ctx_mgr.__name__, ctx_mgr)]
+        return [fn, ctx_mgr]
     else:
-        return [(fn.__name__, fn)]
+        return [fn]
 
 
 class Queries:
@@ -166,13 +163,10 @@ class Queries:
         setattr(self, query_name, fn)
         self._available_queries.add(query_name)
 
-    def add_queries(self, queries: List[Tuple[str, QueryFn]]):
+    def add_queries(self, queries: List[QueryFn]):
         """Add query methods to `Queries` instance."""
-        for query_name, fn in queries:
-            # TODO Could be query_name = fn.__name__.rpartition(".")[2]
-            # if the interface here were changed to just queries being
-            # a List[QueryFn] (see _create_methods)
-            query_name = query_name.rpartition(".")[2]
+        for fn in queries:
+            query_name = fn.__name__.rpartition(".")[2]
             self.add_query(query_name, MethodType(fn, self))
 
     def add_child_queries(self, child_name: str, child_queries: "Queries"):
