@@ -47,7 +47,7 @@ class QueryLoader:
         # Build a query datum
         # - query: the spec and name ("query-name!\n-- comments\nSQL;\n")
         # - ns_parts: name space parts, i.e. subdirectories of loaded files
-        # - fname: name of file the query was extracted from
+        # - floc: file name and lineno the query was extracted from
         lines = [line.strip() for line in query.strip().splitlines()]
         qname, qop = self._get_name_op(lines[0])
         record_class = self._get_record_class(lines[1])
