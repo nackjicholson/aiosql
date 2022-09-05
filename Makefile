@@ -101,7 +101,7 @@ check.coverage: $(VENV)
 	coverage html
 	coverage report --fail-under=100 --include='$(MODULE)/*'
 
-check: check.pytest check.mypy check.flake8 check.black check.coverage
+check: check.pytest check.mypy check.flake8 check.black check.coverage check.rstcheck
 
 #
 # PYPI PUBLICATION
