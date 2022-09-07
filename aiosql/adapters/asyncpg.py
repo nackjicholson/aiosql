@@ -1,7 +1,7 @@
 from collections import defaultdict
 from contextlib import asynccontextmanager
 
-from ..patterns import VAR_REF
+from ..utils import VAR_REF
 
 
 class MaybeAcquire:

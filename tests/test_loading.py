@@ -4,7 +4,7 @@ from unittest import mock
 import re
 
 import aiosql
-from aiosql.exceptions import SQLParseException
+from aiosql import SQLParseException, SQLLoadException
 from aiosql.queries import Queries
 from aiosql.query_loader import QueryLoader
 
@@ -154,7 +154,7 @@ def test_no_such_path():
     try:
         aiosql.from_path("/no/such/file", "sqlite3")
         assert False, "must raise an exception"  # pragma: no cover
-    except aiosql.exceptions.SQLLoadException as e:
+    except SQLLoadException as e:
         assert "File does not exist" in str(e)
 
 
