@@ -54,9 +54,9 @@ Badges
 
 .. image:: https://img.shields.io/pypi/dm/aiosql?style=flat
    :alt: Pypi Downloads
-   :target: https://pypi.org/project/aiosql/
+   :target: https://pypistats.org/packages/aiosql
 
-.. image:: https://img.shields.io/github/stars/nackjicholson/aiosql?style=flat&label=Star&maxAge=2592000
+.. image:: https://img.shields.io/github/stars/nackjicholson/aiosql?style=flat&label=Star
    :alt: Stars
    :target: https://github.com/nackjicholson/aiosql/stargazers
 
