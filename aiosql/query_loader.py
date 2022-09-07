@@ -2,9 +2,8 @@ import inspect
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Type, Sequence, Any
 
-from .exceptions import SQLParseException, SQLLoadException
+from .utils import SQLParseException, SQLLoadException, VAR_REF, re
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
-from .patterns import VAR_REF, re
 
 # identifies name definition comments
 _QUERY_DEF = re.compile(r"--\s*name\s*:\s*")

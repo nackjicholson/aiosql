@@ -1,5 +1,5 @@
-from ..patterns import VAR_REF
 from .generic import GenericAdapter
+from ..utils import VAR_REF
 
 
 def _replacer(match):

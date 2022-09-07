@@ -1,4 +1,4 @@
-from aiosql.patterns import VAR_REF
+from aiosql.utils import VAR_REF
 
 
 def test_var_pattern_is_quote_aware():

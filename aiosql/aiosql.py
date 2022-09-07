@@ -10,7 +10,7 @@ from .adapters.generic import GenericAdapter
 from .adapters.sqlite3 import SQLite3Adapter
 from .adapters.pg8000 import Pg8000Adapter
 from .adapters.apsw import APSWAdapter
-from .exceptions import SQLLoadException
+from .utils import SQLLoadException
 from .queries import Queries
 from .query_loader import QueryLoader
 from .types import DriverAdapterProtocol
