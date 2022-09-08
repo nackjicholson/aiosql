@@ -177,7 +177,7 @@ using ``aiosqlite`` and ``asyncio``:
     asyncio.run(main())
 
 
-It may seem inconvenient to have to pass a connection on each call.
+It may seem inconvenient to provide a connection on each call.
 You may have a look at the `AnoDB <https://github.com/zx80/anodb>`__ `DB`
 class which wraps both a database connection and query functions in one
 connection-like extended object, including managing automatic reconnection if
@@ -190,8 +190,11 @@ Why you might want to use this
 * You think SQL is pretty good, and writing SQL is an important part of your applications.
 * You don't want to write your SQL in strings intermixed with your python code.
 * You're not using an ORM like `SQLAlchemy <https://www.sqlalchemy.org/>`__ or
-  `Django <https://www.djangoproject.com/>`__, and you don't need to.
-* You want to be able to reuse your SQL in other contexts. Loading it into psql or other database tools.
+  `Django <https://www.djangoproject.com/>`__ ,
+  with large (100k lines) code imprints vs under 800 for `aiosql`,
+  and you don't need to.
+* You want to be able to reuse your SQL in other contexts.
+  Loading it into `psql` or other database tools.
 
 
 Why you might NOT want to use this
