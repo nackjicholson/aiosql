@@ -47,6 +47,7 @@ help:
 
 venv:
 	$(PYTHON) -m venv venv
+	$(PIP) install --upgrade pip
 	$(PIP) install -e .
 
 venv.dev: venv
