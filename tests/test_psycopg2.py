@@ -1,11 +1,14 @@
 from datetime import date
 
 import aiosql
-import psycopg2 as db
-from psycopg2.extras import RealDictCursor as DictCursor
-
 import pytest
 import run_tests as t
+
+try:
+    import psycopg2 as db
+    from psycopg2.extras import RealDictCursor as DictCursor
+except ModuleNotFoundError:
+    pytest.skip("missing driver: psycopg2", allow_module_level=True)
 
 DRIVER = "psycopg2"
 

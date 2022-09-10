@@ -1,10 +1,13 @@
 from datetime import date
 
 import aiosql
-import pymysql as db
-
 import pytest
 import run_tests as t
+
+try:
+    import pymysql as db
+except ModuleNotFoundError:
+    pytest.skip("missing driver: pymysql", allow_module_level=True)
 
 DRIVER = "pymysql"
 

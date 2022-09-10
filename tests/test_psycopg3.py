@@ -1,10 +1,14 @@
 from datetime import date
 
 import aiosql
-import psycopg as db
-from psycopg.rows import dict_row
 import pytest
 import run_tests as t
+
+try:
+    import psycopg as db
+    from psycopg.rows import dict_row
+except ModuleNotFoundError:
+    pytest.skip("missing driver: psycopg", allow_module_level=True)
 
 DRIVER = "psycopg"
 

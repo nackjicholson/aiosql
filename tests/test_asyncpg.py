@@ -1,10 +1,13 @@
 from datetime import date
 
-import aiosql
-import asyncpg
-
 import pytest
+import aiosql
 import run_tests as t
+
+try:
+    import asyncpg
+except ModuleNotFoundError:
+    pytest.skip("missing driver: asyncpg", allow_module_level=True)
 
 DRIVER = "asyncpg"
 
