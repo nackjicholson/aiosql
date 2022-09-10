@@ -1,8 +1,11 @@
 import aiosql
-import aiosqlite
-
 import pytest
 import run_tests as t
+
+try:
+    import aiosqlite
+except ModuleNotFoundError:
+    pytest.skip("missing driver: aiosqlite", allow_module_level=True)
 
 DRIVER = "aiosqlite"
 

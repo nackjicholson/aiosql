@@ -1,10 +1,12 @@
 from datetime import date
-
 import aiosql
-import pg8000 as db
 import pytest
 import run_tests as t
 
+try:
+    import pg8000 as db
+except ModuleNotFoundError:
+    pytest.skip("missing driver: apsw", allow_module_level=True)
 
 DRIVER = "pg8000"
 

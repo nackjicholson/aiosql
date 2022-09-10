@@ -1,10 +1,13 @@
 from datetime import date
 
 import aiosql
-import mysql.connector as db
-
 import pytest
 import run_tests as t
+
+try:
+    import mysql.connector as db
+except ModuleNotFoundError:
+    pytest.skip("missing driver: mysql.connector (mysql-connector)", allow_module_level=True)
 
 DRIVER = "mysql-connector"
 pytestmark = pytest.mark.skipif(not t.has_exec("mysqld"), reason="no mysqld")

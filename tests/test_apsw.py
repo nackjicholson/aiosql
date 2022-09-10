@@ -1,7 +1,11 @@
 import aiosql
 import pytest
 import run_tests as t
-import apsw as db
+
+try:
+    import apsw as db
+except ModuleNotFoundError:
+    pytest.skip("missing driver: apsw", allow_module_level=True)
 
 DRIVER = "apsw"
 

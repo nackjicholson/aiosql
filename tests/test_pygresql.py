@@ -1,9 +1,13 @@
 from datetime import date
 
 import aiosql
-import pgdb as db  # PyGreSQL DB-API driver
 import pytest
 import run_tests as t
+
+try:
+    import pgdb as db  # PyGreSQL DB-API driver
+except ModuleNotFoundError:
+    pytest.skip("missing driver: pygresql", allow_module_level=True)
 
 DRIVER = "pygresql"
 
