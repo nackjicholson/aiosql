@@ -10,6 +10,11 @@ try:
 except ModuleNotFoundError:
     pytest.skip("missing driver: psycopg", allow_module_level=True)
 
+pytestmark = [
+    pytest.mark.skipif(not t.has_cmd("psql"), reason="no postgresql installed"),
+    pytest.mark.skipif(not t.has_pkg("pytest_postgresql"), reason="no pytest_postgresql"),
+]
+
 DRIVER = "psycopg"
 
 

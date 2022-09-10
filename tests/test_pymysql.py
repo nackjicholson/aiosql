@@ -11,7 +11,10 @@ except ModuleNotFoundError:
 
 DRIVER = "pymysql"
 
-pytestmark = pytest.mark.skipif(not t.has_exec("mysqld"), reason="no mysqld")
+pytestmark = [
+    pytest.mark.skipif(not t.has_cmd("mysqld"), reason="no mysqld"),
+    pytest.mark.skipif(not t.has_pkg("pytest_mysql"), reason="no pytest_mysql"),
+]
 
 
 @pytest.fixture()
