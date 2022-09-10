@@ -7,9 +7,13 @@ import run_tests as t
 try:
     import MySQLdb as db
 except ModuleNotFoundError:
-    pytest.skipif("missing driver: MySQLdb (mysqlclient)", allow_module_level=True)
+    pytest.skip("missing driver: MySQLdb (mysqlclient)", allow_module_level=True)
 
-pytestmark = pytest.mark.skipif(not t.has_exec("mysqld"), reason="no mysqld")
+pytestmark = [
+    pytest.mark.skipif(not t.has_cmd("mysqld"), reason="no mysqld"),
+    pytest.mark.skipif(not t.has_pkg("pytest_mysql"), reason="no pytest_mysql"),
+]
+
 DRIVER = "mysqldb"
 
 

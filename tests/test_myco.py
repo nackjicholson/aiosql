@@ -9,8 +9,12 @@ try:
 except ModuleNotFoundError:
     pytest.skip("missing driver: mysql.connector (mysql-connector)", allow_module_level=True)
 
+pytestmark = [
+    pytest.mark.skipif(not t.has_cmd("mysqld"), reason="no mysqld"),
+    pytest.mark.skipif(not t.has_pkg("pytest_mysql"), reason="no pytest_mysql"),
+]
+
 DRIVER = "mysql-connector"
-pytestmark = pytest.mark.skipif(not t.has_exec("mysqld"), reason="no mysqld")
 
 
 @pytest.fixture()

@@ -16,8 +16,16 @@ def todate(year, month, day):
     return f"{year:04}-{month:02}-{day:02}"
 
 
-def has_exec(cmd):
+def has_cmd(cmd):
     return shutil.which(cmd) is not None
+
+
+def has_pkg(pkg):
+    try:
+        __import__(pkg)
+        return True
+    except ModuleNotFoundError:
+        return False
 
 
 class UserBlogSummary(NamedTuple):
