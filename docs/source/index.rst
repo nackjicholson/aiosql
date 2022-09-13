@@ -100,8 +100,8 @@ Badges
    :target: https://opensource.org/licenses/BSD-2-Clause
 
 
-Example Usage
--------------
+Usage
+-----
 
 Install from `pypi <https://pypi.org/project/aiosql>`__, for instance with ``pip``:
 
