@@ -103,7 +103,7 @@ Badges
 Example Usage
 -------------
 
-Install from `pypi <https://pypi.org>`__, for instance with ``pip``:
+Install from `pypi <https://pypi.org/project/aiosql>`__, for instance with ``pip``:
 
 .. code:: sh
 
