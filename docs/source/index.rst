@@ -19,8 +19,12 @@ drivers for
 `PostgreSQL <https://postgresql.org/>`__ (`psycopg 2 and 3 <https://www.psycopg.org/docs/>`__, `pg8000 <https://pypi.org/project/pg8000/>`__, `pygresql <http://www.pygresql.org/>`__, `asyncpg <https://magicstack.github.io/asyncpg/current/>`__)
 and `MySQL <https://www.mysql.com/>`__ (`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__, `mysqlclient <https://pypi.org/project/mysqlclient/>`__, `mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__) out of the box.
 
+This module is an implementation of `Kris Jenkins' yesql <https://github.com/krisajenkins/yesql>`__
+`Clojure <https://clojure.org/>`__ library to the `Python <https://www.python.org/>`__
+`ecosystem <https://pypi.org/>`__.
 Extensions to support other database drivers can be written by you!
-See: `Database Driver Adapters <./database-driver-adapters.html>`__
+See: `Database Driver Adapters <./database-driver-adapters.html>`__.
+Feel free to pull request!
 
 
 Badges
