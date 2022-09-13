@@ -103,13 +103,9 @@ Badges
 Usage
 -----
 
-Install from `pypi <https://pypi.org/project/aiosql>`__, for instance with ``pip``:
+Install from `pypi <https://pypi.org/project/aiosql>`__, for instance by running ``pip install aiosql``.
 
-.. code:: sh
-
-    pip install aiosql
-
-Write parametric SQL queries in a file and execute it from Python methods,
+Then write parametric SQL queries in a file and execute it from Python methods,
 eg this *greetings.sql* file:
 
 .. code:: sql
