@@ -100,19 +100,17 @@ Badges
    :target: https://opensource.org/licenses/BSD-2-Clause
 
 
-Installation
-------------
+Example Usage
+-------------
+
+Install from `pypi <https://pypi.org>`__, for instance with ``pip``:
 
 .. code:: sh
 
     pip install aiosql
 
-
-Usage
------
-
-Consider writing SQL in a file and executing it from methods in python,
-for instance this *greetings.sql* file:
+Write parametric SQL queries in a file and execute it from Python methods,
+eg this *greetings.sql* file:
 
 .. code:: sql
 
