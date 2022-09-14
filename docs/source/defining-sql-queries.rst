@@ -175,7 +175,7 @@ This same query using ``psycopg`` or ``psycopg2`` might look like the following.
 .. code:: sql
 
     -- name: publish_blog<!
-    insert into (userid, title, content)
+    insert into blogs(userid, title, content)
          values (:userid, :title, :content)
       returning blogid, title;
 
