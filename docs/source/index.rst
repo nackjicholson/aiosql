@@ -4,23 +4,42 @@
    contain the root `toctree` directive.
 
 aiosql - Simple SQL in Python
-==================================
+=============================
 
-SQL is code. Write it, version control it, comment it, and run it using files.
+`SQL <https://en.wikipedia.org/wiki/SQL>`__ is code.
+Write it, version control it, comment it, and run it using files.
 Writing your SQL code in Python programs as strings doesn't allow you to easily
-reuse them in SQL GUIs or CLI tools like psql.
+reuse them in SQL GUIs or CLI tools like ``psql``.
 With aiosql you can organize your SQL statements in *.sql* files, load them
 into your python application as methods to call without losing the ability to
 use them as you would any other SQL file.
 
-This project supports standard and `asyncio <https://docs.python.org/3/library/asyncio.html>`__ based
-drivers for
-`SQLite <https://www.sqlite.org/>`__ (`sqlite3 <https://docs.python.org/3/library/sqlite3.html>`__, `aiosqlite <https://aiosqlite.omnilib.dev/en/latest/?badge=latest>`__, `apsw <https://pypi.org/project/apsw/>`__),
-`PostgreSQL <https://postgresql.org/>`__ (`psycopg 2 and 3 <https://www.psycopg.org/docs/>`__, `pg8000 <https://pypi.org/project/pg8000/>`__, `pygresql <http://www.pygresql.org/>`__, `asyncpg <https://magicstack.github.io/asyncpg/current/>`__)
-and `MySQL <https://www.mysql.com/>`__ (`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__, `mysqlclient <https://pypi.org/project/mysqlclient/>`__, `mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__) out of the box.
+This project supports standard
+`PEP 249 <https://peps.python.org/pep-0249/>`__
+and
+`asyncio <https://docs.python.org/3/library/asyncio.html>`__
+based drivers for
+`SQLite <https://www.sqlite.org/>`__
+(`sqlite3 <https://docs.python.org/3/library/sqlite3.html>`__,
+`aiosqlite <https://aiosqlite.omnilib.dev/en/latest/?badge=latest>`__,
+`apsw <https://pypi.org/project/apsw/>`__),
+`PostgreSQL <https://postgresql.org/>`__
+(`psycopg (3) <https://www.psycopg.org/psycopg3/>`__,
+`psycopg2 <https://www.psycopg.org/docs/>`__,
+`pg8000 <https://pypi.org/project/pg8000/>`__,
+`pygresql <http://www.pygresql.org/>`__,
+`asyncpg <https://magicstack.github.io/asyncpg/current/>`__)
+and `MySQL <https://www.mysql.com/>`__
+(`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__,
+`mysqlclient <https://pypi.org/project/mysqlclient/>`__,
+`mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__) out of the box.
+Note that some detailed feature support may vary depending on the underlying driver
+actual capabilities.
 
-This module is an implementation of `Kris Jenkins' yesql <https://github.com/krisajenkins/yesql>`__
-`Clojure <https://clojure.org/>`__ library to the `Python <https://www.python.org/>`__
+This module is an implementation of
+`Kris Jenkins' yesql <https://github.com/krisajenkins/yesql>`__
+`Clojure <https://clojure.org/>`__ library to the
+`Python <https://www.python.org/>`__
 `ecosystem <https://pypi.org/>`__.
 Extensions to support other database drivers can be written by you!
 See: `Database Driver Adapters <./database-driver-adapters.html>`__.
