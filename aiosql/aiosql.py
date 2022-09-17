@@ -21,6 +21,7 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore
     "apsw": APSWAdapter,
     "asyncpg": AsyncPGAdapter,  # type: ignore
+    "mariadb": BrokenMySQLAdapter,
     "mysqldb": BrokenMySQLAdapter,
     "mysql-connector": PyFormatAdapter,
     "pg8000": Pg8000Adapter,

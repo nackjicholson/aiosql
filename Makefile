@@ -65,7 +65,7 @@ venv.last:
 
 clean:
 	find . -type d -name __pycache__ -print0 | xargs -0 rm -rf
-	$(RM) -r dist build .mypy_cache .pytest_cache htmlcov
+	$(RM) -r dist build .mypy_cache .pytest_cache htmlcov .docker.*
 	$(RM) .coverage poetry.lock
 
 clean.venv: clean
@@ -77,32 +77,61 @@ clean.venv: clean
 .PHONY: check.pytest check.mypy check.flake8 check.black check.coverage check.rstcheck check
 
 check.rstcheck: $(VENV)
-	[ "$(VENV)" ] && source venv/bin/activate
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	rstcheck docs/source/*.rst
 
 check.pytest: $(VENV)
-	[ "$(VENV)" ] && source venv/bin/activate
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	$(PYTEST) $(PYTOPT) tests/
 
 check.mypy: $(VENV)
-	[ "$(VENV)" ] && source venv/bin/activate
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	mypy --install-types --non-interactive $(MODULE)
 
 check.flake8: $(VENV)
-	[ "$(VENV)" ] && source venv/bin/activate
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	flake8 $(MODULE)
 
 check.black: $(VENV)
-	[ "$(VENV)" ] && source venv/bin/activate
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	black $(MODULE) tests --check
 
 check.coverage: $(VENV)
-	[ "$(VENV)" ] && source venv/bin/activate
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	coverage run -m $(PYTEST) $(PYTOPT)
 	coverage html
 	coverage report --fail-under=100 --include='$(MODULE)/*'
 
 check: check.pytest check.mypy check.flake8 check.black check.coverage check.rstcheck
+
+#
+# testing with docker
+#
+
+.docker.mysql: dockerfile.mysql
+	docker build -f dockerfile.mysql -t aiosql-mysql-test .
+	touch $@
+
+.docker.mariadb: dockerfile.mariadb
+	docker build -f dockerfile.mariadb -t aiosql-mariadb-test .
+	touch $@
+
+.docker.pytest.mysql: .docker.mysql
+	docker run -v "$$PWD:/app:ro" \
+	  -e MYSQL_ALLOW_EMPTY_PASSWORD=1 aiosql-mysql-test \
+	  make -f /app/Makefile PYTOPT="-k my" .docker.pytest
+
+.docker.pytest.mariadb: .docker.mariadb
+	docker run -v "$$PWD:/app:ro" \
+	  -e MARIADB_ALLOW_EMPTY_PASSWORD=1 aiosql-mariadb-test \
+	  make -f /app/Makefile PYTOPT="-k maria" .docker.pytest
+
+# run inside docker image
+.docker.pytest:
+	test -d /app -a -d /home/calvin/app -a -d /venv || exit 1
+	cp -r /app/. /home/calvin/app/.
+	/venv/bin/pip install .
+	$(MAKE) VENV=/venv check.pytest
 
 #
 # PYPI PUBLICATION

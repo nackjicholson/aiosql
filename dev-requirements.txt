@@ -23,6 +23,7 @@ pytest-mysql>=2
 aiosqlite>=0.16.0,<1
 asyncpg>=0.21.0,<1
 apsw
+# mariadb  ## incompatible with mysql?
 mysqlclient>=2
 mysql-connector>=2.2
 pg8000
