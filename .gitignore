@@ -1,3 +1,6 @@
+# Obvious
+.git
+
 # Swap
 [._]*.s[a-v][a-z]
 [._]*.sw[a-p]
@@ -126,3 +129,6 @@ poetry.lock
 # Project files
 scratch/
 exampleblog.db
+
+# misc
+.docker.*

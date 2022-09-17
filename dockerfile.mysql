@@ -1,0 +1,18 @@
+FROM ubuntu
+# install needed packages
+RUN apt update
+RUN apt install -y sudo
+RUN apt install -y python-is-python3 python3-venv python3-dev
+RUN apt install -y mysql-client mysql-server libmysqlclient-dev gcc make
+# add a user
+RUN adduser --disabled-password --gecos '' calvin
+RUN echo 'calvin ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+# dirs and perms
+RUN mkdir /app /home/calvin/app
+RUN python -m venv /venv
+RUN chown -R calvin:calvin /app /home/calvin/app /venv
+USER calvin
+RUN /venv/bin/pip install -U pip
+RUN /venv/bin/pip install mysqlclient mysql-connector pymysql pytest-mysql pytest-asyncio
+WORKDIR /home/calvin/app
+# WTF when bind-mounting directories, all files belong to root:-(
