@@ -16,6 +16,12 @@ PYTOPT	=
 VENV	= venv
 PIP		= venv/bin/pip
 
+# docker
+PG_PORT	= 15432
+PG_USER	= pytest
+PG_PASS	= pytest
+PG_DB	= pytest
+
 .PHONY: help
 help:
 	@echo "useful targets:"
@@ -84,20 +90,17 @@ check.pytest: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	$(PYTEST) $(PYTOPT) tests/
 
-PG_DETACHED	= --postgresql-detached --postgresql-user=pytest --postgresql-password=pytest --postgresql-dbname=pytest
+PG_DETACHED	= --postgresql-detached --postgresql-user=$(PG_USER) --postgresql-password=$(PG_PASS) --postgresql-dbname=$(PG_DB) --postgresql-port=$(PG_PORT)
 
-check.pytest.pg.detached:
+.PHONY: check.pytest.postgres.detached
+check.pytest.postgres.detached:
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	# create a temporary pg user and database
-	# FIXME SUPERUSER privilege is needed because pytest-postgres connects to "postgres"
-	psql -c "CREATE USER pytest SUPERUSER ENCRYPTED PASSWORD 'pytest'" || exit 1
-	psql -c "CREATE DATABASE pytest OWNER pytest" || exit 2
-	# run test
 	$(PYTEST) $(PG_DETACHED) $(PYTOPT) \
-	  tests/test_psycopg2.py tests/test_psycopg3.py tests/test_pygresql.py
-	# cleanup locals
-	dropdb pytest || exit 0
-	dropuser pytest || exit 0
+	  tests/test_psycopg2.py \
+	  tests/test_psycopg3.py \
+	  tests/test_pygresql.py \
+	  tests/test_pg8000.py \
+	  tests/test_asyncpg.py
 
 check.mypy: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
@@ -136,10 +139,29 @@ check: check.pytest check.mypy check.flake8 check.black check.coverage check.rst
 	  -e MYSQL_ALLOW_EMPTY_PASSWORD=1 aiosql-mysql-test \
 	  make -f /app/Makefile PYTOPT="-k my" .docker.pytest
 
+.PHONY: .docker.pytest.mariadb
 .docker.pytest.mariadb: .docker.mariadb
 	docker run -v "$$PWD:/app:ro" \
 	  -e MARIADB_ALLOW_EMPTY_PASSWORD=1 aiosql-mariadb-test \
 	  make -f /app/Makefile PYTOPT="-k maria" .docker.pytest
+
+.docker.run.postgres:
+	docker run -d --name aiosql-pytest-postgres \
+	  -p $(PG_PORT):5432 \
+	  -e POSTGRES_USER=$(PG_USER) \
+	  -e POSTGRES_PASSWORD=$(PG_PASS) \
+	  -e POSTGRES_DB=$(PG_DB) \
+	  postgres
+	touch $@
+
+.PHONY: docker.pytest.postgres
+docker.pytest.postgres: .docker.run.postgres
+	$(MAKE) check.pytest.postgres.detached
+
+.PHONY: docker.stop
+docker.stop:
+	docker stop aiosql-pytest-postgres
+	$(RM) .docker.run.postgres
 
 # run inside docker image
 .docker.pytest:
