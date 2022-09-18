@@ -83,3 +83,9 @@ def test_insert_many(conn, queries):
 
 def test_date_time(conn, queries):
     t.run_date_time(conn, queries, DRIVER)
+
+
+# @pytest.mark.skip("not supported")
+def test_execute_script(conn, queries):
+    actual = queries.comments.pg_create_comments_table(conn)
+    assert actual == "DONE"
