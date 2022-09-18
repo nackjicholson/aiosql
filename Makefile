@@ -84,6 +84,21 @@ check.pytest: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	$(PYTEST) $(PYTOPT) tests/
 
+PG_DETACHED	= --postgresql-detached --postgresql-user=pytest --postgresql-password=pytest --postgresql-dbname=pytest
+
+check.pytest.pg.detached:
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
+	# create a temporary pg user and database
+	# FIXME SUPERUSER privilege is needed because pytest-postgres connects to "postgres"
+	psql -c "CREATE USER pytest SUPERUSER ENCRYPTED PASSWORD 'pytest'" || exit 1
+	psql -c "CREATE DATABASE pytest OWNER pytest" || exit 2
+	# run test
+	$(PYTEST) $(PG_DETACHED) $(PYTOPT) \
+	  tests/test_psycopg2.py tests/test_psycopg3.py tests/test_pygresql.py
+	# cleanup locals
+	dropdb pytest || exit 0
+	dropuser pytest || exit 0
+
 check.mypy: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	mypy --install-types --non-interactive $(MODULE)

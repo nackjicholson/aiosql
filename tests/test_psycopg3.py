@@ -72,9 +72,13 @@ def test_delete(pg_conn, queries):
 
 
 def test_insert_many(pg_conn, queries):
-    with pg_conn:
-        t.run_insert_many(pg_conn, queries, date)
+    t.run_insert_many(pg_conn, queries, date)
 
 
 def test_date_time(pg_conn, queries):
     t.run_date_time(pg_conn, queries, DRIVER)
+
+
+def test_execute_script(pg_conn, queries):
+    actual = queries.comments.pg_create_comments_table(pg_conn)
+    assert actual == "CREATE TABLE"
