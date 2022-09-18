@@ -28,9 +28,14 @@ def create_user_blogs(db):
                 foreign key (userid) references users(userid));""",
     )
 
+
 def drop_user_blogs(db):
     necesse = "if exists" if db == "pgsql" else ""
-    return (f"DROP TABLE {necesse} comments", f"DROP TABLE {necesse} blogs", f"DROP TABLE {necesse} users")
+    return (
+        f"DROP TABLE {necesse} comments",
+        f"DROP TABLE {necesse} blogs",
+        f"DROP TABLE {necesse} users",
+    )
 
 
 def fill_user_blogs(cur, db):

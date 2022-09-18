@@ -17,7 +17,15 @@ try:
             # this is *NOT* a connection, it does not have a "cursor"
             pg = request.getfixturevalue("postgresql_noproc")
             import psycopg
-            conn = psycopg.connect(host=pg.host, port=pg.port, user=pg.user, password=pg.password, dbname=pg.dbname, options=pg.options)
+
+            conn = psycopg.connect(
+                host=pg.host,
+                port=pg.port,
+                user=pg.user,
+                password=pg.password,
+                dbname=pg.dbname,
+                options=pg.options,
+            )
         else:
             conn = request.getfixturevalue("postgresql")
 
