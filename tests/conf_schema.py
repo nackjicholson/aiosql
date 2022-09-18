@@ -12,13 +12,14 @@ def create_user_blogs(db):
     serial = (
         "serial" if db == "pgsql" else "integer" if db == "sqlite" else "integer auto_increment"
     )
+    necesse = "if not exists" if db == "pgsql" else ""
     return (
-        f"""create table users (
+        f"""create table {necesse} users (
                 userid {serial} primary key,
                 username text not null,
                 firstname text not null,
                 lastname text not null);""",
-        f"""create table blogs (
+        f"""create table {necesse} blogs (
                 blogid {serial} primary key,
                 userid integer not null,
                 title text not null,
@@ -26,6 +27,10 @@ def create_user_blogs(db):
                 published date not null default (CURRENT_DATE),
                 foreign key (userid) references users(userid));""",
     )
+
+def drop_user_blogs(db):
+    necesse = "if exists" if db == "pgsql" else ""
+    return (f"DROP TABLE {necesse} comments", f"DROP TABLE {necesse} blogs", f"DROP TABLE {necesse} users")
 
 
 def fill_user_blogs(cur, db):

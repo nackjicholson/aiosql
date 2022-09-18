@@ -1,5 +1,5 @@
 import pytest
-from conf_schema import USERS_DATA_PATH, BLOGS_DATA_PATH, create_user_blogs
+from conf_schema import USERS_DATA_PATH, BLOGS_DATA_PATH, create_user_blogs, drop_user_blogs
 
 # guess psycopg version
 def is_psycopg2(conn):
@@ -12,8 +12,12 @@ try:
     @pytest.fixture
     def pg_conn(request):
         """Loads seed data before returning db connection."""
-        if request.config.getoption("postgresql_detached"):  # pragma: no cover
-            conn = request.getfixturevalue("postgresql_noproc")
+        is_detached = request.config.getoption("postgresql_detached")
+        if is_detached:  # pragma: no cover
+            # this is *NOT* a connection, it does not have a "cursor"
+            pg = request.getfixturevalue("postgresql_noproc")
+            import psycopg
+            conn = psycopg.connect(host=pg.host, port=pg.port, user=pg.user, password=pg.password, dbname=pg.dbname, options=pg.options)
         else:
             conn = request.getfixturevalue("postgresql")
 
@@ -47,23 +51,31 @@ try:
                         cope.write(fp.read())
 
         conn.commit()
-
         yield conn
+        # cleanup
+        with conn.cursor() as cur:
+            for q in drop_user_blogs("pgsql"):
+                cur.execute(q)
+        conn.commit()
 
     @pytest.fixture()
-    def pg_params(pg_conn):
+    def pg_params(request, pg_conn):
         if is_psycopg2(pg_conn):  # pragma: no cover
             dsn = pg_conn.get_dsn_parameters()
             del dsn["tty"]
         else:  # assume psycopg 3.x
             dsn = pg_conn.info.get_parameters()
+        # non empty password?
+        if "password" not in dsn:
+            dsn["password"] = request.config.getoption("postgresql_password") or ""
+        if "port" not in dsn:
+            dsn["port"] = 5432
         return dsn
 
     @pytest.fixture()
     def pg_dsn(request, pg_params):
         p = pg_params
-        pw = request.config.getoption("postgresql_password")
-        yield f"postgres://{p['user']}:{pw}@{p['host']}:{p['port']}/{p['dbname']}"
+        yield f"postgres://{p['user']}:{p['password']}@{p['host']}:{p['port']}/{p['dbname']}"
 
 except ModuleNotFoundError:
 
