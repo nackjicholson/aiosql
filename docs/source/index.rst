@@ -28,11 +28,14 @@ based drivers for
 `psycopg2 <https://www.psycopg.org/docs/>`__,
 `pg8000 <https://pypi.org/project/pg8000/>`__,
 `pygresql <http://www.pygresql.org/>`__,
-`asyncpg <https://magicstack.github.io/asyncpg/current/>`__)
-and `MySQL <https://www.mysql.com/>`__
+`asyncpg <https://magicstack.github.io/asyncpg/current/>`__),
+`MySQL <https://www.mysql.com/>`__
 (`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__,
 `mysqlclient <https://pypi.org/project/mysqlclient/>`__,
-`mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__) out of the box.
+`mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__) and
+`MariaDB <https://mariadb.org/>`__
+(`mariadb <https://pypi.org/project/mariadb/>`__)
+out of the box.
 Note that some detailed feature support may vary depending on the underlying driver
 actual capabilities.
 
@@ -87,11 +90,11 @@ Badges
    :alt: Version
    :target: https://pypi.org/project/aiosql/
 
-.. image:: https://img.shields.io/badge/databases-3-informational
+.. image:: https://img.shields.io/badge/databases-4-informational
    :alt: Databases
    :target: https://github.com/nackjicholson/aiosql/
 
-.. image:: https://img.shields.io/badge/drivers-11-informational
+.. image:: https://img.shields.io/badge/drivers-12-informational
    :alt: Drivers
    :target: https://github.com/nackjicholson/aiosql/
 
