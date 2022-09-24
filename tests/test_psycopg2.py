@@ -3,6 +3,7 @@ from datetime import date
 import aiosql
 import pytest
 import run_tests as t
+import utils as u
 
 try:
     import psycopg2 as db
@@ -11,8 +12,7 @@ except ModuleNotFoundError:
     pytest.skip("missing driver: psycopg2", allow_module_level=True)
 
 pytestmark = [
-    pytest.mark.skipif(not t.has_cmd("psql"), reason="no postgresql installed"),
-    pytest.mark.skipif(not t.has_pkg("pytest_postgresql"), reason="no pytest_postgresql"),
+    pytest.mark.skipif(not u.has_pkg("pytest_postgresql"), reason="no pytest_postgresql"),
 ]
 
 DRIVER = "psycopg2"

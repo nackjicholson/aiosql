@@ -1,13 +1,14 @@
 import aiosql
 import pytest
 import run_tests as t
+import utils as u
 
 try:
     import aiosqlite
 except ModuleNotFoundError:
     pytest.skip("missing driver: aiosqlite", allow_module_level=True)
 
-pytestmark = pytest.mark.skipif(not t.has_pkg("pytest_asyncio"), reason="no pytest_asyncio")
+pytestmark = pytest.mark.skipif(not u.has_pkg("pytest_asyncio"), reason="no pytest_asyncio")
 
 DRIVER = "aiosqlite"
 

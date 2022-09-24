@@ -1,0 +1,51 @@
+services:
+  #
+  # postgres tests
+  #
+  postgres-server:
+    image: postgres
+    environment:
+      - POSTGRES_DB=pytest
+      - POSTGRES_USER=pytest
+      - POSTGRES_PASSWORD=pytest
+  pg-client:
+    image: aiosql-python-postgres
+    volumes:
+      - ..:/code
+    depends_on:
+      - postgres-server
+    command: make VENV=/venv PG_HOST=postgres-server PG_PORT=5432 check.$TEST.misc check.$TEST.postgres.detached
+  #
+  # mysql tests
+  #
+  mysql-server:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=pytest
+      - MYSQL_USER=pytest
+      - MYSQL_PASSWORD=pytest
+      - MYSQL_DATABASE=pytest
+  my-client:
+    image: aiosql-python-mysql
+    depends_on:
+      - mysql-server
+    volumes:
+      - ..:/code
+    command: make VENV=/venv MY_HOST=mysql-server MY_PORT=3306 check.$TEST.mysql.detached
+  #
+  # mariadb tests
+  #
+  mariadb-server:
+    image: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=pytest
+      - MYSQL_USER=pytest
+      - MYSQL_PASSWORD=pytest
+      - MYSQL_DATABASE=pytest
+  ma-client:
+    image: aiosql-python-mariadb
+    depends_on:
+      - mariadb-server
+    volumes:
+      - ..:/code
+    command: make VENV=/venv MA_HOST=mariadb-server MA_PORT=3306 check.$TEST.mariadb.detached
