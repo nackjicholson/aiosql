@@ -167,6 +167,7 @@ check.pytest.postgres.detached: $(INSTALL)
 
 MY_DETACHED	= \
 	--mysql-detached \
+	--mysql-tries=10 \
 	--mysql-host=$(MY_HOST) \
 	--mysql-port=$(MY_PORT) \
 	--mysql-user=$(MY_USER) \
@@ -188,6 +189,7 @@ check.pytest.mysql.detached: $(INSTALL)
 
 MA_DETACHED	= \
 	--mysql-detached \
+	--mysql-tries=2 \
 	--mysql-host=$(MA_HOST) \
 	--mysql-port=$(MA_PORT) \
 	--mysql-user=$(MA_USER) \

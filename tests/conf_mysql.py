@@ -1,6 +1,7 @@
 import pytest
 import importlib
 import utils as u
+import time
 from conf_schema import create_user_blogs, fill_user_blogs, drop_user_blogs
 
 try:
@@ -35,9 +36,19 @@ try:
     @pytest.fixture
     def my_conn(request, my_dsn):
         driver = request.config.getoption("mysql_driver")
+        tries = request.config.getoption("mysql_tries")
         db = importlib.import_module(driver)
-        with db.connect(**my_dsn) as conn:
-            yield conn
+        fails = 0
+        while tries > 0:
+            tries -= 1
+            try:
+                with db.connect(**my_dsn) as conn:
+                    tries = 0
+                    yield conn
+            except:
+                fails += 1
+                u.log.warning(f"{driver} connection failed ({fails})")
+                time.sleep(1.0)
 
     @pytest.fixture
     def my_db(my_conn):

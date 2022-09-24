@@ -26,7 +26,7 @@ def conn(pg_params):
     dbname = pg_params["dbname"]
     del pg_params["dbname"]
     pg_params["database"] = dbname
-    t.log.debug(f"params: {pg_params}")
+    u.log.debug(f"params: {pg_params}")
     with db.connect(**pg_params) as conn:
         yield conn
 
