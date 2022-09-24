@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import NamedTuple
 from datetime import date
-import shutil
 import asyncio
 import logging
 import re
@@ -14,18 +13,6 @@ log = logging.getLogger("test")
 # for sqlite3
 def todate(year, month, day):
     return f"{year:04}-{month:02}-{day:02}"
-
-
-def has_cmd(cmd):
-    return shutil.which(cmd) is not None
-
-
-def has_pkg(pkg):
-    try:
-        __import__(pkg)
-        return True
-    except ModuleNotFoundError:
-        return False
 
 
 class UserBlogSummary(NamedTuple):
@@ -46,6 +33,7 @@ _DB = {
     "pymysql": "mysql",
     "mysql-connector": "mysql",
     "mysqldb": "mysql",
+    "mariadb": "mariadb",
 }
 
 
@@ -106,7 +94,7 @@ def run_parameterized_record_query(conn, queries, db, todate):
         else queries.blogs.pg_get_blogs_published_after
         if _DB[db] == "postgres"
         else queries.blogs.my_get_blogs_published_after
-        if _DB[db] == "mysql"
+        if _DB[db] in ("mysql", "mariadb")
         else None
     )
 
@@ -158,7 +146,7 @@ def run_insert_returning(conn, queries, db, todate):
         queries.blogs.publish_blog
         if _DB[db] == "sqlite3"
         else queries.blogs.pg_publish_blog
-        if _DB[db] == "postgres"
+        if _DB[db] in ("postgres", "mariadb")
         else queries.blogs.my_publish_blog
         if _DB[db] == "mysql"
         else None
@@ -174,7 +162,7 @@ def run_insert_returning(conn, queries, db, todate):
 
     # sqlite returns a number while pg query returns a tuple
     if isinstance(blogid, tuple):
-        assert db in ("psycopg", "psycopg2", "pygresql")
+        assert db in ("psycopg", "psycopg2", "pygresql", "mariadb")
         blogid, title = blogid
     elif isinstance(blogid, list):
         assert db == "pg8000"
@@ -246,7 +234,7 @@ def run_date_time(conn, queries, db):
         now = queries.misc.get_now_date_time(conn)
     elif _DB[db] == "postgres":
         now = queries.misc.pg_get_now_date_time(conn)
-    elif _DB[db] == "mysql":
+    elif _DB[db] in ("mysql", "mariadb"):
         now = queries.misc.my_get_now_date_time(conn)
     else:
         assert False, f"unexpected driver: {db}"

@@ -60,13 +60,13 @@ Badges
    :target: https://github.com/nackjicholson/aiosql/actions/
 
 ..
-   hardcoded coverage and tests, 100% and 153/13 if previous CI status is ok
+   hardcoded coverage and tests, 100% and 162/15 if docker run is ok
 
 .. image:: https://img.shields.io/badge/coverage-100%25-success
    :alt: Code Coverage
    :target: https://github.com/nackjicholson/aiosql/actions/
 
-.. image:: https://img.shields.io/badge/tests-153%20✓-success
+.. image:: https://img.shields.io/badge/tests-162%20✓-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 

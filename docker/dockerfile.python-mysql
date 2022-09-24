@@ -1,0 +1,11 @@
+FROM ubuntu
+RUN apt update
+RUN apt install -y --no-install-recommends \
+      python-is-python3 python3-venv python3-dev gcc make
+RUN python -m venv /venv
+RUN /venv/bin/pip install asyncio pytest pytest-asyncio coverage
+WORKDIR /code
+# mysql specific
+RUN apt install -y --no-install-recommends libmysqlclient-dev
+RUN apt clean
+RUN /venv/bin/pip install cryptography mysqlclient mysql-connector-python pymysql pytest-mysql

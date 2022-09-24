@@ -10,57 +10,56 @@ BLOGS_DATA_PATH = BLOGDB_PATH / "data/blogs_data.csv"
 def create_user_blogs(db):
     assert db in ("sqlite", "pgsql", "mysql")
     serial = (
-        "serial" if db == "pgsql" else "integer" if db == "sqlite" else "integer auto_increment"
+        "SERIAL" if db == "pgsql" else "INTEGER" if db == "sqlite" else "INTEGER auto_increment"
     )
-    necesse = "if not exists" if db == "pgsql" else ""
     return (
-        f"""create table {necesse} users (
-                userid {serial} primary key,
-                username text not null,
-                firstname text not null,
-                lastname text not null);""",
-        f"""create table {necesse} blogs (
-                blogid {serial} primary key,
-                userid integer not null,
-                title text not null,
-                content text not null,
-                published date not null default (CURRENT_DATE),
-                foreign key (userid) references users(userid));""",
+        f"""CREATE TABLE IF NOT EXISTS users (
+                userid {serial} PRIMARY KEY,
+                username TEXT NOT NULL,
+                firstname TEXT NOT NULL,
+                lastname TEXT NOT NULL);""",
+        f"""CREATE TABLE IF NOT EXISTS blogs (
+                blogid {serial} PRIMARY KEY,
+                userid INTEGER NOT NULL,
+                title TEXT NOT NULL,
+                content TEXT NOT NULL,
+                published DATE NOT NULL DEFAULT (CURRENT_DATE),
+                FOREIGN KEY (userid) REFERENCES users(userid));""",
     )
 
 
 def drop_user_blogs(db):
-    necesse = "if exists" if db == "pgsql" else ""
     return (
-        f"DROP TABLE {necesse} comments",
-        f"DROP TABLE {necesse} blogs",
-        f"DROP TABLE {necesse} users",
+        f"DROP TABLE IF EXISTS comments",
+        f"DROP TABLE IF EXISTS blogs",
+        f"DROP TABLE IF EXISTS users",
     )
 
 
 def fill_user_blogs(cur, db):
+    # NOTE postgres filling relies on copy
     assert db in ("sqlite", "mysql")
     param = "?" if db == "sqlite" else "%s"
     with USERS_DATA_PATH.open() as fp:
         users = list(csv.reader(fp))
         cur.executemany(
             f"""
-               insert into users (
+               INSERT INTO users (
                     username,
                     firstname,
                     lastname
-               ) values ({param}, {param}, {param});""",
+               ) VALUES ({param}, {param}, {param});""",
             users,
         )
     with BLOGS_DATA_PATH.open() as fp:
         blogs = list(csv.reader(fp))
         cur.executemany(
             f"""
-                insert into blogs (
+                INSERT INTO blogs (
                     userid,
                     title,
                     content,
                     published
-                ) values ({param}, {param}, {param}, {param});""",
+                ) VALUES ({param}, {param}, {param}, {param});""",
             blogs,
         )
