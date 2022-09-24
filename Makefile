@@ -132,10 +132,6 @@ check.black: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	black $(MODULE) tests --check
 
-# -a: append
-# -p: parallel
-COVERAGE	= $(VENV)/bin/coverage run -p
-
 .PHONY: check.coverage
 check.coverage: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
@@ -150,16 +146,18 @@ check: check.pytest check.mypy check.flake8 check.black check.coverage check.rst
 # docker utils
 #
 
-PG_DETACHED	= --postgresql-detached \
-		  --postgresql-host=$(PG_HOST) \
-		  --postgresql-port=$(PG_PORT) \
-		  --postgresql-user=$(PG_USER) \
-		  --postgresql-password=$(PG_PASS) \
-		  --postgresql-dbname=$(PG_NAME)
+PG_DETACHED	= \
+	--postgresql-detached \
+	--postgresql-host=$(PG_HOST) \
+	--postgresql-port=$(PG_PORT) \
+	--postgresql-user=$(PG_USER) \
+	--postgresql-password=$(PG_PASS) \
+	--postgresql-dbname=$(PG_NAME)
 
 .PHONY: check.pytest.postgres.detached
 check.pytest.postgres.detached: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
+	./tests/wait.py $(PG_HOST) $(PG_PORT) 5
 	$(PYTEST) $(PG_DETACHED) $(PYTOPT) \
 	  tests/test_psycopg2.py \
 	  tests/test_psycopg3.py \
@@ -167,17 +165,20 @@ check.pytest.postgres.detached: $(INSTALL)
 	  tests/test_pg8000.py \
 	  tests/test_asyncpg.py
 
-MY_DETACHED	= --mysql-detached \
-		  --mysql-host=$(MY_HOST) \
-		  --mysql-port=$(MY_PORT) \
-		  --mysql-user=$(MY_USER) \
-		  --mysql-passwd=$(MY_PASS) \
-		  --mysql-dbname=$(MY_NAME)
+MY_DETACHED	= \
+	--mysql-detached \
+	--mysql-host=$(MY_HOST) \
+	--mysql-port=$(MY_PORT) \
+	--mysql-user=$(MY_USER) \
+	--mysql-passwd=$(MY_PASS) \
+	--mysql-dbname=$(MY_NAME)
 
 .PHONY: check.pytest.mysql.detached
 check.pytest.mysql.detached: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	sleep 5
+	# FIXME this does not seem to work…
+	./tests/wait.py $(MY_HOST) $(MY_PORT) 10
+	# run with all 3 drivers
 	$(PYTEST) $(MY_DETACHED) $(PYTOPT) \
 	  --mysql-driver=MySQLdb tests/test_mysqldb.py
 	$(PYTEST) $(MY_DETACHED) $(PYTOPT) \
@@ -185,16 +186,18 @@ check.pytest.mysql.detached: $(INSTALL)
 	$(PYTEST) $(MY_DETACHED) $(PYTOPT) \
 	  --mysql-driver=mysql.connector tests/test_myco.py
 
-MA_DETACHED	= --mysql-detached \
-		  --mysql-host=$(MA_HOST) \
-		  --mysql-port=$(MA_PORT) \
-		  --mysql-user=$(MA_USER) \
-		  --mysql-passwd=$(MA_PASS) \
-		  --mysql-dbname=$(MA_NAME)
+MA_DETACHED	= \
+	--mysql-detached \
+	--mysql-host=$(MA_HOST) \
+	--mysql-port=$(MA_PORT) \
+	--mysql-user=$(MA_USER) \
+	--mysql-passwd=$(MA_PASS) \
+	--mysql-dbname=$(MA_NAME)
 
 .PHONY: check.pytest.mariadb.detached
 check.pytest.mariadb.detached: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
+	./tests/wait.py $(MA_HOST) $(MA_PORT) 5
 	$(PYTEST) $(MA_DETACHED) $(PYTOPT) \
 	  --mysql-driver=mariadb tests/test_mariadb.py
 
@@ -207,6 +210,12 @@ check.pytest.misc: $(INSTALL)
 	  tests/test_sqlite3.py \
 	  tests/test_apsw.py \
 	  tests/test_aiosqlite.py
+
+# coverage by overriding PYTEST
+
+# -a: append
+# -p: parallel
+COVERAGE	= $(VENV)/bin/coverage run -p
 
 .PHONY: check.coverage.postgres.detached
 check.coverage.postgres.detached: PYTEST=$(COVERAGE) -m pytest
@@ -226,16 +235,11 @@ check.coverage.misc: check.pytest.misc
 
 .PHONY: docker.pytest
 docker.pytest:
-	export TEST=pytest
-	cd docker
-	docker compose up
+	$(MAKE) -C docker $@
 
 .PHONY: docker.coverage
 docker.coverage:
-	export TEST=coverage
-	cd docker
-	docker compose up
-	# FIXME
+	$(MAKE) -C docker $@
 	# $(COVERAGE) combine
 
 # start docker servers for local tests
