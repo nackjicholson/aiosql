@@ -1,5 +1,8 @@
 import shutil
 import importlib
+import logging
+
+log = logging.getLogger("pytest-aiosql")
 
 
 def has_cmd(cmd):

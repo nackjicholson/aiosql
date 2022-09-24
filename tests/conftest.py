@@ -8,7 +8,8 @@ from conf_sqlite import sqlite3_db_path
 
 def pytest_addoption(parser):
     parser.addoption("--postgresql-detached", action="store_true")
-    parser.addoption("--mysql-detached", default=False, action="store_true")
+    parser.addoption("--mysql-detached", action="store_true")
+    parser.addoption("--mysql-tries", default=1, type=int)
     parser.addoption(
         "--mysql-driver",
         default="MySQLdb",

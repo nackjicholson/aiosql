@@ -31,7 +31,7 @@ def conn(pg_params):
         port = pg_params["port"]
         del pg_params["port"]
         pg_params["host"] += f":{port}"
-    t.log.debug(f"params: {pg_params}")
+    u.log.debug(f"params: {pg_params}")
     with db.connect(**pg_params) as conn:
         yield conn
 

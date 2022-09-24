@@ -2,12 +2,9 @@ from pathlib import Path
 from typing import NamedTuple
 from datetime import date
 import asyncio
-import logging
 import re
 
 import aiosql
-
-log = logging.getLogger("test")
 
 
 # for sqlite3
