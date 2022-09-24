@@ -217,22 +217,23 @@ check.pytest.misc: $(INSTALL)
 
 # -a: append
 # -p: parallel
-COVERAGE	= $(VENV)/bin/coverage run -p
+COVERAGE	= $(VENV)/bin/coverage
+COVER_RUN	= $(COVERAGE) run -p
 
 .PHONY: check.coverage.postgres.detached
-check.coverage.postgres.detached: PYTEST=$(COVERAGE) -m pytest
+check.coverage.postgres.detached: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.postgres.detached: check.pytest.postgres.detached
 
 .PHONY: check.coverage.mysql.detached
-check.coverage.mysql.detached: PYTEST=$(COVERAGE) -m pytest
+check.coverage.mysql.detached: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.mysql.detached: check.pytest.mysql.detached
 
 .PHONY: check.coverage.mariadb.detached
-check.coverage.mariadb.detached: PYTEST=$(COVERAGE) -m pytest
+check.coverage.mariadb.detached: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.mariadb.detached: check.pytest.mariadb.detached
 
 .PHONY: check.coverage.misc
-check.coverage.misc: PYTEST=$(COVERAGE) -m pytest
+check.coverage.misc: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.misc: check.pytest.misc
 
 .PHONY: docker.pytest
@@ -242,7 +243,10 @@ docker.pytest:
 .PHONY: docker.coverage
 docker.coverage:
 	$(MAKE) -C docker $@
-	# $(COVERAGE) combine
+	$(COVERAGE) combine
+	sqlite3 .coverage "UPDATE File SET path=REPLACE(path, '/code/', '$$PWD/')"
+	$(COVERAGE) html
+	$(COVERAGE) report --fail-under=100 --include='$(MODULE)/*'
 
 # start docker servers for local tests
 .docker.run.postgres:
