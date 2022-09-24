@@ -25,7 +25,9 @@ asyncpg>=0.21.0,<1
 apsw
 # mariadb  ## incompatible with mysql?
 mysqlclient>=2
+# FIXME: which one?
 mysql-connector>=2.2
+# mysql-connector-python
 pg8000
 psycopg>=3
 psycopg2-binary>=2.8.6,<3
