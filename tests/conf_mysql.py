@@ -26,7 +26,8 @@ try:
                 pytest.skip("test needs mysqld")
             mp = request.getfixturevalue("mysql_proc")
             assert mp.host == "localhost"
-            dsn = {"database": "test"}  # FIXME depends?
+            # dsn = {"database": "test"}  # FIXME depends?
+            dsn = {}
         # add common connection parameters
         dsn.update(user=mp.user, host=mp.host, port=mp.port)
         yield dsn
