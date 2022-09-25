@@ -37,7 +37,7 @@ based drivers for
 (`mariadb <https://pypi.org/project/mariadb/>`__)
 out of the box.
 Note that some detailed feature support may vary depending on the underlying driver
-actual capabilities.
+and database engine actual capabilities.
 
 This module is an implementation of
 `Kris Jenkins' yesql <https://github.com/krisajenkins/yesql>`__
