@@ -12,7 +12,7 @@ except ModuleNotFoundError:
 
 pytestmark = [
     pytest.mark.postgres,
-    pytest.mark.asyncio,
+    # pytest.mark.asyncio,
     pytest.mark.skipif(not u.has_pkg("pytest_postgresql"), reason="no pytest_postgresql"),
     pytest.mark.skipif(not u.has_pkg("pytest_asyncio"), reason="no pytest_asyncio"),
 ]
