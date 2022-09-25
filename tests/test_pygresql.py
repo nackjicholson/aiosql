@@ -11,6 +11,7 @@ except ModuleNotFoundError:
     pytest.skip("missing driver: pygresql", allow_module_level=True)
 
 pytestmark = [
+    pytest.mark.postgres,
     pytest.mark.skipif(not u.has_pkg("pytest_postgresql"), reason="no pytest_postgresql"),
 ]
 

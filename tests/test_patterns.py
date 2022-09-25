@@ -1,5 +1,9 @@
+import pytest
 from aiosql.utils import VAR_REF
 
+pytestmark = [
+    pytest.mark.misc,
+]
 
 def test_var_pattern_is_quote_aware():
     sql = r"""

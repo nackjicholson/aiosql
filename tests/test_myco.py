@@ -11,6 +11,7 @@ except ModuleNotFoundError:
     pytest.skip("missing driver: mysql.connector (mysql-connector)", allow_module_level=True)
 
 pytestmark = [
+    pytest.mark.mysql,
     pytest.mark.skipif(not u.has_pkg("pytest_mysql"), reason="no pytest_mysql"),
 ]
 

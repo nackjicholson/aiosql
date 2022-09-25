@@ -11,6 +11,7 @@ except ModuleNotFoundError:
     pytest.skip("missing driver: mariadb", allow_module_level=True)
 
 pytestmark = [
+    pytest.mark.mariadb,
     pytest.mark.skipif(not u.has_pkg("pytest_mysql"), reason="no pytest_mysql"),
 ]
 

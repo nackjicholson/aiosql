@@ -13,6 +13,7 @@ except ModuleNotFoundError:
 DRIVER = "pymysql"
 
 pytestmark = [
+    pytest.mark.mysql,
     pytest.mark.skipif(not u.has_pkg("pytest_mysql"), reason="no pytest_mysql"),
 ]
 

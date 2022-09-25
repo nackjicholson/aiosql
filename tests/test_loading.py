@@ -10,6 +10,10 @@ from aiosql.query_loader import QueryLoader
 
 import pytest
 
+pytestmark = [
+    pytest.mark.misc,
+]
+
 
 @pytest.fixture
 def sql_dir():
