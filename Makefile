@@ -86,6 +86,7 @@ clean:
 	find . -type d -name __pycache__ -print0 | xargs -0 rm -rf
 	$(RM) -r dist build .mypy_cache .pytest_cache htmlcov .docker.*
 	$(RM) .coverage .coverage.* poetry.lock
+	$(MAKE) -C docker clean
 
 clean.venv: clean
 	$(RM) -r venv $(MODULE).egg-info
