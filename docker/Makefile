@@ -3,7 +3,7 @@
 DOCKER	= docker
 
 clean:
-	TEST=pytest $(DOCKER) compose down -v
+	TEST=pytest $(DOCKER) compose -p aiosql down -v
 	$(RM) .aiosql-python-*
 
 # build client images
