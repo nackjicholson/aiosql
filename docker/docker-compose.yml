@@ -2,6 +2,8 @@
 # Docker containers to test aiosql against various databases
 #
 
+name: aiosql-pytest
+
 services:
   #
   # postgres tests
