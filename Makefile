@@ -241,7 +241,7 @@ docker.pytest:
 	$(MAKE) -C docker $@
 
 .PHONY: docker.coverage
-docker.coverage:
+docker.coverage: $(VENV)
 	$(MAKE) -C docker $@
 	$(COVERAGE) combine
 	sqlite3 .coverage "UPDATE File SET path=REPLACE(path, '/code/', '$$PWD/')"
