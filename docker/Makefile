@@ -3,7 +3,7 @@
 DOCKER	= docker
 
 clean:
-	$(DOCKER) compose down
+	TEST=pytest $(DOCKER) compose down -v
 	$(RM) .aiosql-python-*
 
 # build client images
@@ -32,7 +32,7 @@ run:
 	$(DOCKER) container wait aiosql-pg-client-1
 	$(DOCKER) container logs aiosql-pg-client-1
 	echo "# shutting down…"
-	$(DOCKER) compose -p aiosql down
+	$(DOCKER) compose -p aiosql down -v
 
 docker.pytest:
 	export TEST=pytest
