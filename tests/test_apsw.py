@@ -9,6 +9,9 @@ except ModuleNotFoundError:
 
 DRIVER = "apsw"
 
+pytestmark = [
+    pytest.mark.sqlite3,
+]
 
 def dict_factory(cursor, row):
     d = {}

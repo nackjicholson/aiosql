@@ -11,7 +11,8 @@ except ModuleNotFoundError:
     pytest.skip("missing driver: asyncpg", allow_module_level=True)
 
 pytestmark = [
-    # pytest.mark.skipif(not t.has_cmd("psql"), reason="no postgresql installed"),
+    pytest.mark.postgres,
+    pytest.mark.async,
     pytest.mark.skipif(not u.has_pkg("pytest_postgresql"), reason="no pytest_postgresql"),
     pytest.mark.skipif(not u.has_pkg("pytest_asyncio"), reason="no pytest_asyncio"),
 ]

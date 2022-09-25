@@ -8,7 +8,11 @@ try:
 except ModuleNotFoundError:
     pytest.skip("missing driver: aiosqlite", allow_module_level=True)
 
-pytestmark = pytest.mark.skipif(not u.has_pkg("pytest_asyncio"), reason="no pytest_asyncio")
+pytestmark = [
+    pytest.mark.sqlite3,
+    pytest.mark.async,
+    pytest.mark.skipif(not u.has_pkg("pytest_asyncio"), reason="no pytest_asyncio"),
+]
 
 DRIVER = "aiosqlite"
 
