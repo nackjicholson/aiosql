@@ -1,9 +1,10 @@
 .ONESHELL:
 
 DOCKER	= docker
+NAME	= aiosql-pytest
 
 clean:
-	TEST=pytest $(DOCKER) compose -p aiosql down -v
+	TEST=pytest $(DOCKER) compose down -v
 	$(RM) .aiosql-python-*
 
 # build client images
@@ -21,18 +22,20 @@ aiosql-python: \
 
 .PHONY: run
 run:
-	$(DOCKER) compose -p aiosql up -d
-	# $(DOCKER) container logs -f aiosql-ma-client-1
-	$(DOCKER) container wait aiosql-ma-client-1
-	$(DOCKER) container logs aiosql-ma-client-1
-	# $(DOCKER) container logs -f aiosql-my-client-1
-	$(DOCKER) container wait aiosql-my-client-1
-	$(DOCKER) container logs aiosql-my-client-1
-	# $(DOCKER) container logs -f aiosql-pg-client-1
-	$(DOCKER) container wait aiosql-pg-client-1
-	$(DOCKER) container logs aiosql-pg-client-1
+	echo "# starting up…"
+	$(DOCKER) compose up -d
+	# wait and show results, in probable completion order
+	# $(DOCKER) container logs -f $(NAME)-ma-client-1
+	$(DOCKER) container wait $(NAME)-ma-client-1
+	$(DOCKER) container logs $(NAME)-ma-client-1
+	# $(DOCKER) container logs -f $(NAME)-pg-client-1
+	$(DOCKER) container wait $(NAME)-pg-client-1
+	$(DOCKER) container logs $(NAME)-pg-client-1
+	# $(DOCKER) container logs -f $(NAME)-my-client-1
+	$(DOCKER) container wait $(NAME)-my-client-1
+	$(DOCKER) container logs $(NAME)-my-client-1
 	echo "# shutting down…"
-	$(DOCKER) compose -p aiosql down -v
+	$(DOCKER) compose down -v
 
 docker.pytest:
 	export TEST=pytest
