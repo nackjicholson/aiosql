@@ -10,7 +10,7 @@ except ModuleNotFoundError:
 
 pytestmark = [
     pytest.mark.sqlite3,
-    pytest.mark.async,
+    pytest.mark.asyncio,
     pytest.mark.skipif(not u.has_pkg("pytest_asyncio"), reason="no pytest_asyncio"),
 ]
 
