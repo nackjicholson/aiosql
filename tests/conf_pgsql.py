@@ -1,7 +1,7 @@
 import pytest
 from conf_schema import USERS_DATA_PATH, BLOGS_DATA_PATH, create_user_blogs, drop_user_blogs
 
-# guess psycopg version
+# guess psycopg version from a connection
 def is_psycopg2(conn):
     return hasattr(conn, "get_dsn_parameters")
 
@@ -11,7 +11,7 @@ try:
 
     @pytest.fixture
     def pg_conn(request):
-        """Loads seed data before returning db connection."""
+        """Loads seed data and return a database connection."""
         is_detached = request.config.getoption("postgresql_detached")
         if is_detached:  # pragma: no cover
             # this is *NOT* a connection, it does not have a "cursor"
@@ -27,6 +27,8 @@ try:
                 options=pg.options,
             )
         else:
+            # returns the underlying pytest-postgresql connection
+            # which may be psycopg version 2 or 3, depending.
             conn = request.getfixturevalue("postgresql")
 
         # Loads data from blogdb fixture data
@@ -68,6 +70,7 @@ try:
 
     @pytest.fixture()
     def pg_params(request, pg_conn):
+        """Build postgres connection parameters as a dictionnary."""
         if is_psycopg2(pg_conn):  # pragma: no cover
             dsn = pg_conn.get_dsn_parameters()
             del dsn["tty"]
@@ -82,6 +85,7 @@ try:
 
     @pytest.fixture()
     def pg_dsn(request, pg_params):
+        """Build a postgres URL connection string."""
         p = pg_params
         yield f"postgres://{p['user']}:{p['password']}@{p['host']}:{p['port']}/{p['dbname']}"
 
