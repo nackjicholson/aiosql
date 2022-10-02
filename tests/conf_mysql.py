@@ -9,6 +9,7 @@ try:
 
     @pytest.fixture
     def my_dsn(request):
+        """Return connection parameters suitable to target driver."""
         is_detached = request.config.getoption("mysql_detached")
         driver = request.config.getoption("mysql_driver")
         if is_detached:
@@ -35,6 +36,7 @@ try:
 
     @pytest.fixture
     def my_conn(request, my_dsn):
+        """Return a connection using the expected driver."""
         driver = request.config.getoption("mysql_driver")
         tries = request.config.getoption("mysql_tries")
         db = importlib.import_module(driver)
@@ -52,7 +54,7 @@ try:
 
     @pytest.fixture
     def my_db(my_conn):
-
+        """Build the test database."""
         # initial contents
         with my_conn.cursor() as cur:
             for ct in create_user_blogs("mysql"):
@@ -60,9 +62,8 @@ try:
             my_conn.commit()
             fill_user_blogs(cur, "mysql")
             my_conn.commit()
-
+        # connection to use
         yield my_conn
-
         # cleanup
         with my_conn.cursor() as cur:
             for dt in drop_user_blogs("mysql"):
