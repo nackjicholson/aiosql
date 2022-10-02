@@ -19,13 +19,13 @@ pytestmark = [
 DRIVER = "psycopg2"
 
 
-def test_version():
-    assert db.__version__.startswith("2.")
-
-
 @pytest.fixture()
 def queries():
     return t.queries(DRIVER)
+
+
+def test_version():
+    assert db.__version__.startswith("2.")
 
 
 def test_record_query(pg_dsn, queries):
