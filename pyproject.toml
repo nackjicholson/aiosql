@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiosql"
-version = "7.1"
+version = "6.5"
 description = "Simple SQL in Python"
 authors = ["William Vaughn <vaughnwilld@gmail.com>"]
 maintainers = ["Fabien Coelho <aio.sql@coelho.net>"]
