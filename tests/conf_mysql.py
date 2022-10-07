@@ -32,6 +32,7 @@ try:
             dsn = {"database": "test"} if driver == "mysql.connector" else {}
         # add common connection parameters
         dsn.update(user=mp.user, host=mp.host, port=mp.port)
+        u.log.debug(f"my_dsn: {dsn}")
         yield dsn
 
     @pytest.fixture
@@ -47,9 +48,9 @@ try:
                 with db.connect(**my_dsn) as conn:
                     tries = 0
                     yield conn
-            except:
+            except Exception as e:
                 fails += 1
-                u.log.warning(f"{driver} connection failed ({fails})")
+                u.log.warning(f"{driver} connection failed ({fails}): {e}")
                 time.sleep(1.0)
 
     @pytest.fixture
