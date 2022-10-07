@@ -3,9 +3,7 @@ import pytest
 import run_tests as t
 import sqlite3 as db
 
-pytestmark = [
-    pytest.mark.sqlite3
-]
+pytestmark = [pytest.mark.sqlite3]
 
 DRIVER = "sqlite3"
 

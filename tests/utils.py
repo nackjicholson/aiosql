@@ -20,6 +20,7 @@ def has_pkg(pkg):
 def has_service(host="localhost", port=22, retry=1):
     import socket
     import time
+
     while retry > 0:
         retry -= 1
         try:
