@@ -23,7 +23,8 @@ author = "William Vaughn <vaughnwilld@gmail.com>"
 github_doc_root = "https://github.com/nackjicholson/aiosql/tree/master/docs/source/"
 
 # The full version, including alpha/beta/rc tags
-release = "7.0"
+# FIXME should be consistent with "setup.cfg"?
+release = "7.1"
 
 
 # -- General configuration ---------------------------------------------------

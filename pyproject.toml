@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiosql"
-version = "7.0"
+version = "7.1"
 description = "Simple SQL in Python"
 authors = ["William Vaughn <vaughnwilld@gmail.com>"]
 maintainers = ["Fabien Coelho <aio.sql@coelho.net>"]
@@ -17,6 +17,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
+setuptools = "*"  # for pkg_resources
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
