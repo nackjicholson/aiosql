@@ -18,25 +18,6 @@ jobs:
       matrix:
         # NOTE asyncpg does not compile with pypy 3.7 & 3.8
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11-dev']
-
-    # services:
-    #   # FIXME the service is probably unused as pytest creates its own instance
-    #   # Label used to access the service container
-    #   postgres:
-    #     # GitHub Docker Images: https://github.com/docker-library/official-images/blob/master/library/postgres
-    #     image: postgres:alpine
-    #     # Provide the password for postgres
-    #     env:
-    #       POSTGRES_PASSWORD: postgres
-    #     # Set health checks to wait until postgres has started
-    #     options: >-
-    #       --health-cmd pg_isready
-    #       --health-interval 10s
-    #       --health-timeout 5s
-    #       --health-retries 5
-    #     ports:
-    #       # Maps tcp port 5432 on service container to the host
-    #       - 5432:5432
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
