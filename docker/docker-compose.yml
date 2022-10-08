@@ -1,6 +1,8 @@
 #
 # Docker containers to test aiosql against various databases
 #
+# TEST is either "pytest" or "coverage"
+#
 
 name: aiosql-pytest
 
