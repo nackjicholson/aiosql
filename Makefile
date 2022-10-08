@@ -16,6 +16,7 @@ PYTOPT	=
 
 VENV	= venv
 PIP		= venv/bin/pip
+WAIT	= ./tests/wait.py
 
 # docker
 PG_HOST	= localhost
@@ -94,12 +95,12 @@ clean.venv: clean
 
 INSTALL	= $(VENV)/.aiosql_installed
 
-$(INSTALL):
+$(INSTALL): $(VENV)
 	$(VENV)/bin/pip install -e .
 	touch $@
 
 #
-# VARIOUS CHECKS
+# LOCAL CHECKS
 #
 .PHONY: check.rstcheck
 check.rstcheck: $(VENV)
@@ -110,38 +111,10 @@ check.rstcheck: $(VENV)
 MYSQL	= mysql
 
 .PHONY: check.pytest
-check.pytest: check.pytest.misc check.pytest.postgres.local check.pytest.$(MYSQL).local
+check.pytest: check.pytest.local
 
-.PHONY: check.pytest.postgres.local
-check.pytest.postgres.local: $(VENV)
-	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	$(PYTEST) $(PYTOPT) \
-	  tests/test_psycopg2.py \
-	  tests/test_psycopg3.py \
-	  tests/test_pygresql.py \
-	  tests/test_pg8000.py \
-	  tests/test_asyncpg.py
-
-.PHONY: check.pytest.mysql.local
-check.pytest.mysql.local: $(VENV)
-	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	# run with all 3 drivers
-	$(PYTEST) $(PYTOPT) --mysql-driver=MySQLdb tests/test_mysqldb.py
-	$(PYTEST) $(PYTOPT) --mysql-driver=pymysql tests/test_pymysql.py
-	$(PYTEST) $(PYTOPT) --mysql-driver=mysql.connector tests/test_myco.py
-
-.PHONY: check.pytest.mariadb.local
-check.pytest.mariadb.local: $(VENV)
-	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	$(PYTEST) $(PYTOPT) --mysql-driver=mariadb tests/test_myco.py
-
-# FIXME this cannot work because of unexpected pytest options
-# .PHONY: check.pytest.detached
-# check.pytest.detached: \
-# 	check.pytest.misc \
-# 	check.pytest.postgres.detached \
-# 	check.pytest.mysql.detached \
-# 	check.pytest.mariadb.detached
+.PHONY: check.pytest.local
+check.pytest.local: check.pytest.misc check.pytest.postgres.local check.pytest.$(MYSQL).local
 
 .PHONY: check.mypy
 check.mypy: $(VENV)
@@ -159,17 +132,13 @@ check.black: $(VENV)
 	black $(MODULE) tests --check
 
 .PHONY: check.coverage
-check.coverage: $(VENV)
-	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	coverage run -m $(PYTEST) $(PYTOPT) tests/
-	coverage html
-	coverage report --fail-under=100 --include='$(MODULE)/*'
+check.coverage: check.coverage.local
 
 .PHONY: check
 check: check.pytest check.mypy check.flake8 check.black check.coverage check.rstcheck
 
 #
-# docker utils
+# Postgres
 #
 
 PG_DETACHED	= \
@@ -181,15 +150,32 @@ PG_DETACHED	= \
 	--postgresql-dbname=$(PG_NAME)
 
 .PHONY: check.pytest.postgres.detached
-check.pytest.postgres.detached: $(INSTALL)
+check.pytest.postgres.detached: PYTOPT+=$(PG_DETACHED)
+check.pytest.postgres.detached: check.pytest.postgres
+
+.PHONY: check.pytest.postgres.local
+check.pytest.postgres.local: WAIT=:
+check.pytest.postgres.local: $(VENV)
+check.pytest.postgres.local: check.pytest.postgres
+
+.PHONY: check.pytest.postgres
+check.pytest.postgres: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	./tests/wait.py $(PG_HOST) $(PG_PORT) 5
-	$(PYTEST) $(PG_DETACHED) $(PYTOPT) \
+	$(WAIT) $(PG_HOST) $(PG_PORT) 5
+	$(PYTEST) $(PYTOPT) \
 	  tests/test_psycopg2.py \
 	  tests/test_psycopg3.py \
 	  tests/test_pygresql.py \
 	  tests/test_pg8000.py \
 	  tests/test_asyncpg.py
+
+#
+# MySQL
+#
+
+.PHONY: check.pytest.mysql.local
+check.pytest.mysql.local: WAIT=:
+check.pytest.mysql.local: check.pytest.mysql
 
 MY_DETACHED	= \
 	--mysql-detached \
@@ -201,17 +187,28 @@ MY_DETACHED	= \
 	--mysql-dbname=$(MY_NAME)
 
 .PHONY: check.pytest.mysql.detached
+check.pytest.mysql.detached: PYTOPT+=$(MY_DETACHED)
 check.pytest.mysql.detached: $(INSTALL)
+check.pytest.mysql.detached: check.pytest.mysql
+
+.PHONY: check.pytest.mysql
+check.pytest.mysql: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	# FIXME this does not seem to work…
-	./tests/wait.py $(MY_HOST) $(MY_PORT) 10
+	$(WAIT) $(MY_HOST) $(MY_PORT) 10
+	set -e
 	# run with all 3 drivers
-	$(PYTEST) $(MY_DETACHED) $(PYTOPT) \
-	  --mysql-driver=MySQLdb tests/test_mysqldb.py
-	$(PYTEST) $(MY_DETACHED) $(PYTOPT) \
-	  --mysql-driver=pymysql tests/test_pymysql.py
-	$(PYTEST) $(MY_DETACHED) $(PYTOPT) \
-	  --mysql-driver=mysql.connector tests/test_myco.py
+	$(PYTEST) $(PYTOPT) --mysql-driver=MySQLdb tests/test_mysqldb.py
+	$(PYTEST) $(PYTOPT) --mysql-driver=pymysql tests/test_pymysql.py
+	$(PYTEST) $(PYTOPT) --mysql-driver=mysql.connector tests/test_myco.py
+
+#
+# MariaDB
+#
+
+.PHONY: check.pytest.mariadb.local
+check.pytest.mariadb.local: WAIT=:
+check.pytest.mariadb.local: check.pytest.mariadb
 
 MA_DETACHED	= \
 	--mysql-detached \
@@ -224,10 +221,18 @@ MA_DETACHED	= \
 
 .PHONY: check.pytest.mariadb.detached
 check.pytest.mariadb.detached: $(INSTALL)
+check.pytest.mariadb.detached: PYTOPT+=$(MA_DETACHED)
+check.pytest.mariadb.detached: check.pytest.mariadb
+
+.PHONY: check.pytest.mariadb
+check.pytest.mariadb: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	./tests/wait.py $(MA_HOST) $(MA_PORT) 5
-	$(PYTEST) $(MA_DETACHED) $(PYTOPT) \
-	  --mysql-driver=mariadb tests/test_mariadb.py
+	$(WAIT) $(MA_HOST) $(MA_PORT) 5
+	$(PYTEST) $(PYTOPT) --mysql-driver=mariadb tests/test_mariadb.py
+
+#
+# SQLite3 and Misc
+#
 
 .PHONY: check.pytest.misc
 check.pytest.misc: $(INSTALL)
@@ -250,31 +255,59 @@ COVER_RUN	= $(COVERAGE) run -p
 check.coverage.postgres.detached: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.postgres.detached: check.pytest.postgres.detached
 
+.PHONY: check.coverage.postgres.local
+check.coverage.postgres.local: PYTEST=$(COVER_RUN) -m pytest
+check.coverage.postgres.local: check.pytest.postgres.local
+
 .PHONY: check.coverage.mysql.detached
 check.coverage.mysql.detached: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.mysql.detached: check.pytest.mysql.detached
+
+.PHONY: check.coverage.mysql.local
+check.coverage.mysql.local: PYTEST=$(COVER_RUN) -m pytest
+check.coverage.mysql.local: check.pytest.mysql.local
 
 .PHONY: check.coverage.mariadb.detached
 check.coverage.mariadb.detached: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.mariadb.detached: check.pytest.mariadb.detached
 
+.PHONY: check.coverage.mariadb.local
+check.coverage.mariadb.local: PYTEST=$(COVER_RUN) -m pytest
+check.coverage.mariadb.local: check.pytest.mariadb.local
+
 .PHONY: check.coverage.misc
 check.coverage.misc: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.misc: check.pytest.misc
+
+.PHONY: check.coverage.local
+check.coverage.local: check.coverage.misc check.coverage.postgres.local check.coverage.$(MYSQL).local
+	$(MAKE) check.coverage.combine
+
+IS_DOCKER	=
+
+.PHONY: check.coverage.combine
+check.coverage.combine: $(VENV)
+	$(COVERAGE) combine
+	if [[ "$(IS_DOCKER)" ]] ; then
+	  sqlite3 .coverage "UPDATE File SET path=REPLACE(path, '/code/', '$$PWD/')"
+	fi
+	$(COVERAGE) html
+	$(COVERAGE) report --fail-under=100 --include='$(MODULE)/*'
+
+#
+# Docker runs
+#
 
 .PHONY: docker.pytest
 docker.pytest:
 	$(MAKE) -C docker $@
 
 .PHONY: docker.coverage
-docker.coverage: $(VENV)
+docker.coverage:
 	$(MAKE) -C docker $@
-	$(COVERAGE) combine
-	sqlite3 .coverage "UPDATE File SET path=REPLACE(path, '/code/', '$$PWD/')"
-	$(COVERAGE) html
-	$(COVERAGE) report --fail-under=100 --include='$(MODULE)/*'
+	$(MAKE) IS_DOCKER=1 check.coverage.combine
 
-# start docker servers for local tests
+# start docker servers for local detached tests
 .docker.run.postgres:
 	docker run -d --name aiosql-pytest-postgres \
 	  -p $(PG_PORT):5432 \
