@@ -12,27 +12,33 @@ try:
         """Return connection parameters suitable to target driver."""
         is_detached = request.config.getoption("mysql_detached")
         driver = request.config.getoption("mysql_driver")
+        database = request.config.getoption("mysql_dbname") or "test"
         if is_detached:
             mp = request.getfixturevalue("mysql_noproc")
-            # hmmm... pytest-mysql is a copy if the pg version so the
-            # parameter is named "dbname" whereas mysql expects "database"
             dsn = {
                 "password": request.config.getoption("mysql_passwd"),
-                "database": request.config.getoption("mysql_dbname"),
             }
-            # NOTE pip install mysql-connector-python
-            if driver == "mysql.connector":
-                dsn.update(auth_plugin="mysql_native_password")
         else:
             if not u.has_cmd("mysqld"):
                 pytest.skip("test needs mysqld")
             mp = request.getfixturevalue("mysql_proc")
+            # u.log.debug(f"mp: {mp}")
+            # this fixture creates the database as a side effect
+            conn = request.getfixturevalue("mysql")
+            # u.log.debug(f"conn: {conn}")
             assert mp.running()
             assert mp.host == "localhost"
-            dsn = {"database": "test"} if driver == "mysql.connector" else {}
-        # add common connection parameters
-        dsn.update(user=mp.user, host=mp.host, port=mp.port)
-        u.log.debug(f"my_dsn: {dsn}")
+            # dsn = {"database": "test"} # if driver == "mysql.connector" else {}
+            # NOTE mysql complains about host even if a unix socket is used:-/
+            dsn = {"unix_socket": mp.unixsocket}
+        # add common connection parameters… although host may be unused
+        dsn.update(user=mp.user, host=mp.host, port=mp.port, database=database)
+        # FIXME passwd?
+        # NOTE pip install mysql-connector-python
+        # TODO check for mysql.connector version ?
+        if driver == "mysql.connector":
+            dsn.update(auth_plugin="mysql_native_password")
+        u.log.debug(f"my_dsn for {driver}: {dsn}")
         yield dsn
 
     @pytest.fixture

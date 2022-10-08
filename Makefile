@@ -10,7 +10,8 @@ SHELL	= /bin/bash
 .ONESHELL:
 
 PYTHON	= python
-PYTEST	= pytest --log-level=debug --capture=tee-sys --asyncio-mode=auto
+LOGLVL	= info
+PYTEST	= pytest --log-level=$(LOGLVL) --capture=tee-sys --asyncio-mode=auto
 PYTOPT	=
 
 VENV	= venv
@@ -105,10 +106,34 @@ check.rstcheck: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	rstcheck docs/source/*.rst
 
+# mysql or mariadb
+MYSQL	= mysql
+
 .PHONY: check.pytest
-check.pytest: $(VENV)
+check.pytest: check.pytest.misc check.pytest.postgres.local check.pytest.$(MYSQL).local
+
+.PHONY: check.pytest.postgres.local
+check.pytest.postgres.local: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	$(PYTEST) $(PYTOPT) tests/
+	$(PYTEST) $(PYTOPT) \
+	  tests/test_psycopg2.py \
+	  tests/test_psycopg3.py \
+	  tests/test_pygresql.py \
+	  tests/test_pg8000.py \
+	  tests/test_asyncpg.py
+
+.PHONY: check.pytest.mysql.local
+check.pytest.mysql.local: $(VENV)
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
+	# run with all 3 drivers
+	$(PYTEST) $(PYTOPT) --mysql-driver=MySQLdb tests/test_mysqldb.py
+	$(PYTEST) $(PYTOPT) --mysql-driver=pymysql tests/test_pymysql.py
+	$(PYTEST) $(PYTOPT) --mysql-driver=mysql.connector tests/test_myco.py
+
+.PHONY: check.pytest.mariadb.local
+check.pytest.mariadb.local: $(VENV)
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
+	$(PYTEST) $(PYTOPT) --mysql-driver=mariadb tests/test_myco.py
 
 # FIXME this cannot work because of unexpected pytest options
 # .PHONY: check.pytest.detached
