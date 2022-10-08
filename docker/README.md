@@ -14,6 +14,10 @@ They are built on top of `ubuntu` because using the official `python`
 image could not be made to work for all 3 databases.
 See docker specifications in `dockerfile.python-*`.
 
+## Makefile
+
+Run docker compose for `pytest` or `coverage`.
+
 ## Commands
 
 ```sh
