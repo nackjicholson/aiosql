@@ -14,27 +14,9 @@ They are built on top of `ubuntu` because using the official `python`
 image could not be made to work for all 3 databases.
 See docker specifications in `dockerfile.python-*`.
 
-## Makefile
-
-Automate some tasks.
-
-## Coverage
-
-```shell
-make docker.coverage
-# TODO wait for clients
-# loop on docker compose ls ?
-# TODO stop servers
-cd ..
-coverage combine
-sqlite3 .coverage "UPDATE File SET path=REPLACE(path, '/code', '$PWD');
-coverage html
-coverage report
-```
-
 ## Commands
 
 ```sh
-docker run -it --add-host=host.docker.internal:host-gateway python  bash
+docker run -it --add-host=host.docker.internal:host-gateway python bash
 docker build -t aiosql-python-mysql -f dockerfile.python-mysql .
 ```
