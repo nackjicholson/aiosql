@@ -3,7 +3,7 @@ import importlib
 import logging
 
 log = logging.getLogger("pytest-aiosql")
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 def has_cmd(cmd):
