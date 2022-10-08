@@ -62,7 +62,7 @@ help:
 # want to work with multiple versions of python, which all have their own
 # requirements and dependencies and random incompatibilities wrt libraries,
 # so the result is kind of a mess, so we attempt at doing nearly nothing and
-# hope for the bese, i.e. dependencies will not break the library.
+# hope for the best, i.e. dependencies will not break the library.
 #
 .PHONY: venv.dev venv.prod venv.last
 
@@ -100,7 +100,12 @@ $(INSTALL): $(VENV)
 	touch $@
 
 #
-# LOCAL CHECKS
+# VARIOUS CHECKS
+#
+# the targets below are expected to work more or less for:
+# - local tests
+# - docker tests
+# - github tests
 #
 .PHONY: check.rstcheck
 check.rstcheck: $(VENV)
@@ -248,7 +253,7 @@ check.pytest.misc: $(INSTALL)
 
 # -a: append
 # -p: parallel
-COVERAGE	= $(VENV)/bin/coverage
+COVERAGE	= coverage
 COVER_RUN	= $(COVERAGE) run -p
 
 .PHONY: check.coverage.postgres.detached
@@ -287,6 +292,7 @@ IS_DOCKER	=
 
 .PHONY: check.coverage.combine
 check.coverage.combine: $(VENV)
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	$(COVERAGE) combine
 	if [[ "$(IS_DOCKER)" ]] ; then
 	  sqlite3 .coverage "UPDATE File SET path=REPLACE(path, '/code/', '$$PWD/')"
