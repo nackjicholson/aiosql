@@ -37,10 +37,12 @@ run:
 	echo "# shutting down…"
 	$(DOCKER) compose down -v
 
+.PHONY: docker.pytest
 docker.pytest:
 	export TEST=pytest
 	$(MAKE) run
 
+.PHONY: docker.coverage
 docker.coverage:
 	export TEST=coverage
 	$(MAKE) run
