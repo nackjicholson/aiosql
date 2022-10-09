@@ -15,7 +15,7 @@ PYTEST	= pytest --log-level=$(LOGLVL) --capture=tee-sys --asyncio-mode=auto
 PYTOPT	=
 
 VENV	= venv
-PIP		= venv/bin/pip
+PIP		= $(VENV)/bin/pip
 WAIT	= ./tests/wait.py
 
 # docker
@@ -93,10 +93,14 @@ clean:
 clean.venv: clean
 	$(RM) -r venv $(MODULE).egg-info
 
+ifdef VENV
 INSTALL	= $(VENV)/.aiosql_installed
+else
+INSTALL = .aiosql_installed
+endif
 
 $(INSTALL): $(VENV)
-	$(VENV)/bin/pip install -e .
+	$(PIP) install -e .
 	touch $@
 
 #
