@@ -1,7 +1,7 @@
 .ONESHELL:
 
 DOCKER	= docker
-NAME	= aiosql-pytest
+NAME	= aiosql-tests
 
 clean:
 	TEST=pytest $(DOCKER) compose down -v
