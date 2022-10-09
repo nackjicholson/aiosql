@@ -7,7 +7,11 @@ clean:
 	TEST=pytest $(DOCKER) compose down -v
 	$(RM) .aiosql-python-*
 
-# build client images
+#
+# Build docker client images
+#
+# NOTE it really depends on the base image version and
+# when it is run to know which are the latest packages
 .aiosql-python-%: dockerfile.python-%
 	tag=$@
 	tag=$${tag#.}
@@ -20,29 +24,33 @@ aiosql-python: \
 	.aiosql-python-mysql \
 	.aiosql-python-mariadb
 
-.PHONY: run
-run:
+#
+# Run tests with docker
+#
+.PHONY: docker.run
+docker.run:
+	[ "$$TEST" ] || { echo "# Missing \$$TEST" >&2 ; exit 1 ; }
 	echo "# starting up…"
 	$(DOCKER) compose up -d
 	# wait and show results, in probable completion order
 	# $(DOCKER) container logs -f $(NAME)-ma-client-1
 	$(DOCKER) container wait $(NAME)-ma-client-1
 	$(DOCKER) container logs $(NAME)-ma-client-1
-	# $(DOCKER) container logs -f $(NAME)-pg-client-1
-	$(DOCKER) container wait $(NAME)-pg-client-1
-	$(DOCKER) container logs $(NAME)-pg-client-1
 	# $(DOCKER) container logs -f $(NAME)-my-client-1
 	$(DOCKER) container wait $(NAME)-my-client-1
 	$(DOCKER) container logs $(NAME)-my-client-1
+	# $(DOCKER) container logs -f $(NAME)-pg-client-1
+	$(DOCKER) container wait $(NAME)-pg-client-1
+	$(DOCKER) container logs $(NAME)-pg-client-1
 	echo "# shutting down…"
 	$(DOCKER) compose down -v
 
 .PHONY: docker.pytest
 docker.pytest:
 	export TEST=pytest
-	$(MAKE) run
+	$(MAKE) docker.run
 
 .PHONY: docker.coverage
 docker.coverage:
 	export TEST=coverage
-	$(MAKE) run
+	$(MAKE) docker.run
