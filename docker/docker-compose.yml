@@ -4,7 +4,7 @@
 # TEST is either "pytest" or "coverage"
 #
 
-name: aiosql-pytest
+name: aiosql-tests
 
 services:
   #
