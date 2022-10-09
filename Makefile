@@ -301,8 +301,9 @@ check.coverage.combine: $(VENV)
 	$(COVERAGE) combine
 	if [[ "$(IS_DOCKER)" ]] ; then
 	  sqlite3 .coverage "UPDATE File SET path=REPLACE(path, '/code/', '$$PWD/')"
+	else
+	  $(COVERAGE) html
 	fi
-	$(COVERAGE) html
 	$(COVERAGE) report --fail-under=100 --include='$(MODULE)/*'
 
 #
