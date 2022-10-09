@@ -32,14 +32,14 @@ jobs:
         python -m pip install -r dev-requirements.txt
         python -m pip install .
     - name: Check types with mypy
-      run: make check.mypy
+      run: make VENV= check.mypy
     - name: Lint with black
-      run: make check.black
+      run: make VENV= check.black
     - name: Lint with flake8
-      run: make check.flake8
+      run: make VENV= check.flake8
     - name: Test with pytest and databases
-      run: make check.pytest
+      run: make VENV= check.pytest
     - name: Coverage tests
-      run: make check.coverage
+      run: make VENV= check.coverage
     - name: Check RST files
-      run: make check.rstcheck
+      run: make VENV= check.rstcheck
