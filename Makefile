@@ -18,7 +18,7 @@ VENV	= venv
 PIP		= $(VENV)/bin/pip
 WAIT	= ./tests/wait.py
 
-# docker
+# docker settings
 PG_HOST	= localhost
 PG_PORT	= 15432
 PG_USER	= pytest
@@ -69,7 +69,6 @@ help:
 venv:
 	$(PYTHON) -m venv venv
 	$(PIP) install --upgrade pip
-	$(PIP) install -e .
 
 venv.dev: venv
 	$(PIP) install -r dev-requirements.txt
@@ -163,13 +162,16 @@ PG_DETACHED	= \
 check.pytest.postgres.detached: PYTOPT+=$(PG_DETACHED)
 check.pytest.postgres.detached: check.pytest.postgres
 
+# shared local and detached settings
+check.pytest.%.local: WAIT=:
+check.pytest.%.local: $(VENV)
+check.pytest.%.detached: $(INSTALL)
+
 .PHONY: check.pytest.postgres.local
-check.pytest.postgres.local: WAIT=:
-check.pytest.postgres.local: $(VENV)
 check.pytest.postgres.local: check.pytest.postgres
 
 .PHONY: check.pytest.postgres
-check.pytest.postgres: $(VENV)
+check.pytest.postgres: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	$(WAIT) $(PG_HOST) $(PG_PORT) 5
 	$(PYTEST) $(PYTOPT) \
@@ -184,7 +186,6 @@ check.pytest.postgres: $(VENV)
 #
 
 .PHONY: check.pytest.mysql.local
-check.pytest.mysql.local: WAIT=:
 check.pytest.mysql.local: check.pytest.mysql
 
 MY_DETACHED	= \
@@ -198,11 +199,10 @@ MY_DETACHED	= \
 
 .PHONY: check.pytest.mysql.detached
 check.pytest.mysql.detached: PYTOPT+=$(MY_DETACHED)
-check.pytest.mysql.detached: $(INSTALL)
 check.pytest.mysql.detached: check.pytest.mysql
 
 .PHONY: check.pytest.mysql
-check.pytest.mysql: $(VENV)
+check.pytest.mysql: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	# FIXME this does not seem to work…
 	$(WAIT) $(MY_HOST) $(MY_PORT) 10
@@ -217,7 +217,6 @@ check.pytest.mysql: $(VENV)
 #
 
 .PHONY: check.pytest.mariadb.local
-check.pytest.mariadb.local: WAIT=:
 check.pytest.mariadb.local: check.pytest.mariadb
 
 MA_DETACHED	= \
@@ -230,12 +229,11 @@ MA_DETACHED	= \
 	--mysql-dbname=$(MA_NAME)
 
 .PHONY: check.pytest.mariadb.detached
-check.pytest.mariadb.detached: $(INSTALL)
 check.pytest.mariadb.detached: PYTOPT+=$(MA_DETACHED)
 check.pytest.mariadb.detached: check.pytest.mariadb
 
 .PHONY: check.pytest.mariadb
-check.pytest.mariadb: $(VENV)
+check.pytest.mariadb: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	$(WAIT) $(MA_HOST) $(MA_PORT) 5
 	$(PYTEST) $(PYTOPT) --mysql-driver=mariadb tests/test_mariadb.py
@@ -261,32 +259,27 @@ check.pytest.misc: $(INSTALL)
 COVERAGE	= coverage
 COVER_RUN	= $(COVERAGE) run -p
 
+check.coverage.%: PYTEST=$(COVER_RUN) -m pytest
+
 .PHONY: check.coverage.postgres.detached
-check.coverage.postgres.detached: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.postgres.detached: check.pytest.postgres.detached
 
 .PHONY: check.coverage.postgres.local
-check.coverage.postgres.local: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.postgres.local: check.pytest.postgres.local
 
 .PHONY: check.coverage.mysql.detached
-check.coverage.mysql.detached: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.mysql.detached: check.pytest.mysql.detached
 
 .PHONY: check.coverage.mysql.local
-check.coverage.mysql.local: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.mysql.local: check.pytest.mysql.local
 
 .PHONY: check.coverage.mariadb.detached
-check.coverage.mariadb.detached: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.mariadb.detached: check.pytest.mariadb.detached
 
 .PHONY: check.coverage.mariadb.local
-check.coverage.mariadb.local: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.mariadb.local: check.pytest.mariadb.local
 
 .PHONY: check.coverage.misc
-check.coverage.misc: PYTEST=$(COVER_RUN) -m pytest
 check.coverage.misc: check.pytest.misc
 
 .PHONY: check.coverage.local
