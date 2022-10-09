@@ -79,6 +79,17 @@ venv.prod: venv
 venv.last:
 	$(PIP) install $$($(PIP) freeze | cut -d= -f1 | grep -v -- '^-e') -U
 
+# direct module installation for github or docker
+ifdef VENV
+INSTALL	= $(VENV)/.aiosql_installed
+else
+INSTALL = .aiosql_installed
+endif
+
+$(INSTALL): $(VENV)
+	$(PIP) install -e .
+	touch $@
+
 #
 # CLEANUP
 #
@@ -92,16 +103,6 @@ clean:
 
 clean.venv: clean
 	$(RM) -r venv $(MODULE).egg-info
-
-ifdef VENV
-INSTALL	= $(VENV)/.aiosql_installed
-else
-INSTALL = .aiosql_installed
-endif
-
-$(INSTALL): $(VENV)
-	$(PIP) install -e .
-	touch $@
 
 #
 # VARIOUS CHECKS
@@ -319,7 +320,7 @@ docker.coverage:
 
 # start docker servers for local detached tests
 .docker.run.postgres:
-	docker run -d --name aiosql-pytest-postgres \
+	docker run -d --name aiosql-tests-postgres \
 	  -p $(PG_PORT):5432 \
 	  -e POSTGRES_USER=$(PG_USER) \
 	  -e POSTGRES_PASSWORD=$(PG_PASS) \
@@ -329,7 +330,7 @@ docker.coverage:
 	touch $@
 
 .docker.run.mysql:
-	docker run -d --name aiosql-pytest-mysql \
+	docker run -d --name aiosql-tests-mysql \
 	  -p $(MY_PORT):3306 \
 	  -e MYSQL_ROOT_PASSWORD=$(MY_PASS) \
 	  -e MYSQL_USER=$(MY_USER) \
@@ -340,7 +341,7 @@ docker.coverage:
 	touch $@
 
 .docker.run.mariadb:
-	docker run -d --name aiosql-pytest-mariadb \
+	docker run -d --name aiosql-tests-mariadb \
 	  -p $(MA_PORT):3306 \
 	  -e MYSQL_ROOT_PASSWORD=$(MA_PASS) \
 	  -e MYSQL_USER=$(MA_USER) \
@@ -373,7 +374,7 @@ check.pytest.docker:
 
 .PHONY: docker.stop
 docker.stop:
-	docker stop aiosql-pytest-postgres aiosql-pytest-mysql aiosql-pytest-mariadb || exit 0
+	docker stop aiosql-tests-postgres aiosql-tests-mysql aiosql-tests-mariadb || exit 0
 	$(RM) .docker.run.*
 
 #
