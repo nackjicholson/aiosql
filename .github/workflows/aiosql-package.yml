@@ -30,16 +30,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install -r dev-requirements.txt
-        python -m pip install .
     - name: Check types with mypy
-      run: make VENV= check.mypy
+      run: make VENV= INSTALL= check.mypy
     - name: Lint with black
-      run: make VENV= check.black
+      run: make VENV= INSTALL= check.black
     - name: Lint with flake8
-      run: make VENV= check.flake8
+      run: make VENV= INSTALL= check.flake8
     - name: Test with pytest and databases
-      run: make VENV= check.pytest
+      run: make VENV= INSTALL= check.pytest
     - name: Coverage tests
-      run: make VENV= check.coverage
+      run: make VENV= INSTALL= check.coverage
     - name: Check RST files
-      run: make VENV= check.rstcheck
+      run: make VENV= INSTALL= check.rstcheck
