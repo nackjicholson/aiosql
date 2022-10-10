@@ -52,6 +52,7 @@ help:
 	echo " - check.flake8: run flake8 code style checks"
 	echo " - check.black: run black formatter checks"
 	echo " - check.coverage: run coverage and generate html report"
+	echo " - check.rstcheck: check rest files"
 	echo " - check: run all above checks"
 	echo " - publish: publish a new release on pypi (for maintainers)"
 
