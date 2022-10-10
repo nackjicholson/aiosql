@@ -15,7 +15,7 @@ PYTEST	= pytest --log-level=$(LOGLVL) --capture=tee-sys --asyncio-mode=auto
 PYTOPT	=
 
 VENV	= venv
-PIP		= $(VENV)/bin/pip
+PIP		= pip
 WAIT	= ./tests/wait.py
 
 # docker settings
@@ -69,18 +69,22 @@ help:
 
 venv:
 	$(PYTHON) -m venv venv
+	source venv/bin/activate
 	$(PIP) install --upgrade pip
 
 venv.dev: venv
+	source venv/bin/activate
 	$(PIP) install -r dev-requirements.txt
 
 venv.prod: venv
 
-venv.last:
+venv.last: venv
+	source venv/bin/activate
 	$(PIP) install $$($(PIP) freeze | cut -d= -f1 | grep -v -- '^-e') -U
 
 # direct module installation for github or docker
 ifdef VENV
+PIP		= $(VENV)/bin/pip
 INSTALL	= $(VENV)/.aiosql_installed
 else
 INSTALL = .aiosql_installed
@@ -108,24 +112,11 @@ clean.venv: clean
 # VARIOUS CHECKS
 #
 # the targets below are expected to work more or less for:
-# - local tests
-# - docker tests
+# - local tests (pytest managed instances)
+# - local docker tests (docker servers, local client)
+# - full docker tests (docker servers and clients)
 # - github tests
 #
-.PHONY: check.rstcheck
-check.rstcheck: $(VENV)
-	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	rstcheck docs/source/*.rst
-
-# mysql or mariadb
-MYSQL	= mysql
-
-.PHONY: check.pytest
-check.pytest: check.pytest.local
-
-.PHONY: check.pytest.local
-check.pytest.local: check.pytest.misc check.pytest.postgres.local check.pytest.$(MYSQL).local
-
 .PHONY: check.mypy
 check.mypy: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
@@ -141,11 +132,33 @@ check.black: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	black $(MODULE) tests --check
 
+.PHONY: check.rstcheck
+check.rstcheck: $(VENV)
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
+	rstcheck docs/source/*.rst
+
+.PHONY: check.pytest
+check.pytest: check.pytest.local
+
+# mysql or mariadb
+MYSQL	= mysql
+
+.PHONY: check.pytest.local
+check.pytest.local: check.pytest.misc check.pytest.postgres.local check.pytest.$(MYSQL).local
+
 .PHONY: check.coverage
 check.coverage: check.coverage.local
 
 .PHONY: check
 check: check.pytest check.mypy check.flake8 check.black check.coverage check.rstcheck
+
+#
+# pytest/coverage local/detached tests
+#
+check.pytest.%.detached: $(INSTALL)
+
+check.pytest.%.local: WAIT=:
+check.pytest.%.local: $(VENV)
 
 #
 # Postgres
@@ -162,11 +175,6 @@ PG_DETACHED	= \
 .PHONY: check.pytest.postgres.detached
 check.pytest.postgres.detached: PYTOPT+=$(PG_DETACHED)
 check.pytest.postgres.detached: check.pytest.postgres
-
-# shared local and detached settings
-check.pytest.%.local: WAIT=:
-check.pytest.%.local: $(VENV)
-check.pytest.%.detached: $(INSTALL)
 
 .PHONY: check.pytest.postgres.local
 check.pytest.postgres.local: check.pytest.postgres
@@ -253,11 +261,10 @@ check.pytest.misc: $(INSTALL)
 	  tests/test_apsw.py \
 	  tests/test_aiosqlite.py
 
-# coverage by overriding PYTEST
+# run coverage by overriding PYTEST
 
-# -a: append
-# -p: parallel
 COVERAGE	= coverage
+# parallel runs need a merge afterwards
 COVER_RUN	= $(COVERAGE) run -p
 
 check.coverage.%: PYTEST=$(COVER_RUN) -m pytest
