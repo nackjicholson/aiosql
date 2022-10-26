@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, Dict, Optional, Type, Union
+from typing import Callable, Dict, Optional, Type, Union, Tuple
 import logging
 
 from .adapters.aiosqlite import AioSQLiteAdapter
@@ -125,6 +125,7 @@ def from_path(
     *,
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
+    ext: Tuple[str] = (".sql",),
 ):
     """Load queries from a `.sql` file, or directory of `.sql` files.
 
@@ -138,13 +139,14 @@ def from_path(
     declarations to the python classes which aiosql should use when marshaling SQL results.
     * **loader_cls** - *(optional)* Custom constructor for `QueryLoader` extensions.
     * **queries_cls** - *(optional)* Custom constructor for `Queries` extensions.
+    * **ext** - *(optional)* allowed file extensions for query files, default is `(".sql",)`
 
     **Returns:** `Queries`
 
     Usage:
 
     ```python
-    >>> queries = aiosql.from_path("./sql", "pscycopg2")
+    >>> queries = aiosql.from_path("./sql", "psycopg2")
     >>> queries = aiosql.from_path("./sql", MyDBAdapter)
     ```
     """
@@ -160,7 +162,7 @@ def from_path(
         query_data = query_loader.load_query_data_from_file(path)
         return queries_cls(adapter).load_from_list(query_data)
     elif path.is_dir():
-        query_data_tree = query_loader.load_query_data_from_dir_path(path)
+        query_data_tree = query_loader.load_query_data_from_dir_path(path, ext=ext)
         return queries_cls(adapter).load_from_tree(query_data_tree)
     else:  # pragma: no cover
         raise SQLLoadException(f"The sql_path must be a directory or file, got {sql_path}")
