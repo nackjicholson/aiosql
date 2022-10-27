@@ -12,6 +12,7 @@ clean:
 #
 # NOTE it really depends on the base image version and
 # when it is run to know which are the latest packages
+# --no-cache? docker build prune?
 .aiosql-python-%: dockerfile.python-%
 	tag=$@
 	tag=$${tag#.}
