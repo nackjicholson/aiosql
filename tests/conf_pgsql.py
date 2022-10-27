@@ -70,7 +70,7 @@ try:
 
     @pytest.fixture()
     def pg_params(request, pg_conn):
-        """Build postgres connection parameters as a dictionnary."""
+        """Build postgres connection parameters as a dictionary."""
         if is_psycopg2(pg_conn):  # pragma: no cover
             dsn = pg_conn.get_dsn_parameters()
             del dsn["tty"]
