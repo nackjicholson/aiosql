@@ -24,7 +24,7 @@ github_doc_root = "https://github.com/nackjicholson/aiosql/tree/master/docs/sour
 
 # The full version, including alpha/beta/rc tags
 # FIXME should be consistent with "setup.cfg"?
-release = "7.0"
+release = "7.1"
 
 
 # -- General configuration ---------------------------------------------------
