@@ -1,7 +1,7 @@
 FROM ubuntu
 RUN apt update
 RUN apt install -y --no-install-recommends \
-      python-is-python3 python3-venv python3-dev gcc make
+      python-is-python3 python3-venv python3-dev gcc make curl
 RUN python -m venv /venv
 RUN /venv/bin/pip install asyncio pytest pytest-asyncio coverage
 WORKDIR /code
