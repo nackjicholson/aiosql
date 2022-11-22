@@ -21,13 +21,18 @@ class GenericAdapter:
         cur = self._cursor(conn)
         try:
             cur.execute(sql, parameters)
-            results = cur.fetchall()
-            if record_class is not None and len(results) > 0:
-                column_names = [c[0] for c in cur.description]
-                results = [record_class(**dict(zip(column_names, row))) for row in results]
+            if record_class is None:
+                for row in cur:
+                    yield row
+            else:
+                first = True
+                for row in cur:
+                    if first:  # only get description on the fly, for apsw
+                        column_names = [c[0] for c in cur.description]
+                        first = False
+                    yield record_class(**dict(zip(column_names, row)))
         finally:
             cur.close()
-        return results
 
     def select_one(self, conn, _query_name, sql, parameters, record_class=None):
         cur = self._cursor(conn)
