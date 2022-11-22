@@ -19,7 +19,7 @@ _NAME_OP = re.compile(r"^(\w+)(|\^|\$|!|<!|\*!|#)$")
 _BAD_PREFIX = re.compile(r"^\d")
 
 # get SQL comment contents
-_SQL_COMMENT = re.compile(r"\s*--\s*(.*)$")
+_SQL_COMMENT = re.compile(r"\s*--\s*(.*)|/\*\s*([^\*]*)\s*")
 
 # map operation suffixes to their type
 _OP_TYPES = {
@@ -72,13 +72,11 @@ class QueryLoader:
 
     def _get_sql_doc(self, lines: Sequence[str]) -> Tuple[str, str]:
         doc, sql = "", ""
+        for doc_match in _SQL_COMMENT.finditer("\n".join(lines)):
+            doc += next(group for group in doc_match.groups() if group) + "\n"
         for line in lines:
-            doc_match = _SQL_COMMENT.match(line)
-            if doc_match:
-                doc += doc_match.group(1) + "\n"
-            else:
+            if not _SQL_COMMENT.match(line):
                 sql += line + "\n"
-
         return sql.strip(), doc.rstrip()
 
     def _build_signature(self, sql: str) -> inspect.Signature:

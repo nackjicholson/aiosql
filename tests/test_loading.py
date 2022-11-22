@@ -184,3 +184,22 @@ def test_misc(sql_file):
         assert False, "must raise en exception"  # pragma: no cover
     except ValueError as e:
         assert "must be a directory" in str(e)
+
+
+@pytest.mark.parametrize(
+    "comment,expected",
+    [
+        ("--comment", "comment"),
+        ("--comment comment", "comment comment"),
+        ("--comment\n--comment", "comment\ncomment"),
+        ("-- comment ", "comment"),
+        ("/*comment*/", "comment"),
+        ("/* comment */", "comment"),
+        ("/* comment\n */", "comment"),
+        ("/* comment \n comment */", "comment\ncomment"),
+        ("/* comment \n comment\n comment*/", "comment\ncomment\ncomment"),
+    ]
+)
+def test_comments(comment, expected):
+    queries = aiosql.from_str(f"--name: one$\n{comment}\nSELECT 1;", "sqlite3")
+    assert queries.one.__doc__ == expected
