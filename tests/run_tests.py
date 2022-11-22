@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import NamedTuple
+from typing import NamedTuple, Iterable
 from datetime import date
 import asyncio
 import re
@@ -65,7 +65,9 @@ def run_something(conn):
 
 
 def run_record_query(conn, queries):
-    actual = queries.users.get_all(conn)
+    raw_actual = queries.users.get_all(conn)
+    assert isinstance(raw_actual, Iterable)
+    actual = list(raw_actual)
     assert len(actual) == 3
     assert actual[0] == {
         "userid": 1,
@@ -105,7 +107,9 @@ def run_parameterized_record_query(conn, queries, db, todate):
         else None
     )
 
-    actual = fun(conn, published=todate(2018, 1, 1))
+    raw_actual = fun(conn, published=todate(2018, 1, 1))
+    assert isinstance(raw_actual, Iterable)
+    actual = list(raw_actual)
 
     expected = [
         {"title": "How to make a pie.", "username": "bobsmith", "published": "2018-11-23 00:00"},
@@ -116,7 +120,10 @@ def run_parameterized_record_query(conn, queries, db, todate):
 
 
 def run_record_class_query(conn, queries, todate):
-    actual = queries.blogs.get_user_blogs(conn, userid=1)
+    raw_actual = queries.blogs.get_user_blogs(conn, userid=1)
+    assert isinstance(raw_actual, Iterable)
+    actual = list(raw_actual)
+
     expected = [
         UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23)),
         UserBlogSummary(title="What I did Today", published=todate(2017, 7, 28)),
@@ -192,7 +199,10 @@ def run_delete(conn, queries, expect=1):
     actual = queries.blogs.remove_blog(conn, blogid=2)
     assert actual == expect
 
-    janes_blogs = queries.blogs.get_user_blogs(conn, userid=3)
+    raw_janes_blogs = queries.blogs.get_user_blogs(conn, userid=3)
+    assert isinstance(raw_janes_blogs, Iterable)
+
+    janes_blogs = list(raw_janes_blogs)
     assert len(janes_blogs) == 0
 
 

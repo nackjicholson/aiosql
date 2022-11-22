@@ -9,7 +9,6 @@ from .adapters.mysql import BrokenMySQLAdapter
 from .adapters.generic import GenericAdapter
 from .adapters.sqlite3 import SQLite3Adapter
 from .adapters.pg8000 import Pg8000Adapter
-from .adapters.apsw import APSWAdapter
 from .utils import SQLLoadException
 from .queries import Queries
 from .query_loader import QueryLoader
@@ -19,7 +18,7 @@ log = logging.getLogger(__name__)
 
 _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore
-    "apsw": APSWAdapter,
+    "apsw": GenericAdapter,
     "asyncpg": AsyncPGAdapter,  # type: ignore
     "mariadb": BrokenMySQLAdapter,
     "mysqldb": BrokenMySQLAdapter,
