@@ -16,7 +16,7 @@ clean:
 .aiosql-python-%: dockerfile.python-%
 	tag=$@
 	tag=$${tag#.}
-	$(DOCKER) build -t $$tag -f $< . && touch $@
+	$(DOCKER) build --no-cache -t $$tag -f $< . && touch $@
 
 .PHONY: aiosql-python
 aiosql-python: \
