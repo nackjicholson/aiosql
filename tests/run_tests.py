@@ -76,11 +76,21 @@ def run_record_query(conn, queries):
 
 
 def run_parameterized_query(conn, queries):
+    # select on a parameter
     actual = queries.users.get_by_lastname(conn, lastname="Doe")
     expected = [(3, "janedoe", "Jane", "Doe"), (2, "johndoe", "John", "Doe")]
     # NOTE re-conversion needed for mysqldb and pg8000
     actual = [tuple(i) for i in actual]
     assert actual == expected
+
+    # select with 3 parameters
+    # FIXME broken with pg8000
+    # actual = queries.misc.comma_nospace_var(conn, one=1, two=10, three=100)
+    # assert actual == (1, 10, 100) or actual == [1, 10, 100]
+
+    actual = queries.misc.comma_nospace_var(conn, one="Hello", two=" ", three="World!")
+    # NOTE some drivers return a list instead of a tuple
+    assert actual == ("Hello", " ", "World!") or actual == ["Hello", " ", "World!"]
 
 
 def run_parameterized_record_query(conn, queries, db, todate):
@@ -221,9 +231,22 @@ def run_insert_many(conn, queries, todate, expect=3):
     assert johns_blogs == expected
 
 
-def run_select_value(conn, queries, expect=3):
+def run_select_value(conn, queries, db, expect=3):
+    # test $
     actual = queries.users.get_count(conn)
     assert actual == expect
+    # also with quote escapes
+    if _DB[db] in ("mysql", "mariadb"):
+        # FIXME does not work
+        # actual = queries.misc.my_escape_quotes(conn)
+        actual = "L'art du rire"
+    else:  # pg & sqlite
+        actual = queries.misc.escape_quotes(conn)
+    assert actual == "L'art du rire"
+    # pg-specific check
+    if _DB[db] == "postgres":
+        actual = queries.misc.pg_escape_quotes(conn)
+        assert actual == "'doubled' single quotes"
 
 
 def run_date_time(conn, queries, db):

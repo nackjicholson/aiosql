@@ -65,6 +65,10 @@ def test_select_one(my_db, queries):
     t.run_select_one(my_db, queries)
 
 
+def test_select_value(my_db, queries):
+    t.run_select_value(my_db, queries, DRIVER)
+
+
 @pytest.mark.skip("mysql does not support RETURNING, although mariadb does")
 def test_insert_returning(my_db, queries):  # pragma: no cover
     t.run_insert_returning(my_db, queries, DRIVER, date)

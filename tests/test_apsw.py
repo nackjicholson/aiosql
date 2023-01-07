@@ -86,7 +86,7 @@ def test_select_one(conn, queries):
 
 
 def test_select_value(conn, queries):
-    t.run_select_value(conn, queries)
+    t.run_select_value(conn, queries, DRIVER)
 
 
 def test_modulo(conn, queries):
