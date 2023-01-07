@@ -68,7 +68,7 @@ class QueryLoader:
         rc_match = _RECORD_DEF.match(text)
         rc_name = rc_match.group(1) if rc_match else None
         # TODO: Probably will want this to be a class, marshal in, and marshal out
-        return self.record_classes.get(rc_name)
+        return self.record_classes.get(rc_name) if isinstance(rc_name, str) else None
 
     def _get_sql_doc(self, lines: Sequence[str]) -> Tuple[str, str]:
         doc, sql = "", ""
