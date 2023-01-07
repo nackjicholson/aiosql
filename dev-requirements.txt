@@ -1,7 +1,4 @@
 -e file:.
-# utils
-# NOTE google-re2 installation error on 3.11
-google-re2 ; python_version <= '3.10'
 # building tools
 build
 wheel

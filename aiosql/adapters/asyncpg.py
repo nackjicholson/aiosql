@@ -48,7 +48,7 @@ class AsyncPGAdapter:
             # variable that we are replacing, taking into account an adjustment
             # factor based on previous replacements (see the note below).
             start = match.start() + len(gd["lead"]) + adj
-            end = match.end() - len(gd["trail"]) + adj
+            end = match.end() + adj
 
             sql = sql[:start] + replacement + sql[end:]
 

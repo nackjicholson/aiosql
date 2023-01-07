@@ -1,9 +1,4 @@
-# use re2 if available.
-# FIXME strange issue on debian buster with py3.7 apache wsgi flask… loading re2 "freezes" the process
-try:
-    import re2 as re
-except ModuleNotFoundError:  # pragma: no cover
-    import re  # type: ignore
+import re
 
 # FIXME to be improved
 VAR_REF = re.compile(
@@ -13,7 +8,7 @@ VAR_REF = re.compile(
     r"(?P<quote>\'(\'\'|[^\'])*\')|"
     # FIXME fails if variables are separated by only one char: :v1+:v2
     # because lead and trail overlap
-    r"(?P<lead>[^:]):(?P<var_name>[\w-]+)(?P<trail>[^:]?)"
+    r"(?P<lead>[^:]):(?P<var_name>[\w-]+)(?=[^:]?)"
 )
 """Pattern to identifies colon-variables in SQL code"""
 

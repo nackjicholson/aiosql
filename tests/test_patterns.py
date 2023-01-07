@@ -26,17 +26,15 @@ def test_var_pattern_is_quote_aware():
             "dblquote": None,
             "lead": None,
             "quote": "'YYYY-MM-DD\"T\"HH24:MI:SSOF'",
-            "trail": None,
             "var_name": None,
         },
         {
             "dblquote": None,
             "lead": " ",
             "quote": None,
-            "trail": "\n",
             "var_name": "created_at_mark",
         },
-        {"dblquote": None, "lead": " ", "quote": None, "trail": "\n", "var_name": "foo_mark"},
+        {"dblquote": None, "lead": " ", "quote": None, "var_name": "foo_mark"},
     ]
     assert groupdicts == expected
 
@@ -55,7 +53,7 @@ def test_var_pattern_does_not_require_semicolon_trail():
     groupdicts = [m.groupdict() for m in VAR_REF.finditer(sql)]
     assert len(groupdicts) == 1
 
-    expected = {"dblquote": None, "lead": " ", "quote": None, "trail": "", "var_name": "a"}
+    expected = {"dblquote": None, "lead": " ", "quote": None, "var_name": "a"}
     assert groupdicts[0] == expected
 
 
@@ -72,7 +70,6 @@ def test_var_pattern_handles_empty_sql_string_literals():
         "dblquote": None,
         "lead": None,
         "quote": "''",
-        "trail": None,
         "var_name": None,
     }
     assert groupdicts[1] == expected_single_quote_match
@@ -81,7 +78,6 @@ def test_var_pattern_handles_empty_sql_string_literals():
         "dblquote": None,
         "lead": "(",
         "quote": None,
-        "trail": ",",
         "var_name": "blah",
     }
     assert groupdicts[3] == expected_var_match

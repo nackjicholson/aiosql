@@ -9,7 +9,7 @@ def _replacer(match):
     elif gd["quote"] is not None:
         return gd["quote"]
     else:
-        return f'{gd["lead"]}%({gd["var_name"]})s{gd["trail"]}'
+        return f'{gd["lead"]}%({gd["var_name"]})s'
 
 
 class PyFormatAdapter(GenericAdapter):
