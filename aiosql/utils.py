@@ -5,9 +5,14 @@ try:
 except ModuleNotFoundError:  # pragma: no cover
     import re  # type: ignore
 
+# FIXME to be improved
 VAR_REF = re.compile(
-    r'(?P<dblquote>"[^"]+")|'
-    r"(?P<quote>\'[^\']*\')|"
+    # NOTE probably pg specific?
+    r'(?P<dblquote>"(""|[^"])+")|'
+    # FIXME mysql/mariadb use backslash escapes
+    r"(?P<quote>\'(\'\'|[^\'])*\')|"
+    # FIXME fails if variables are separated by only one char: :v1+:v2
+    # because lead and trail overlap
     r"(?P<lead>[^:]):(?P<var_name>[\w-]+)(?P<trail>[^:]?)"
 )
 """Pattern to identifies colon-variables in SQL code"""

@@ -66,7 +66,7 @@ def test_select_one(my_db, queries):
 
 
 def test_select_value(my_db, queries):
-    t.run_select_value(my_db, queries)
+    t.run_select_value(my_db, queries, DRIVER)
     my_db.commit()  # or fail on teardown
 
 
