@@ -1,5 +1,6 @@
 import pytest
 from aiosql.utils import VAR_REF
+from aiosql.query_loader import _UNCOMMENT, _remove_ml_comments
 
 pytestmark = [
     pytest.mark.misc,
@@ -81,3 +82,68 @@ def test_var_pattern_handles_empty_sql_string_literals():
         "var_name": "blah",
     }
     assert groupdicts[3] == expected_var_match
+
+
+# must remove only OK comments
+COMMENTED = """
+KO
+-- KO
+/* OK */
+'/* KO */'
+"/* KO */"
+' /* KO
+   */'
+" /* KO
+   */"
+/*
+ * OK
+ */
+-- /* KO
+-- */
+/* OK
+  -- OK
+  ' OK ' "OK "
+ */
+KO
+/* OK */ -- KO 'KO'
+-- KO */
+"""
+
+
+def test_comments():
+    n = 0
+    for m in _UNCOMMENT.finditer(COMMENTED):
+        n += 1
+        matches = m.groupdict()
+        s, d, c, m = matches["squote"], matches["dquote"], matches["oneline"], matches["multiline"]
+        assert s or d or c or m
+        if m:
+            assert "KO" not in m
+        if s:
+            assert "OK" not in s
+        if d:
+            assert "OK" not in d
+        if c:
+            assert "OK" not in c
+    assert n == 13
+
+
+COMMENT_UNCOMMENT = [
+    ("", ""),
+    ("hello", "hello"),
+    ("world!\n", "world!\n"),
+    ("/**/", ""),
+    ("x/*\n*/y\n", "xy\n"),
+    ("-- /* */\n", "-- /* */\n"),
+    ("-- /* */", "-- /* */"),
+    ("'/* */'", "'/* */'"),
+    ("--\n/* */X\n", "--\nX\n"),
+]
+
+
+def test_uncomment():
+    n = 0
+    for c, u in COMMENT_UNCOMMENT:
+        n += 1
+        assert _remove_ml_comments(c) == u
+    assert n == len(COMMENT_UNCOMMENT)

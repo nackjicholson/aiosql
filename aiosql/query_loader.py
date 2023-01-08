@@ -1,8 +1,9 @@
+import re
 import inspect
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Type, Sequence, Any
 
-from .utils import SQLParseException, SQLLoadException, VAR_REF, re
+from .utils import SQLParseException, SQLLoadException, VAR_REF
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
 
 # identifies name definition comments
@@ -31,6 +32,35 @@ _OP_TYPES = {
     "$": SQLOperationType.SELECT_VALUE,
     "": SQLOperationType.SELECT,
 }
+
+
+# extracting comments requires some kind of scanner
+_UNCOMMENT = re.compile(
+    # strings
+    r"(?P<squote>\'(\'\'|[^\'])*\')|" r'(?P<dquote>"(""|[^"])+")|'
+    # one-line comment
+    r"(?P<oneline>--.*?$)|"
+    # multi-line comment
+    r"(?P<multiline>/\*.*?\*/)",
+    re.DOTALL | re.MULTILINE,
+)
+
+
+def _remove_ml_comments(code: str) -> str:
+    """Remove /* ... */ comments from code"""
+    # identify commented regions
+    rm = []
+    for m in _UNCOMMENT.finditer(code):
+        ml = m.groupdict()["multiline"]
+        if ml:
+            rm.append(m.span())
+    # keep whatever else
+    ncode, current = "", 0
+    for start, end in rm:
+        ncode += code[current:start]
+        current = end
+    ncode += code[current:]
+    return ncode
 
 
 class QueryLoader:
@@ -103,7 +133,9 @@ class QueryLoader:
     def load_query_data_from_sql(
         self, sql: str, ns_parts: List[str] = [], fname: Optional[Path] = None
     ) -> List[QueryDatum]:
-        qdefs = _QUERY_DEF.split(sql)
+        usql = _remove_ml_comments(sql)
+        qdefs = _QUERY_DEF.split(usql)
+        # FIXME lineno is from the uncommented file
         lineno = 1 + qdefs[0].count("\n")
         data = []
         # first item is anything before the first query definition, drop it!
