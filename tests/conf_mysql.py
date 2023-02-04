@@ -78,7 +78,6 @@ try:
             my_conn.commit()
 
 except ModuleNotFoundError:
-
     # provide empty fixtures to please pytest "parsing"
 
     @pytest.fixture

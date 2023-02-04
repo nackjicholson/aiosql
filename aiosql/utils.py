@@ -1,4 +1,5 @@
 import re
+import logging
 
 # FIXME to be improved
 VAR_REF = re.compile(
@@ -10,6 +11,8 @@ VAR_REF = re.compile(
     r"(?P<lead>[^:]):(?P<var_name>[\w-]+)(?=[^:]?)"
 )
 """Pattern to identifies colon-variables in SQL code"""
+
+log = logging.getLogger("aiosql")
 
 
 class SQLLoadException(Exception):

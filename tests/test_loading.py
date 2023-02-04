@@ -80,6 +80,16 @@ def test_trailing_space_on_lines_does_not_error():
         pytest.fail("Raised SQLParseException due to trailing space in query.")
 
 
+def test_non_ascii_char():
+    # this triggers a warning, that we do not really check but for coverage
+    q = aiosql.from_str("-- name: zéro\nSELECT 0;\n", "sqlite3")
+    assert "zéro" in q._available_queries
+    q = aiosql.from_str("-- name: éêèëÉÊÈË\nSELECT 'eeeeeeee!';\n", "sqlite3")
+    assert "éêèëÉÊÈË" in q._available_queries
+    q = aiosql.from_str("-- name: 안녕하세요\nSELECT 'hello!';\n", "sqlite3")
+    assert "안녕하세요" in q._available_queries
+
+
 def test_loading_query_signature():
     sql_str = "-- name: get^\n" "select * from test where foo=:foo and bar=:bar"
     queries = aiosql.from_str(sql_str, "aiosqlite")
