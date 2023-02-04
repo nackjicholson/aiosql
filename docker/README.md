@@ -18,7 +18,20 @@ See docker specifications in `dockerfile.python-*`.
 
 Run docker compose for `pytest` or `coverage`.
 
-## Commands
+```shell
+# get/update docker images
+docker image pull postgres
+docker image pull mariadb
+docker image pull mysql
+docker image pull ubuntu
+# generate client images
+make aiosql-python
+# run tests
+make docker.pytest
+make docker.coverage
+```
+
+## Miscellaneous Commands
 
 ```sh
 docker run -it --add-host=host.docker.internal:host-gateway python bash
