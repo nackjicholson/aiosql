@@ -66,7 +66,7 @@ Badges
    :alt: Code Coverage
    :target: https://github.com/nackjicholson/aiosql/actions/
 
-.. image:: https://img.shields.io/badge/tests-166%20✓-success
+.. image:: https://img.shields.io/badge/tests-167%20✓-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 

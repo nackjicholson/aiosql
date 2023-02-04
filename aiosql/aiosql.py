@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import Callable, Dict, Optional, Type, Union, Tuple
-import logging
 
 from .adapters.aiosqlite import AioSQLiteAdapter
 from .adapters.asyncpg import AsyncPGAdapter
@@ -9,12 +8,10 @@ from .adapters.mysql import BrokenMySQLAdapter
 from .adapters.generic import GenericAdapter
 from .adapters.sqlite3 import SQLite3Adapter
 from .adapters.pg8000 import Pg8000Adapter
-from .utils import SQLLoadException
+from .utils import SQLLoadException, log
 from .queries import Queries
 from .query_loader import QueryLoader
 from .types import DriverAdapterProtocol
-
-log = logging.getLogger(__name__)
 
 _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore

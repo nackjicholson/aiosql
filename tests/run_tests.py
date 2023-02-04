@@ -355,7 +355,6 @@ async def run_async_select_value(conn, queries):
 
 
 async def run_async_insert_returning(conn, queries, db, todate):
-
     is_pg = _DB[db] == "postgres"
 
     fun = queries.blogs.pg_publish_blog if is_pg else queries.blogs.publish_blog

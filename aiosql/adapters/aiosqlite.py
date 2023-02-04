@@ -2,7 +2,6 @@ from contextlib import asynccontextmanager
 
 
 class AioSQLiteAdapter:
-
     is_aio_driver = True
 
     def process_sql(self, _query_name, _op_type, sql):

@@ -1,6 +1,7 @@
 import pytest
 from conf_schema import USERS_DATA_PATH, BLOGS_DATA_PATH, create_user_blogs, drop_user_blogs
 
+
 # guess psycopg version from a connection
 def is_psycopg2(conn):
     return hasattr(conn, "get_dsn_parameters")
@@ -33,7 +34,6 @@ try:
 
         # Loads data from blogdb fixture data
         with conn.cursor() as cur:
-
             for tc in create_user_blogs("pgsql"):
                 cur.execute(tc)
 
@@ -90,7 +90,6 @@ try:
         yield f"postgres://{p['user']}:{p['password']}@{p['host']}:{p['port']}/{p['dbname']}"
 
 except ModuleNotFoundError:
-
     # FIXME empty fixtures to please pytest
 
     @pytest.fixture

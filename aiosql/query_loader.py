@@ -3,7 +3,7 @@ import inspect
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Type, Sequence, Any
 
-from .utils import SQLParseException, SQLLoadException, VAR_REF
+from .utils import SQLParseException, SQLLoadException, VAR_REF, log
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
 
 # identifies name definition comments
@@ -79,6 +79,8 @@ class QueryLoader:
         # - floc: file name and lineno the query was extracted from
         lines = [line.strip() for line in query.strip().splitlines()]
         qname, qop = self._get_name_op(lines[0])
+        if re.search(r"[^A-Za-z0-9_]", qname):
+            log.warning(f"non ASCII character in query name: {qname}")
         record_class = self._get_record_class(lines[1])
         sql, doc = self._get_sql_doc(lines[2 if record_class else 1 :])
         signature = self._build_signature(sql)
