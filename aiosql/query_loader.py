@@ -33,11 +33,12 @@ _OP_TYPES = {
     "": SQLOperationType.SELECT,
 }
 
-
 # extracting comments requires some kind of scanner
 _UNCOMMENT = re.compile(
-    # strings
-    r"(?P<squote>\'(\'\'|[^\'])*\')|" r'(?P<dquote>"(""|[^"])+")|'
+    # single quote strings
+    r"(?P<squote>\'(\'\'|[^\'])*\')|"
+    # double quote strings
+    r'(?P<dquote>"(""|[^"])+")|'
     # one-line comment
     r"(?P<oneline>--.*?$)|"
     # multi-line comment
@@ -118,7 +119,7 @@ class QueryLoader:
         names = set()
         for match in VAR_REF.finditer(sql):
             gd = match.groupdict()
-            if gd["quote"] or gd["dblquote"]:
+            if gd["squote"] or gd["dquote"]:
                 continue
             name = gd["var_name"]
             if name.isdigit() or name in names:

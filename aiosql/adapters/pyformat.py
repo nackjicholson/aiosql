@@ -4,10 +4,10 @@ from ..utils import VAR_REF
 
 def _replacer(match):
     gd = match.groupdict()
-    if gd["dblquote"] is not None:
-        return gd["dblquote"]
-    elif gd["quote"] is not None:
-        return gd["quote"]
+    if gd["dquote"] is not None:
+        return gd["dquote"]
+    elif gd["squote"] is not None:
+        return gd["squote"]
     else:
         return f'{gd["lead"]}%({gd["var_name"]})s'
 
