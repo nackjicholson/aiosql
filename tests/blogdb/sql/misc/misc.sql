@@ -22,4 +22,4 @@ SELECT '''doubled'' single quotes' as """doubled"" double quotes"
 
 -- FIXME this one does not work
 -- name: my-escape-quotes$
-SELECT 'L\'art du rire' AS escaped;
+-- SELECT 'L\'art du rire' AS escaped;

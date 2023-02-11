@@ -34,7 +34,7 @@ class AsyncPGAdapter:
         for match in VAR_REF.finditer(sql):
             gd = match.groupdict()
             # Do nothing if the match is found within quotes.
-            if gd["dblquote"] is not None or gd["quote"] is not None:
+            if gd["dquote"] is not None or gd["squote"] is not None:
                 continue
 
             var_name = gd["var_name"]

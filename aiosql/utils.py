@@ -4,9 +4,9 @@ import logging
 # FIXME to be improved
 VAR_REF = re.compile(
     # NOTE probably pg specific?
-    r'(?P<dblquote>"(""|[^"])+")|'
+    r'(?P<dquote>"(""|[^"])+")|'
     # FIXME mysql/mariadb use backslash escapes
-    r"(?P<quote>\'(\'\'|[^\'])*\')|"
+    r"(?P<squote>\'(\'\'|[^\'])*\')|"
     # NOTE beware of overlapping re
     r"(?P<lead>[^:]):(?P<var_name>[\w-]+)(?=[^:]?)"
 )
