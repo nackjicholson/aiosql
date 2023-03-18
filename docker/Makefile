@@ -13,10 +13,13 @@ clean:
 # NOTE it really depends on the base image version and
 # when it is run to know which are the latest packages
 # --no-cache? docker build prune?
+CACHE	= --no-cache
+
 .docker-aiosql-%: dockerfile.python-%
 	tag=$@
-	tag=$${tag#.}
-	$(DOCKER) build --no-cache -t $$tag -f $< . && touch $@
+	tag=$${tag#.docker-aiosql-}
+	tag=python-aiosql-$$tag
+	$(DOCKER) build $(CACHE) -t $$tag -f $< . && touch $@
 
 .PHONY: docker.aiosql
 docker.aiosql: \

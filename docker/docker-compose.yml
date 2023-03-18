@@ -17,7 +17,7 @@ services:
       - POSTGRES_USER=pytest
       - POSTGRES_PASSWORD=pytest
   pg-client:
-    image: aiosql-python-postgres
+    image: python-aiosql-postgres
     volumes:
       - ..:/code
     depends_on:
@@ -34,7 +34,7 @@ services:
       - MYSQL_PASSWORD=pytest
       - MYSQL_DATABASE=pytest
   my-client:
-    image: aiosql-python-mysql
+    image: python-aiosql-mysql
     depends_on:
       - mysql-server
     volumes:
@@ -51,7 +51,7 @@ services:
       - MYSQL_PASSWORD=pytest
       - MYSQL_DATABASE=pytest
   ma-client:
-    image: aiosql-python-mariadb
+    image: python-aiosql-mariadb
     depends_on:
       - mariadb-server
     volumes:
