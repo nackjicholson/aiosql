@@ -25,7 +25,7 @@ docker image pull mariadb
 docker image pull mysql
 docker image pull ubuntu
 # generate client images
-make aiosql-python
+make docker.aiosql
 # run tests
 make docker.pytest
 make docker.coverage

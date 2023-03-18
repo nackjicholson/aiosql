@@ -5,7 +5,7 @@ NAME	= aiosql-tests
 
 clean:
 	TEST=pytest $(DOCKER) compose down -v
-	$(RM) .aiosql-python-*
+	$(RM) .docker-aiosql-*
 
 #
 # Build docker client images
@@ -13,16 +13,16 @@ clean:
 # NOTE it really depends on the base image version and
 # when it is run to know which are the latest packages
 # --no-cache? docker build prune?
-.aiosql-python-%: dockerfile.python-%
+.docker-aiosql-%: dockerfile.python-%
 	tag=$@
 	tag=$${tag#.}
 	$(DOCKER) build --no-cache -t $$tag -f $< . && touch $@
 
-.PHONY: aiosql-python
-aiosql-python: \
-	.aiosql-python-postgres \
-	.aiosql-python-mysql \
-	.aiosql-python-mariadb
+.PHONY: docker.aiosql
+docker.aiosql: \
+	.docker-aiosql-postgres \
+	.docker-aiosql-mysql \
+	.docker-aiosql-mariadb
 
 #
 # Run tests with docker
