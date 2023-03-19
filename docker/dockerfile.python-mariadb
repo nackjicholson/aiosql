@@ -1,3 +1,4 @@
+LABEL description="Python AioSQL setup for MariaDB"
 FROM ubuntu
 RUN apt update
 RUN apt install -y --no-install-recommends \
