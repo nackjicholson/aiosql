@@ -1,4 +1,5 @@
-LABEL description="Python AioSQL setup for Postgres"
+LABEL description="Python setup for AioSQL Postgres testing"
+# python testing environment
 FROM ubuntu
 RUN apt update
 RUN apt install -y --no-install-recommends \
@@ -6,7 +7,7 @@ RUN apt install -y --no-install-recommends \
 RUN python -m venv /venv
 RUN /venv/bin/pip install asyncio pytest pytest-asyncio coverage
 WORKDIR /code
-# postgres specific
+# postgres specific packages
 RUN apt install -y --no-install-recommends libpq-dev sqlite3
 RUN apt clean
 RUN /venv/bin/pip install psycopg psycopg2 pygresql pg8000 asyncpg pytest-postgresql apsw aiosqlite
