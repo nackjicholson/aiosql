@@ -1,4 +1,5 @@
-LABEL description="Python AiSQL setup for MySQL"
+LABEL description="Python setup for AioSQL MySQL testing"
+# python testing environment
 FROM ubuntu
 RUN apt update
 RUN apt install -y --no-install-recommends \
@@ -6,7 +7,7 @@ RUN apt install -y --no-install-recommends \
 RUN python -m venv /venv
 RUN /venv/bin/pip install asyncio pytest pytest-asyncio coverage
 WORKDIR /code
-# mysql specific
+# mysql specific packages
 RUN apt install -y --no-install-recommends libmysqlclient-dev
 RUN apt clean
 RUN /venv/bin/pip install cryptography mysqlclient mysql-connector-python pymysql pytest-mysql
