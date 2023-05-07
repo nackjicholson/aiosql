@@ -38,6 +38,7 @@ mysqlclient = "*"
 apsw = "*"
 asyncpg = "*"
 aiosqlite = "*"
+duckdb = "*"
 
 [build-system]
 # setuptools needed so that pip works?

@@ -1,7 +1,7 @@
 Database Driver Adapters
 ========================
 
-Database driver adapters in aiosql allow extension of the library to support additional database drivers. If you are using a driver other than the ones currently supported by built-in driver adapters (``sqlite3``, ``apsw``, ``aiosqlite``, ``psycopg``, ``psycopg2``, ``pg8000``, ``pygresql``, ``asyncpg``, ``pymysql``, ``mysqlclient``, ``mysql-connector``) then you will need to make your own. A database driver adapter is a duck-typed class that follows either of the ``Protocol`` types below. These types are defined in `aiosql/types.py <https://github.com/nackjicholson/aiosql/blob/master/aiosql/types.py>`__.
+Database driver adapters in aiosql allow extension of the library to support additional database drivers. If you are using a driver other than the ones currently supported by built-in driver adapters (``sqlite3``, ``apsw``, ``aiosqlite``, ``psycopg``, ``psycopg2``, ``pg8000``, ``pygresql``, ``asyncpg``, ``pymysql``, ``mysqlclient``, ``mysql-connector``, ``duckdb``) then you will need to make your own. A database driver adapter is a duck-typed class that follows either of the ``Protocol`` types below. These types are defined in `aiosql/types.py <https://github.com/nackjicholson/aiosql/blob/master/aiosql/types.py>`__.
 
 **Sync Adapter**
 

@@ -32,9 +32,11 @@ based drivers for
 `MySQL <https://www.mysql.com/>`__
 (`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__,
 `mysqlclient <https://pypi.org/project/mysqlclient/>`__,
-`mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__) and
+`mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__),
 `MariaDB <https://mariadb.org/>`__
-(`mariadb <https://pypi.org/project/mariadb/>`__)
+(`mariadb <https://pypi.org/project/mariadb/>`__) and
+`DuckDB <https://www.duckdb.org/>`__
+(`duckdb <https://duckdb.org/docs/api/python/dbapi>`__),
 out of the box.
 Note that some detailed feature support may vary depending on the underlying driver
 and database engine actual capabilities.
