@@ -213,9 +213,8 @@ def run_insert_returning(conn, queries, db, todate):
             2,
             "My first blog",
             "Hello, World!",
-            date(2018, 12, 4),
+            todate(2018, 12, 4),
         )
-        conn.commit()
     else:
         blogid = fun(
             conn,
@@ -232,6 +231,12 @@ def run_insert_returning(conn, queries, db, todate):
     elif isinstance(blogid, list):
         assert db == "pg8000"
         blogid, title = blogid
+    # duckdb will return a tuple or a dict depending on how the sql is structured.
+    # If you wrap the returning in `()` a dict is returned.
+    elif isinstance(blogid, dict):
+        assert db == "duckdb"
+        title = blogid.get('title')
+        blogid = blogid.get('blogid')
     else:
         assert db in ("sqlite3", "apsw")
         blogid, title = blogid, "My first blog"
@@ -323,9 +328,9 @@ def run_select_value(conn, queries, db, expect=3):
 
 
 def run_date_time(conn, queries, db):
-    if _DB[db] in ("sqlite3"):
+    if _DB[db] == "sqlite3":
         now = queries.misc.get_now_date_time(conn)
-    if _DB[db] in ("duckdb"):
+    elif _DB[db] == "duckdb":
         now = queries.misc.duckdb_get_now_date_time(conn)
     elif _DB[db] == "postgres":
         now = queries.misc.pg_get_now_date_time(conn)
