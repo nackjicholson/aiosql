@@ -34,7 +34,7 @@ class DuckDBAdapter(GenericAdapter):
                         column_names = [c[0] for c in cur.description]
                         first = False
                     if self.convert_row_to_dict:
-                        yield dict(zip(column_names, row))
+                        yield dict(zip(column_names, row, strict=False))
                     else:
                         yield row
             else:
@@ -43,7 +43,7 @@ class DuckDBAdapter(GenericAdapter):
                     if first:  # only get description on the fly, for apsw
                         column_names = [c[0] for c in cur.description]
                         first = False
-                    yield record_class(**dict(zip(column_names, row)))
+                    yield record_class(**dict(zip(column_names, row, strict=False)))
         finally:
             cur.close()
 
@@ -54,7 +54,7 @@ class DuckDBAdapter(GenericAdapter):
             result = cur.fetchone()
             if result is not None and record_class is not None:
                 column_names = [c[0] for c in cur.description]
-                result = record_class(**dict(zip(column_names, result)))
+                result = record_class(**dict(zip(column_names, result, strict=False)))
             elif result is not None and self.convert_row_to_dict:
                 column_names = [c[0] for c in cur.description]
                 result = dict(zip(column_names, result))
