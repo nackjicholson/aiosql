@@ -4,6 +4,7 @@ import aiosql
 from conf_mysql import my_dsn, my_db, my_conn
 from conf_pgsql import pg_conn, pg_params, pg_dsn
 from conf_sqlite import sqlite3_db_path
+from conf_duckdb import duckdb_db_path, duckdb_conn
 
 
 def pytest_addoption(parser):

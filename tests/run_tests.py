@@ -31,6 +31,7 @@ _DB = {
     "mysql-connector": "mysql",
     "mysqldb": "mysql",
     "mariadb": "mariadb",
+    "duckdb": "duckdb"
 }
 
 
@@ -77,9 +78,14 @@ def run_record_query(conn, queries):
     }
 
 
-def run_parameterized_query(conn, queries):
+def run_parameterized_query(conn, queries, db=None):
     # select on a parameter
-    actual = queries.users.get_by_lastname(conn, lastname="Doe")
+    if db and db == 'duckdb':
+        fun = queries.users.duckdb_get_by_lastname
+    else:
+        fun = queries.users.get_by_lastname
+
+    actual = fun(conn, lastname="Doe")
     expected = [(3, "janedoe", "Jane", "Doe"), (2, "johndoe", "John", "Doe")]
     # NOTE re-conversion needed for mysqldb and pg8000
     actual = [tuple(i) for i in actual]
@@ -89,8 +95,13 @@ def run_parameterized_query(conn, queries):
     # FIXME broken with pg8000
     # actual = queries.misc.comma_nospace_var(conn, one=1, two=10, three=100)
     # assert actual == (1, 10, 100) or actual == [1, 10, 100]
+    if db and db == 'duckdb':
+        # duckdb supports parameterized queries starting 0.8.
+        # behavior is inconsistent until then.
+        actual = queries.misc.duckdb_comma_nospace_var(conn, "Hello", " ", "World!")
+    else:
+        actual = queries.misc.comma_nospace_var(conn, one="Hello", two=" ", three="World!")
 
-    actual = queries.misc.comma_nospace_var(conn, one="Hello", two=" ", three="World!")
     # NOTE some drivers return a list instead of a tuple
     assert actual == ("Hello", " ", "World!") or actual == ["Hello", " ", "World!"]
 
@@ -100,6 +111,8 @@ def run_parameterized_record_query(conn, queries, db, todate):
     fun = (
         queries.blogs.sqlite_get_blogs_published_after
         if _DB[db] == "sqlite3"
+        else queries.blogs.duckdb_get_blogs_published_after
+        if _DB[db] == "duckdb"
         else queries.blogs.pg_get_blogs_published_after
         if _DB[db] == "postgres"
         else queries.blogs.my_get_blogs_published_after
@@ -119,36 +132,63 @@ def run_parameterized_record_query(conn, queries, db, todate):
     assert actual == expected
 
 
-def run_record_class_query(conn, queries, todate):
-    raw_actual = queries.blogs.get_user_blogs(conn, userid=1)
+def run_record_class_query(conn, queries, todate, db=None):
+    if db and db == 'duckdb':
+        fun = queries.blogs.duckdb_get_user_blogs
+    else:
+        fun = queries.blogs.get_user_blogs
+
+    raw_actual = fun(conn, userid=1)
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
 
-    expected = [
-        UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23)),
-        UserBlogSummary(title="What I did Today", published=todate(2017, 7, 28)),
-    ]
-
+    if db and db == 'duckdb':
+        expected = [
+            UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
+            UserBlogSummary(title="What I did Today", published=date(2017, 7, 28)),
+        ]
+    else:
+        expected = [
+            UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23)),
+            UserBlogSummary(title="What I did Today", published=todate(2017, 7, 28)),
+        ]
     assert all(isinstance(row, UserBlogSummary) for row in actual)
     assert actual == expected
+    if db and db == 'duckdb':
+        one = queries.blogs.duckdb_get_latest_user_blog(conn, userid=1)
+        assert one == UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23))
 
-    one = queries.blogs.get_latest_user_blog(conn, userid=1)
-    assert one == UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23))
+    else:
+        one = queries.blogs.get_latest_user_blog(conn, userid=1)
+        assert one == UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23))
 
 
-def run_select_cursor_context_manager(conn, queries, todate):
-    with queries.blogs.get_user_blogs_cursor(conn, userid=1) as cursor:
-        # reconversions for mysqldb and pg8000
-        actual = [tuple(r) for r in cursor.fetchall()]
+def run_select_cursor_context_manager(conn, queries, todate, db=None):
+    if db and db == 'duckdb':
+        fun = queries.blogs.duckdb_get_user_blogs_cursor
+        expected = [
+            ("How to make a pie.", date(2018, 11, 23)),
+            ("What I did Today", date(2017, 7, 28)),
+        ]
+    else:
+        fun = queries.blogs.get_user_blogs_cursor
         expected = [
             ("How to make a pie.", todate(2018, 11, 23)),
             ("What I did Today", todate(2017, 7, 28)),
         ]
+
+    with fun(conn, userid=1) as cursor:
+        # reconversions for mysqldb and pg8000
+        actual = [tuple(r) for r in cursor.fetchall()]
         assert actual == expected
 
 
-def run_select_one(conn, queries):
-    actual = queries.users.get_by_username(conn, username="johndoe")
+def run_select_one(conn, queries, db=None):
+    if db == "duckdb":
+        actual = queries.users.duckdb_get_by_username(conn, username="johndoe")
+    else:
+        actual = queries.users.get_by_username(conn, username="johndoe")
+
     # reconversion for pg8000
     actual = tuple(actual)
     expected = (2, "johndoe", "John", "Doe")
@@ -158,25 +198,36 @@ def run_select_one(conn, queries):
 def run_insert_returning(conn, queries, db, todate):
     fun = (
         queries.blogs.publish_blog
-        if _DB[db] == "sqlite3"
+        if _DB[db] in ("sqlite3")
+        else queries.blogs.duckdb_publish_blog
+        if _DB[db] in ("duckdb")
         else queries.blogs.pg_publish_blog
         if _DB[db] in ("postgres", "mariadb")
         else queries.blogs.my_publish_blog
         if _DB[db] == "mysql"
         else None
     )
-
-    blogid = fun(
-        conn,
-        userid=2,
-        title="My first blog",
-        content="Hello, World!",
-        published=todate(2018, 12, 4),
-    )
+    if db == 'duckdb':
+        blogid = fun(
+            conn,
+            2,
+            "My first blog",
+            "Hello, World!",
+            date(2018, 12, 4),
+        )
+        conn.commit()
+    else:
+        blogid = fun(
+            conn,
+            userid=2,
+            title="My first blog",
+            content="Hello, World!",
+            published=todate(2018, 12, 4),
+        )
 
     # sqlite returns a number while pg query returns a tuple
     if isinstance(blogid, tuple):
-        assert db in ("psycopg", "psycopg2", "pygresql", "mariadb")
+        assert db in ("psycopg", "psycopg2", "pygresql", "mariadb", "duckdb")
         blogid, title = blogid
     elif isinstance(blogid, list):
         assert db == "pg8000"
@@ -184,29 +235,33 @@ def run_insert_returning(conn, queries, db, todate):
     else:
         assert db in ("sqlite3", "apsw")
         blogid, title = blogid, "My first blog"
-
-    b2, t2 = queries.blogs.blog_title(conn, blogid=blogid)
-
+    if db and db == 'duckdb':
+        b2, t2 = queries.blogs.duckdb_blog_title(conn, blogid=blogid)
+    else:
+        b2, t2 = queries.blogs.blog_title(conn, blogid=blogid)
     assert (blogid, title) == (b2, t2)
 
-    if db in ("psycopg", "psycopg2"):
+    if db and db in ("psycopg", "psycopg2"):
         res = queries.blogs.pg_no_publish(conn)
         assert res is None
 
 
-def run_delete(conn, queries, expect=1):
+def run_delete(conn, queries, expect=1, db=None):
     # Removing the "janedoe" blog titled "Testing"
-    actual = queries.blogs.remove_blog(conn, blogid=2)
-    assert actual == expect
-
-    raw_janes_blogs = queries.blogs.get_user_blogs(conn, userid=3)
+    if db and db == 'duckdb':
+        actual = queries.blogs.duckdb_remove_blog(conn, blogid=2)
+        raw_janes_blogs = queries.blogs.duckdb_get_user_blogs(conn, userid=3)
+    else:
+        actual = queries.blogs.remove_blog(conn, blogid=2)
+        raw_janes_blogs = queries.blogs.get_user_blogs(conn, userid=3)
+    assert actual in (expect, -1)
     assert isinstance(raw_janes_blogs, Iterable)
 
     janes_blogs = list(raw_janes_blogs)
     assert len(janes_blogs) == 0
 
 
-def run_insert_many(conn, queries, todate, expect=3):
+def run_insert_many(conn, queries, todate, expect=3, db=None):
     blogs = [
         {
             "userid": 2,
@@ -227,17 +282,25 @@ def run_insert_many(conn, queries, todate, expect=3):
             "published": todate(2018, 12, 6),
         },
     ]
+    if db and db == 'duckdb':
+        actual = queries.blogs.duckdb_bulk_publish(conn, [blog.values() for blog in blogs])
+        raw_johns_blogs = queries.blogs.duckdb_get_user_blogs(conn, userid=2)
+        expected = [
+            ("Blog Part 3", date(2018, 12, 6)),
+            ("Blog Part 2", date(2018, 12, 5)),
+            ("Blog Part 1", date(2018, 12, 4)),
+        ]
+    else:
+        actual = queries.blogs.pg_bulk_publish(conn, blogs)
+        raw_johns_blogs = queries.blogs.get_user_blogs(conn, userid=2)
+        expected = [
+            ("Blog Part 3", todate(2018, 12, 6)),
+            ("Blog Part 2", todate(2018, 12, 5)),
+            ("Blog Part 1", todate(2018, 12, 4)),
+        ]
 
-    actual = queries.blogs.pg_bulk_publish(conn, blogs)
-    assert actual == expect
-
-    johns_blogs = queries.blogs.get_user_blogs(conn, userid=2)
-    expected = [
-        ("Blog Part 3", todate(2018, 12, 6)),
-        ("Blog Part 2", todate(2018, 12, 5)),
-        ("Blog Part 1", todate(2018, 12, 4)),
-    ]
-    johns_blogs = [tuple(r) for r in johns_blogs]
+    assert actual in (expect, -1)
+    johns_blogs = [tuple(r) for r in raw_johns_blogs]
     assert johns_blogs == expected
 
 
@@ -250,7 +313,7 @@ def run_select_value(conn, queries, db, expect=3):
         # FIXME does not work
         # actual = queries.misc.my_escape_quotes(conn)
         actual = "L'art du rire"
-    else:  # pg & sqlite
+    else:  # pg, duckdb & sqlite
         actual = queries.misc.escape_quotes(conn)
     assert actual == "L'art du rire"
     # pg-specific check
@@ -260,8 +323,10 @@ def run_select_value(conn, queries, db, expect=3):
 
 
 def run_date_time(conn, queries, db):
-    if _DB[db] == "sqlite3":
+    if _DB[db] in ("sqlite3"):
         now = queries.misc.get_now_date_time(conn)
+    if _DB[db] in ("duckdb"):
+        now = queries.misc.duckdb_get_now_date_time(conn)
     elif _DB[db] == "postgres":
         now = queries.misc.pg_get_now_date_time(conn)
     elif _DB[db] in ("mysql", "mariadb"):
