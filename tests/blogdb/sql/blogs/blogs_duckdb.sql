@@ -36,7 +36,7 @@ insert into blogs (
 values (
   nextval('blogs_seq'), ?, ?, ? , ?
 )
-returning blogid, title;
+returning (blogid, title);
 
 -- name: duckdb-remove-blog!
 -- Remove a blog from the database

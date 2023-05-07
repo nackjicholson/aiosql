@@ -10,6 +10,18 @@ class DuckDBAdapter(GenericAdapter):
         super().__init__(driver=driver)
         self.convert_row_to_dict = cursor_as_dict
 
+    def insert_returning(self, conn, _query_name, sql, parameters):
+        # very similar to select_one but the returned value
+        cur = self._cursor(conn)
+        cur.execute(sql, parameters)
+        # we have to use fetchall instead of fetchone for now due to this:
+        # https://github.com/duckdb/duckdb/issues/6008
+        res = cur.fetchall()
+        cur.close()
+        if isinstance(res, list):
+            res = res[0]
+        return res[0] if res and len(res) == 1 else res
+
     def select(self, conn, _query_name, sql, parameters, record_class=None):
         cur = self._cursor(conn)
         try:
@@ -44,6 +56,7 @@ class DuckDBAdapter(GenericAdapter):
                 column_names = [c[0] for c in cur.description]
                 result = record_class(**dict(zip(column_names, result)))
             elif result is not None and self.convert_row_to_dict:
+                column_names = [c[0] for c in cur.description]
                 result = dict(zip(column_names, result))
         finally:
             cur.close()
