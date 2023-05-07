@@ -57,7 +57,7 @@ class DuckDBAdapter(GenericAdapter):
                 result = record_class(**dict(zip(column_names, result, strict=False)))
             elif result is not None and self.convert_row_to_dict:
                 column_names = [c[0] for c in cur.description]
-                result = dict(zip(column_names, result))
+                result = dict(zip(column_names, result, strict=False))
         finally:
             cur.close()
         return result
