@@ -8,6 +8,7 @@ from .adapters.mysql import BrokenMySQLAdapter
 from .adapters.generic import GenericAdapter
 from .adapters.sqlite3 import SQLite3Adapter
 from .adapters.pg8000 import Pg8000Adapter
+from .adapters.duckdb import DuckDBAdapter
 from .utils import SQLLoadException, log
 from .queries import Queries
 from .query_loader import QueryLoader
@@ -26,6 +27,7 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "pygresql": PyFormatAdapter,
     "pymysql": BrokenMySQLAdapter,
     "sqlite3": SQLite3Adapter,
+    "duckdb": DuckDBAdapter,
 }
 
 

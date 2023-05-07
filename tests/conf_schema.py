@@ -8,11 +8,11 @@ BLOGS_DATA_PATH = BLOGDB_PATH / "data/blogs_data.csv"
 
 
 def create_user_blogs(db):
-    assert db in ("sqlite", "pgsql", "mysql")
+    assert db in ("sqlite", "pgsql", "mysql", "duckdb")
     serial = (
-        "SERIAL" if db == "pgsql" else "INTEGER" if db == "sqlite" else "INTEGER auto_increment"
+        "SERIAL" if db == "pgsql" else "INTEGER" if db in ("sqlite", "duckdb") else "INTEGER auto_increment"
     )
-    return (
+    ddl_statements = [
         f"""CREATE TABLE IF NOT EXISTS users (
                 userid {serial} PRIMARY KEY,
                 username TEXT NOT NULL,
@@ -25,14 +25,17 @@ def create_user_blogs(db):
                 content TEXT NOT NULL,
                 published DATE NOT NULL DEFAULT (CURRENT_DATE),
                 FOREIGN KEY (userid) REFERENCES users(userid));""",
-    )
+    ]
+    if db and db == 'duckdb':
+        ddl_statements.extend(["create sequence users_seq;", "create sequence blogs_seq;"])
+    return tuple(ddl_statements)
 
 
 def drop_user_blogs(db):
     return (
-        f"DROP TABLE IF EXISTS comments",
-        f"DROP TABLE IF EXISTS blogs",
-        f"DROP TABLE IF EXISTS users",
+        "DROP TABLE IF EXISTS comments",
+        "DROP TABLE IF EXISTS blogs",
+        "DROP TABLE IF EXISTS users",
     )
 
 
