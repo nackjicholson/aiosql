@@ -1,3 +1,5 @@
+LABEL description="Python setup for AioSQL MariaDB testing"
+# python testing environment
 FROM ubuntu
 RUN apt update
 RUN apt install -y --no-install-recommends \
@@ -5,7 +7,7 @@ RUN apt install -y --no-install-recommends \
 RUN python -m venv /venv
 RUN /venv/bin/pip install asyncio pytest pytest-asyncio coverage
 WORKDIR /code
-# mariadb specific
+# mariadb specific packages
 RUN curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 RUN apt install -y --no-install-recommends libmariadb-dev
 RUN apt clean
