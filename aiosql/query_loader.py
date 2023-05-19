@@ -147,28 +147,34 @@ class QueryLoader:
             lineno += qdef.count("\n")
         return data
 
-    def load_query_data_from_file(self, path: Path, ns_parts: List[str] = []) -> List[QueryDatum]:
-        return self.load_query_data_from_sql(path.read_text(), ns_parts, path)
+    def load_query_data_from_file(
+        self, path: Path, ns_parts: List[str] = [], encoding=None
+    ) -> List[QueryDatum]:
+        return self.load_query_data_from_sql(path.read_text(encoding=encoding), ns_parts, path)
 
-    def load_query_data_from_dir_path(self, dir_path, ext=(".sql",)) -> QueryDataTree:
+    def load_query_data_from_dir_path(
+        self, dir_path, ext=(".sql",), encoding=None
+    ) -> QueryDataTree:
         if not dir_path.is_dir():
             raise ValueError(f"The path {dir_path} must be a directory")
 
-        def _recurse_load_query_data_tree(path, ns_parts=[], ext=(".sql",)):
+        def _recurse_load_query_data_tree(path, ns_parts=[], ext=(".sql",), encoding=None):
             query_data_tree = {}
             for p in path.iterdir():
                 if p.is_file():
                     if p.suffix not in ext:
                         continue
-                    for query_datum in self.load_query_data_from_file(p, ns_parts):
+                    for query_datum in self.load_query_data_from_file(
+                        p, ns_parts, encoding=encoding
+                    ):
                         query_data_tree[query_datum.query_name] = query_datum
                 elif p.is_dir():
                     query_data_tree[p.name] = _recurse_load_query_data_tree(
-                        p, ns_parts + [p.name], ext=ext
+                        p, ns_parts + [p.name], ext=ext, encoding=encoding
                     )
                 else:  # pragma: no cover
                     # This should be practically unreachable.
                     raise SQLLoadException(f"The path must be a directory or file, got {p}")
             return query_data_tree
 
-        return _recurse_load_query_data_tree(dir_path, ext=ext)
+        return _recurse_load_query_data_tree(dir_path, ext=ext, encoding=encoding)
