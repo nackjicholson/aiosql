@@ -74,7 +74,7 @@ venv:
 
 venv.dev: venv
 	source venv/bin/activate
-	$(PIP) install -r dev-requirements.txt
+	$(PIP) install .[dev,dev-postgres,dev-sqlite,dev-duckdb]
 
 venv.prod: venv
 

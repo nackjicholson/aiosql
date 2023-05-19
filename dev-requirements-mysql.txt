@@ -1,5 +1,0 @@
-# MySQL testing stuff
-pytest-mysql>=2
-mysqlclient>=2
-mysql-connector-python
-pymysql>=1

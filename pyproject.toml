@@ -1,54 +1,59 @@
-[tool.poetry]
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
 name = "aiosql"
-version = "8.0"
+version = "9.0"
+authors = [ { name = "William Vaughn et al.", email = "vaughnwilld@gmail.com" } ]
 description = "Simple SQL in Python"
-authors = ["William Vaughn <vaughnwilld@gmail.com>"]
-maintainers = ["Fabien Coelho <aio.sql@coelho.net>"]
-license = "BSD-2-Clause"
 readme = "README.rst"
-homepage = "https://github.com/nackjicholson/aiosql"
-repository = "https://github.com/nackjicholson/aiosql.git"
-documentation = "https://nackjicholson.github.io/aiosql/"
+requires-python = ">=3.8"
+license = { text = "BSD 2-Clause License" }
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: BSD License",
-    "Operating System :: OS Independent"
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent"
 ]
 
-[tool.poetry.dependencies]
-python = "^3.7"
-setuptools = "*"  # for pkg_resources
+[project.optional-dependencies]
+dev = [
+  "pytest", "pytest-asyncio",
+  "rstcheck", "black", "coverage", "flake8", "mypy"
+]
+dev-duckdb = [
+  "duckdb"
+]
+dev-sqlite = [
+  "aiosqlite", "apsw"
+]
+dev-postgres = [
+  "pytest-postgresql",
+  "asyncpg; python_version < '3.12'",
+  "psycopg>=3", "psycopg2", "psycopg2-binary",
+  "pygresql"
+]
+dev-mysql = [
+  "pytest-mysql",
+  "mysqlclient", "mysql-connector-python", "pymysql"
+]
+dev-mariadb = [
+  "mariadb"
+]
+dist = [
+  "build", "wheel", "twine",
+  "sphinx >= 4, < 5", "sphinx-rtd-theme >= 0.5.2"
+]
 
-[tool.poetry.dev-dependencies]
-pytest = "*"
-pytest-asyncio = "*"
-pytest-postgresql = "^4"
-pytest-mysql = "^2"
-coverage = "*"
-black = "*"
-flake8 = "*"
-mypy = "*"
-psycopg = "^3"
-psycopg2 = "^2"
-pg8000 = "*"
-PyGreSQL = "*"
-PyMySQL = "*"
-mysql-connector = "*"
-mysqlclient = "*"
-apsw = "*"
-asyncpg = "*"
-aiosqlite = "*"
-duckdb = "*"
+[tool.setuptools.package-data]
+aiosql = [ "py.typed" ]
 
-[build-system]
-# setuptools needed so that pip works?
-requires = ["poetry-core>=1.0.0", "setuptools"]
-build-backend = "poetry.core.masonry.api"
+[tool.setuptools.packages.find]
+include = [ "aiosql" ]
+exclude = [ "tests" ]
 
-[tool.black]
-line-length = 100
-target-version = ["py37"]
-
-[tool.mypy]
-exclude = ["(build|venv)/", ".*/virtualenvs/.*"]
-ignore_missing_imports = true
+[project.urls]
+repository = "https://github.com/nackjicholson/aiosql"
+documentation = "https://nackjicholson.github.io/aiosql/"
+issues = "https://github.com/nackjicholson/aiosql/issues"
+package = "https://pypi.org/project/aiosql/"
