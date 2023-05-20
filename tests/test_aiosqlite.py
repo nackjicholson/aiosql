@@ -28,9 +28,11 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
+
 # NOTE no cursor on aiosqlite driver adapter
 # def test_cursor(conn, queries):
 #    t.run_cursor(conn, queries)
+
 
 @pytest.mark.asyncio
 async def test_record_query(sqlite3_db_path, queries):
