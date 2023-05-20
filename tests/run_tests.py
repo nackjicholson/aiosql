@@ -70,7 +70,7 @@ def run_cursor(conn, queries):
     cur = queries.driver_adapter._cursor(conn)
     cur.execute("SELECT 'Hello World!'")
     res = cur.fetchone()
-    assert res in [ ("Hello World!",), ["Hello World!"] ]
+    assert res in [("Hello World!",), ["Hello World!"]]
     cur.close()
 
 
