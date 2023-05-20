@@ -16,9 +16,6 @@ SELECT date_format(NOW(), '%Y-%m-%d %H:%i:%S');
 -- name: comma_nospace_var^
 SELECT :one,:two,:three AS comma;
 
--- name: duckdb_comma_nospace_var^
-SELECT ?,?,? AS comma;
-
 -- NOTE this does not work with mysql which uses backslash escapes
 -- name: escape-quotes$
 SELECT 'L''art du rire' AS escaped;

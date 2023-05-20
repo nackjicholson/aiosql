@@ -21,8 +21,12 @@ def duckdb_conn(duckdb_db_path):
 def populate_duckdb_db(conn):
     conn.execute("\n".join(create_user_blogs("duckdb")))
     conn.execute(
-        f"insert into users(userid, username, firstname, lastname) select nextval('users_seq') userid, column0 as username, column1 as firstname, column2 as lastname from read_csv_auto('{str(USERS_DATA_PATH)}', header=False)"
+        "insert into users(userid, username, firstname, lastname)\n"
+        "select nextval('users_seq') userid, column0 as username, column1 as firstname, column2 as lastname\n"
+        f"from read_csv_auto('{str(USERS_DATA_PATH)}', header=False)"
     )
     conn.execute(
-        f"insert into blogs(blogid, userid, title, content, published) select nextval('blogs_seq') blogid, column0 as userid, column1 as title, column2 as content, column3 as published from read_csv_auto('{str(BLOGS_DATA_PATH)}', header=False)"
+        "insert into blogs(blogid, userid, title, content, published)\n"
+        "select nextval('blogs_seq') blogid, column0 as userid, column1 as title, column2 as content, column3 as published\n"
+        f"from read_csv_auto('{str(BLOGS_DATA_PATH)}', header=False)"
     )

@@ -1,4 +1,5 @@
 -- name: duckdb-create-comments-table#
+create sequence comments_seq;
 create table comments (
     commentid integer not null primary key,
     blogid integer not null,
@@ -6,4 +7,3 @@ create table comments (
     content text not null,
     foreign key(blogid) references blogs(blogid)
 );
-create sequence comments_seq;

@@ -13,6 +13,7 @@ VAR_REF = re.compile(
 """Pattern to identifies colon-variables in SQL code"""
 
 log = logging.getLogger("aiosql")
+log.setLevel(logging.DEBUG)
 
 
 class SQLLoadException(Exception):
