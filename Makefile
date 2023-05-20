@@ -288,6 +288,10 @@ check.coverage.mariadb.detached: check.pytest.mariadb.detached
 .PHONY: check.coverage.mariadb.local
 check.coverage.mariadb.local: check.pytest.mariadb.local
 
+.PHONY: check.coverage.skip.local
+check.coverage.skip.local:
+	# skipped!
+
 .PHONY: check.coverage.misc
 check.coverage.misc: check.pytest.misc
 
