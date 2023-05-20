@@ -47,7 +47,7 @@ values (
 
 -- name: pg-get-modulo$
 -- %-escaped percent modulo operator
-SELECT :left %% :right;
+SELECT :numerator %% :denominator;
 
 -- name: pg-get-modulo-2$
 -- no-escape modulo + cast

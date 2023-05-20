@@ -153,8 +153,6 @@ def run_select_cursor_context_manager(conn, queries, todate, db=None):
     with fun(conn, userid=1) as cursor:
         # reconversions for mysqldb and pg8000
         actual = [tuple(r) for r in cursor.fetchall()]
-        log.warning(f"actual: {actual}")
-        log.warning(f"expected: {expected}")
         assert actual == expected
 
 
@@ -192,7 +190,7 @@ def run_insert_returning(conn, queries, db, todate):
             conn,
             userid=2,
             title="My first blog",
-            content="Hello, World!",
+            contents="Hello, World!",
             published=todate(2018, 12, 4),
         )
 
@@ -391,7 +389,7 @@ async def run_async_insert_returning(conn, queries, db, todate):
         conn,
         userid=2,
         title="My first blog",
-        content="Hello, World!",
+        contents="Hello, World!",
         published=todate(2018, 12, 4),
     )
 
