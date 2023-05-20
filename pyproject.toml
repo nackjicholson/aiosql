@@ -19,7 +19,8 @@ classifiers = [
 [project.optional-dependencies]
 dev = [
   "pytest", "pytest-asyncio",
-  "rstcheck", "black", "coverage", "flake8", "mypy"
+  "rstcheck", "black", "coverage", "flake8",
+  "mypy", "types-setuptools"
 ]
 dev-duckdb = [
   "duckdb"
