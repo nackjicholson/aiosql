@@ -92,11 +92,11 @@ Badges
    :alt: Version
    :target: https://pypi.org/project/aiosql/
 
-.. image:: https://img.shields.io/badge/databases-4-informational
+.. image:: https://img.shields.io/badge/databases-5-informational
    :alt: Databases
    :target: https://github.com/nackjicholson/aiosql/
 
-.. image:: https://img.shields.io/badge/drivers-12-informational
+.. image:: https://img.shields.io/badge/drivers-13-informational
    :alt: Drivers
    :target: https://github.com/nackjicholson/aiosql/
 
