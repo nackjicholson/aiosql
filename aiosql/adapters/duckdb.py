@@ -1,6 +1,7 @@
 from .generic import GenericAdapter
 from ..utils import VAR_REF
 
+
 def _colon_to_dollar(match):
     """Convert 'WHERE :id = 1' to 'WHERE $id = 1'."""
     gd = match.groupdict()
