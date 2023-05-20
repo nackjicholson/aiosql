@@ -29,8 +29,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install -r dev-requirements.txt
-        python -m pip install -r dev-requirements-mysql.txt
+        python -m pip install .[dev,dev-postgres,dev-mysql,dev-sqlite,dev-duckdb]
     - name: Check types with mypy
       run: make VENV= INSTALL= check.mypy
     - name: Lint with black
