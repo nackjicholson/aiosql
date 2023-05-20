@@ -1,4 +1,4 @@
-LABEL description="Python setup for AioSQL MariaDB testing"
+LABEL description="Python setup for AioSQL MariaDB, SQLite and DuckDB testing"
 # python testing environment
 FROM ubuntu
 RUN apt update
@@ -9,6 +9,6 @@ RUN /venv/bin/pip install asyncio pytest pytest-asyncio coverage
 WORKDIR /code
 # mariadb specific packages
 RUN curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
-RUN apt install -y --no-install-recommends libmariadb-dev
+RUN apt install -y --no-install-recommends libmariadb-dev sqlite3
 RUN apt clean
-RUN /venv/bin/pip install mariadb pytest-mysql
+RUN /venv/bin/pip install mariadb pytest-mysql duckdb apsw aiosqlite

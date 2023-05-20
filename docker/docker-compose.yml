@@ -22,7 +22,7 @@ services:
       - ..:/code
     depends_on:
       - postgres-server
-    command: make VENV=/venv PG_HOST=postgres-server PG_PORT=5432 check.$TEST.misc check.$TEST.postgres.detached
+    command: make VENV=/venv PG_HOST=postgres-server PG_PORT=5432 check.$TEST.postgres.detached
   #
   # mysql tests
   #
@@ -56,4 +56,4 @@ services:
       - mariadb-server
     volumes:
       - ..:/code
-    command: make VENV=/venv MA_HOST=mariadb-server MA_PORT=3306 check.$TEST.mariadb.detached
+    command: make VENV=/venv MA_HOST=mariadb-server MA_PORT=3306 check.$TEST.mariadb.detached check.$TEST.misc
