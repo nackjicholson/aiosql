@@ -32,7 +32,8 @@ class DuckDBAdapter(GenericAdapter):
                         column_names = [c[0] for c in cur.description or []]
                         first = False
                     if self._convert_row_to_dict:
-                        yield dict(zip(column_names, row, strict=False))
+                        # strict=False: requires 3.10
+                        yield dict(zip(column_names, row))
                     else:
                         yield row
             else:
@@ -41,7 +42,8 @@ class DuckDBAdapter(GenericAdapter):
                     if first:  # only get description on the fly, for apsw
                         column_names = [c[0] for c in cur.description or []]
                         first = False
-                    yield record_class(**dict(zip(column_names, row, strict=False)))
+                    # strict=False: requires 3.10
+                    yield record_class(**dict(zip(column_names, row)))
         finally:
             cur.close()
 
