@@ -118,7 +118,11 @@ def run_parameterized_record_query(conn, queries, db, todate):
     actual = list(raw_actual)
 
     expected = [
-        {"title": "How to make a pie.", "username": "bobsmith", "published": "2018-11-23 00:00"},
+        {
+            "title": "How to make a pie.",
+            "username": "bobsmith",
+            "published": "2018-11-23 00:00",
+        },
         {"title": "Testing", "username": "janedoe", "published": "2018-01-01 00:00"},
     ]
 
@@ -140,7 +144,9 @@ def run_record_class_query(conn, queries, todate, db=None):
     assert actual == expected
 
     one = queries.blogs.get_latest_user_blog(conn, userid=1)
-    assert one == UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23))
+    assert one == UserBlogSummary(
+        title="How to make a pie.", published=todate(2018, 11, 23)
+    )
 
 
 def run_select_cursor_context_manager(conn, queries, todate, db=None):
@@ -336,7 +342,11 @@ async def run_async_parameterized_record_query(conn, queries, db, todate):
     actual = [dict(rec) for rec in records]
 
     expected = [
-        {"title": "How to make a pie.", "username": "bobsmith", "published": "2018-11-23 00:00"},
+        {
+            "title": "How to make a pie.",
+            "username": "bobsmith",
+            "published": "2018-11-23 00:00",
+        },
         {"title": "Testing", "username": "janedoe", "published": "2018-01-01 00:00"},
     ]
 
@@ -355,7 +365,9 @@ async def run_async_record_class_query(conn, queries, todate):
     assert actual == expected
 
     one = await queries.blogs.get_latest_user_blog(conn, userid=1)
-    assert one == UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23))
+    assert one == UserBlogSummary(
+        title="How to make a pie.", published=todate(2018, 11, 23)
+    )
 
 
 async def run_async_select_cursor_context_manager(conn, queries, todate):
