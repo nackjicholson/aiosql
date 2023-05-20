@@ -248,7 +248,7 @@ check.pytest.mariadb: $(INSTALL)
 	$(PYTEST) $(PYTOPT) --mysql-driver=mariadb tests/test_mariadb.py
 
 #
-# SQLite3 and Misc
+# SQLite3, DuckDB and Misc
 #
 
 .PHONY: check.pytest.misc
@@ -259,7 +259,8 @@ check.pytest.misc: $(INSTALL)
 	  tests/test_patterns.py \
 	  tests/test_sqlite3.py \
 	  tests/test_apsw.py \
-	  tests/test_aiosqlite.py
+	  tests/test_aiosqlite.py \
+	  tests/test_duckdb.py
 
 # run coverage by overriding PYTEST
 
