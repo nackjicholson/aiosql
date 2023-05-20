@@ -4,12 +4,10 @@ from .generic import GenericAdapter
 class DuckDBAdapter(GenericAdapter):
     """DuckDB Adapter"""
 
-    convert_row_to_dict: bool = False
-    """Converts the default tuple response to a dict."""
-
     def __init__(self, driver=None, cursor_as_dict: bool = False):
         super().__init__(driver=driver)
-        self.convert_row_to_dict = cursor_as_dict
+        # whether to converts the default tuple response to a dict.
+        self._convert_row_to_dict = cursor_as_dict
 
     def insert_returning(self, conn, _query_name, sql, parameters):
         # very similar to select_one but the returned value
@@ -33,7 +31,7 @@ class DuckDBAdapter(GenericAdapter):
                     if first:  # get column names on the fly
                         column_names = [c[0] for c in cur.description or []]
                         first = False
-                    if self.convert_row_to_dict:
+                    if self._convert_row_to_dict:
                         yield dict(zip(column_names, row, strict=False))
                     else:
                         yield row
@@ -55,7 +53,7 @@ class DuckDBAdapter(GenericAdapter):
             if result is not None and record_class is not None:
                 column_names = [c[0] for c in cur.description or []]
                 result = record_class(**dict(zip(column_names, result, strict=False)))
-            elif result is not None and self.convert_row_to_dict:
+            elif result is not None and self._convert_row_to_dict:
                 column_names = [c[0] for c in cur.description or []]
                 result = dict(zip(column_names, result, strict=False))
         finally:
