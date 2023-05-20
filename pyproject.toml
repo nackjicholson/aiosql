@@ -32,7 +32,7 @@ dev-postgres = [
   "pytest-postgresql",
   "asyncpg; python_version < '3.12'",
   "psycopg>=3", "psycopg2", "psycopg2-binary",
-  "pygresql"
+  "pygresql", "pg8000"
 ]
 dev-mysql = [
   "pytest-mysql",
