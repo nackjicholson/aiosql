@@ -3,6 +3,7 @@ from .generic import GenericAdapter
 
 class DuckDBAdapter(GenericAdapter):
     """DuckDB Adapter"""
+
     convert_row_to_dict: bool = False
     """Converts the default tuple response to a dict."""
 
@@ -27,7 +28,6 @@ class DuckDBAdapter(GenericAdapter):
         try:
             cur.execute(sql, parameters)
             if record_class is None:
-
                 first = True
                 for row in cur.fetchall():
                     if first:  # get column names on the fly
