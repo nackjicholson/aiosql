@@ -37,6 +37,10 @@ def conn(pg_params):
         yield conn
 
 
+def test_cursor(conn, queries):
+    t.run_cursor(conn, queries)
+
+
 @pytest.mark.skip("row factory is not supported")
 def test_record_query(pg_params, queries):
     with db.connect(**pg_params, row_factory=dict_row) as conn:

@@ -33,6 +33,10 @@ def test_version():
     assert db.__version__.startswith("2.")
 
 
+def test_cursor(conn, queries):
+    t.run_cursor(conn, queries)
+
+
 def test_record_query(pg_dsn, queries):
     with db.connect(dsn=pg_dsn, cursor_factory=DictCursor) as conn:
         t.run_record_query(conn, queries)

@@ -37,6 +37,10 @@ def test_my_db(my_db):
     t.run_something(my_db)
 
 
+def test_cursor(my_conn, queries):
+    t.run_cursor(my_conn, queries)
+
+
 def test_record_query(my_db, my_dsn, queries):
     with db.connect(**my_dsn, cursorclass=db.cursors.DictCursor) as conn:
         t.run_record_query(conn, queries)

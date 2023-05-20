@@ -20,6 +20,10 @@ def queries() -> Queries:
     return t.queries(DRIVER)
 
 
+def test_cursor(conn, queries):
+    t.run_cursor(conn, queries)
+
+
 @pytest.mark.skip("does not work yet")
 def test_record_query(conn, queries: Queries):
     queries.driver_adapter.convert_row_to_dict = True
