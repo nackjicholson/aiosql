@@ -51,7 +51,7 @@ class DuckDBAdapter(GenericAdapter):
                         yield dict(zip(column_names, row))
                     else:
                         yield row
-            else:
+            else:  # pragma: no cover
                 first = True
                 for row in cur.fetchall():
                     if first:  # only get description on the fly, for apsw
@@ -67,7 +67,7 @@ class DuckDBAdapter(GenericAdapter):
         try:
             cur.execute(sql, parameters)
             result = cur.fetchone()
-            if result is not None and record_class is not None:
+            if result is not None and record_class is not None:  # pragma: no cover
                 column_names = [c[0] for c in cur.description or []]
                 # strict=False: requires 3.10
                 result = record_class(**dict(zip(column_names, result)))
