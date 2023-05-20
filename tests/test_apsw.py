@@ -59,6 +59,10 @@ def conn(sqlite3_db_path):
     conn.close()
 
 
+def test_cursor(conn, queries):
+    t.run_cursor(conn, queries)
+
+
 def test_record_query(conn, queries):
     conn.setrowtrace(dict_factory)
     t.run_record_query(conn, queries)

@@ -23,6 +23,10 @@ def queries():
     return t.queries(DRIVER)
 
 
+def test_cursor(conn, queries):
+    t.run_cursor(conn, queries)
+
+
 def test_my_dsn(my_dsn):
     assert "user" in my_dsn and "host" in my_dsn and "port" in my_dsn
     assert "dbname" not in my_dsn and "database" in my_dsn

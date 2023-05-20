@@ -66,6 +66,14 @@ def run_something(conn):
     conn.commit()
 
 
+def run_cursor(conn, queries):
+    cur = queries.driver_adapter._cursor(conn)
+    cur.execute("SELECT 'Hello World!'")
+    res = cur.fetchone()
+    assert res in [ ("Hello World!",), ["Hello World!"] ]
+    cur.close()
+
+
 def run_record_query(conn, queries):
     raw_actual = queries.users.get_all(conn)
     assert isinstance(raw_actual, Iterable)
