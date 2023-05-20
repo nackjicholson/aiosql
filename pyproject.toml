@@ -58,3 +58,11 @@ repository = "https://github.com/nackjicholson/aiosql"
 documentation = "https://nackjicholson.github.io/aiosql/"
 issues = "https://github.com/nackjicholson/aiosql/issues"
 package = "https://pypi.org/project/aiosql/"
+
+[tool.black]
+line-length = 100
+target-version = ["py38"]
+
+[tool.mypy]
+exclude = ["(build|venv)/", ".*/virtualenvs/.*"]
+ignore_missing_imports = true
