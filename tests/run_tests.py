@@ -31,7 +31,7 @@ _DB = {
     "mysql-connector": "mysql",
     "mysqldb": "mysql",
     "mariadb": "mariadb",
-    "duckdb": "duckdb"
+    "duckdb": "duckdb",
 }
 
 
@@ -80,7 +80,7 @@ def run_record_query(conn, queries):
 
 def run_parameterized_query(conn, queries, db=None):
     # select on a parameter
-    if db and db == 'duckdb':
+    if db and db == "duckdb":
         fun = queries.users.duckdb_get_by_lastname
     else:
         fun = queries.users.get_by_lastname
@@ -95,7 +95,7 @@ def run_parameterized_query(conn, queries, db=None):
     # FIXME broken with pg8000
     # actual = queries.misc.comma_nospace_var(conn, one=1, two=10, three=100)
     # assert actual == (1, 10, 100) or actual == [1, 10, 100]
-    if db and db == 'duckdb':
+    if db and db == "duckdb":
         # duckdb supports parameterized queries starting 0.8.
         # behavior is inconsistent until then.
         actual = queries.misc.duckdb_comma_nospace_var(conn, "Hello", " ", "World!")
@@ -133,7 +133,7 @@ def run_parameterized_record_query(conn, queries, db, todate):
 
 
 def run_record_class_query(conn, queries, todate, db=None):
-    if db and db == 'duckdb':
+    if db and db == "duckdb":
         fun = queries.blogs.duckdb_get_user_blogs
     else:
         fun = queries.blogs.get_user_blogs
@@ -142,7 +142,7 @@ def run_record_class_query(conn, queries, todate, db=None):
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
 
-    if db and db == 'duckdb':
+    if db and db == "duckdb":
         expected = [
             UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
             UserBlogSummary(title="What I did Today", published=date(2017, 7, 28)),
@@ -154,7 +154,7 @@ def run_record_class_query(conn, queries, todate, db=None):
         ]
     assert all(isinstance(row, UserBlogSummary) for row in actual)
     assert actual == expected
-    if db and db == 'duckdb':
+    if db and db == "duckdb":
         one = queries.blogs.duckdb_get_latest_user_blog(conn, userid=1)
         assert one == UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23))
 
@@ -164,7 +164,7 @@ def run_record_class_query(conn, queries, todate, db=None):
 
 
 def run_select_cursor_context_manager(conn, queries, todate, db=None):
-    if db and db == 'duckdb':
+    if db and db == "duckdb":
         fun = queries.blogs.duckdb_get_user_blogs_cursor
         expected = [
             ("How to make a pie.", date(2018, 11, 23)),
@@ -207,7 +207,7 @@ def run_insert_returning(conn, queries, db, todate):
         if _DB[db] == "mysql"
         else None
     )
-    if db == 'duckdb':
+    if db == "duckdb":
         blogid = fun(
             conn,
             2,
@@ -235,12 +235,12 @@ def run_insert_returning(conn, queries, db, todate):
     # If you wrap the returning in `()` a dict is returned.
     elif isinstance(blogid, dict):
         assert db == "duckdb"
-        title = blogid.get('title')
-        blogid = blogid.get('blogid')
+        title = blogid.get("title")
+        blogid = blogid.get("blogid")
     else:
         assert db in ("sqlite3", "apsw")
         blogid, title = blogid, "My first blog"
-    if db and db == 'duckdb':
+    if db and db == "duckdb":
         b2, t2 = queries.blogs.duckdb_blog_title(conn, blogid=blogid)
     else:
         b2, t2 = queries.blogs.blog_title(conn, blogid=blogid)
@@ -253,7 +253,7 @@ def run_insert_returning(conn, queries, db, todate):
 
 def run_delete(conn, queries, expect=1, db=None):
     # Removing the "janedoe" blog titled "Testing"
-    if db and db == 'duckdb':
+    if db and db == "duckdb":
         actual = queries.blogs.duckdb_remove_blog(conn, blogid=2)
         raw_janes_blogs = queries.blogs.duckdb_get_user_blogs(conn, userid=3)
     else:
@@ -287,7 +287,7 @@ def run_insert_many(conn, queries, todate, expect=3, db=None):
             "published": todate(2018, 12, 6),
         },
     ]
-    if db and db == 'duckdb':
+    if db and db == "duckdb":
         actual = queries.blogs.duckdb_bulk_publish(conn, [blog.values() for blog in blogs])
         raw_johns_blogs = queries.blogs.duckdb_get_user_blogs(conn, userid=2)
         expected = [
