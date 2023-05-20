@@ -19,7 +19,7 @@ insert into blogs (
 values (
   :userid,
   :title,
-  :content,
+  :contents,
   :published
 )
 returning blogid, title;
@@ -41,7 +41,7 @@ insert into blogs (
 values (
   :userid,
   :title,
-  :content,
+  :contents,
   :published
 );
 
@@ -51,4 +51,4 @@ SELECT :left %% :right;
 
 -- name: pg-get-modulo-2$
 -- no-escape modulo + cast
-SELECT :left::INT8 % :right::INT8;
+SELECT :numerator::INT8 % :denominator::INT8;

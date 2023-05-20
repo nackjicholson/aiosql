@@ -5,6 +5,7 @@ import asyncio
 import re
 
 import aiosql
+from utils import log
 
 
 # for sqlite3
@@ -80,10 +81,7 @@ def run_record_query(conn, queries):
 
 def run_parameterized_query(conn, queries, db=None):
     # select on a parameter
-    if db and db == "duckdb":
-        fun = queries.users.duckdb_get_by_lastname
-    else:
-        fun = queries.users.get_by_lastname
+    fun = queries.users.get_by_lastname
 
     actual = fun(conn, lastname="Doe")
     expected = [(3, "janedoe", "Jane", "Doe"), (2, "johndoe", "John", "Doe")]
@@ -95,12 +93,7 @@ def run_parameterized_query(conn, queries, db=None):
     # FIXME broken with pg8000
     # actual = queries.misc.comma_nospace_var(conn, one=1, two=10, three=100)
     # assert actual == (1, 10, 100) or actual == [1, 10, 100]
-    if db and db == "duckdb":
-        # duckdb supports parameterized queries starting 0.8.
-        # behavior is inconsistent until then.
-        actual = queries.misc.duckdb_comma_nospace_var(conn, "Hello", " ", "World!")
-    else:
-        actual = queries.misc.comma_nospace_var(conn, one="Hello", two=" ", three="World!")
+    actual = queries.misc.comma_nospace_var(conn, one="Hello", two=" ", three="World!")
 
     # NOTE some drivers return a list instead of a tuple
     assert actual == ("Hello", " ", "World!") or actual == ["Hello", " ", "World!"]
@@ -133,61 +126,40 @@ def run_parameterized_record_query(conn, queries, db, todate):
 
 
 def run_record_class_query(conn, queries, todate, db=None):
-    if db and db == "duckdb":
-        fun = queries.blogs.duckdb_get_user_blogs
-    else:
-        fun = queries.blogs.get_user_blogs
+    fun = queries.blogs.get_user_blogs
 
     raw_actual = fun(conn, userid=1)
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
 
-    if db and db == "duckdb":
-        expected = [
-            UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
-            UserBlogSummary(title="What I did Today", published=date(2017, 7, 28)),
-        ]
-    else:
-        expected = [
-            UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23)),
-            UserBlogSummary(title="What I did Today", published=todate(2017, 7, 28)),
-        ]
+    expected = [
+        UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23)),
+        UserBlogSummary(title="What I did Today", published=todate(2017, 7, 28)),
+    ]
     assert all(isinstance(row, UserBlogSummary) for row in actual)
     assert actual == expected
-    if db and db == "duckdb":
-        one = queries.blogs.duckdb_get_latest_user_blog(conn, userid=1)
-        assert one == UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23))
 
-    else:
-        one = queries.blogs.get_latest_user_blog(conn, userid=1)
-        assert one == UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23))
+    one = queries.blogs.get_latest_user_blog(conn, userid=1)
+    assert one == UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23))
 
 
 def run_select_cursor_context_manager(conn, queries, todate, db=None):
-    if db and db == "duckdb":
-        fun = queries.blogs.duckdb_get_user_blogs_cursor
-        expected = [
-            ("How to make a pie.", date(2018, 11, 23)),
-            ("What I did Today", date(2017, 7, 28)),
-        ]
-    else:
-        fun = queries.blogs.get_user_blogs_cursor
-        expected = [
-            ("How to make a pie.", todate(2018, 11, 23)),
-            ("What I did Today", todate(2017, 7, 28)),
-        ]
+    fun = queries.blogs.get_user_blogs_cursor
+    expected = [
+        ("How to make a pie.", todate(2018, 11, 23)),
+        ("What I did Today", todate(2017, 7, 28)),
+    ]
 
     with fun(conn, userid=1) as cursor:
         # reconversions for mysqldb and pg8000
         actual = [tuple(r) for r in cursor.fetchall()]
+        log.warning(f"actual: {actual}")
+        log.warning(f"expected: {expected}")
         assert actual == expected
 
 
 def run_select_one(conn, queries, db=None):
-    if db == "duckdb":
-        actual = queries.users.duckdb_get_by_username(conn, username="johndoe")
-    else:
-        actual = queries.users.get_by_username(conn, username="johndoe")
+    actual = queries.users.get_by_username(conn, username="johndoe")
 
     # reconversion for pg8000
     actual = tuple(actual)
@@ -240,10 +212,8 @@ def run_insert_returning(conn, queries, db, todate):
     else:
         assert db in ("sqlite3", "apsw")
         blogid, title = blogid, "My first blog"
-    if db and db == "duckdb":
-        b2, t2 = queries.blogs.duckdb_blog_title(conn, blogid=blogid)
-    else:
-        b2, t2 = queries.blogs.blog_title(conn, blogid=blogid)
+
+    b2, t2 = queries.blogs.blog_title(conn, blogid=blogid)
     assert (blogid, title) == (b2, t2)
 
     if db and db in ("psycopg", "psycopg2"):
@@ -253,12 +223,8 @@ def run_insert_returning(conn, queries, db, todate):
 
 def run_delete(conn, queries, expect=1, db=None):
     # Removing the "janedoe" blog titled "Testing"
-    if db and db == "duckdb":
-        actual = queries.blogs.duckdb_remove_blog(conn, blogid=2)
-        raw_janes_blogs = queries.blogs.duckdb_get_user_blogs(conn, userid=3)
-    else:
-        actual = queries.blogs.remove_blog(conn, blogid=2)
-        raw_janes_blogs = queries.blogs.get_user_blogs(conn, userid=3)
+    actual = queries.blogs.remove_blog(conn, blogid=2)
+    raw_janes_blogs = queries.blogs.get_user_blogs(conn, userid=3)
     assert actual in (expect, -1)
     assert isinstance(raw_janes_blogs, Iterable)
 
@@ -271,38 +237,30 @@ def run_insert_many(conn, queries, todate, expect=3, db=None):
         {
             "userid": 2,
             "title": "Blog Part 1",
-            "content": "content - 1",
+            "contents": "content - 1",
             "published": todate(2018, 12, 4),
         },
         {
             "userid": 2,
             "title": "Blog Part 2",
-            "content": "content - 2",
+            "contents": "content - 2",
             "published": todate(2018, 12, 5),
         },
         {
             "userid": 2,
             "title": "Blog Part 3",
-            "content": "content - 3",
+            "contents": "content - 3",
             "published": todate(2018, 12, 6),
         },
     ]
-    if db and db == "duckdb":
-        actual = queries.blogs.duckdb_bulk_publish(conn, [blog.values() for blog in blogs])
-        raw_johns_blogs = queries.blogs.duckdb_get_user_blogs(conn, userid=2)
-        expected = [
-            ("Blog Part 3", date(2018, 12, 6)),
-            ("Blog Part 2", date(2018, 12, 5)),
-            ("Blog Part 1", date(2018, 12, 4)),
-        ]
-    else:
-        actual = queries.blogs.pg_bulk_publish(conn, blogs)
-        raw_johns_blogs = queries.blogs.get_user_blogs(conn, userid=2)
-        expected = [
-            ("Blog Part 3", todate(2018, 12, 6)),
-            ("Blog Part 2", todate(2018, 12, 5)),
-            ("Blog Part 1", todate(2018, 12, 4)),
-        ]
+
+    actual = queries.blogs.pg_bulk_publish(conn, blogs)
+    raw_johns_blogs = queries.blogs.get_user_blogs(conn, userid=2)
+    expected = [
+        ("Blog Part 3", todate(2018, 12, 6)),
+        ("Blog Part 2", todate(2018, 12, 5)),
+        ("Blog Part 1", todate(2018, 12, 4)),
+    ]
 
     assert actual in (expect, -1)
     johns_blogs = [tuple(r) for r in raw_johns_blogs]
@@ -471,19 +429,19 @@ async def run_async_insert_many(conn, queries, todate):
         {
             "userid": 2,
             "title": "Blog Part 1",
-            "content": "content - 1",
+            "contents": "content - 1",
             "published": todate(2018, 12, 4),
         },
         {
             "userid": 2,
             "title": "Blog Part 2",
-            "content": "content - 2",
+            "contents": "content - 2",
             "published": todate(2018, 12, 5),
         },
         {
             "userid": 2,
             "title": "Blog Part 3",
-            "content": "content - 3",
+            "contents": "content - 3",
             "published": todate(2018, 12, 6),
         },
     ]

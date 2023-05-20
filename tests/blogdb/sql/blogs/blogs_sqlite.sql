@@ -17,8 +17,8 @@ insert into blogs (
   content,
   published
 )
-values (?, ?, ? , ?);
+values (?, ?, ?, ?);
 
 -- name: sqlite-get-modulo$
 -- no-escaped percent modulo operator
-SELECT :left % :right;
+SELECT :numerator % :denominator;

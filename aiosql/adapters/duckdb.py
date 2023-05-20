@@ -1,4 +1,15 @@
 from .generic import GenericAdapter
+from ..utils import VAR_REF
+
+def _colon_to_dollar(match):
+    """Convert 'WHERE :id = 1' to 'WHERE $id = 1'."""
+    gd = match.groupdict()
+    if gd["dquote"] is not None:
+        return gd["dquote"]
+    elif gd["squote"] is not None:
+        return gd["squote"]
+    else:
+        return f'{gd["lead"]}${gd["var_name"]}'
 
 
 class DuckDBAdapter(GenericAdapter):
@@ -8,6 +19,9 @@ class DuckDBAdapter(GenericAdapter):
         super().__init__(driver=driver)
         # whether to converts the default tuple response to a dict.
         self._convert_row_to_dict = cursor_as_dict
+
+    def process_sql(self, _query_name, _op_type, sql):
+        return VAR_REF.sub(_colon_to_dollar, sql)
 
     def insert_returning(self, conn, _query_name, sql, parameters):
         # very similar to select_one but the returned value

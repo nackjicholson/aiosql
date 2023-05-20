@@ -70,7 +70,7 @@ def test_select_value(conn, queries):
 
 
 def test_modulo(conn, queries):
-    actual = queries.blogs.pg_get_modulo(conn, left=7, right=3)
+    actual = queries.blogs.pg_get_modulo(conn, numerator=7, denominator=3)
     expected = 7 % 3
     assert actual == expected
 

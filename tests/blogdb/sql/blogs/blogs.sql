@@ -12,7 +12,7 @@ insert into blogs (
 values (
   :userid,
   :title,
-  :content,
+  :contents,
   :published
 )
 
