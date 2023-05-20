@@ -221,6 +221,10 @@ check.pytest.mysql: $(INSTALL)
 	$(PYTEST) $(PYTOPT) --mysql-driver=pymysql tests/test_pymysql.py
 	$(PYTEST) $(PYTOPT) --mysql-driver=mysql.connector tests/test_myco.py
 
+.PHONY: check.pytest.skip.local
+check.pytest.skip.local:
+	# skip
+
 #
 # MariaDB
 #
