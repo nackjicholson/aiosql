@@ -24,7 +24,7 @@ pytest-postgresql>=4
 aiosqlite>=0.16.0,<1
 apsw
 #
-# DuckDB
+# DuckDB driver
 #
 duckdb
 #
