@@ -144,9 +144,7 @@ def run_record_class_query(conn, queries, todate, db=None):
     assert actual == expected
 
     one = queries.blogs.get_latest_user_blog(conn, userid=1)
-    assert one == UserBlogSummary(
-        title="How to make a pie.", published=todate(2018, 11, 23)
-    )
+    assert one == UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23))
 
 
 def run_select_cursor_context_manager(conn, queries, todate, db=None):
@@ -365,9 +363,7 @@ async def run_async_record_class_query(conn, queries, todate):
     assert actual == expected
 
     one = await queries.blogs.get_latest_user_blog(conn, userid=1)
-    assert one == UserBlogSummary(
-        title="How to make a pie.", published=todate(2018, 11, 23)
-    )
+    assert one == UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23))
 
 
 async def run_async_select_cursor_context_manager(conn, queries, todate):
