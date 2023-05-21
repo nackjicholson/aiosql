@@ -18,13 +18,13 @@
 # -- Project information -----------------------------------------------------
 
 project = "aiosql"
-copyright = "2022, William Vaughn"
+copyright = "2018-2023, William Vaughn"
 author = "William Vaughn <vaughnwilld@gmail.com>"
 github_doc_root = "https://github.com/nackjicholson/aiosql/tree/master/docs/source/"
 
 # The full version, including alpha/beta/rc tags
 # FIXME should be consistent with "setup.cfg"?
-release = "8.0"
+release = "9.0"
 
 
 # -- General configuration ---------------------------------------------------
