@@ -1,6 +1,5 @@
-LABEL description="Python setup for AioSQL MariaDB, SQLite and DuckDB testing"
-# python testing environment
 FROM ubuntu
+LABEL description="Python setup for AioSQL MariaDB, SQLite and DuckDB testing"
 RUN apt update
 RUN apt install -y --no-install-recommends \
       python-is-python3 python3-venv python3-dev gcc make curl
