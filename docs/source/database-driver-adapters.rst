@@ -1,7 +1,12 @@
 Database Driver Adapters
 ========================
 
-Database driver adapters in aiosql allow extension of the library to support additional database drivers. If you are using a driver other than the ones currently supported by built-in driver adapters (``sqlite3``, ``apsw``, ``aiosqlite``, ``psycopg``, ``psycopg2``, ``pg8000``, ``pygresql``, ``asyncpg``, ``pymysql``, ``mysqlclient``, ``mysql-connector``, ``duckdb``) then you will need to make your own. A database driver adapter is a duck-typed class that follows either of the ``Protocol`` types below. These types are defined in `aiosql/types.py <https://github.com/nackjicholson/aiosql/blob/master/aiosql/types.py>`__.
+Database driver adapters in aiosql allow extension of the library to support additional database drivers.
+If you are using a driver other than the ones currently supported by built-in driver adapters
+(``sqlite3``, ``apsw``, ``aiosqlite``, ``psycopg``, ``psycopg2``, ``pg8000``, ``pygresql``, ``asyncpg``,
+``pymysql``, ``mysqlclient``, ``mysql-connector``, ``duckdb``) then you will need to make your own.
+A database driver adapter is a duck-typed class that follows either of the ``Protocol`` types below.
+These types are defined in `aiosql/types.py <https://github.com/nackjicholson/aiosql/blob/master/aiosql/types.py>`__.
 
 **Sync Adapter**
 
@@ -107,7 +112,12 @@ Database driver adapters in aiosql allow extension of the library to support add
         async def execute_script(self, conn: Any, sql: str) -> None:
             ...
 
-There isn't much difference between these two protocols besides the ``async def`` syntax for the method definition. There is one more sneaky difference, the aiosql code expects async adapters to have a static class field ``is_aio_driver = True`` so it can tell when to use ``await`` for method returns. Looking at the source of the builtin `adapters/ <https://github.com/nackjicholson/aiosql/tree/master/aiosql/adapters>`__ is a great place to start seeing how you may write your own database driver adapter.
+There isn't much difference between these two protocols besides the ``async def`` syntax for the method definition.
+There is one more sneaky difference, the aiosql code expects async adapters to have a static class field
+``is_aio_driver = True`` so it can tell when to use ``await`` for method returns.
+Looking at the source of the builtin
+`adapters/ <https://github.com/nackjicholson/aiosql/tree/master/aiosql/adapters>`__ is a great place to start
+seeing how you may write your own database driver adapter.
 
 To use the adapter pass its constructor or factory as the ``driver_adapter`` argument when building Queries:
 
@@ -128,4 +138,5 @@ Alternatively, an adapter can be registered or overriden:
     queries = aiosql.from_path("some.sql", "mydb")
 
 
-Please ask questions on `GitHub Issues <https://github.com/nackjicholson/aiosql/issues>`__. If the community makes additional adapter add-ons I'll be sure to list them here.
+Please ask questions on `GitHub Issues <https://github.com/nackjicholson/aiosql/issues>`__.
+If the community makes additional adapter add-ons I'll be sure to list them here.
