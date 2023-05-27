@@ -393,7 +393,7 @@ docker.stop:
 #
 
 dist:
-	$(PYTHON) setup.py sdist bdist_wheel
+	$(PYTHON) -m build
 
 .PHONY: publish
 publish: dist check
