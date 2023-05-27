@@ -11,39 +11,39 @@ readme = "README.rst"
 requires-python = ">=3.8"
 license = { text = "BSD 2-Clause License" }
 classifiers = [
-  "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: BSD License",
-  "Operating System :: OS Independent"
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent"
 ]
 
 [project.optional-dependencies]
 dev = [
-  "pytest", "pytest-asyncio",
-  "rstcheck", "black", "coverage", "flake8",
-  "mypy", "types-setuptools"
+    "pytest", "pytest-asyncio",
+    "rstcheck", "black", "coverage", "flake8",
+    "mypy", "types-setuptools"
 ]
 dev-duckdb = [
-  "duckdb"
+    "duckdb"
 ]
 dev-sqlite = [
-  "aiosqlite", "apsw"
+    "aiosqlite", "apsw"
 ]
 dev-postgres = [
-  "pytest-postgresql",
-  "asyncpg; python_version < '3.12'",
-  "psycopg>=3", "psycopg2", "psycopg2-binary",
-  "pygresql", "pg8000"
+    "pytest-postgresql",
+    "asyncpg; python_version < '3.12'",
+    "psycopg>=3", "psycopg2", "psycopg2-binary",
+    "pygresql", "pg8000"
 ]
 dev-mysql = [
-  "pytest-mysql",
-  "mysqlclient", "mysql-connector-python", "pymysql"
+    "pytest-mysql",
+    "mysqlclient", "mysql-connector-python", "pymysql"
 ]
 dev-mariadb = [
-  "mariadb"
+    "mariadb"
 ]
 dist = [
-  "build", "wheel", "twine",
-  "sphinx >= 4, < 5", "sphinx-rtd-theme >= 0.5.2"
+    "build", "wheel", "twine",
+    "sphinx >= 4, < 5", "sphinx-rtd-theme >= 0.5.2"
 ]
 
 [tool.setuptools.package-data]
