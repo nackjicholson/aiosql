@@ -195,7 +195,8 @@ would work as well.
 
 The ``*!`` operator directs aiosql to execute a SQL statement over all items of a given sequence.
 Under the hood this calls the ``executemany`` method of many database drivers.
-See `sqlite3 Cursor.executemany <https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.executemany>`__ for an example.
+See `sqlite3 Cursor.executemany <https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.executemany>`__
+for an example.
 
 In aiosql we can use this for a bulk publish method that operates over a list of blog entries.
 

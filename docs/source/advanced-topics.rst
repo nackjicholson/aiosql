@@ -28,7 +28,8 @@ For example, say you have the following query named ``get-all-greetings`` in a `
         greeting
     FROM greetings;
 
-With this query, you can get all ``greeting_id``'s and ``greeting``'s, access the cursor object, and print the column names with the following code:
+With this query, you can get all ``greeting_id``'s and ``greeting``'s, access the cursor object,
+and print the column names with the following code:
 
 .. code:: python
 
@@ -59,9 +60,15 @@ With this query, you can get all ``greeting_id``'s and ``greeting``'s, access th
 Accessing prepared SQL as a string
 ----------------------------------
 
-When you need to do something not directly supported by aiosql, this is your escape hatch. You can still define your sql in a file and load it with aiosql, but then you may choose to use it without calling your aiosql method. The prepared SQL string of a method is available as an attribute of each method ``queries.<method_name>.sql``. Here's an example of how you might use it with a unique feature of ``psycopg2`` like `execute_values <https://www.psycopg.org/docs/extras.html#psycopg2.extras.execute_values>`__.
+When you need to do something not directly supported by aiosql, this is your escape hatch.
+You can still define your sql in a file and load it with aiosql, but then you may choose to use it
+without calling your aiosql method.
+The prepared SQL string of a method is available as an attribute of each method ``queries.<method_name>.sql``.
+Here's an example of how you might use it with a unique feature of ``psycopg2`` like
+`execute_values <https://www.psycopg.org/docs/extras.html#psycopg2.extras.execute_values>`__.
 
-This example adapts the example usage from psycopg2's documentation for `execute_values <https://www.psycopg.org/docs/extras.html#psycopg2.extras.execute_values>`__.
+This example adapts the example usage from psycopg2's documentation for
+`execute_values <https://www.psycopg.org/docs/extras.html#psycopg2.extras.execute_values>`__.
 
 .. code:: python
 
@@ -99,7 +106,8 @@ Accessing the SQL Operation Type
 
 Query functions also provide access to the SQL Operation Type you define in your library.
 
-This can be useful for observability (such as metrics, tracing, or logging), or customizing how you manage different operations within your codebase. Extending from the above example:
+This can be useful for observability (such as metrics, tracing, or logging), or customizing how you
+manage different operations within your codebase. Extending from the above example:
 
 .. code:: python
 
@@ -130,7 +138,8 @@ This can be useful for observability (such as metrics, tracing, or logging), or 
 Sync & Async
 ------------
 
-Below are two example of a program which can print ``"{greeting}, {world_name}!"`` from data held in a minimal SQLite database containing greetings and worlds. They use this same sql.
+Below are two example of a program which can print ``"{greeting}, {world_name}!"`` from data held
+in a minimal SQLite database containing greetings and worlds. They use this same SQL.
 
 *greetings.sql*
 
@@ -149,12 +158,17 @@ Below are two example of a program which can print ``"{greeting}, {world_name}!"
       from worlds
      where world_name = :world_name;
 
-Notice there is a usage of the ``^`` `Select One Query Operator <./defining-sql-queries.rst#select-one>`__. Adding this to the SQL comment ``--name: get-world-by-name^`` indicates to aiosql that ``queries.get_world_by_name()`` will return a single row back.
+Notice there is a usage of the ``^`` `Select One Query Operator <./defining-sql-queries.rst#select-one>`__.
+Adding this to the SQL comment ``--name: get-world-by-name^`` indicates to aiosql that
+``queries.get_world_by_name()`` will return a single row back.
 
 Sync with sqlite3
 ~~~~~~~~~~~~~~~~~
 
-Here we've set up our ``sqlite3`` connection. Using the ``sqlite3.Row`` type for our records to make it easy to access values by column names rather than as tuple indices. The program works, it does two queries sqequentially then loops over their results to print greetings.
+Here we've set up our ``sqlite3`` connection.
+Using the ``sqlite3.Row`` type for our records to make it easy to access values by column names
+rather than as tuple indices.
+The program works, it does two queries sqequentially then loops over their results to print greetings.
 
 .. code:: python
 
@@ -187,7 +201,9 @@ Here we've set up our ``sqlite3`` connection. Using the ``sqlite3.Row`` type for
 Asyncio with aiosqlite
 ~~~~~~~~~~~~~~~~~~~~~~
 
-This program is only a little bit different. It let's us leverage `asyncio.gather <https://docs.python.org/3/library/asyncio-task.html#asyncio.gather>`__  to make both queries for greetings and worlds in parallel!
+This program is only a little bit different.
+It let's us leverage `asyncio.gather <https://docs.python.org/3/library/asyncio-task.html#asyncio.gather>`__
+to make both queries for greetings and worlds in parallel!
 
 .. code:: python
 
@@ -224,4 +240,6 @@ This program is only a little bit different. It let's us leverage `asyncio.gathe
 
     asyncio.run(main())
 
-Slightly different usage with `aiosqlite <https://github.com/omnilib/aiosqlite>`__ but I hope this has demonstrated in a small way the big power and performance possibilities with asyncronous queries using the async driver types.
+Slightly different usage with `aiosqlite <https://github.com/omnilib/aiosqlite>`__ but I hope this
+has demonstrated in a small way the big power and performance possibilities with asyncronous queries
+using the async driver types.
