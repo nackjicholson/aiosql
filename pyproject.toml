@@ -20,7 +20,7 @@ classifiers = [
 dev = [
     "pytest", "pytest-asyncio",
     "rstcheck", "black", "coverage", "flake8",
-    "mypy", "types-setuptools"
+    "mypy", "types-setuptools", "build"
 ]
 dev-duckdb = [
     "duckdb"
