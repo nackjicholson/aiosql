@@ -89,9 +89,7 @@ def run_record_query(conn, queries):
 
 def run_parameterized_query(conn, queries, db=None):
     # select on a parameter
-    fun = queries.users.get_by_lastname
-
-    actual = fun(conn, lastname="Doe")
+    actual = queries.users.get_by_lastname(conn, lastname="Doe")
     expected = [(3, "janedoe", "Jane", "Doe"), (2, "johndoe", "John", "Doe")]
     # NOTE re-conversion needed for mysqldb and pg8000
     actual = [tuple(i) for i in actual]
@@ -138,9 +136,8 @@ def run_parameterized_record_query(conn, queries, db, todate):
 
 
 def run_record_class_query(conn, queries, todate, db=None):
-    fun = queries.blogs.get_user_blogs
 
-    raw_actual = fun(conn, userid=1)
+    raw_actual = queries.blogs.get_user_blogs(conn, userid=1)
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
 
