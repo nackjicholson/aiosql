@@ -396,6 +396,6 @@ dist:
 	$(PYTHON) -m build
 
 .PHONY: publish
-publish: dist check
+publish: dist
 	echo "# run twine to publish on pypi"
 	echo twine upload --repository $(MODULE) dist/*
