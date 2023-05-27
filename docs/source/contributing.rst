@@ -15,7 +15,8 @@ Whether you have an idea for a feature improvement or have found a troubling bug
 Packaging & Distribution
 ------------------------
 
-This aiosql repository uses the python standard packaging tools. Read about them in more detail at the following links.
+This aiosql repository uses the python standard packaging tools.
+Read about them in more detail at the following links.
 
 -  `Python Packaging User Guide <https://packaging.python.org/>`__
 -  `PyPA - Packaging & Distributing

@@ -5,7 +5,8 @@ Philosophy
 ----------
 
 The aiosql project is for writing SQL to interact with a database.
-Most database libraries are intended to reduce the amount of SQL developers need to write, aiosql takes an alternative approach.
+Most database libraries are intended to reduce the amount of SQL developers need to write,
+aiosql takes an alternative approach.
 Why?
 
 -  Alternatives are good. No approach fits all use cases, no matter how predominant.
@@ -163,7 +164,8 @@ Subdirectories
 
 Introducing subdirectories allows namspacing queries.
 This provides a way to further organize and group queries conceptually.
-For instance, you could define blog queries separate from user queries access them on distinct properties of the queries object.
+For instance, you could define blog queries separate from user queries access them on distinct
+properties of the queries object.
 
 Assume the *blogs.sql* and *users.sql* files both contain a ``-- name: get_all`` query.
 
@@ -251,7 +253,8 @@ Passing Parameters
 in the above query and having the resultant method expect an inbound argument to
 substitute for ``:username``.
 
-You can call the ``get_user_blogs`` function with plain arguments or keyword arguments with the name of the subsitution variable.
+You can call the ``get_user_blogs`` function with plain arguments or keyword arguments with the
+name of the subsitution variable.
 
 .. code:: python
 
