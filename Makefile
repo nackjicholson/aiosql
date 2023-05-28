@@ -76,6 +76,10 @@ venv.dev: venv
 	source venv/bin/activate
 	$(PIP) install .[dev,dev-postgres,dev-sqlite,dev-duckdb]
 
+venv.dist: venv
+	source venv/bin/activate
+	$(PIP) install .[dist]
+
 venv.prod: venv
 
 venv.last: venv
@@ -101,7 +105,7 @@ $(INSTALL): $(VENV)
 
 clean:
 	find . -type d -name __pycache__ -print0 | xargs -0 rm -rf
-	$(RM) -r dist build .mypy_cache .pytest_cache htmlcov .docker.*
+	$(RM) -r dist build .mypy_cache .pytest_cache htmlcov .docker.* $(MODULE).egg-info
 	$(RM) .coverage .coverage.* poetry.lock
 	$(MAKE) -C docker clean
 
@@ -392,8 +396,12 @@ docker.stop:
 # PYPI PUBLICATION
 #
 
-dist:
+dist: venv.dist
+	source venv/bin/activate
 	$(PYTHON) -m build
+
+check.publish: dist
+	twine check dist/*
 
 .PHONY: publish
 publish: dist
