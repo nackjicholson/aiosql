@@ -6,15 +6,17 @@ class AioSQLiteAdapter:
 
     def process_sql(self, _query_name, _op_type, sql):
         """Pass through function because the ``aiosqlite`` driver can already handle the
-        :var_name format used by aiosql and doesn't need any additional processing.
+        ``:var_name`` format used by aiosql and doesn't need any additional processing.
 
         Args:
-            _query_name (str): The name of the sql query.
-            _op_type (SQLOperationType): The type of SQL operation performed by the query.
-            sql (str): The sql as written before processing.
+
+        - _query_name (str): The name of the sql query.
+        - _op_type (SQLOperationType): The type of SQL operation performed by the query.
+        - sql (str): The sql as written before processing.
 
         Returns:
-            str: Original SQL text unchanged.
+
+        - str: Original SQL text unchanged.
         """
         return sql
 
