@@ -209,7 +209,7 @@ In the examples throughout this page a ``conn`` object has been passed.
 Here is a more code complete example that shows the connection creation and call to
 ``aiosql.from_path`` `<./api.md#aiosqlfrom_path>`__ that make a queries object.
 
-.. code:: ipython
+.. code:: pycon
 
     >>> import sqlite3
     >>> import aiosql
