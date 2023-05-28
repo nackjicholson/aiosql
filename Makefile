@@ -105,7 +105,7 @@ $(INSTALL): $(VENV)
 
 clean:
 	find . -type d -name __pycache__ -print0 | xargs -0 rm -rf
-	$(RM) -r dist build .mypy_cache .pytest_cache htmlcov .docker.* $(MODULE).egg-info
+	$(RM) -r dist build .mypy_cache .pytest_cache htmlcov .docker.* $(MODULE).egg-info docs/build docs/html
 	$(RM) .coverage .coverage.* poetry.lock
 	$(MAKE) -C docker clean
 
@@ -398,7 +398,8 @@ docker.stop:
 
 dist: venv.dist
 	source venv/bin/activate
-	./github/scripts/docs.sh
+	.github/scripts/docs.sh
+	mv docs/build docs/html
 	$(PYTHON) -m build
 
 check.publish: dist
