@@ -32,7 +32,7 @@ Any other SQL comments you make between the name definition and your code will
 be used a the python documentation string for the generated method.
 You can use ``help()`` in the Python REPL to view these comments while using python.
 
-.. code:: ipython
+.. code:: pycon
 
     Python 3.8.3 (default, May 17 2020, 18:15:42) 
     [GCC 10.1.0] on linux
