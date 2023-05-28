@@ -75,40 +75,41 @@ def from_str(
 
     **Parameters:**
 
-    * **sql** - A string containing SQL statements and aiosql name.
-    * **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
-    adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your
-    own adapter class, you can pass it's constructor.
-    * **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
-    declarations to the python classes which aiosql should use when marshaling SQL results.
-    * **loader_cls** - *(optional)* Custom constructor for QueryLoader extensions.
-    * **queries_cls** - *(optional)* Custom constructor for Queries extensions.
+    - **sql** - A string containing SQL statements and aiosql name.
+    - **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
+      adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your
+      own adapter class, you can pass it's constructor.
+    - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
+      declarations to the python classes which aiosql should use when marshaling SQL results.
+    - **loader_cls** - *(optional)* Custom constructor for QueryLoader extensions.
+    - **queries_cls** - *(optional)* Custom constructor for Queries extensions.
 
-    **Returns:** `Queries`
+    **Returns:** ``Queries``
 
     Usage:
 
     Loading queries from a SQL string.
 
-    ```python
-    import sqlite3
-    import aiosql
+    .. code-block:: python
 
-    sql_text = \"""
-    -- name: get-all-greetings
-    -- Get all the greetings in the database
-    select * from greetings;
+      import sqlite3
+      import aiosql
 
-    -- name: get-user-by-username^
-    -- Get all the users from the database,
-    -- and return it as a dict
-    select * from users where username = :username;
-    \"""
+      sql_text = \"""
+      -- name: get-all-greetings
+      -- Get all the greetings in the database
+      select * from greetings;
 
-    queries = aiosql.from_str(sql_text, "sqlite3")
-    queries.get_all_greetings(conn)
-    queries.get_user_by_username(conn, username="willvaughn")
-    ```
+      -- name: get-user-by-username^
+      -- Get all the users from the database,
+      -- and return it as a dict
+      select * from users where username = :username;
+      \"""
+
+      queries = aiosql.from_str(sql_text, "sqlite3")
+      queries.get_all_greetings(conn)
+      queries.get_user_by_username(conn, username="willvaughn")
+
     """
     adapter = _make_driver_adapter(driver_adapter)
     query_loader = loader_cls(adapter, record_classes)
@@ -130,25 +131,25 @@ def from_path(
 
     **Parameters:**
 
-    * **sql_path** - Path to a `.sql` file or directory containing `.sql` files.
-    * **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
-    adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your own
-    adapter class, you may pass its constructor.
-    * **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
-    declarations to the python classes which aiosql should use when marshaling SQL results.
-    * **loader_cls** - *(optional)* Custom constructor for `QueryLoader` extensions.
-    * **queries_cls** - *(optional)* Custom constructor for `Queries` extensions.
-    * **ext** - *(optional)* allowed file extensions for query files, default is `(".sql",)`.
-    * **encoding** - *(optional)* encoding for reading files.
+    - **sql_path** - Path to a `.sql` file or directory containing `.sql` files.
+    - **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
+      adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your own
+      adapter class, you may pass its constructor.
+    - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
+      declarations to the python classes which aiosql should use when marshaling SQL results.
+    - **loader_cls** - *(optional)* Custom constructor for `QueryLoader` extensions.
+    - **queries_cls** - *(optional)* Custom constructor for `Queries` extensions.
+    - **ext** - *(optional)* allowed file extensions for query files, default is `(".sql",)`.
+    - **encoding** - *(optional)* encoding for reading files.
 
     **Returns:** `Queries`
 
     Usage:
 
-    ```python
-    >>> queries = aiosql.from_path("./sql", "psycopg2")
-    >>> queries = aiosql.from_path("./sql", MyDBAdapter)
-    ```
+    .. code-block:: python
+
+      queries = aiosql.from_path("./sql", "psycopg2")
+      queries = aiosql.from_path("./sql", MyDBAdapter)
     """
     path = Path(sql_path)
 

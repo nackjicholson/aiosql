@@ -398,6 +398,7 @@ docker.stop:
 
 dist: venv.dist
 	source venv/bin/activate
+	./github/scripts/docs.sh
 	$(PYTHON) -m build
 
 check.publish: dist

@@ -126,14 +126,14 @@ def _create_methods(query_datum: QueryDatum, is_aio: bool) -> List[QueryFn]:
 class Queries:
     """Container object with dynamic methods built from SQL queries.
 
-    The `-- name` definition comments in the content of the SQL determine what the dynamic
+    The ``-- name`` definition comments in the content of the SQL determine what the dynamic
     methods of this class will be named.
 
     **Parameters:**
 
-    * **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
-    adapters. One of "sqlite3", "psycopg2", "aiosqlite", or "asyncpg". If you have defined your
-    own adapter class, you can pass it's constructor.
+    - **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
+      adapters (e.g. "sqlite3", "psycopg").
+      If you have defined your own adapter class, you can pass its constructor.
     """
 
     def __init__(self, driver_adapter: DriverAdapterProtocol):
@@ -145,7 +145,7 @@ class Queries:
     def available_queries(self) -> List[str]:
         """Returns listing of all the available query methods loaded in this class.
 
-        **Returns:** `List[str]` List of dot-separated method accessor names.
+        **Returns:** ``list[str]`` List of dot-separated method accessor names.
         """
         return sorted(self._available_queries)
 
@@ -157,8 +157,8 @@ class Queries:
 
         **Parameters:**
 
-        * **query_name** - The method name as found in the SQL content.
-        * **fn** - The loaded query function.
+        - **query_name** - The method name as found in the SQL content.
+        - **fn** - The loaded query function.
         """
         setattr(self, query_name, fn)
         self._available_queries.add(query_name)
@@ -174,8 +174,8 @@ class Queries:
 
         **Parameters:**
 
-        * **child_name** - The property name to group the child queries under.
-        * **child_queries** - Queries instance to add as sub-queries.
+        - **child_name** - The property name to group the child queries under.
+        - **child_queries** - Queries instance to add as sub-queries.
         """
         setattr(self, child_name, child_queries)
         for child_query_name in child_queries.available_queries:
