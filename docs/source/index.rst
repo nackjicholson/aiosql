@@ -92,6 +92,10 @@ Badges
    :alt: Version
    :target: https://pypi.org/project/aiosql/
 
+.. image:: https://img.shields.io/github/languages/code-size/nackjicholson/aiosql?style=flat
+   :alt: Code Size
+   :target: https://github.com/nackjicholson/aiosql/
+
 .. image:: https://img.shields.io/badge/databases-5-informational
    :alt: Databases
    :target: https://github.com/nackjicholson/aiosql/
@@ -115,7 +119,7 @@ Badges
 ..
    some non-sense badge about badges:-)
 
-.. image:: https://img.shields.io/badge/badges-15-informational
+.. image:: https://img.shields.io/badge/badges-16-informational
    :alt: Badges
    :target: https://shields.io/
 
