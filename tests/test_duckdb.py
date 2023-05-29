@@ -15,7 +15,12 @@ pytestmark = [pytest.mark.duckdb]
 DRIVER = "duckdb"
 
 
-@pytest.fixture()
+@pytest.fixture
+def conn(duckdb_conn):
+    return duckdb_conn
+
+
+@pytest.fixture
 def queries() -> Queries:
     return t.queries(DRIVER)
 
