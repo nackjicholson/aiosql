@@ -1,8 +1,9 @@
 # AioSQL Docker Tests
 
 As MySQL et MariaDB cannot be installed one alongside the other easily,
-this directory attempts at providing a docker solution with 3 servers
-(for sqlite + postgres, mysql and mariadb) and their 3 clients.
+this directory provides a docker solution with 3 servers (for postgres,
+mysql and mariadb) and their clients. Databse sqlite3 and duckdb are run
+with mariadb because it has the lowest load.
 
 ## Servers
 
@@ -11,7 +12,7 @@ They rely on the official images for `postgres`, `mysql` and `mariadb`.
 ## Clients
 
 They are built on top of `ubuntu` because using the official `python`
-image could not be made to work for all 3 databases.
+image could not be made to work for all 5 databases.
 See docker specifications in `dockerfile.python-*`.
 
 ## Makefile
@@ -26,7 +27,7 @@ docker image pull mysql
 docker image pull ubuntu
 # generate client images
 make docker.aiosql
-# run tests
+# run tests in ..
 make docker.pytest
 make docker.coverage
 ```
