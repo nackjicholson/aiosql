@@ -18,12 +18,12 @@ pytestmark = [
 DRIVER = "pygresql"
 
 
-@pytest.fixture()
+@pytest.fixture
 def queries():
     return t.queries(DRIVER)
 
 
-@pytest.fixture()
+@pytest.fixture
 def conn(pg_params):
     dbname = pg_params["dbname"]
     del pg_params["dbname"]

@@ -15,12 +15,12 @@ def dict_factory(cursor, row):
     return d
 
 
-@pytest.fixture()
+@pytest.fixture
 def queries():
     return t.queries(DRIVER)
 
 
-@pytest.fixture()
+@pytest.fixture
 def conn(sqlite3_db_path):
     conn = db.connect(sqlite3_db_path)
     yield conn

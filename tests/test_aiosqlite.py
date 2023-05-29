@@ -17,7 +17,7 @@ pytestmark = [
 DRIVER = "aiosqlite"
 
 
-@pytest.fixture()
+@pytest.fixture
 def queries():
     return t.queries("aiosqlite")
 

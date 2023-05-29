@@ -23,6 +23,16 @@ def queries():
     return t.queries(DRIVER)
 
 
+@pytest.fixture
+def conn(my_conn):
+    return my_conn
+
+
+@pytest.fixture
+def conn_db(my_db):
+    return my_db
+
+
 def test_cursor(conn, queries):
     t.run_cursor(conn, queries)
 
@@ -31,14 +41,14 @@ def test_my_dsn(my_dsn):
     assert "user" in my_dsn and "host" in my_dsn and "port" in my_dsn
 
 
-def test_my_conn(my_conn):
-    assert my_conn.__module__.startswith(db.__name__)
-    t.run_something(my_conn)
+def test_my_conn(conn):
+    assert conn.__module__.startswith(db.__name__)
+    t.run_something(conn)
 
 
-def test_my_db(my_db):
-    assert my_db.__module__.startswith(db.__name__)
-    t.run_something(my_db)
+def test_conn_db(conn_db):
+    assert conn_db.__module__.startswith(db.__name__)
+    t.run_something(conn_db)
 
 
 @pytest.mark.skip("myco cursor handling is unclear")
@@ -47,8 +57,8 @@ def test_record_query(db_dsn, queries):
         t.run_record_query(conn, queries)
 
 
-def test_parameterized_query(my_db, queries):
-    t.run_parameterized_query(my_db, queries)
+def test_parameterized_query(conn_db, queries):
+    t.run_parameterized_query(conn_db, queries)
 
 
 @pytest.mark.skip("myco cursor handling is unclear")
@@ -57,34 +67,34 @@ def test_parameterized_record_query(my_dsn, queries):  # pragma: no cover
         t.run_parameterized_record_query(conn, queries, DRIVER, date)
 
 
-def test_record_class_query(my_db, queries):
-    t.run_record_class_query(my_db, queries, date)
+def test_record_class_query(conn_db, queries):
+    t.run_record_class_query(conn_db, queries, date)
 
 
-def test_select_cursor_context_manager(my_db, queries):
-    t.run_select_cursor_context_manager(my_db, queries, date)
+def test_select_cursor_context_manager(conn_db, queries):
+    t.run_select_cursor_context_manager(conn_db, queries, date)
 
 
-def test_select_one(my_db, queries):
-    t.run_select_one(my_db, queries)
+def test_select_one(conn_db, queries):
+    t.run_select_one(conn_db, queries)
 
 
-def test_select_value(my_db, queries):
-    t.run_select_value(my_db, queries, DRIVER)
+def test_select_value(conn_db, queries):
+    t.run_select_value(conn_db, queries, DRIVER)
 
 
 @pytest.mark.skip("mysql does not support RETURNING, although mariadb does")
-def test_insert_returning(my_db, queries):  # pragma: no cover
-    t.run_insert_returning(my_db, queries, DRIVER, date)
+def test_insert_returning(conn_db, queries):  # pragma: no cover
+    t.run_insert_returning(conn_db, queries, DRIVER, date)
 
 
-def test_delete(my_db, queries):
-    t.run_delete(my_db, queries)
+def test_delete(conn_db, queries):
+    t.run_delete(conn_db, queries)
 
 
-def test_insert_many(my_db, queries):
-    t.run_insert_many(my_db, queries, date)
+def test_insert_many(conn_db, queries):
+    t.run_insert_many(conn_db, queries, date)
 
 
-def test_date_time(my_db, queries):
-    t.run_date_time(my_db, queries, DRIVER)
+def test_date_time(conn_db, queries):
+    t.run_date_time(conn_db, queries, DRIVER)

@@ -68,7 +68,7 @@ try:
                 cur.execute(q)
         conn.commit()
 
-    @pytest.fixture()
+    @pytest.fixture
     def pg_params(request, pg_conn):
         """Build postgres connection parameters as a dictionary."""
         if is_psycopg2(pg_conn):  # pragma: no cover
@@ -83,7 +83,7 @@ try:
             dsn["port"] = 5432
         return dsn
 
-    @pytest.fixture()
+    @pytest.fixture
     def pg_dsn(request, pg_params):
         """Build a postgres URL connection string."""
         p = pg_params

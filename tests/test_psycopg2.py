@@ -19,12 +19,12 @@ pytestmark = [
 DRIVER = "psycopg2"
 
 
-@pytest.fixture()
+@pytest.fixture
 def queries():
     return t.queries(DRIVER)
 
 
-@pytest.fixture()
+@pytest.fixture
 def conn(pg_conn):
     return pg_conn
 

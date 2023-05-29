@@ -20,7 +20,7 @@ pytestmark = [
 DRIVER = "asyncpg"
 
 
-@pytest.fixture()
+@pytest.fixture
 def queries():
     return t.queries(DRIVER)
 

@@ -13,7 +13,7 @@ def populate_sqlite3_db(db_path):
     conn.close()
 
 
-@pytest.fixture()
+@pytest.fixture
 def sqlite3_db_path(tmpdir):
     db_path = str(Path(tmpdir.strpath) / "blogdb.db")
     populate_sqlite3_db(db_path)
