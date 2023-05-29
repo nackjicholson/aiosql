@@ -10,14 +10,12 @@ try:
         db_path = str(Path(tmpdir.strpath) / "blogdb.duck.db")
         return db_path
 
-
     @pytest.fixture
     def duckdb_conn(duckdb_db_path):
         conn = duckdb.connect(":memory:")
         populate_duckdb_db(conn)
         yield conn
         conn.close()
-
 
     def populate_duckdb_db(conn):
         conn.execute("\n".join(create_user_blogs("duckdb")))
