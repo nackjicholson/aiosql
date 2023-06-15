@@ -408,4 +408,4 @@ check.publish: dist
 .PHONY: publish
 publish: dist
 	echo "# run twine to publish on pypi"
-	echo twine upload --repository $(MODULE) dist/*
+	echo twine upload dist/*
