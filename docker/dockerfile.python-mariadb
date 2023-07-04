@@ -10,4 +10,5 @@ WORKDIR /code
 RUN curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash
 RUN apt install -y --no-install-recommends libmariadb-dev sqlite3
 RUN apt clean
+RUN cp /usr/lib/x86_64-linux-gnu/pkgconfig/libmariadb.pc /usr/lib/x86_64-linux-gnu/pkgconfig/mariadb.pc
 RUN /venv/bin/pip install mariadb pytest-mysql duckdb apsw aiosqlite
