@@ -2,8 +2,8 @@
 
 As MySQL et MariaDB cannot be installed one alongside the other easily,
 this directory provides a docker solution with 3 servers (for postgres,
-mysql and mariadb) and their clients. Databse sqlite3 and duckdb are run
-with mariadb because it has the lowest load.
+mysql and mariadb) and their clients. Tests with databases sqlite3 and duckdb
+are run with mariadb because it has the lowest load.
 
 ## Servers
 
