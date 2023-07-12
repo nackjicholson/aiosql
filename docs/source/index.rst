@@ -230,18 +230,3 @@ Why you might NOT want to use this
 * You aren't comfortable writing SQL code.
 * You don't have anything in your application that requires complicated SQL beyond basic CRUD operations.
 * Dynamically loaded objects built at runtime really bother you.
-
-
-Table of Contents
------------------
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-   Getting Started <getting-started>
-   Defining SQL Queries <defining-sql-queries>
-   Advanced Topics <advanced-topics>
-   Database Driver Adapters <database-driver-adapters>
-   Contributing <contributing>
-   API <pydoc/modules>
