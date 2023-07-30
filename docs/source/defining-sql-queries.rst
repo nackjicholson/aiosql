@@ -151,10 +151,14 @@ if available.
 
 When performing a modification of rows, or adding new rows, sometimes it is
 necessary to return values using the ``returning`` clause where available.
-With the ``<!`` operator aiosql can execute a query and return values.
 
-When using SQLite this operator will return the id of the inserted row
-using ```cur.lastrowid`` <https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.lastrowid>`__.
+When using SQLite this operator will return the id of the inserted row using
+```cur.lastrowid`` <https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.lastrowid>`__.
+
+As recent version of SQLite do support the ``returning`` clause, forget about
+this, use the clause explicitely and treat the whole command as a standard
+select with the *empty* operator (relation), or ``^`` (tuple), or ``$``
+(scalar).
 
 .. code:: sql
 
@@ -168,27 +172,6 @@ Executing this query in python will return the ``blogid`` of the inserted row.
     queries = aiosql.from_path("blogs.sql", "sqlite3")
     # ... connection code ...
     blogid = queries.publish_blog(conn, userid=1, title="Hi", content="blah blah.")
-
-PostgreSQL allows returning multiple values via the ``RETURNING`` clause of queries.
-This same query using ``psycopg`` or ``psycopg2`` might look like the following.
-
-.. code:: sql
-
-    -- name: publish_blog<!
-    insert into blogs(userid, title, content)
-         values (:userid, :title, :content)
-      returning blogid, title;
-
-In python a tuple is returned with the ``blogid`` and ``title`` of the inserted row.
-
-.. code:: python
-
-    queries = aiosql.from_path("blogs.sql", "psycopg2")
-    # ... connection code ...
-    blogid, title = queries.publish_blog(conn, userid=1, title="Hi", content="blah blah.")
-
-Note that ``INSERT … RETURNING`` basically behaves as a ``SELECT``, so using ``^`` or ``$``
-would work as well.
 
 ``*!`` Insert/Update/Delete Many
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
