@@ -23,7 +23,7 @@ author = "William Vaughn <vaughnwilld@gmail.com>"
 github_doc_root = "https://github.com/nackjicholson/aiosql/tree/master/docs/source/"
 
 # The full version, including alpha/beta/rc tags
-# FIXME should be consistent with "setup.cfg"?
+# FIXME should be consistent with "pyproject.toml"!
 release = "9.0"
 
 
