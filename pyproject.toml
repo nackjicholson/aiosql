@@ -23,15 +23,16 @@ dev = [
     "mypy", "types-setuptools", "build"
 ]
 dev-duckdb = [
-    "duckdb; python_version < '3.12'"
-    # "duckdb"
+    # FIXME duckdb does not compile on 3.12dev on 2023-09-10
+    # NOTE leaving it out breaks coverage
+    # "duckdb; python_version < '3.12'"
+    "duckdb"
 ]
 dev-sqlite = [
     "aiosqlite", "apsw"
 ]
 dev-postgres = [
     "pytest-postgresql",
-    # "asyncpg; python_version < '3.12'",
     "asyncpg",
     "psycopg>=3", "psycopg2", "psycopg2-binary",
     "pygresql", "pg8000"
