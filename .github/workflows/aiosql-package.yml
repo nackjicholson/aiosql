@@ -16,8 +16,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # NOTE asyncpg does not compile with pypy 3.7 & 3.8
-        # NOTE asyncpg and duckdb do not compile with python 3.12-dev
+        # NOTE asyncpg does not install with pypy 3.7 & 3.8
+        # NOTE duckdb does not install with python 3.12-dev
         # https://github.com/actions/python-versions (versions-manifest.json)
         # https://downloads.python.org/pypy/versions.json
         # KO: "3.12-dev"
