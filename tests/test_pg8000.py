@@ -27,6 +27,7 @@ def conn(pg_params):
     dbname = pg_params["dbname"]
     del pg_params["dbname"]
     pg_params["database"] = dbname
+    del pg_params["sslcertmode"]
     u.log.debug(f"params: {pg_params}")
     with db.connect(**pg_params) as conn:
         yield conn
