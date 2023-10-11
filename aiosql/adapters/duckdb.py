@@ -24,7 +24,7 @@ class DuckDBAdapter(GenericAdapter):
     def process_sql(self, _query_name, _op_type, sql):
         return VAR_REF.sub(_colon_to_dollar, sql)
 
-    def insert_returning(self, conn, _query_name, sql, parameters):
+    def insert_returning(self, conn, _query_name, sql, parameters):  # pragma: no cover
         # very similar to select_one but the returned value
         cur = self._cursor(conn)
         cur.execute(sql, parameters)
