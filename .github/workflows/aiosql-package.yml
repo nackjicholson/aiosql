@@ -20,8 +20,7 @@ jobs:
         # NOTE duckdb does not install with python 3.12-dev
         # https://github.com/actions/python-versions (versions-manifest.json)
         # https://downloads.python.org/pypy/versions.json
-        # KO: "3.12-dev"
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12-dev"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
