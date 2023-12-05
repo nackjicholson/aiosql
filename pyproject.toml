@@ -53,7 +53,7 @@ dist = [
 aiosql = [ "py.typed" ]
 
 [tool.setuptools.packages.find]
-include = [ "aiosql" ]
+include = [ "aiosql", "aiosql.adapters" ]
 exclude = [ "tests" ]
 
 [project.urls]
