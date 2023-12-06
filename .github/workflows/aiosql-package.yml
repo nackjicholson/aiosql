@@ -16,8 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # NOTE asyncpg does not install with pypy 3.7 & 3.8
-        # NOTE duckdb does not install with python 3.12?
+        # NOTE duckdb does not install with python 3.12 (2023-12-06)
         # https://github.com/actions/python-versions (versions-manifest.json)
         # https://downloads.python.org/pypy/versions.json
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
