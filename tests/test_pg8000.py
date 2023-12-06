@@ -27,6 +27,10 @@ def conn(pg_params):
     dbname = pg_params["dbname"]
     del pg_params["dbname"]
     pg_params["database"] = dbname
+    # cleanup unsupported keyword arguments
+    del pg_params["sslcertmode"]
+    del pg_params["connect_timeout"]
+    del pg_params["hostaddr"]
     u.log.debug(f"params: {pg_params}")
     with db.connect(**pg_params) as conn:
         yield conn

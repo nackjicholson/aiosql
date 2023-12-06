@@ -23,9 +23,8 @@ author = "William Vaughn <vaughnwilld@gmail.com>"
 github_doc_root = "https://github.com/nackjicholson/aiosql/tree/master/docs/source/"
 
 # The full version, including alpha/beta/rc tags
-# FIXME should be consistent with "setup.cfg"?
-release = "9.0"
-
+from importlib.metadata import version as pkg_version
+release = pkg_version("aiosql")
 
 # -- General configuration ---------------------------------------------------
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aiosql"
-version = "9.0"
+version = "9.1dev"
 authors = [ { name = "William Vaughn et al.", email = "vaughnwilld@gmail.com" } ]
 description = "Simple SQL in Python"
 readme = "README.rst"
@@ -23,14 +23,17 @@ dev = [
     "mypy", "types-setuptools", "build"
 ]
 dev-duckdb = [
-    "duckdb"
+    # FIXME duckdb does not compile on 3.12.0 on 2023-12-06
+    # NOTE leaving it out breaks coverage
+    "duckdb; python_version < '3.12'"
+    # "duckdb"
 ]
 dev-sqlite = [
     "aiosqlite", "apsw"
 ]
 dev-postgres = [
     "pytest-postgresql",
-    "asyncpg; python_version < '3.12'",
+    "asyncpg",
     "psycopg>=3", "psycopg2", "psycopg2-binary",
     "pygresql", "pg8000"
 ]

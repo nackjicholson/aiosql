@@ -32,7 +32,7 @@ def sql(sql_file):
 
 
 def test_version():
-    assert re.match(r"\d+\.\d+$", aiosql.__version__)
+    assert re.match(r"\d+\.\d+(\.?dev\d*)?$", aiosql.__version__)
 
 
 def test_frompath_queries_cls(sql_dir):
