@@ -112,12 +112,12 @@ class AsyncPGAdapter:
     async def insert_update_delete(self, conn, query_name, sql, parameters):
         parameters = self.maybe_order_params(query_name, parameters)
         async with MaybeAcquire(conn) as connection:
-            await connection.execute(sql, *parameters)
+            return await connection.execute(sql, *parameters)
 
     async def insert_update_delete_many(self, conn, query_name, sql, parameters):
         parameters = [self.maybe_order_params(query_name, params) for params in parameters]
         async with MaybeAcquire(conn) as connection:
-            await connection.executemany(sql, parameters)
+            return await connection.executemany(sql, parameters)
 
     async def execute_script(self, conn, sql):
         async with MaybeAcquire(conn) as connection:
