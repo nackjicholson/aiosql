@@ -51,8 +51,8 @@ class AioSQLiteAdapter:
             return cur.lastrowid
 
     async def insert_update_delete(self, conn, _query_name, sql, parameters):
-        cur = await conn.execute(sql, parameters)
-        await cur.close()
+        async with conn.execute(sql, parameters) as cur:
+            return cur.rowcount
 
     async def insert_update_delete_many(self, conn, _query_name, sql, parameters):
         cur = await conn.executemany(sql, parameters)
