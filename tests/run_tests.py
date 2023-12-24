@@ -428,7 +428,9 @@ async def run_async_insert_returning(conn, queries, db, todate):
 async def run_async_delete(conn, queries):
     # Removing the "janedoe" blog titled "Testing"
     actual = await queries.blogs.remove_blog(conn, blogid=2)
-    assert actual is None
+    # log.warning(f"actual = {actual}")
+    # FIXME all implementations should return the same!
+    assert actual == "DELETE 1" or actual == 1
 
     janes_blogs = await queries.blogs.get_user_blogs(conn, userid=3)
     assert len(janes_blogs) == 0
