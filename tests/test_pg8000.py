@@ -28,9 +28,9 @@ def conn(pg_params):
     del pg_params["dbname"]
     pg_params["database"] = dbname
     # cleanup unsupported keyword arguments
-    del pg_params["sslcertmode"]
-    del pg_params["connect_timeout"]
-    del pg_params["hostaddr"]
+    for kw in ("sslcertmode", "connect_timeout", "hostaddr"):
+        if kw in pg_params:
+            del pg_params[kw]
     u.log.debug(f"params: {pg_params}")
     with db.connect(**pg_params) as conn:
         yield conn
