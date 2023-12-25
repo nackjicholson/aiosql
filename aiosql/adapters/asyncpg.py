@@ -112,6 +112,7 @@ class AsyncPGAdapter:
     async def insert_update_delete(self, conn, query_name, sql, parameters):
         parameters = self.maybe_order_params(query_name, parameters)
         async with MaybeAcquire(conn) as connection:
+            # TODO extract integer last result
             return await connection.execute(sql, *parameters)
 
     async def insert_update_delete_many(self, conn, query_name, sql, parameters):
