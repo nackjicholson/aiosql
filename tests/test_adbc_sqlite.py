@@ -5,7 +5,7 @@ import sqlite3 as db
 
 
 try:
-    import adbc_driver_postgresql.dbapi as db
+    import adbc_driver_sqlite.dbapi as db
 except ModuleNotFoundError:
     pytest.skip("missing driver: adbc-sqlite3", allow_module_level=True)
 
@@ -74,9 +74,9 @@ def test_modulo(conn, queries):
     assert actual == expected
 
 
-# def test_insert_returning(conn, queries):
-#     print(queries)
-#     t.run_insert_returning(conn, queries, DRIVER, t.todate)
+def test_insert_returning(conn, queries):
+    print(queries)
+    t.run_insert_returning(conn, queries, DRIVER, t.todate)
 
 
 def test_delete(conn, queries):
