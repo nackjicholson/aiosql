@@ -119,10 +119,14 @@ class ADBCAdapter(GenericAdapter):
             cur.close()
         return result[0] if result else None
 
-    def fetch_arrow_table():
-        pass
-
-    def fetch_df():
-        pass
+    def bulk_select(self, conn, query_name, sql, parameters, record_class=None):
+        parameters = self.maybe_order_params(query_name, parameters)
+        cur = self._cursor(conn)
+        try:
+            cur.execute(sql, parameters)
+            results = cur.fetch_arrow_table()
+        finally:
+            cur.close()
+        return results
 
     # https://arrow.apache.org/adbc/current/python/api/adbc_driver_manager.html#adbc_driver_manager.dbapi.Cursor.fetch_arrow_table

@@ -94,8 +94,5 @@ class GenericAdapter:
         return msg
 
     # Todo: Determine if this is the correct location
-    def fetch_arrow_table(self, conn, sql):
-        raise ValueError("Only Implemented for the ADBC driver")
-
-    def fetch_df(self, conn, sql):
+    def bulk_select(self, conn, sql):
         raise ValueError("Only Implemented for the ADBC driver")

@@ -31,6 +31,7 @@ class SQLOperationType(Enum):
     SELECT = 4
     SELECT_ONE = 5
     SELECT_VALUE = 6
+    BULK_SELECT = 7
 
 
 class QueryDatum(NamedTuple):
@@ -112,10 +113,7 @@ class SyncDriverAdapterProtocol(Protocol):
     def execute_script(self, conn: Any, sql: str) -> str:
         ...  # pragma: no cover
 
-    def fetch_arrow_table(self, conn: Any, sql: str) -> Optional[Any]:
-        ...  # pragma: no cover
-
-    def fetch_df(self, conn: Any, sql: str) -> Optional[Any]:
+    def bulk_select(self, conn: Any, sql: str) -> Optional[Any]:
         ...  # pragma: no cover
 
 
