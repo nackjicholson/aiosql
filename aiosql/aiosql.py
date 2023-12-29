@@ -17,7 +17,7 @@ from .types import DriverAdapterProtocol
 
 _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore
-    "adbc-sqlite3": ADBCAdapter,  # type: ignore
+    "adbc": ADBCAdapter,  # type: ignore
     "apsw": GenericAdapter,
     "asyncpg": AsyncPGAdapter,  # type: ignore
     "mariadb": BrokenMySQLAdapter,

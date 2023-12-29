@@ -23,7 +23,7 @@ _DB = {
     "sqlite3": "sqlite3",
     "apsw": "sqlite3",
     "aiosqlite": "sqlite3",
-    "adbc-sqlite3": "sqlite3",
+    "adbc": "sqlite3",
     "psycopg": "postgres",
     "psycopg2": "postgres",
     "asyncpg": "postgres",
@@ -111,7 +111,7 @@ def run_parameterized_record_query(conn, queries, db, todate):
     # this black-generated indentation is a joke…
     fun = (
         queries.blogs.sqlite_get_blogs_published_after
-        if _DB[db] in ("sqlite3", "adbc-sqlite3")
+        if _DB[db] in ("sqlite3", "adbc")
         else queries.blogs.duckdb_get_blogs_published_after
         if _DB[db] == "duckdb"
         else queries.blogs.pg_get_blogs_published_after
