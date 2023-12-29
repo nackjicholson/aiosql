@@ -18,17 +18,22 @@ def _colon_word_to_dollar(match):
 
 
 class ADBCAdapter(GenericAdapter):
-    """ADBC Adapter"""
+    """ADBC Adapter
+
+    Note that this adapter borrows heavily from the asyncpg.py adapter.
+    This is beacuase at the moment ADBC doesn't seem to allow named variables
+    and named params but it DOES allow for positional substitution which is what
+    the postgres driver does as well.
+
+    Todo: update this driver if/when the ADBC driver changes.
+
+    """
 
     def __init__(self, driver=None, cursor_as_dict: bool = False):
         super().__init__(driver=driver)
         # whether to converts the default tuple response to a dict.
         self._convert_row_to_dict = cursor_as_dict
         self.var_sorted = defaultdict(list)
-
-    # def process_sql(self, _query_name, _op_type, sql):
-    #     # return VAR_REF.sub(_colon_to_dollar, sql)
-    #     return VAR_REF.sub(_replacer, sql)
 
     # from asyncpg.py
     def process_sql(self, query_name, _op_type, sql):
@@ -76,15 +81,13 @@ class ADBCAdapter(GenericAdapter):
                 f"Parameters expected to be dict or tuple, received {parameters}"
             )
 
-    def select_one(self, conn, query_name, sql, parameters, record_class=None):
+    def select(self, conn, query_name, sql, parameters, record_class=None):
         parameters = self.maybe_order_params(query_name, parameters)
         cur = self._cursor(conn)
-        print(cur)
         try:
             print(sql, parameters)
             cur.execute(sql, parameters)
-            print("here!")
-            result = cur.fetchone()
+            result = cur.fetchall()
             print(result)
             if result is not None and record_class is not None:
                 # https://arrow.apache.org/adbc/current/python/quickstart.html#getting-database-driver-metadata
@@ -100,3 +103,50 @@ class ADBCAdapter(GenericAdapter):
         finally:
             cur.close()
         return result
+
+    def select_one(self, conn, query_name, sql, parameters, record_class=None):
+        parameters = self.maybe_order_params(query_name, parameters)
+        cur = self._cursor(conn)
+        print(cur)
+        try:
+            print(sql, parameters)
+            cur.execute(sql, parameters)
+            result = cur.fetchone()
+            if result is not None and record_class is not None:
+                # https://arrow.apache.org/adbc/current/python/quickstart.html#getting-database-driver-metadata
+                info = conn.adbc_get_objects().read_all().to_pylist()
+                main_catalog = info[0]
+                schema = main_catalog["catalog_db_schemas"][0]
+                tables = schema["db_schema_tables"]
+
+                column_names = [
+                    column["column_name"] for column in tables[0]["table_columns"]
+                ]
+                result = record_class(**dict(zip(column_names, result)))
+        finally:
+            cur.close()
+        return result
+
+        # def select_one(self, conn, query_name, sql, parameters, record_class=None):
+        # parameters = self.maybe_order_params(query_name, parameters)
+        # cur = self._cursor(conn)
+        # print(cur)
+        # try:
+        #     print(sql, parameters)
+        #     cur.execute(sql, parameters)
+        #     result = cur.fetchone()
+        #     print(result)
+        #     if result is not None and record_class is not None:
+        #         # https://arrow.apache.org/adbc/current/python/quickstart.html#getting-database-driver-metadata
+        #         info = conn.adbc_get_objects().read_all().to_pylist()
+        #         main_catalog = info[0]
+        #         schema = main_catalog["catalog_db_schemas"][0]
+        #         tables = schema["db_schema_tables"]
+
+        #         column_names = [
+        #             column["column_name"] for column in tables[0]["table_columns"]
+        #         ]
+        #         result = record_class(**dict(zip(column_names, result)))
+        # finally:
+        #     cur.close()
+        # return result

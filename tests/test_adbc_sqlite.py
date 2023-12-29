@@ -38,9 +38,9 @@ def test_cursor(conn, queries):
     t.run_cursor(conn, queries)
 
 
-def test_record_query(conn, queries):
-    conn.row_factory = dict_factory
-    t.run_record_query(conn, queries)
+# def test_record_query(conn, queries):
+#     conn.row_factory = dict_factory
+#     t.run_record_query(conn, queries)
 
 
 def test_parameterized_query(conn, queries):

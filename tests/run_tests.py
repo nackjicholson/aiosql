@@ -91,6 +91,7 @@ def run_record_query(conn, queries):
 def run_parameterized_query(conn, queries, db=None):
     # select on a parameter
     actual = queries.users.get_by_lastname(conn, lastname="Doe")
+    print(actual)
     expected = [(3, "janedoe", "Jane", "Doe"), (2, "johndoe", "John", "Doe")]
     # NOTE re-conversion needed for mysqldb and pg8000
     actual = [tuple(i) for i in actual]
@@ -168,9 +169,7 @@ def run_select_cursor_context_manager(conn, queries, todate, db=None):
 
 
 def run_select_one(conn, queries, db=None):
-    print(queries)
     actual = queries.users.get_by_username(conn, username="johndoe")
-    print(actual)
     # reconversion for pg8000
     # actual = tuple(actual)
     expected = (2, "johndoe", "John", "Doe")
