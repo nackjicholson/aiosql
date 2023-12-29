@@ -16,6 +16,7 @@ from .types import DriverAdapterProtocol
 
 _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore
+    "adbc-sqlite3": GenericAdapter,  # type: ignore
     "apsw": GenericAdapter,
     "asyncpg": AsyncPGAdapter,  # type: ignore
     "mariadb": BrokenMySQLAdapter,
@@ -39,14 +40,16 @@ def register_adapter(name: str, adapter: Callable[..., DriverAdapterProtocol]):
 
 
 def _make_driver_adapter(
-    driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]]
+    driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
 ) -> DriverAdapterProtocol:
     """Get the driver adapter instance registered by the `driver_name`."""
     if isinstance(driver_adapter, str):
         try:
             driver_adapter = _ADAPTERS[driver_adapter.lower()]
         except KeyError:
-            raise ValueError(f"Encountered unregistered driver_adapter: {driver_adapter}")
+            raise ValueError(
+                f"Encountered unregistered driver_adapter: {driver_adapter}"
+            )
     # try some guessing if it is a PEP249 module
     elif hasattr(driver_adapter, "paramstyle"):
         style = getattr(driver_adapter, "paramstyle")  # avoid mypy warning?
@@ -168,4 +171,6 @@ def from_path(
         )
         return queries_cls(adapter).load_from_tree(query_data_tree)
     else:  # pragma: no cover
-        raise SQLLoadException(f"The sql_path must be a directory or file, got {sql_path}")
+        raise SQLLoadException(
+            f"The sql_path must be a directory or file, got {sql_path}"
+        )
