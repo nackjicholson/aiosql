@@ -86,13 +86,15 @@ class ADBCAdapter(GenericAdapter):
         cur = self._cursor(conn)
         try:
             cur.execute(sql, parameters)
-            result = cur.fetchall()
-            if result is not None and record_class is not None:
+            results = cur.fetchall()
+            if results is not None and record_class is not None:
                 column_names = [c[0] for c in cur.description]
-                result = record_class(**dict(zip(column_names, result)))
+                results = [
+                    record_class(**dict(zip(column_names, row))) for row in results
+                ]
         finally:
             cur.close()
-        return result
+        return results
 
     def select_one(self, conn, query_name, sql, parameters, record_class=None):
         parameters = self.maybe_order_params(query_name, parameters)
@@ -102,31 +104,9 @@ class ADBCAdapter(GenericAdapter):
             result = cur.fetchone()
             if result is not None and record_class is not None:
                 column_names = [c[0] for c in cur.description]
+                print(column_names)
+                print(result)
                 result = record_class(**dict(zip(column_names, result)))
         finally:
             cur.close()
         return result
-
-        # def select_one(self, conn, query_name, sql, parameters, record_class=None):
-        # parameters = self.maybe_order_params(query_name, parameters)
-        # cur = self._cursor(conn)
-        # print(cur)
-        # try:
-        #     print(sql, parameters)
-        #     cur.execute(sql, parameters)
-        #     result = cur.fetchone()
-        #     print(result)
-        #     if result is not None and record_class is not None:
-        #         # https://arrow.apache.org/adbc/current/python/quickstart.html#getting-database-driver-metadata
-        #         info = conn.adbc_get_objects().read_all().to_pylist()
-        #         main_catalog = info[0]
-        #         schema = main_catalog["catalog_db_schemas"][0]
-        #         tables = schema["db_schema_tables"]
-
-        #         column_names = [
-        #             column["column_name"] for column in tables[0]["table_columns"]
-        #         ]
-        #         result = record_class(**dict(zip(column_names, result)))
-        # finally:
-        #     cur.close()
-        # return result

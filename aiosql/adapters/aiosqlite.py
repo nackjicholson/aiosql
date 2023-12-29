@@ -25,7 +25,9 @@ class AioSQLiteAdapter:
             results = await cur.fetchall()
             if record_class is not None:
                 column_names = [c[0] for c in cur.description]
-                results = [record_class(**dict(zip(column_names, row))) for row in results]
+                results = [
+                    record_class(**dict(zip(column_names, row))) for row in results
+                ]
         return results
 
     async def select_one(self, conn, _query_name, sql, parameters, record_class=None):
