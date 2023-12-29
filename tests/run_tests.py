@@ -139,7 +139,6 @@ def run_parameterized_record_query(conn, queries, db, todate):
 
 def run_record_class_query(conn, queries, todate, db=None):
     raw_actual = queries.blogs.get_user_blogs(conn, userid=1)
-    print(raw_actual)
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
 

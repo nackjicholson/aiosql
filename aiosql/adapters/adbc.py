@@ -104,9 +104,17 @@ class ADBCAdapter(GenericAdapter):
             result = cur.fetchone()
             if result is not None and record_class is not None:
                 column_names = [c[0] for c in cur.description]
-                print(column_names)
-                print(result)
                 result = record_class(**dict(zip(column_names, result)))
         finally:
             cur.close()
         return result
+
+    def select_value(self, conn, _query_name, sql, parameters):
+        parameters = self.maybe_order_params(_query_name, parameters)
+        cur = self._cursor(conn)
+        try:
+            cur.execute(sql, parameters)
+            result = cur.fetchone()
+        finally:
+            cur.close()
+        return result[0] if result else None
