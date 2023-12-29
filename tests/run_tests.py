@@ -133,12 +133,13 @@ def run_parameterized_record_query(conn, queries, db, todate):
         },
         {"title": "Testing", "username": "janedoe", "published": "2018-01-01 00:00"},
     ]
-
+    print(actual, expected)
     assert actual == expected
 
 
 def run_record_class_query(conn, queries, todate, db=None):
     raw_actual = queries.blogs.get_user_blogs(conn, userid=1)
+    print(raw_actual)
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
 

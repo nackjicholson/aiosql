@@ -42,14 +42,15 @@ def test_cursor(conn, queries):
 #     conn.row_factory = dict_factory
 #     t.run_record_query(conn, queries)
 
+# needs dict return
+# def test_parameterized_query(conn, queries):
+#     conn.row_factory = dict_factory
+#     t.run_parameterized_query(conn, queries)
 
-def test_parameterized_query(conn, queries):
-    t.run_parameterized_query(conn, queries)
-
-
-def test_parameterized_record_query(conn, queries):
-    conn.row_factory = dict_factory
-    t.run_parameterized_record_query(conn, queries, DRIVER, t.todate)
+# needs dict return
+# def test_parameterized_record_query(conn, queries):
+#     conn.row_factory = dict_factory
+#     t.run_parameterized_record_query(conn, queries, DRIVER, t.todate)
 
 
 def test_record_class_query(conn, queries):
