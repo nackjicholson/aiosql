@@ -110,7 +110,7 @@ def run_parameterized_record_query(conn, queries, db, todate):
     # this black-generated indentation is a joke…
     fun = (
         queries.blogs.sqlite_get_blogs_published_after
-        if _DB[db] == "sqlite3"
+        if _DB[db] in ("sqlite3", "adbc-sqlite3")
         else queries.blogs.duckdb_get_blogs_published_after
         if _DB[db] == "duckdb"
         else queries.blogs.pg_get_blogs_published_after
@@ -168,10 +168,11 @@ def run_select_cursor_context_manager(conn, queries, todate, db=None):
 
 
 def run_select_one(conn, queries, db=None):
+    print(queries)
     actual = queries.users.get_by_username(conn, username="johndoe")
-
+    print(actual)
     # reconversion for pg8000
-    actual = tuple(actual)
+    # actual = tuple(actual)
     expected = (2, "johndoe", "John", "Doe")
     assert actual == expected
 
