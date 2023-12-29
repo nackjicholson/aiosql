@@ -112,6 +112,12 @@ class SyncDriverAdapterProtocol(Protocol):
     def execute_script(self, conn: Any, sql: str) -> str:
         ...  # pragma: no cover
 
+    def fetch_arrow_table(self, conn: Any, sql: str) -> Optional[Any]:
+        ...  # pragma: no cover
+
+    def fetch_df(self, conn: Any, sql: str) -> Optional[Any]:
+        ...  # pragma: no cover
+
 
 class AsyncDriverAdapterProtocol(Protocol):
     def process_sql(self, query_name: str, op_type: SQLOperationType, sql: str) -> str:

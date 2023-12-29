@@ -118,3 +118,11 @@ class ADBCAdapter(GenericAdapter):
         finally:
             cur.close()
         return result[0] if result else None
+
+    def fetch_arrow_table():
+        pass
+
+    def fetch_df():
+        pass
+
+    # https://arrow.apache.org/adbc/current/python/api/adbc_driver_manager.html#adbc_driver_manager.dbapi.Cursor.fetch_arrow_table
