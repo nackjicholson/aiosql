@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Callable, Dict, Optional, Type, Union, Tuple
 
 from .adapters.aiosqlite import AioSQLiteAdapter
+from .adapters.adbc import ADBCAdapter
 from .adapters.asyncpg import AsyncPGAdapter
 from .adapters.pyformat import PyFormatAdapter
 from .adapters.mysql import BrokenMySQLAdapter
@@ -16,7 +17,7 @@ from .types import DriverAdapterProtocol
 
 _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore
-    "adbc-sqlite3": GenericAdapter,  # type: ignore
+    "adbc-sqlite3": ADBCAdapter,  # type: ignore
     "apsw": GenericAdapter,
     "asyncpg": AsyncPGAdapter,  # type: ignore
     "mariadb": BrokenMySQLAdapter,
