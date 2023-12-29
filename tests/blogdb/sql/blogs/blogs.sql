@@ -30,6 +30,13 @@ delete from blogs where blogid = :blogid;
    where userid = :userid
 order by published desc;
 
+-- name: get-user-blogs-all@
+-- record_class: UserBlogSummary
+-- Get blogs authored by a user.
+  select title,
+         published
+    from blogs;
+
 
 -- name: get-latest-user-blog^
 -- record_class: UserBlogSummary

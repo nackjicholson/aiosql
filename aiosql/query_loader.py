@@ -14,7 +14,7 @@ _RECORD_DEF = re.compile(r"--\s*record_class\s*:\s*(\w+)\s*")
 
 # extract a valid query name followed by an optional operation spec
 # FIXME this accepts "1st" but seems to reject "é"
-_NAME_OP = re.compile(r"^(\w+)(|\^|\$|!|<!|\*!|#)$")
+_NAME_OP = re.compile(r"^(\w+)(|\^|\$|!|<!|\*!|#|\@)$")
 
 # forbid numbers as first character
 _BAD_PREFIX = re.compile(r"^\d")
@@ -31,6 +31,7 @@ _OP_TYPES = {
     "^": SQLOperationType.SELECT_ONE,
     "$": SQLOperationType.SELECT_VALUE,
     "": SQLOperationType.SELECT,
+    "@": SQLOperationType.BULK_SELECT,
 }
 
 # extracting comments requires some kind of scanner
@@ -66,7 +67,9 @@ def _remove_ml_comments(code: str) -> str:
 
 class QueryLoader:
     def __init__(
-        self, driver_adapter: DriverAdapterProtocol, record_classes: Optional[Dict[str, Any]]
+        self,
+        driver_adapter: DriverAdapterProtocol,
+        record_classes: Optional[Dict[str, Any]],
     ):
         self.driver_adapter = driver_adapter
         self.record_classes = record_classes if record_classes is not None else {}
@@ -93,7 +96,9 @@ class QueryLoader:
         qname_spec = text.replace("-", "_")
         nameop = _NAME_OP.match(qname_spec)
         if not nameop or _BAD_PREFIX.match(qname_spec):
-            raise SQLParseException(f'invalid query name and operation spec: "{qname_spec}"')
+            raise SQLParseException(
+                f'invalid query name and operation spec: "{qname_spec}"'
+            )
         qname, qop = nameop.group(1, 2)
         return qname, _OP_TYPES[qop]
 
@@ -143,14 +148,20 @@ class QueryLoader:
         data = []
         # first item is anything before the first query definition, drop it!
         for qdef in qdefs[1:]:
-            data.append(self._make_query_datum(qdef, ns_parts, (fname, lineno) if fname else None))
+            data.append(
+                self._make_query_datum(
+                    qdef, ns_parts, (fname, lineno) if fname else None
+                )
+            )
             lineno += qdef.count("\n")
         return data
 
     def load_query_data_from_file(
         self, path: Path, ns_parts: List[str] = [], encoding=None
     ) -> List[QueryDatum]:
-        return self.load_query_data_from_sql(path.read_text(encoding=encoding), ns_parts, path)
+        return self.load_query_data_from_sql(
+            path.read_text(encoding=encoding), ns_parts, path
+        )
 
     def load_query_data_from_dir_path(
         self, dir_path, ext=(".sql",), encoding=None
@@ -158,7 +169,9 @@ class QueryLoader:
         if not dir_path.is_dir():
             raise ValueError(f"The path {dir_path} must be a directory")
 
-        def _recurse_load_query_data_tree(path, ns_parts=[], ext=(".sql",), encoding=None):
+        def _recurse_load_query_data_tree(
+            path, ns_parts=[], ext=(".sql",), encoding=None
+        ):
             query_data_tree = {}
             for p in path.iterdir():
                 if p.is_file():
@@ -174,7 +187,9 @@ class QueryLoader:
                     )
                 else:  # pragma: no cover
                     # This should be practically unreachable.
-                    raise SQLLoadException(f"The path must be a directory or file, got {p}")
+                    raise SQLLoadException(
+                        f"The path must be a directory or file, got {p}"
+                    )
             return query_data_tree
 
         return _recurse_load_query_data_tree(dir_path, ext=ext, encoding=encoding)

@@ -4,7 +4,13 @@ from pathlib import Path
 from types import MethodType
 from typing import Any, Callable, List, Optional, Set, Tuple, cast
 
-from .types import DriverAdapterProtocol, QueryDatum, QueryDataTree, QueryFn, SQLOperationType
+from .types import (
+    DriverAdapterProtocol,
+    QueryDatum,
+    QueryDataTree,
+    QueryFn,
+    SQLOperationType,
+)
 
 
 def _params(args, kwargs):
@@ -41,7 +47,15 @@ def _query_fn(
 # source, coverage does note detect that the "fn" functions are actually called,
 # hence the "no cover" hints.
 def _make_sync_fn(query_datum: QueryDatum) -> QueryFn:
-    query_name, doc_comments, operation_type, sql, record_class, signature, floc = query_datum
+    (
+        query_name,
+        doc_comments,
+        operation_type,
+        sql,
+        record_class,
+        signature,
+        floc,
+    ) = query_datum
     if operation_type == SQLOperationType.INSERT_RETURNING:
 
         def fn(self: Queries, conn, *args, **kwargs):  # pragma: no cover
@@ -85,7 +99,16 @@ def _make_sync_fn(query_datum: QueryDatum) -> QueryFn:
     elif operation_type == SQLOperationType.SELECT_VALUE:
 
         def fn(self: Queries, conn, *args, **kwargs):  # pragma: no cover
-            return self.driver_adapter.select_value(conn, query_name, sql, _params(args, kwargs))
+            return self.driver_adapter.select_value(
+                conn, query_name, sql, _params(args, kwargs)
+            )
+
+    elif operation_type == SQLOperationType.BULK_SELECT:
+
+        def fn(self: Queries, conn, *args, **kwargs):  # pragma: no cover
+            return self.driver_adapter.bulk_select(
+                conn, query_name, sql, _params(args, kwargs)
+            )
 
     else:
         raise ValueError(f"Unknown operation_type: {operation_type}")
@@ -97,15 +120,24 @@ def _make_async_fn(fn: QueryFn) -> QueryFn:
     async def afn(self: Queries, conn, *args, **kwargs):
         return await fn(self, conn, *args, **kwargs)
 
-    return _query_fn(afn, fn.__name__, fn.__doc__, fn.sql, fn.operation, fn.__signature__)
+    return _query_fn(
+        afn, fn.__name__, fn.__doc__, fn.sql, fn.operation, fn.__signature__
+    )
 
 
 def _make_ctx_mgr(fn: QueryFn) -> QueryFn:
     def ctx_mgr(self, conn, *args, **kwargs):
-        return self.driver_adapter.select_cursor(conn, fn.__name__, fn.sql, _params(args, kwargs))
+        return self.driver_adapter.select_cursor(
+            conn, fn.__name__, fn.sql, _params(args, kwargs)
+        )
 
     return _query_fn(
-        ctx_mgr, f"{fn.__name__}_cursor", fn.__doc__, fn.sql, fn.operation, fn.__signature__
+        ctx_mgr,
+        f"{fn.__name__}_cursor",
+        fn.__doc__,
+        fn.sql,
+        fn.operation,
+        fn.__signature__,
     )
 
 
@@ -191,7 +223,9 @@ class Queries:
         """Load Queries from a `QuaryDataTree`"""
         for key, value in query_data_tree.items():
             if isinstance(value, dict):
-                self.add_child_queries(key, Queries(self.driver_adapter).load_from_tree(value))
+                self.add_child_queries(
+                    key, Queries(self.driver_adapter).load_from_tree(value)
+                )
             else:
                 self.add_queries(_create_methods(value, self.is_aio))
         return self

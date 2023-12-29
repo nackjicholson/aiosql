@@ -308,6 +308,15 @@ def run_date_time(conn, queries, db):
     assert re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", now)
 
 
+def run_bulk_retrieval(conn, queries, db):
+    import pyarrow
+
+    result = queries.blogs.get_user_blogs_all(conn)
+    assert isinstance(result, pyarrow.Table)
+    assert result.column_names == ["title", "published"]
+    assert result.shape == [3, 2]
+
+
 #
 # Asynchronous tests
 #

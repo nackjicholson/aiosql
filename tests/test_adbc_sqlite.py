@@ -3,7 +3,6 @@ import pytest
 import run_tests as t
 import sqlite3 as db
 
-
 try:
     import adbc_driver_sqlite.dbapi as db
 except ModuleNotFoundError:
@@ -97,3 +96,7 @@ def test_execute_script(conn, queries):
     with conn:
         actual = queries.comments.sqlite_create_comments_table(conn)
         assert actual == "DONE"
+
+
+def test_bulk_retrieval(conn, queries):
+    t.run_bulk_retrieval(conn, queries, DRIVER)
