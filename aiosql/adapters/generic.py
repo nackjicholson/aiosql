@@ -41,6 +41,7 @@ class GenericAdapter:
             result = cur.fetchone()
             if result is not None and record_class is not None:
                 column_names = [c[0] for c in cur.description]
+                # this fails if result is not a list or tuple
                 result = record_class(**dict(zip(column_names, result)))
         finally:
             cur.close()
@@ -51,9 +52,17 @@ class GenericAdapter:
         try:
             cur.execute(sql, parameters)
             result = cur.fetchone()
+            if result:
+                if isinstance(result, (list, tuple)):
+                    return result[0]
+                elif isinstance(result, dict):
+                    return next(iter(result.values()))
+                else:  # pragma: no cover
+                    raise Exception(f"unexpected value type: {type(result)}")
+            else:
+                return None
         finally:
             cur.close()
-        return result[0] if result else None
 
     @contextmanager
     def select_cursor(self, conn, _query_name, sql, parameters):
