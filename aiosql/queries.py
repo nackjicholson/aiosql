@@ -62,9 +62,7 @@ def _make_sync_fn(query_datum: QueryDatum) -> QueryFn:
         def fn(self: Queries, conn, *args, **kwargs):  # type: ignore
             # pragma: no cover
             assert not kwargs  # help type checker
-            return self.driver_adapter.insert_update_delete_many(
-                conn, query_name, sql, *args
-            )
+            return self.driver_adapter.insert_update_delete_many(conn, query_name, sql, *args)
 
     elif operation_type == SQLOperationType.SCRIPT:
 
