@@ -126,6 +126,11 @@ check.mypy: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	mypy --install-types --non-interactive $(MODULE)
 
+.PHONY: check.pyright
+check.pyright: $(VENV)
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
+	pyright $(MODULE)
+
 .PHONY: check.flake8
 check.flake8: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
