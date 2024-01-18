@@ -28,4 +28,4 @@ SELECT '''doubled'' single quotes' as """doubled"" double quotes"
 -- SELECT 'L\'art du rire' AS escaped;
 
 -- name: empty$
-SELECT i FROM generate_series(1, 3) AS i WHERE i > 10;
+SELECT i FROM (VALUES (1), (2), (3))  AS i WHERE i > 10;
