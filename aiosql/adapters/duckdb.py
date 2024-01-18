@@ -1,5 +1,6 @@
 from .generic import GenericAdapter
 from ..utils import VAR_REF
+from typing import List
 
 
 def _colon_to_dollar(match):
@@ -37,6 +38,7 @@ class DuckDBAdapter(GenericAdapter):
         return res[0] if res and len(res) == 1 else res
 
     def select(self, conn, _query_name, sql, parameters, record_class=None):
+        column_names: List[str] = []
         cur = self._cursor(conn)
         try:
             cur.execute(sql, parameters)
