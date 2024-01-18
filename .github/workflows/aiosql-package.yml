@@ -32,6 +32,8 @@ jobs:
         python -m pip install .[dev,dev-postgres,dev-mysql,dev-sqlite,dev-duckdb]
     - name: Check types with mypy
       run: make VENV= INSTALL= check.mypy
+    - name: Check types with pyright
+      run: make VENV= INSTALL= check.pyright
     - name: Lint with black
       run: make VENV= INSTALL= check.black
     - name: Lint with flake8
