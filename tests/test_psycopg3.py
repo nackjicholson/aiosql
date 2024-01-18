@@ -40,6 +40,8 @@ def test_cursor(conn, queries):
 def test_record_query(pg_params, queries):
     with db.connect(**pg_params, row_factory=dict_row) as conn:
         t.run_record_query(conn, queries)
+        # test select_value with dict_row
+        t.run_select_value(conn, queries, DRIVER)
 
 
 def test_parameterized_query(conn, queries):
