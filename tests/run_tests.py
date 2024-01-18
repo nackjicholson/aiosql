@@ -289,6 +289,9 @@ def run_select_value(conn, queries, db, expect=3):
     if _DB[db] == "postgres":
         actual = queries.misc.pg_escape_quotes(conn)
         assert actual == "'doubled' single quotes"
+    # empty result
+    none = queries.misc.empty(conn)
+    assert none is None
 
 
 def run_date_time(conn, queries, db):

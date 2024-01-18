@@ -26,3 +26,6 @@ SELECT '''doubled'' single quotes' as """doubled"" double quotes"
 -- FIXME this one does not work
 -- name: my-escape-quotes$
 -- SELECT 'L\'art du rire' AS escaped;
+
+-- name: empty$
+SELECT i FROM generate_series(1, 3) AS i WHERE i > 10;
