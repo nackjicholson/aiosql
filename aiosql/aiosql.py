@@ -51,9 +51,9 @@ def _make_driver_adapter(
     elif hasattr(driver_adapter, "paramstyle"):
         style = getattr(driver_adapter, "paramstyle")  # avoid mypy warning?
         if style == "pyformat":
-            driver_adapter = PyFormatAdapter
+            driver_adapter = PyFormatAdapter  # type: ignore
         elif style == "named":
-            driver_adapter = GenericAdapter
+            driver_adapter = GenericAdapter  # type: ignore
         else:
             raise ValueError(f"Unexpected driver_adapter: {driver_adapter} ({style})")
     # so, can we just call it?

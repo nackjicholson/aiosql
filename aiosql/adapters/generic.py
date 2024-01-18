@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from typing import List
 
 
 class GenericAdapter:
@@ -18,6 +19,7 @@ class GenericAdapter:
         return conn.cursor()
 
     def select(self, conn, _query_name, sql, parameters, record_class=None):
+        column_names: List[str] = []
         cur = self._cursor(conn)
         try:
             cur.execute(sql, parameters)
