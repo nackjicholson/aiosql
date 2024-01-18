@@ -28,4 +28,4 @@ SELECT '''doubled'' single quotes' as """doubled"" double quotes"
 -- SELECT 'L\'art du rire' AS escaped;
 
 -- name: empty$
-SELECT TRUE FROM Users WHERE FALSE;
+SELECT TRUE WHERE FALSE;
