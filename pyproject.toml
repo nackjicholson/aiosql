@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aiosql"
-version = "9.2"
+version = "9.3"
 authors = [ { name = "William Vaughn et al.", email = "vaughnwilld@gmail.com" } ]
 description = "Simple SQL in Python"
 readme = "README.rst"
