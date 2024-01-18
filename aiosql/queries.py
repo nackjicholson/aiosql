@@ -51,29 +51,25 @@ def _make_sync_fn(query_datum: QueryDatum) -> QueryFn:
 
     elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE:
 
-        def fn(self: Queries, conn, *args, **kwargs):  # type: ignore
-            # pragma: no cover
+        def fn(self: Queries, conn, *args, **kwargs):  # type: ignore # pragma: no cover
             return self.driver_adapter.insert_update_delete(
                 conn, query_name, sql, _params(args, kwargs)
             )
 
     elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
 
-        def fn(self: Queries, conn, *args, **kwargs):  # type: ignore
-            # pragma: no cover
+        def fn(self: Queries, conn, *args, **kwargs):  # type: ignore # pragma: no cover
             assert not kwargs  # help type checker
             return self.driver_adapter.insert_update_delete_many(conn, query_name, sql, *args)
 
     elif operation_type == SQLOperationType.SCRIPT:
 
-        def fn(self: Queries, conn, *args, **kwargs):  # type: ignore
-            # pragma: no cover
+        def fn(self: Queries, conn, *args, **kwargs):  # type: ignore # pragma: no cover
             return self.driver_adapter.execute_script(conn, sql)
 
     elif operation_type == SQLOperationType.SELECT:
 
-        def fn(self: Queries, conn, *args, **kwargs):  # type: ignore
-            # pragma: no cover
+        def fn(self: Queries, conn, *args, **kwargs):  # type: ignore # pragma: no cover
             return self.driver_adapter.select(
                 conn, query_name, sql, _params(args, kwargs), record_class
             )
