@@ -1,4 +1,3 @@
-import sys
 import inspect
 from pathlib import Path
 from types import MethodType
