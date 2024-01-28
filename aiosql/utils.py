@@ -10,7 +10,7 @@ VAR_REF = re.compile(
     # NOTE beware of overlapping re
     r"(?P<lead>[^:]):(?P<var_name>[\w-]+)(?=[^:]?)"
 )
-"""Pattern to identifies colon-variables in SQL code"""
+"""Pattern to identifies colon-variables (aka _named_ style) in SQL code"""
 
 log = logging.getLogger("aiosql")
 # log.setLevel(logging.DEBUG)

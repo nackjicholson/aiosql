@@ -20,7 +20,7 @@ class GenericAdapter:
         """Get a cursor from a connection."""
         return conn.cursor()
 
-    def select(self, conn, _query_name, sql, parameters, record_class=None):
+    def select(self, conn, _query_name: str, sql: str, parameters, record_class=None):
         """Handle a relation-returning SELECT (no suffix)."""
         column_names: List[str] = []
         cur = self._cursor(conn)

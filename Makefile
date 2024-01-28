@@ -323,7 +323,7 @@ check.coverage.combine: $(VENV)
 	else
 	  $(COVERAGE) html
 	fi
-	$(COVERAGE) report --fail-under=100 --include='$(MODULE)/*'
+	$(COVERAGE) report --show-missing --precision=1 --fail-under=100.0 --include='$(MODULE)/*'
 
 #
 # Docker runs

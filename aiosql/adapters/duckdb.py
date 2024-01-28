@@ -37,7 +37,7 @@ class DuckDBAdapter(GenericAdapter):
             res = res[0]
         return res[0] if res and len(res) == 1 else res
 
-    def select(self, conn, _query_name, sql, parameters, record_class=None):
+    def select(self, conn, _query_name: str, sql: str, parameters, record_class=None):
         column_names: List[str] = []
         cur = self._cursor(conn)
         try:

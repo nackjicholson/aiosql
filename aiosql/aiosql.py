@@ -113,7 +113,7 @@ def from_str(
     """
     adapter = _make_driver_adapter(driver_adapter)
     query_loader = loader_cls(adapter, record_classes)
-    query_data = query_loader.load_query_data_from_sql(sql)
+    query_data = query_loader.load_query_data_from_sql(sql, [])
     return queries_cls(adapter).load_from_list(query_data)
 
 
