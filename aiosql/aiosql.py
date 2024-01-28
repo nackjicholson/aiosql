@@ -66,8 +66,8 @@ def _make_driver_adapter(
 def from_str(
     sql: str,
     driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
-    kwargs_only: bool = False,
     record_classes: Optional[Dict] = None,
+    kwargs_only: bool = False,
     *,
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
@@ -122,8 +122,8 @@ def from_str(
 def from_path(
     sql_path: Union[str, Path],
     driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
-    kwargs_only: bool = False,
     record_classes: Optional[Dict] = None,
+    kwargs_only: bool = False,
     *,
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
