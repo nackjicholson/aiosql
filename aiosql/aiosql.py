@@ -66,6 +66,7 @@ def _make_driver_adapter(
 def from_str(
     sql: str,
     driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
+    kwargs_only: bool = False,
     record_classes: Optional[Dict] = None,
     *,
     loader_cls: Type[QueryLoader] = QueryLoader,
@@ -79,6 +80,7 @@ def from_str(
     - **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
       adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your
       own adapter class, you can pass it's constructor.
+    - **kwargs_only** - Whether to only use named parameters on query execution.
     - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
       declarations to the python classes which aiosql should use when marshaling SQL results.
     - **loader_cls** - *(optional)* Custom constructor for QueryLoader extensions.
@@ -114,12 +116,13 @@ def from_str(
     adapter = _make_driver_adapter(driver_adapter)
     query_loader = loader_cls(adapter, record_classes)
     query_data = query_loader.load_query_data_from_sql(sql, [])
-    return queries_cls(adapter).load_from_list(query_data)
+    return queries_cls(adapter, kwargs_only=kwargs_only).load_from_list(query_data)
 
 
 def from_path(
     sql_path: Union[str, Path],
     driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
+    kwargs_only: bool = False,
     record_classes: Optional[Dict] = None,
     *,
     loader_cls: Type[QueryLoader] = QueryLoader,
@@ -135,6 +138,7 @@ def from_path(
     - **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
       adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your own
       adapter class, you may pass its constructor.
+    - **kwargs_only** - Whether to only use named parameters on query execution.
     - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
       declarations to the python classes which aiosql should use when marshaling SQL results.
     - **loader_cls** - *(optional)* Custom constructor for `QueryLoader` extensions.
@@ -161,11 +165,11 @@ def from_path(
 
     if path.is_file():
         query_data = query_loader.load_query_data_from_file(path, encoding=encoding)
-        return queries_cls(adapter).load_from_list(query_data)
+        return queries_cls(adapter, kwargs_only=kwargs_only).load_from_list(query_data)
     elif path.is_dir():
         query_data_tree = query_loader.load_query_data_from_dir_path(
             path, ext=ext, encoding=encoding
         )
-        return queries_cls(adapter).load_from_tree(query_data_tree)
+        return queries_cls(adapter, kwargs_only=kwargs_only).load_from_tree(query_data_tree)
     else:  # pragma: no cover
         raise SQLLoadException(f"The sql_path must be a directory or file, got {sql_path}")
