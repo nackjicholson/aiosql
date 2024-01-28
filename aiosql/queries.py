@@ -130,7 +130,7 @@ class Queries:
     def _make_async_fn(self, fn: QueryFn) -> QueryFn:
         """Wrap in an async function."""
 
-        async def afn(self, conn, *args, **kwargs):
+        async def afn(self, conn, *args, **kwargs):  # pragma: no cover
             return await fn(self, conn, *args, **kwargs)
 
         return self._query_fn(afn, fn.__name__, fn.__doc__, fn.sql, fn.operation, fn.__signature__)
@@ -138,7 +138,7 @@ class Queries:
     def _make_ctx_mgr(self, fn: QueryFn) -> QueryFn:
         """Wrap in a context manager function."""
 
-        def ctx_mgr(self, conn, *args, **kwargs):
+        def ctx_mgr(self, conn, *args, **kwargs):  # pragma: no cover
             return self.driver_adapter.select_cursor(
                 conn, fn.__name__, fn.sql, self._params(args, kwargs)
             )
