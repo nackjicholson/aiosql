@@ -18,7 +18,7 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest", "pytest-asyncio",
+    "pytest<8", "pytest-asyncio",
     "rstcheck", "black", "coverage", "flake8",
     "mypy", "pyright", "types-setuptools", "build"
 ]
