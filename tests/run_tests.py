@@ -106,24 +106,16 @@ def run_parameterized_query(conn, queries, db=None):
 
 
 def run_parameterized_record_query(conn, queries, db, todate):
-    # this black-generated indentation is a joke…
-    fun = (
-        queries.blogs.sqlite_get_blogs_published_after
-        if _DB[db] == "sqlite3"
-        else (
-            queries.blogs.duckdb_get_blogs_published_after
-            if _DB[db] == "duckdb"
-            else (
-                queries.blogs.pg_get_blogs_published_after
-                if _DB[db] == "postgres"
-                else (
-                    queries.blogs.my_get_blogs_published_after
-                    if _DB[db] in ("mysql", "mariadb")
-                    else None
-                )
-            )
-        )
-    )
+    if _DB[db] == "sqlite3":
+        fun = queries.blogs.sqlite_get_blogs_published_after
+    elif _DB[db] == "duckdb":
+        fun = queries.blogs.duckdb_get_blogs_published_after
+    elif _DB[db] == "postgres":
+        fun = queries.blogs.pg_get_blogs_published_after
+    elif _DB[db] in ("mysql", "mariadb"):
+        fun = queries.blogs.my_get_blogs_published_after
+    else:
+        raise Exception(f"unexpected driver: {db}")
 
     raw_actual = fun(conn, published=todate(2018, 1, 1))
     assert isinstance(raw_actual, Iterable)
@@ -180,19 +172,17 @@ def run_select_one(conn, queries, db=None):
 
 
 def run_insert_returning(conn, queries, db, todate):
-    fun = (
-        queries.blogs.publish_blog
-        if _DB[db] in ("sqlite3")
-        else (
-            queries.blogs.duckdb_publish_blog
-            if _DB[db] in ("duckdb")
-            else (
-                queries.blogs.pg_publish_blog
-                if _DB[db] in ("postgres", "mariadb")
-                else queries.blogs.my_publish_blog if _DB[db] == "mysql" else None
-            )
-        )
-    )
+    if _DB[db] in ("sqlite3"):
+        fun = queries.blogs.publish_blog
+    elif _DB[db] in ("duckdb"):
+        fun = queries.blogs.duckdb_publish_blog
+    elif _DB[db] in ("postgres", "mariadb"):
+        fun = queries.blogs.pg_publish_blog
+    elif _DB[db] == "mysql":
+        fun = queries.blogs.my_publish_blog
+    else:
+        raise Exception(f"unexpected driver: {db}")
+
     if db == "duckdb":
         blogid = fun(
             conn,
