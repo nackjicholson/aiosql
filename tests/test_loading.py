@@ -195,3 +195,24 @@ def test_misc(sql_file):
         assert False, "must raise en exception"  # pragma: no cover
     except ValueError as e:
         assert "must be a directory" in str(e)
+
+
+def test_kwargs():
+    # kwargs_only == True
+    queries = aiosql.from_str("-- name: plus_one$\nSELECT 1 + :val;\n", "sqlite3", kwargs_only=True)
+    import sqlite3
+    conn = sqlite3.connect(":memory:")
+    assert 42 == queries.plus_one(conn, val=41)
+    try:
+        queries.plus_one(conn, 2)
+        assert False, "must raise an exception"  # pragma: no cover
+    except ValueError as e:
+        assert "kwargs" in str(e)
+    # kwargs_only == False
+    queries = aiosql.from_str("-- name: plus_two$\nSELECT 2 + :val;\n", "sqlite3", kwargs_only=False)
+    assert 42 == queries.plus_two(conn, val=40)
+    try:
+        queries.plus_two(conn, 2, val=41)
+        assert False, "must raise an exception"  # pragma: no cover
+    except ValueError as e:
+        assert "mix" in str(e)
