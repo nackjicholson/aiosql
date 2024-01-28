@@ -12,9 +12,7 @@ def create_user_blogs(db):
     serial = (
         "SERIAL"
         if db == "pgsql"
-        else "INTEGER"
-        if db in ("sqlite", "duckdb")
-        else "INTEGER auto_increment"
+        else "INTEGER" if db in ("sqlite", "duckdb") else "INTEGER auto_increment"
     )
     ddl_statements = [
         f"""CREATE TABLE IF NOT EXISTS users (

@@ -110,13 +110,19 @@ def run_parameterized_record_query(conn, queries, db, todate):
     fun = (
         queries.blogs.sqlite_get_blogs_published_after
         if _DB[db] == "sqlite3"
-        else queries.blogs.duckdb_get_blogs_published_after
-        if _DB[db] == "duckdb"
-        else queries.blogs.pg_get_blogs_published_after
-        if _DB[db] == "postgres"
-        else queries.blogs.my_get_blogs_published_after
-        if _DB[db] in ("mysql", "mariadb")
-        else None
+        else (
+            queries.blogs.duckdb_get_blogs_published_after
+            if _DB[db] == "duckdb"
+            else (
+                queries.blogs.pg_get_blogs_published_after
+                if _DB[db] == "postgres"
+                else (
+                    queries.blogs.my_get_blogs_published_after
+                    if _DB[db] in ("mysql", "mariadb")
+                    else None
+                )
+            )
+        )
     )
 
     raw_actual = fun(conn, published=todate(2018, 1, 1))
@@ -177,13 +183,15 @@ def run_insert_returning(conn, queries, db, todate):
     fun = (
         queries.blogs.publish_blog
         if _DB[db] in ("sqlite3")
-        else queries.blogs.duckdb_publish_blog
-        if _DB[db] in ("duckdb")
-        else queries.blogs.pg_publish_blog
-        if _DB[db] in ("postgres", "mariadb")
-        else queries.blogs.my_publish_blog
-        if _DB[db] == "mysql"
-        else None
+        else (
+            queries.blogs.duckdb_publish_blog
+            if _DB[db] in ("duckdb")
+            else (
+                queries.blogs.pg_publish_blog
+                if _DB[db] in ("postgres", "mariadb")
+                else queries.blogs.my_publish_blog if _DB[db] == "mysql" else None
+            )
+        )
     )
     if db == "duckdb":
         blogid = fun(
@@ -338,9 +346,7 @@ async def run_async_parameterized_record_query(conn, queries, db, todate):
     fun = (
         queries.blogs.pg_get_blogs_published_after
         if _DB[db] == "postgres"
-        else queries.blogs.sqlite_get_blogs_published_after
-        if _DB[db] == "sqlite3"
-        else None
+        else queries.blogs.sqlite_get_blogs_published_after if _DB[db] == "sqlite3" else None
     )
     records = await fun(conn, published=todate(2018, 1, 1))
 

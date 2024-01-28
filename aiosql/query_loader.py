@@ -1,7 +1,7 @@
 import re
 import inspect
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Type, Sequence, Any
+from typing import Dict, List, Optional, Tuple, Type, Sequence, Any, Union
 
 from .utils import SQLParseException, SQLLoadException, VAR_REF, log
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
@@ -72,7 +72,7 @@ class QueryLoader:
         self.record_classes = record_classes if record_classes is not None else {}
 
     def _make_query_datum(
-        self, query: str, ns_parts: List[str], floc: Optional[Tuple[Path, int]] = None
+        self, query: str, ns_parts: List[str], floc: Tuple[Union[Path, str], int]
     ) -> QueryDatum:
         # Build a query datum
         # - query: the spec and name ("query-name!\n-- comments\nSQL;\n")
@@ -134,7 +134,7 @@ class QueryLoader:
         return inspect.Signature(parameters=params)
 
     def load_query_data_from_sql(
-        self, sql: str, ns_parts: List[str] = [], fname: Optional[Path] = None
+        self, sql: str, ns_parts: List[str], fname: Union[Path, str] = "<unknown>"
     ) -> List[QueryDatum]:
         usql = _remove_ml_comments(sql)
         qdefs = _QUERY_DEF.split(usql)
@@ -143,7 +143,7 @@ class QueryLoader:
         data = []
         # first item is anything before the first query definition, drop it!
         for qdef in qdefs[1:]:
-            data.append(self._make_query_datum(qdef, ns_parts, (fname, lineno) if fname else None))
+            data.append(self._make_query_datum(qdef, ns_parts, (fname, lineno)))
             lineno += qdef.count("\n")
         return data
 
