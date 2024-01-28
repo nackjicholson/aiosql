@@ -5,6 +5,8 @@ from typing import List
 class GenericAdapter:
     """
     Generic AioSQL Adapter suitable for `named` parameter style and no with support.
+
+    This class also serves as the base class for other adapters.
     """
 
     def __init__(self, driver=None):
@@ -19,6 +21,7 @@ class GenericAdapter:
         return conn.cursor()
 
     def select(self, conn, _query_name, sql, parameters, record_class=None):
+        """Handle a relation-returning SELECT (no suffix)."""
         column_names: List[str] = []
         cur = self._cursor(conn)
         try:
@@ -37,6 +40,9 @@ class GenericAdapter:
             cur.close()
 
     def select_one(self, conn, _query_name, sql, parameters, record_class=None):
+        """Handle a tuple-returning (one row) SELECT (``^`` suffix).
+
+        Return None if empty."""
         cur = self._cursor(conn)
         try:
             cur.execute(sql, parameters)
@@ -50,6 +56,9 @@ class GenericAdapter:
         return result
 
     def select_value(self, conn, _query_name, sql, parameters):
+        """Handle a scalar-returning (one value) SELECT (``$`` suffix).
+
+        Return None if empty."""
         cur = self._cursor(conn)
         try:
             cur.execute(sql, parameters)
@@ -68,6 +77,7 @@ class GenericAdapter:
 
     @contextmanager
     def select_cursor(self, conn, _query_name, sql, parameters):
+        """Return the raw cursor after a SELECT exec."""
         cur = self._cursor(conn)
         cur.execute(sql, parameters)
         try:
@@ -76,6 +86,7 @@ class GenericAdapter:
             cur.close()
 
     def insert_update_delete(self, conn, _query_name, sql, parameters):
+        """Handle affected row counts (INSERT UPDATE DELETE) (``!`` suffix)."""
         cur = self._cursor(conn)
         cur.execute(sql, parameters)
         rc = cur.rowcount if hasattr(cur, "rowcount") else -1
@@ -83,13 +94,16 @@ class GenericAdapter:
         return rc
 
     def insert_update_delete_many(self, conn, _query_name, sql, parameters):
+        """Handle affected row counts (INSERT UPDATE DELETE) (``*!`` suffix)."""
         cur = self._cursor(conn)
         cur.executemany(sql, parameters)
         rc = cur.rowcount if hasattr(cur, "rowcount") else -1
         cur.close()
         return rc
 
+    # FIXME this made sense when SQLite had no RETURNING prefix (v3.35, 2021-03-12)
     def insert_returning(self, conn, _query_name, sql, parameters):
+        """Special case for RETURNING (``<!`` suffix) with SQLite."""
         # very similar to select_one but the returned value
         cur = self._cursor(conn)
         cur.execute(sql, parameters)
@@ -98,6 +112,7 @@ class GenericAdapter:
         return res[0] if res and len(res) == 1 else res
 
     def execute_script(self, conn, sql):
+        """Handle an SQL script (``#`` suffix)."""
         cur = self._cursor(conn)
         cur.execute(sql)
         msg = cur.statusmessage if hasattr(cur, "statusmessage") else "DONE"
