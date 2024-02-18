@@ -23,10 +23,7 @@ dev = [
     "mypy", "pyright", "types-setuptools", "build"
 ]
 dev-duckdb = [
-    # FIXME duckdb does not compile on 3.12.0 on 2023-12-06
-    # NOTE leaving it out breaks coverage
-    "duckdb; python_version < '3.12'"
-    # "duckdb"
+    "duckdb"
 ]
 dev-sqlite = [
     "aiosqlite", "apsw"
