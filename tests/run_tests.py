@@ -43,7 +43,7 @@ RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 def queries(driver):
     """Load queries into AioSQL."""
     dir_path = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(dir_path, driver, RECORD_CLASSES, attribute="__")
+    return aiosql.from_path(dir_path, driver, RECORD_CLASSES, attribute="_dot_")
 
 
 def run_something(conn):

@@ -34,7 +34,7 @@ You can use ``help()`` in the Python REPL to view these comments while using pyt
 
 .. code:: pycon
 
-    Python 3.8.3 (default, May 17 2020, 18:15:42) 
+    Python 3.8.3 (default, Jul 29 2020, 11:15:42)
     [GCC 10.1.0] on linux
     Type "help", "copyright", "credits" or "license" for more information.
     >>> import aiosql
@@ -44,6 +44,26 @@ You can use ``help()`` in the Python REPL to view these comments while using pyt
 
     get_all_blogs(conn, *args, **kwargs) method of aiosql.queries.Queries instance
         Fetch all fields for every blog in the database.
+
+
+Named Parameters
+----------------
+
+Named parameters ``:param`` are accepted by all supported drivers and taken
+from Python named parameters passed to the query.
+In addition, simple attributes can be referenced with the ``.``-syntax.
+
+.. code:: sql
+
+    -- name: with-params
+    select length(:name), :x.real + :x.imaj;
+
+Then the generated function expects two named parameters:
+
+.. code:: python
+
+    res = queries.with_params(name="Calvin", x=(1+1j))
+    # => (6, 2.0)
 
 Operators
 ---------
