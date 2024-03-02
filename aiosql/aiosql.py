@@ -68,7 +68,7 @@ def from_str(
     driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
     record_classes: Optional[Dict] = None,
     kwargs_only: bool = False,
-    attribute: Optional[str] = None,
+    attribute: Optional[str] = "__",
     *,
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
@@ -82,6 +82,8 @@ def from_str(
       adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your
       own adapter class, you can pass it's constructor.
     - **kwargs_only** - Whether to only use named parameters on query execution.
+    - **attribute** - ``.`` attribute access substitution, defaults to ``"__"``, *None* disables
+      the feature.
     - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
       declarations to the python classes which aiosql should use when marshaling SQL results.
     - **loader_cls** - *(optional)* Custom constructor for QueryLoader extensions.
@@ -125,7 +127,7 @@ def from_path(
     driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
     record_classes: Optional[Dict] = None,
     kwargs_only: bool = False,
-    attribute: Optional[str] = None,
+    attribute: Optional[str] = "__",
     *,
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
@@ -141,6 +143,8 @@ def from_path(
       adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your own
       adapter class, you may pass its constructor.
     - **kwargs_only** - Whether to only use named parameters on query execution.
+    - **attribute** - ``.`` attribute access substitution, defaults to ``"__""``, *None* disables
+      the feature.
     - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
       declarations to the python classes which aiosql should use when marshaling SQL results.
     - **loader_cls** - *(optional)* Custom constructor for `QueryLoader` extensions.
