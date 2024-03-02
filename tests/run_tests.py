@@ -314,6 +314,7 @@ class Person:
 
 
 def run_object_attributes(conn, queries, db):
+    # success
     calvin = Person(name="Calvin", age=6)
     r = queries.misc.person_attributes(conn, p=calvin)
     if isinstance(r, (tuple, list)):
@@ -323,6 +324,18 @@ def run_object_attributes(conn, queries, db):
         assert r["name"] == calvin.name and r["age"] == calvin.age
     else:
         assert False, "unexpected query output"
+    # failures
+    try:
+        queries.misc.person_attributes(conn, q=calvin)
+        assert False, "should fail on missing parameter p"
+    except ValueError as e:
+        assert "missing named parameter p" in str(e)
+    del calvin.age
+    try:
+        queries.misc.person_attributes(conn, p=calvin)
+        assert False, "should fail on missing attribute age"
+    except ValueError as e:
+        assert "parameter p is missing attribute age" in str(e)
 
 
 #
