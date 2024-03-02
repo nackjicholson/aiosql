@@ -88,3 +88,7 @@ def test_execute_script(conn, queries):
     with conn:
         actual = queries.comments.sqlite_create_comments_table(conn)
         assert actual == "DONE"
+
+
+def test_object_attributes(conn, queries):
+    t.run_object_attributes(conn, queries, DRIVER)

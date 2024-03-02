@@ -41,6 +41,7 @@ class QueryDatum(NamedTuple):
     record_class: Any
     signature: Optional[inspect.Signature]
     floc: Tuple[Union[Path, str], int]
+    attributes: Optional[Dict[str, Dict[str, str]]]
 
 
 class QueryFn(Protocol):
@@ -48,6 +49,7 @@ class QueryFn(Protocol):
     __signature__: Optional[inspect.Signature]
     sql: str
     operation: SQLOperationType
+    attributes: Optional[Dict[str, Dict[str, str]]]
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any: ...  # pragma: no cover
 

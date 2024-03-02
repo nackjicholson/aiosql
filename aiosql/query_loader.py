@@ -3,7 +3,7 @@ import inspect
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Type, Sequence, Any, Union
 
-from .utils import SQLParseException, SQLLoadException, VAR_REF, log
+from .utils import SQLParseException, SQLLoadException, VAR_REF, VAR_REF_DOT, log
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
 
 # identifies name definition comments
@@ -64,12 +64,42 @@ def _remove_ml_comments(code: str) -> str:
     return ncode
 
 
+def _preprocess_object_attributes(attribute, sql):
+    """Substitute o.a by o<attribute>a and keep track of variables."""
+
+    attributes = {}
+
+    def _replace(m):
+        gd = m.groupdict()
+        if gd["dquote"] is not None:
+            return gd["dquote"]
+        elif gd["squote"] is not None:
+            return gd["squote"]
+        else:
+            var, att = gd["var_name"].split(".", 1)
+            var_name = var + attribute + att
+            if var not in attributes:
+                attributes[var] = {}
+            if att not in attributes[var]:
+                attributes[var][att] = var_name
+            return f"{gd['lead']}:{var_name}"
+
+    sql = VAR_REF_DOT.sub(_replace, sql)
+
+    return sql, attributes
+
+
 class QueryLoader:
+
     def __init__(
-        self, driver_adapter: DriverAdapterProtocol, record_classes: Optional[Dict[str, Any]]
+        self,
+        driver_adapter: DriverAdapterProtocol,
+        record_classes: Optional[Dict[str, Any]],
+        attribute: Optional[str] = None,
     ):
         self.driver_adapter = driver_adapter
         self.record_classes = record_classes if record_classes is not None else {}
+        self.attribute = attribute
 
     def _make_query_datum(
         self, query: str, ns_parts: List[str], floc: Tuple[Union[Path, str], int]
@@ -86,8 +116,12 @@ class QueryLoader:
         sql, doc = self._get_sql_doc(lines[2 if record_class else 1 :])
         signature = self._build_signature(sql)
         query_fqn = ".".join(ns_parts + [qname])
+        if self.attribute:
+            sql, attributes = _preprocess_object_attributes(self.attribute, sql)
+        else:
+            attributes = None
         sql = self.driver_adapter.process_sql(query_fqn, qop, sql)
-        return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, floc)
+        return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, floc, attributes)
 
     def _get_name_op(self, text: str) -> Tuple[str, SQLOperationType]:
         qname_spec = text.replace("-", "_")

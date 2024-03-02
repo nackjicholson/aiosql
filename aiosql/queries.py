@@ -2,7 +2,7 @@ import inspect
 from pathlib import Path
 from types import MethodType
 
-# TODO drop this ugly stuff when >= 3.10
+# TODO drop most of this ugly stuff when >= 3.10
 from typing import Any, Callable, List, Optional, Set, Tuple, Union, Dict, cast
 
 from .types import DriverAdapterProtocol, QueryDatum, QueryDataTree, QueryFn, SQLOperationType
@@ -14,15 +14,21 @@ class Queries:
     The ``-- name:`` definition comments in the content of the SQL determine what the dynamic
     methods of this class will be named.
 
+    Much of the needed pre-processing is performed in ``QueryLoader``.
+
     **Parameters:**
 
     - **driver_adapter**: Either a string to designate one of the aiosql built-in database driver
       adapters (e.g. "sqlite3", "psycopg").
       If you have defined your own adapter class, you can pass its constructor.
-    - **kwargs_only**: whether to reject positional parameters.
+    - **kwargs_only**: whether to reject positional parameters, defaults to false.
     """
 
-    def __init__(self, driver_adapter: DriverAdapterProtocol, kwargs_only: bool = False):
+    def __init__(
+        self,
+        driver_adapter: DriverAdapterProtocol,
+        kwargs_only: bool = False,
+    ):
         self.driver_adapter: DriverAdapterProtocol = driver_adapter
         self.is_aio: bool = getattr(driver_adapter, "is_aio_driver", False)
         self._kwargs_only = kwargs_only
@@ -32,9 +38,22 @@ class Queries:
     # INTERNAL UTILS
     #
     def _params(
-        self, args: Union[List[Any], Tuple[Any]], kwargs: Dict[str, Any]
+        self, attributes, args: Union[List[Any], Tuple[Any]], kwargs: Dict[str, Any]
     ) -> Union[List[Any], Tuple[Any], Dict[str, Any]]:
         """Execute parameter handling."""
+
+        if attributes and kwargs:
+
+            # switch o.a to o<attribute>a
+            for var, atts in attributes.items():
+                if var not in kwargs:
+                    raise ValueError(f"missing named parameter {var}")
+                val = kwargs.pop(var)
+                for att, var_name in atts.items():
+                    if not hasattr(val, att):
+                        raise ValueError(f"parameter {var} is missing attribute {att}")
+                    kwargs[var_name] = getattr(val, att)
+
         if self._kwargs_only:
             if args:
                 raise ValueError("cannot use positional parameters under kwargs_only")
@@ -56,6 +75,7 @@ class Queries:
         operation: SQLOperationType,
         signature: Optional[inspect.Signature],
         floc: Tuple[Union[Path, str], int] = ("<unknown>", 0),
+        attributes: Optional[Dict[str, Dict[str, str]]] = None,
     ) -> QueryFn:
         """Add custom-made metadata to a dynamically generated function."""
         fname, lineno = floc
@@ -66,6 +86,7 @@ class Queries:
         qfn.__signature__ = signature
         qfn.sql = sql
         qfn.operation = operation
+        qfn.attributes = attributes
         return qfn
 
     # NOTE about coverage: because __code__ is set to reflect the actual SQL file
@@ -73,19 +94,23 @@ class Queries:
     # hence the "no cover" hints.
     def _make_sync_fn(self, query_datum: QueryDatum) -> QueryFn:
         """Build a dynamic method from a parsed query."""
-        query_name, doc_comments, operation_type, sql, record_class, signature, floc = query_datum
+
+        query_name, doc_comments, operation_type, sql, record_class, signature, floc, attributes = (
+            query_datum
+        )
+
         if operation_type == SQLOperationType.INSERT_RETURNING:
 
             def fn(self, conn, *args, **kwargs):  # pragma: no cover
                 return self.driver_adapter.insert_returning(
-                    conn, query_name, sql, self._params(args, kwargs)
+                    conn, query_name, sql, self._params(attributes, args, kwargs)
                 )
 
         elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE:
 
             def fn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover
                 return self.driver_adapter.insert_update_delete(
-                    conn, query_name, sql, self._params(args, kwargs)
+                    conn, query_name, sql, self._params(attributes, args, kwargs)
                 )
 
         elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
@@ -104,27 +129,29 @@ class Queries:
 
             def fn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover
                 return self.driver_adapter.select(
-                    conn, query_name, sql, self._params(args, kwargs), record_class
+                    conn, query_name, sql, self._params(attributes, args, kwargs), record_class
                 )
 
         elif operation_type == SQLOperationType.SELECT_ONE:
 
             def fn(self, conn, *args, **kwargs):  # pragma: no cover
                 return self.driver_adapter.select_one(
-                    conn, query_name, sql, self._params(args, kwargs), record_class
+                    conn, query_name, sql, self._params(attributes, args, kwargs), record_class
                 )
 
         elif operation_type == SQLOperationType.SELECT_VALUE:
 
             def fn(self, conn, *args, **kwargs):  # pragma: no cover
                 return self.driver_adapter.select_value(
-                    conn, query_name, sql, self._params(args, kwargs)
+                    conn, query_name, sql, self._params(attributes, args, kwargs)
                 )
 
         else:
             raise ValueError(f"Unknown operation_type: {operation_type}")
 
-        return self._query_fn(fn, query_name, doc_comments, sql, operation_type, signature, floc)
+        return self._query_fn(
+            fn, query_name, doc_comments, sql, operation_type, signature, floc, attributes
+        )
 
     # NOTE does this make sense?
     def _make_async_fn(self, fn: QueryFn) -> QueryFn:
@@ -140,7 +167,7 @@ class Queries:
 
         def ctx_mgr(self, conn, *args, **kwargs):  # pragma: no cover
             return self.driver_adapter.select_cursor(
-                conn, fn.__name__, fn.sql, self._params(args, kwargs)
+                conn, fn.__name__, fn.sql, self._params(fn.attributes, args, kwargs)
             )
 
         return self._query_fn(

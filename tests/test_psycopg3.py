@@ -94,3 +94,7 @@ def test_date_time(conn, queries):
 def test_execute_script(conn, queries):
     actual = queries.comments.pg_create_comments_table(conn)
     assert actual == "CREATE TABLE"
+
+
+def test_object_attributes(conn, queries):
+    t.run_object_attributes(conn, queries, DRIVER)
