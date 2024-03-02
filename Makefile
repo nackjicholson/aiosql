@@ -406,9 +406,10 @@ dist: venv.dist
 	$(PYTHON) -m build
 
 check.publish: dist
+	source venv/bin/activate
 	twine check dist/*
 
 .PHONY: publish
 publish: dist
 	echo "# run twine to publish on pypi"
-	echo twine upload dist/*
+	echo venv/bin/twine upload dist/*
