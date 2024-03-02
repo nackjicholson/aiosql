@@ -2,9 +2,9 @@ from .generic import GenericAdapter
 from ..utils import VAR_REF
 
 
-def _replacer(match):
+def _replacer(ma):
     """Regex hook for named to pyformat conversion."""
-    gd = match.groupdict()
+    gd = ma.groupdict()
     if gd["dquote"] is not None:  # "..."
         return gd["dquote"]
     elif gd["squote"] is not None:  # '...'
