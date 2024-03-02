@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import NamedTuple, Iterable
 from datetime import date
+import dataclasses
 import asyncio
 import re
 
@@ -42,7 +43,7 @@ RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 def queries(driver):
     """Load queries into AioSQL."""
     dir_path = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(dir_path, driver, RECORD_CLASSES)
+    return aiosql.from_path(dir_path, driver, RECORD_CLASSES, attribute="__")
 
 
 def run_something(conn):
@@ -304,6 +305,24 @@ def run_date_time(conn, queries, db):
     else:
         assert False, f"unexpected driver: {db}"
     assert re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", now)
+
+
+@dataclasses.dataclass
+class Person:
+    name: str
+    age: int
+
+
+def run_object_attributes(conn, queries, db):
+    calvin = Person(name="Calvin", age=6)
+    r = queries.misc.person_attributes(conn, p=calvin)
+    if isinstance(r, (tuple, list)):
+        name, age = r
+        assert name == calvin.name and age == calvin.age
+    elif isinstance(r, dict):
+        assert r["name"] == calvin.name and r["age"] == calvin.age
+    else:
+        assert False, "unexpected query output"
 
 
 #

@@ -8,9 +8,17 @@ VAR_REF = re.compile(
     # FIXME mysql/mariadb use backslash escapes
     r"(?P<squote>\'(\'\'|[^\'])*\')|"
     # NOTE beware of overlapping re
-    r"(?P<lead>[^:]):(?P<var_name>[\w-]+)(?=[^:]?)"
+    r"(?P<lead>[^:]):(?P<var_name>\w+)(?=[^:]?)"
 )
-"""Pattern to identifies colon-variables (aka _named_ style) in SQL code"""
+"""Pattern to identify colon-variables (aka _named_ style) in SQL code"""
+
+# NOTE see comments above
+VAR_REF_DOT = re.compile(
+    r'(?P<dquote>"(""|[^"])+")|'
+    r"(?P<squote>\'(\'\'|[^\'])*\')|"
+    r"(?P<lead>[^:]):(?P<var_name>\w+\.\w+)(?=[^:]?)"
+)
+"""Pattern to identify colon-variables with a simple attribute in SQL code."""
 
 log = logging.getLogger("aiosql")
 # log.setLevel(logging.DEBUG)

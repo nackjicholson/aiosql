@@ -23,6 +23,9 @@ SELECT 'L''art du rire' AS escaped;
 -- name: pg-escape-quotes$
 SELECT '''doubled'' single quotes' as """doubled"" double quotes"
 
+-- name: person-attributes^
+SELECT :p.name AS nom, :p.age AS age;
+
 -- FIXME this one does not work
 -- name: my-escape-quotes$
 -- SELECT 'L\'art du rire' AS escaped;

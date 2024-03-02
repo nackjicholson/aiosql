@@ -68,6 +68,7 @@ def from_str(
     driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
     record_classes: Optional[Dict] = None,
     kwargs_only: bool = False,
+    attribute: Optional[str] = None,
     *,
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
@@ -114,7 +115,7 @@ def from_str(
 
     """
     adapter = _make_driver_adapter(driver_adapter)
-    query_loader = loader_cls(adapter, record_classes)
+    query_loader = loader_cls(adapter, record_classes, attribute=attribute)
     query_data = query_loader.load_query_data_from_sql(sql, [])
     return queries_cls(adapter, kwargs_only=kwargs_only).load_from_list(query_data)
 
@@ -124,6 +125,7 @@ def from_path(
     driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
     record_classes: Optional[Dict] = None,
     kwargs_only: bool = False,
+    attribute: Optional[str] = None,
     *,
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
@@ -161,7 +163,7 @@ def from_path(
         raise SQLLoadException(f"File does not exist: {path}")
 
     adapter = _make_driver_adapter(driver_adapter)
-    query_loader = loader_cls(adapter, record_classes)
+    query_loader = loader_cls(adapter, record_classes, attribute=attribute)
 
     if path.is_file():
         query_data = query_loader.load_query_data_from_file(path, encoding=encoding)
