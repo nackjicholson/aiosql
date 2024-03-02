@@ -118,7 +118,7 @@ class QueryLoader:
         query_fqn = ".".join(ns_parts + [qname])
         if self.attribute:
             sql, attributes = _preprocess_object_attributes(self.attribute, sql)
-        else:
+        else:  # pragma: no cover
             attributes = None
         sql = self.driver_adapter.process_sql(query_fqn, qop, sql)
         return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, floc, attributes)
