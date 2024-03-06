@@ -50,6 +50,7 @@ help:
 	echo " - check.pytest: run pytest tests"
 	echo " - check.mypy: run mypy type checker"
 	echo " - check.flake8: run flake8 code style checks"
+	echo " - check.ruff: run ruff code style checks"
 	echo " - check.black: run black formatter checks"
 	echo " - check.coverage: run coverage and generate html report"
 	echo " - check.rstcheck: check rest files"
@@ -131,6 +132,11 @@ check.pyright: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	pyright $(MODULE)
 
+.PHONY: check.ruff
+check.ruff: $(VENV)
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
+	ruff check $(MODULE)
+
 .PHONY: check.flake8
 check.flake8: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
@@ -159,7 +165,7 @@ check.pytest.local: check.pytest.misc check.pytest.postgres.local check.pytest.$
 check.coverage: check.coverage.local
 
 .PHONY: check
-check: check.pytest check.mypy check.flake8 check.black check.coverage check.rstcheck
+check: check.ruff check.pyright check.pytest check.coverage check.rstcheck
 
 #
 # pytest/coverage local/detached tests
