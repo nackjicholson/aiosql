@@ -42,7 +42,7 @@ _UNCOMMENT = re.compile(
     # one-line comment
     r"(?P<oneline>--.*?$)|"
     # Multiline comments, excluding SQL hints
-    r"|(?P<multiline>/\*(?!\+)[\s\S]*?\*/)"
+    r"|(?P<multiline>/\*(?!\+)[\s\S]*?\*/)",
     re.DOTALL | re.MULTILINE,
 )
 
