@@ -107,6 +107,7 @@ KO
 KO
 /* OK */ -- KO 'KO'
 -- KO */
+/*+ OK */
 """
 
 
@@ -125,7 +126,7 @@ def test_comments():
             assert "OK" not in d
         if c:
             assert "OK" not in c
-    assert n == 13
+    assert n == 14
 
 
 COMMENT_UNCOMMENT = [
@@ -133,6 +134,7 @@ COMMENT_UNCOMMENT = [
     ("hello", "hello"),
     ("world!\n", "world!\n"),
     ("/**/", ""),
+        ("/*+ hint */", "/*+ hint */"),
     ("x/*\n*/y\n", "xy\n"),
     ("-- /* */\n", "-- /* */\n"),
     ("-- /* */", "-- /* */"),
