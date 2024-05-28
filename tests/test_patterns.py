@@ -126,7 +126,7 @@ def test_comments():
             assert "OK" not in d
         if c:
             assert "OK" not in c
-    assert n == 14
+    assert n == 13
 
 
 COMMENT_UNCOMMENT = [
