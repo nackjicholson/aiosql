@@ -41,8 +41,8 @@ _UNCOMMENT = re.compile(
     r'(?P<dquote>"(""|[^"])+")|'
     # one-line comment
     r"(?P<oneline>--.*?$)|"
-    # Multiline comments, excluding SQL hints
-    r"|(?P<multiline>/\*(?!\+)[\s\S]*?\*/)",
+    # multiline comments, excluding SQL hints
+    r"|(?P<multiline>/\*(?!\+[\s\S]*?\*/)[\s\S]*?\*/)",
     re.DOTALL | re.MULTILINE,
 )
 
