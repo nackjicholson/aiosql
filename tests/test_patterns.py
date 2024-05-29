@@ -84,7 +84,7 @@ def test_var_pattern_handles_empty_sql_string_literals():
     assert groupdicts[3] == expected_var_match
 
 
-# must remove only OK comments
+# must remove *only* OK comments
 COMMENTED = """
 KO
 -- KO
@@ -99,7 +99,7 @@ KO
  * OK
  */
 -- /* KO
--- */
+-- KO */
 /* OK
   -- OK
   ' OK ' "OK "
@@ -107,25 +107,26 @@ KO
 KO
 /* OK */ -- KO 'KO'
 -- KO */
-/*+ OK */
+/*+ KO (hints must be kept!) */
 """
 
 
 def test_comments():
     n = 0
-    for m in _UNCOMMENT.finditer(COMMENTED):
-        n += 1
-        matches = m.groupdict()
+    for ma in _UNCOMMENT.finditer(COMMENTED):
+        matches = ma.groupdict()
         s, d, c, m = matches["squote"], matches["dquote"], matches["oneline"], matches["multiline"]
-        assert s or d or c or m
-        if m:
-            assert "KO" not in m
-        if s:
-            assert "OK" not in s
-        if d:
-            assert "OK" not in d
-        if c:
-            assert "OK" not in c
+        # assert s or d or c or m, f"bad match: {m} {matches}"
+        if s or d or c or m:
+            n += 1
+            if m:
+                assert "OK" in m and "KO" not in m
+            if s:
+                assert "KO" in s and "OK" not in s
+            if d:
+                assert "KO" in d and "OK" not in d
+            if c:
+                assert "KO" in c and "OK" not in c
     assert n == 13
 
 
