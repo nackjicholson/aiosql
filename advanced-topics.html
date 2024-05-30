@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Topics &mdash; aiosql 10.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=15ce5a54"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Database Driver Adapters" href="database-driver-adapters.html" />
+    <link rel="prev" title="Defining SQL Queries" href="defining-sql-queries.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            aiosql
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defining-sql-queries.html">Defining SQL Queries</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced Topics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#leveraging-driver-specific-features">Leveraging Driver Specific Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#access-the-cursor-object">Access the <code class="docutils literal notranslate"><span class="pre">cursor</span></code> object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#accessing-prepared-sql-as-a-string">Accessing prepared SQL as a string</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#accessing-the-sql-operation-type">Accessing the SQL Operation Type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sync-async">Sync &amp; Async</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sync-with-sqlite3">Sync with sqlite3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#asyncio-with-aiosqlite">Asyncio with aiosqlite</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="database-driver-adapters.html">Database Driver Adapters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pydoc/modules.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">aiosql</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Advanced Topics</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/advanced-topics.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="advanced-topics">
+<h1>Advanced Topics<a class="headerlink" href="#advanced-topics" title="Link to this heading"></a></h1>
+<section id="leveraging-driver-specific-features">
+<h2>Leveraging Driver Specific Features<a class="headerlink" href="#leveraging-driver-specific-features" title="Link to this heading"></a></h2>
+<p>TODO</p>
+</section>
+<section id="access-the-cursor-object">
+<h2>Access the <code class="docutils literal notranslate"><span class="pre">cursor</span></code> object<a class="headerlink" href="#access-the-cursor-object" title="Link to this heading"></a></h2>
+<p>The cursor is a temporary object created in memory that allows you to perform
+row-by-row operations on your data and use handy methods such as
+<code class="docutils literal notranslate"><span class="pre">.description</span></code>, <code class="docutils literal notranslate"><span class="pre">.fetchall()</span></code> and <code class="docutils literal notranslate"><span class="pre">.fetchone()</span></code>.
+As long as you are running a SQL <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> query, you can access the cursor
+object by appending <code class="docutils literal notranslate"><span class="pre">_cursor</span></code> to the end of the queries name.</p>
+<p>For example, say you have the following query named <code class="docutils literal notranslate"><span class="pre">get-all-greetings</span></code> in a <code class="docutils literal notranslate"><span class="pre">sql</span></code> file:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- greetings.sql</span>
+
+<span class="c1">-- name: get-all-greetings</span>
+<span class="c1">-- Get all the greetings in the database</span>
+<span class="k">SELECT</span>
+<span class="w">    </span><span class="n">greeting_id</span><span class="p">,</span>
+<span class="w">    </span><span class="n">greeting</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">greetings</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>With this query, you can get all <code class="docutils literal notranslate"><span class="pre">greeting_id</span></code>’s and <code class="docutils literal notranslate"><span class="pre">greeting</span></code>’s, access the cursor object,
+and print the column names with the following code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">aiosql</span>
+<span class="kn">import</span> <span class="nn">aiosqlite</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="s2">&quot;greetings.sql&quot;</span><span class="p">,</span> <span class="s2">&quot;aiosqlite&quot;</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">access_cursor</span><span class="p">():</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">aiosqlite</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;greetings.db&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="c1"># append _cursor after query name</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">queries</span><span class="o">.</span><span class="n">get_all_greetings_cursor</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">([</span><span class="n">col_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">col_info</span> <span class="ow">in</span> <span class="n">cur</span><span class="o">.</span><span class="n">description</span><span class="p">])</span>
+            <span class="n">first_row</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="n">all_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ALL DATA: </span><span class="si">{</span><span class="n">all_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># list of tuples</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FIRST ROW: </span><span class="si">{</span><span class="n">first_row</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># tuple of first row data</span>
+
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">access_cursor</span><span class="p">())</span>
+<span class="c1"># [greeting_id, greeting]</span>
+<span class="c1"># ALL DATA: [(1, hi), (2, aloha), (3, hola)]</span>
+<span class="c1"># FIRST ROW: (1, hi)</span>
+</pre></div>
+</div>
+</section>
+<section id="accessing-prepared-sql-as-a-string">
+<h2>Accessing prepared SQL as a string<a class="headerlink" href="#accessing-prepared-sql-as-a-string" title="Link to this heading"></a></h2>
+<p>When you need to do something not directly supported by aiosql, this is your escape hatch.
+You can still define your sql in a file and load it with aiosql, but then you may choose to use it
+without calling your aiosql method.
+The prepared SQL string of a method is available as an attribute of each method <code class="docutils literal notranslate"><span class="pre">queries.&lt;method_name&gt;.sql</span></code>.
+Here’s an example of how you might use it with a unique feature of <code class="docutils literal notranslate"><span class="pre">psycopg2</span></code> like
+<a class="reference external" href="https://www.psycopg.org/docs/extras.html#psycopg2.extras.execute_values">execute_values</a>.</p>
+<p>This example adapts the example usage from psycopg2’s documentation for
+<a class="reference external" href="https://www.psycopg.org/docs/extras.html#psycopg2.extras.execute_values">execute_values</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">aiosql</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">psycopg2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">psycopg2.extras</span> <span class="kn">import</span> <span class="n">execute_values</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sql_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="gp">... </span><span class="s2">-- name: create_schema#</span>
+<span class="gp">... </span><span class="s2">create table test (id int primary key, v1 int, v2 int);</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="s2">-- name: insert!</span>
+<span class="gp">... </span><span class="s2">INSERT INTO test (id, v1, v2) VALUES </span><span class="si">%s</span><span class="s2">;</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="s2">-- name: update!</span>
+<span class="gp">... </span><span class="s2">UPDATE test SET v1 = data.v1 FROM (VALUES </span><span class="si">%s</span><span class="s2">) AS data (id, v1)</span>
+<span class="gp">... </span><span class="s2">WHERE test.id = data.id;</span>
+<span class="gp">...</span>
+<span class="gp">... </span><span class="s2">-- name: getem</span>
+<span class="gp">... </span><span class="s2">select * from test order by id;</span>
+<span class="gp">... </span><span class="s2">&quot;&quot;&quot;</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="n">sql_str</span><span class="p">,</span> <span class="s2">&quot;psycopg2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;dbname=test user=postgres&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">queries</span><span class="o">.</span><span class="n">create_schema</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execute_values</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="n">queries</span><span class="o">.</span><span class="n">insert</span><span class="o">.</span><span class="n">sql</span><span class="p">,</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">execute_values</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="n">queries</span><span class="o">.</span><span class="n">update</span><span class="o">.</span><span class="n">sql</span><span class="p">,</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">50</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">queries</span><span class="o">.</span><span class="n">getem</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+<span class="go">[(1, 20, 3), (4, 50, 6), (7, 8, 9)]</span>
+</pre></div>
+</div>
+</section>
+<section id="accessing-the-sql-operation-type">
+<h2>Accessing the SQL Operation Type<a class="headerlink" href="#accessing-the-sql-operation-type" title="Link to this heading"></a></h2>
+<p>Query functions also provide access to the SQL Operation Type you define in your library.</p>
+<p>This can be useful for observability (such as metrics, tracing, or logging), or customizing how you
+manage different operations within your codebase. Extending from the above example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reporter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;metrics&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">report_metrics</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">op_time</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">reporter</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Operation: </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="se">\n</span><span class="s2">SQL: </span><span class="si">{</span><span class="n">sql</span><span class="si">!r}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">Time (ms): </span><span class="si">{</span><span class="n">op_time</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="gp">... </span><span class="k">def</span> <span class="nf">observe_query</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">op</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">operation</span>
+<span class="gp">... </span>    <span class="n">sql</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">sql</span>
+<span class="gp">... </span>    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">yield</span>
+<span class="gp">... </span>    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="n">op_time</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+<span class="gp">... </span>    <span class="n">report_metrics</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">op_time</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">observe_query</span><span class="p">(</span><span class="n">queries</span><span class="o">.</span><span class="n">getem</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">queries</span><span class="o">.</span><span class="n">getem</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">[(1, 20, 3), (4, 50, 6), (7, 8, 9)]</span>
+</pre></div>
+</div>
+</section>
+<section id="sync-async">
+<h2>Sync &amp; Async<a class="headerlink" href="#sync-async" title="Link to this heading"></a></h2>
+<p>Below are two example of a program which can print <code class="docutils literal notranslate"><span class="pre">&quot;{greeting},</span> <span class="pre">{world_name}!&quot;</span></code> from data held
+in a minimal SQLite database containing greetings and worlds. They use this same SQL.</p>
+<p><em>greetings.sql</em></p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: get-all-greetings</span>
+<span class="c1">-- Get all the greetings in the database</span>
+<span class="k">select</span><span class="w"> </span><span class="n">greeting_id</span><span class="p">,</span>
+<span class="w">       </span><span class="n">greeting</span>
+<span class="w">  </span><span class="k">from</span><span class="w"> </span><span class="n">greetings</span><span class="p">;</span>
+
+<span class="c1">-- name: get-worlds-by-name^</span>
+<span class="c1">-- Get the world record from the database.</span>
+<span class="k">select</span><span class="w"> </span><span class="n">world_id</span><span class="p">,</span>
+<span class="w">       </span><span class="n">world_name</span>
+<span class="w">  </span><span class="k">from</span><span class="w"> </span><span class="n">worlds</span>
+<span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">world_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">world_name</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Notice there is a usage of the <code class="docutils literal notranslate"><span class="pre">^</span></code> <a class="reference external" href="./defining-sql-queries.rst#select-one">Select One Query Operator</a>.
+Adding this to the SQL comment <code class="docutils literal notranslate"><span class="pre">--name:</span> <span class="pre">get-world-by-name^</span></code> indicates to aiosql that
+<code class="docutils literal notranslate"><span class="pre">queries.get_world_by_name()</span></code> will return a single row back.</p>
+<section id="sync-with-sqlite3">
+<h3>Sync with sqlite3<a class="headerlink" href="#sync-with-sqlite3" title="Link to this heading"></a></h3>
+<p>Here we’ve set up our <code class="docutils literal notranslate"><span class="pre">sqlite3</span></code> connection.
+Using the <code class="docutils literal notranslate"><span class="pre">sqlite3.Row</span></code> type for our records to make it easy to access values by column names
+rather than as tuple indices.
+The program works, it does two queries sqequentially then loops over their results to print greetings.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">aiosql</span>
+
+<span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="s2">&quot;greetings.sql&quot;</span><span class="p">,</span> <span class="n">driver_adapter</span><span class="o">=</span><span class="s2">&quot;sqlite3&quot;</span><span class="p">)</span>
+
+<span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;greetings.db&quot;</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">row_factory</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Row</span>
+
+<span class="c1"># greetings = [</span>
+<span class="c1">#     &lt;Row greeting_id=1, greeting=&quot;Hi&quot;&gt;,</span>
+<span class="c1">#     &lt;Row greeting_id=2, greeting=&quot;Aloha&quot;&gt;,</span>
+<span class="c1">#     &lt;Row greeting_id=3, greeting=&quot;Hola&quot;&gt;</span>
+<span class="c1"># ]</span>
+<span class="n">greetings</span> <span class="o">=</span> <span class="n">queries</span><span class="o">.</span><span class="n">get_all_greetings</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+
+<span class="c1"># world = &lt;Row world_id=1, world_name=&quot;Earth&quot;&gt;</span>
+<span class="n">world</span> <span class="o">=</span> <span class="n">queries</span><span class="o">.</span><span class="n">get_worlds_by_name</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">world_name</span><span class="o">=</span><span class="s2">&quot;Earth&quot;</span><span class="p">)</span>
+
+<span class="c1"># Hi, Earth!</span>
+<span class="c1"># Aloha, Earth!</span>
+<span class="c1"># Hola, Earth!</span>
+<span class="k">for</span> <span class="n">greeting_row</span> <span class="ow">in</span> <span class="n">greetings</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">greeting_row</span><span class="p">[</span><span class="s1">&#39;greeting&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">world</span><span class="p">[</span><span class="s1">&#39;world_name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
+
+<span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="asyncio-with-aiosqlite">
+<h3>Asyncio with aiosqlite<a class="headerlink" href="#asyncio-with-aiosqlite" title="Link to this heading"></a></h3>
+<p>This program is only a little bit different.
+It let’s us leverage <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html#asyncio.gather">asyncio.gather</a>
+to make both queries for greetings and worlds in parallel!</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="kn">import</span> <span class="nn">aiosql</span>
+<span class="kn">import</span> <span class="nn">aiosqlite</span>
+
+
+<span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="s2">&quot;greetings.sql&quot;</span><span class="p">,</span> <span class="n">driver_adapter</span><span class="o">=</span><span class="s2">&quot;aiosqlite&quot;</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">aiosqlite</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;greetings.db&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">row_factory</span> <span class="o">=</span> <span class="n">aiosqlite</span><span class="o">.</span><span class="n">Row</span>
+        <span class="c1"># Parallel queries!!!</span>
+        <span class="c1">#</span>
+        <span class="c1"># greetings = [</span>
+        <span class="c1">#     &lt;Row greeting_id=1, greeting=&quot;Hi&quot;&gt;,</span>
+        <span class="c1">#     &lt;Row greeting_id=2, greeting=&quot;Aloha&quot;&gt;,</span>
+        <span class="c1">#     &lt;Row greeting_id=3, greeting=&quot;Hola&quot;&gt;</span>
+        <span class="c1"># ]</span>
+        <span class="c1"># world = &lt;Row world_id=1, world_name=&quot;Earth&quot;&gt;</span>
+        <span class="n">greeting_rows</span><span class="p">,</span> <span class="n">world</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="n">queries</span><span class="o">.</span><span class="n">get_all_greetings</span><span class="p">(</span><span class="n">conn</span><span class="p">),</span>
+            <span class="n">queries</span><span class="o">.</span><span class="n">get_worlds_by_name</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">world_name</span><span class="o">=</span><span class="s2">&quot;Earth&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Hi, Earth!</span>
+        <span class="c1"># Aloha, Earth!</span>
+        <span class="c1"># Hola, Earth!</span>
+        <span class="k">for</span> <span class="n">greeting_row</span> <span class="ow">in</span> <span class="n">greeting_rows</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">greeting_row</span><span class="p">[</span><span class="s1">&#39;greeting&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">world</span><span class="p">[</span><span class="s1">&#39;world_name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
+
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Slightly different usage with <a class="reference external" href="https://github.com/omnilib/aiosqlite">aiosqlite</a> but I hope this
+has demonstrated in a small way the big power and performance possibilities with asyncronous queries
+using the async driver types.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="defining-sql-queries.html" class="btn btn-neutral float-left" title="Defining SQL Queries" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="database-driver-adapters.html" class="btn btn-neutral float-right" title="Database Driver Adapters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2024, William Vaughn et alii..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
