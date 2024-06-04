@@ -56,73 +56,55 @@ Badges
 
 ..
    NOTE :target: is needed so that github renders badges on a line.
-
 .. image:: https://github.com/nackjicholson/aiosql/actions/workflows/aiosql-package.yml/badge.svg?branch=master&style=flat
    :alt: Build status
    :target: https://github.com/nackjicholson/aiosql/actions/
-
 ..
    hardcoded coverage and tests, 100% and 162/15 if docker run is ok
-
 .. image:: https://img.shields.io/badge/coverage-100%25-success
    :alt: Code Coverage
    :target: https://github.com/nackjicholson/aiosql/actions/
-
 .. image:: https://img.shields.io/badge/tests-189%20✓-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
-
 .. image:: https://img.shields.io/github/issues/nackjicholson/aiosql?style=flat
    :alt: Issues
    :target: https://github.com/nackjicholson/aiosql/issues/
-
 .. image:: https://img.shields.io/github/contributors/nackjicholson/aiosql
    :alt: Contributors
    :target: https://github.com/nackjicholson/aiosql/graphs/contributors
-
 .. image:: https://img.shields.io/pypi/dm/aiosql?style=flat
    :alt: Pypi Downloads
    :target: https://pypistats.org/packages/aiosql
-
 .. image:: https://img.shields.io/github/stars/nackjicholson/aiosql?style=flat&label=Star
    :alt: Stars
    :target: https://github.com/nackjicholson/aiosql/stargazers
-
 .. image:: https://img.shields.io/pypi/v/aiosql
    :alt: Version
    :target: https://pypi.org/project/aiosql/
-
 .. image:: https://img.shields.io/github/languages/code-size/nackjicholson/aiosql?style=flat
    :alt: Code Size
    :target: https://github.com/nackjicholson/aiosql/
-
 .. image:: https://img.shields.io/badge/databases-5-informational
    :alt: Databases
    :target: https://github.com/nackjicholson/aiosql/
-
 .. image:: https://img.shields.io/badge/drivers-13-informational
    :alt: Drivers
    :target: https://github.com/nackjicholson/aiosql/
-
 .. image:: https://img.shields.io/github/languages/count/nackjicholson/aiosql?style=flat
    :alt: Language Count
    :target: https://en.wikipedia.org/wiki/Programming_language
-
 .. image:: https://img.shields.io/github/languages/top/nackjicholson/aiosql?style=flat
    :alt: Top Language
    :target: https://en.wikipedia.org/wiki/Python_(programming_language)
-
 .. image:: https://img.shields.io/pypi/pyversions/aiosql?style=flat
    :alt: Python Versions
    :target: https://www.python.org/
-
 ..
    some non-sense badge about badges:-)
-
 .. image:: https://img.shields.io/badge/badges-16-informational
    :alt: Badges
    :target: https://shields.io/
-
 .. image:: https://img.shields.io/pypi/l/aiosql?style=flat
    :alt: BSD 2-Clause License
    :target: https://opensource.org/licenses/BSD-2-Clause
