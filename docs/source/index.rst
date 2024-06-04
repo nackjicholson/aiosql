@@ -56,7 +56,7 @@ Badges
 
 ..
    NOTE :target: is needed so that github renders badges on a line.
-.. image:: https://github.com/nackjicholson/aiosql/actions/workflows/aiosql-package.yml/badge.svg?branch=master&style=flat
+.. image:: https://github.com/nackjicholson/aiosql/actions/workflows/aiosql-package.yml/badge.svg?branch=main&style=flat
    :alt: Build status
    :target: https://github.com/nackjicholson/aiosql/actions/
 ..
