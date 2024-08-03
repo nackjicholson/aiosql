@@ -27,7 +27,9 @@ dev-duckdb = [
     "duckdb; python_version < '3.13' and implementation_name != 'pypy'"
 ]
 dev-sqlite = [
-    "aiosqlite", "apsw"
+    "aiosqlite",
+    # fails on missing symbol with pypy
+    "apsw; implementation_name != 'pypy'"
 ]
 dev-postgres = [
     "pytest-postgresql",
