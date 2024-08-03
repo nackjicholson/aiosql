@@ -33,7 +33,7 @@ dev-postgres = [
     "pytest-postgresql",
     "asyncpg; python_version < '3.13'",
     "psycopg>=3",
-    "psycopg2; python_version < '3.13'",
+    "psycopg2; python_version < '3.13' and python_implementation != 'pypy'",
     "pygresql",
     "pg8000"
 ]
