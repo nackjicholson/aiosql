@@ -30,7 +30,7 @@ dev-sqlite = [
 ]
 dev-postgres = [
     "pytest-postgresql",
-    "asyncpg",
+    "asyncpg; python_version < '3.13'",
     "psycopg>=3",
     "psycopg2; python_version < '3.13'",
     "pygresql",
