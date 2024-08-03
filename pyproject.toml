@@ -23,7 +23,8 @@ dev = [
     "mypy", "pyright", "types-setuptools", "build"
 ]
 dev-duckdb = [
-    "duckdb"
+    # skip, wheel compilation takes 12 minutes…
+    "duckdb; python_version < '3.13'"
 ]
 dev-sqlite = [
     "aiosqlite", "apsw"
