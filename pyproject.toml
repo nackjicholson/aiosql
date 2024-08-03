@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aiosql"
-version = "10.2"
+version = "10.3"
 authors = [ { name = "William Vaughn et al.", email = "vaughnwilld@gmail.com" } ]
 description = "Simple SQL in Python"
 readme = "README.rst"
@@ -31,8 +31,10 @@ dev-sqlite = [
 dev-postgres = [
     "pytest-postgresql",
     "asyncpg",
-    "psycopg>=3", "psycopg2", "psycopg2-binary",
-    "pygresql", "pg8000"
+    "psycopg>=3",
+    "psycopg2; python_version < '3.13'",
+    "pygresql",
+    "pg8000"
 ]
 dev-mysql = [
     "pytest-mysql",
