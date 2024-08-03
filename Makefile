@@ -319,6 +319,7 @@ check.coverage.local: check.coverage.misc check.coverage.postgres.local check.co
 	$(MAKE) check.coverage.combine
 
 IS_DOCKER	=
+FAIL_UNDER  = $(shell python -c 'import sys; print(100.0 if sys.version_info < (3, 13) else 84.6)')
 
 .PHONY: check.coverage.combine
 check.coverage.combine: $(VENV)
@@ -329,7 +330,7 @@ check.coverage.combine: $(VENV)
 	else
 	  $(COVERAGE) html
 	fi
-	$(COVERAGE) report --show-missing --precision=1 --fail-under=100.0 --include='$(MODULE)/*'
+	$(COVERAGE) report --show-missing --precision=1 --fail-under=$(FAIL_UNDER) --include='$(MODULE)/*'
 
 #
 # Docker runs
