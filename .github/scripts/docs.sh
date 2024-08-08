@@ -20,6 +20,7 @@ Table of Contents
    Database Driver Adapters <database-driver-adapters>
    Contributing <contributing>
    API <pydoc/modules>
+   Versions <versions>
 EOF
 
 sphinx-apidoc -f -o docs/source/pydoc aiosql
