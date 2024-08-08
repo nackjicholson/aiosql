@@ -49,7 +49,7 @@ _UNCOMMENT = re.compile(
 
 def _remove_ml_comments(code: str) -> str:
     """Remove /* ... */ comments from code"""
-    # identify commented regions
+    # identify commented regions to be removed
     rm = []
     for m in _UNCOMMENT.finditer(code):
         ml = m.groupdict()["multiline"]
@@ -60,6 +60,7 @@ def _remove_ml_comments(code: str) -> str:
     for start, end in rm:
         ncode += code[current:start]
         current = end
+    # get tail
     ncode += code[current:]
     return ncode
 
@@ -90,6 +91,11 @@ def _preprocess_object_attributes(attribute, sql):
 
 
 class QueryLoader:
+    """Load Queries.
+
+    This class holds the various utilities to read SQL files and build
+    QueryDatum, which will be transformed as functions in Queries.
+    """
 
     def __init__(
         self,

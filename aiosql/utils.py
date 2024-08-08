@@ -21,6 +21,7 @@ VAR_REF_DOT = re.compile(
 """Pattern to identify colon-variables with a simple attribute in SQL code."""
 
 log = logging.getLogger("aiosql")
+"""Shared package logging."""
 # log.setLevel(logging.DEBUG)
 
 

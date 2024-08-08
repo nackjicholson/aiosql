@@ -18,6 +18,7 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore
     "apsw": GenericAdapter,
     "asyncpg": AsyncPGAdapter,  # type: ignore
+    "duckdb": DuckDBAdapter,
     "mariadb": BrokenMySQLAdapter,
     "mysqldb": BrokenMySQLAdapter,
     "mysql-connector": PyFormatAdapter,
@@ -27,8 +28,8 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "pygresql": PyFormatAdapter,
     "pymysql": BrokenMySQLAdapter,
     "sqlite3": SQLite3Adapter,
-    "duckdb": DuckDBAdapter,
 }
+"""Map adapter names to their adapter class."""
 
 
 def register_adapter(name: str, adapter: Callable[..., DriverAdapterProtocol]):
