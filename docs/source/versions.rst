@@ -1,8 +1,8 @@
 AioSQL - Versions
 =================
 
-10.4 on ?
----------
+10.4 on 2024-08-08
+------------------
 
 - add history of version changes in the documentation (this file!).
 
