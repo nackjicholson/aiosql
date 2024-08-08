@@ -5,6 +5,7 @@ AioSQL - Versions
 ------------------
 
 - add history of version changes in the documentation (this file!).
+- improve comments and doc strings.
 
 10.3 on 2024-08-03
 ------------------
