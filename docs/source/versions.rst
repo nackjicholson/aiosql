@@ -276,4 +276,5 @@ AioSQL - Versions
 -------------------
 
 - adaptater refactoring, including breaking changes.
-- remove add ``_cursor`` variants for full control.
+- add ``_cursor`` variants for full control.
+- remove some stuff
