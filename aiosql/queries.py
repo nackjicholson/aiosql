@@ -40,7 +40,12 @@ class Queries:
     def _params(
         self, attributes, args: Union[List[Any], Tuple[Any]], kwargs: Dict[str, Any]
     ) -> Union[List[Any], Tuple[Any], Dict[str, Any]]:
-        """Execute parameter handling."""
+        """Handle query parameters.
+
+        - update attribute references ``:u.a`` to ``:u__a``.
+        - check whether non kwargs are allowed and other checks.
+        - return the parameters, either ``args`` or ``kwargs``.
+        """
 
         if attributes and kwargs:
 
@@ -231,13 +236,13 @@ class Queries:
             self._available_queries.add(f"{child_name}.{child_query_name}")
 
     def load_from_list(self, query_data: List[QueryDatum]):
-        """Load Queries from a list of `QuaryDatum`"""
+        """Load Queries from a list of `QueryDatum`"""
         for query_datum in query_data:
             self.add_queries(self._create_methods(query_datum, self.is_aio))
         return self
 
     def load_from_tree(self, query_data_tree: QueryDataTree):
-        """Load Queries from a `QuaryDataTree`"""
+        """Load Queries from a `QueryDataTree`"""
         for key, value in query_data_tree.items():
             if isinstance(value, dict):
                 self.add_child_queries(key, Queries(self.driver_adapter).load_from_tree(value))
