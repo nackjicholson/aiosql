@@ -173,6 +173,7 @@ AioSQL - Versions
 - add convenient makefile.
 - refactor adapters.
 - add ``apsw`` driver support.
+- add MySQL support with several drivers.
 - test names with dash (``-``).
 - refactor and improve tests to reduce code duplications.
 
