@@ -105,14 +105,19 @@ def test_loading_query_signature():
 def test_names():
     try:
         queries = aiosql.from_str("-- name: 1st\nSELECT 1;\n", "sqlite3")
-        assert False, "'1st' should be rejected"
+        pytest.fail("'1st' should be rejected")
     except SQLParseException as e:
         assert '"1st"' in str(e)
     try:
         queries = aiosql.from_str("-- name: one$garbage\nSELECT 1;\n", "sqlite3")
-        assert False, "garbage should be rejected"
+        pytest.fail("garbage should be rejected")
     except SQLParseException as e:
         assert 'garbage"' in str(e)
+    try:
+        queries = aiosql.from_str("-- name: foo-bla\nSELECT 1;\n" * 2, "sqlite3")
+        pytest.fail("must reject homonymous queries")
+    except SQLLoadException as e:
+        assert "foo_bla" in str(e)
     # - is okay because mapped to _
     queries = aiosql.from_str("-- name: -dash\nSELECT 1;\n", "sqlite3")
     assert "_dash" in queries.available_queries

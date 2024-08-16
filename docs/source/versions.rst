@@ -1,6 +1,12 @@
 AioSQL - Versions
 =================
 
+11.0 on ?
+---------
+
+- do not allow to override existing queries, as it can lead to hard to
+  understand bugs.
+
 10.4 on 2024-08-08
 ------------------
 
