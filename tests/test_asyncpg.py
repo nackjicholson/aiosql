@@ -163,6 +163,6 @@ def test_maybe_order_params():
     a = aiosql.adapters.asyncpg.AsyncPGAdapter()
     try:
         a.maybe_order_params("foo", "wrong-type-parameter")
-        assert False, "exception should be raised"  # pragma: no cover
+        pytest.fail("exception should be raised")  # pragma: no cover
     except ValueError as e:
         assert "dict or tuple" in str(e)

@@ -4,6 +4,7 @@ from datetime import date
 import dataclasses
 import asyncio
 import re
+import pytest
 
 import aiosql
 from utils import log
@@ -303,7 +304,7 @@ def run_date_time(conn, queries, db):
     elif _DB[db] in ("mysql", "mariadb"):
         now = queries.misc.my_get_now_date_time(conn)
     else:
-        assert False, f"unexpected driver: {db}"
+        pytest.fail(f"unexpected driver: {db}")
     assert re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", now)
 
 
@@ -323,17 +324,17 @@ def run_object_attributes(conn, queries, db):
     elif isinstance(r, dict):
         assert r["name"] == calvin.name and r["age"] == calvin.age
     else:
-        assert False, "unexpected query output"
+        pytest.fail("unexpected query output")
     # failures
     try:
         queries.misc.person_attributes(conn, q=calvin)
-        assert False, "should fail on missing parameter p"
+        pytest.fail("should fail on missing parameter p")
     except ValueError as e:
         assert "missing named parameter p" in str(e)
     del calvin.age
     try:
         queries.misc.person_attributes(conn, p=calvin)
-        assert False, "should fail on missing attribute age"
+        pytest.fail("should fail on missing attribute age")
     except ValueError as e:
         assert "parameter p is missing attribute age" in str(e)
 

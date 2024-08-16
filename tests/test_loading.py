@@ -137,7 +137,7 @@ def test_loading_query_signature_with_duplicate_parameter():
 def test_adapters():
     try:
         aiosql.aiosql._make_driver_adapter("no-such-driver-adapter")
-        assert False, "must raise an exception"  # pragma: no cover
+        pytest.fail("must raise an exception")  # pragma: no cover
     except ValueError as e:
         assert "unregistered driver_adapter" in str(e)
 
@@ -158,13 +158,13 @@ def test_adapters():
 
     try:
         aiosql.aiosql._make_driver_adapter(NoSuchConnector)
-        assert False, "must raise an exception"  # pragma: no cover
+        pytest.fail("must raise an exception")  # pragma: no cover
     except ValueError as e:
         assert "Unexpected driver_adapter" in str(e)
 
     try:
         aiosql.aiosql._make_driver_adapter(True)  # type: ignore
-        assert False, "must raise an exception"  # pragma: no cover
+        pytest.fail("must raise an exception")  # pragma: no cover
     except ValueError as e:
         assert "Unexpected driver_adapter" in str(e)
 
@@ -172,7 +172,7 @@ def test_adapters():
 def test_no_such_path():
     try:
         aiosql.from_path("/no/such/file", "sqlite3")
-        assert False, "must raise an exception"  # pragma: no cover
+        pytest.fail("must raise an exception")  # pragma: no cover
     except SQLLoadException as e:
         assert "File does not exist" in str(e)
 
@@ -186,18 +186,18 @@ def test_misc(sql_file):
     try:
         queries = aiosql.queries.Queries("sqlite3")
         queries._make_sync_fn(("hello", None, -1, "SELECT NULL;", None, None, None, None))
-        assert False, "must raise an exception"  # pragma: no cover
+        pytest.fail("must raise an exception")  # pragma: no cover
     except ValueError as e:
         assert "Unknown operation_type" in str(e)
     try:
         db = aiosql.from_str("-- name: a*b\nSELECT 'ab'\n", "sqlite3")
-        assert False, "must raise en exception"  # pragma: no cover
+        pytest.fail("must raise en exception")  # pragma: no cover
     except Exception as e:
         assert "invalid query name and operation" in str(e)
     ql = aiosql.query_loader.QueryLoader(None, None)
     try:
         ql.load_query_data_from_dir_path(sql_file)
-        assert False, "must raise en exception"  # pragma: no cover
+        pytest.fail("must raise en exception")  # pragma: no cover
     except ValueError as e:
         assert "must be a directory" in str(e)
 
@@ -211,7 +211,7 @@ def test_kwargs():
     assert 42 == queries.plus_one(conn, val=41)
     try:
         queries.plus_one(conn, 2)
-        assert False, "must raise an exception"  # pragma: no cover
+        pytest.fail("must raise an exception")  # pragma: no cover
     except ValueError as e:
         assert "kwargs" in str(e)
     # kwargs_only == False
@@ -221,6 +221,6 @@ def test_kwargs():
     assert 42 == queries.plus_two(conn, val=40)
     try:
         queries.plus_two(conn, 2, val=41)
-        assert False, "must raise an exception"  # pragma: no cover
+        pytest.fail("must raise an exception")  # pragma: no cover
     except ValueError as e:
         assert "mix" in str(e)
