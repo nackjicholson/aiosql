@@ -6,6 +6,7 @@ from types import MethodType
 from typing import Any, Callable, List, Optional, Set, Tuple, Union, Dict, cast
 
 from .types import DriverAdapterProtocol, QueryDatum, QueryDataTree, QueryFn, SQLOperationType
+from .utils import SQLLoadException
 
 
 class Queries:
@@ -214,6 +215,9 @@ class Queries:
         - **query_name** - The method name as found in the SQL content.
         - **fn** - The loaded query function.
         """
+        if hasattr(self, query_name):
+            # this is filtered out because it can lead to hard to find bugs.
+            raise SQLLoadException(f"cannot override existing attribute with query: {query_name}")
         setattr(self, query_name, fn)
         self._available_queries.add(query_name)
 
@@ -231,6 +235,9 @@ class Queries:
         - **child_name** - The property name to group the child queries under.
         - **child_queries** - Queries instance to add as sub-queries.
         """
+        if hasattr(self, child_name):  # pragma: no cover
+            # this is filtered out because it can lead to hard to find bugs.
+            raise SQLLoadException(f"cannot override existing attribute with child: {child_name}")
         setattr(self, child_name, child_queries)
         for child_query_name in child_queries.available_queries:
             self._available_queries.add(f"{child_name}.{child_query_name}")
