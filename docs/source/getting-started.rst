@@ -85,13 +85,17 @@ and the name of the database driver intended for use with the methods.
 
 In the case of *blogs.sql* we expect the following two methods to be available.
 The ``username`` parameter of ``get_user_blogs`` will substitute in for the ``:username`` variable in the SQL.
+Standard ``SELECT`` statements return a generator, i.e. something which can be iterated upon,
+for instance with a ``for`` loop.
+Just cast the result to ``list`` to get an actual list.
+The generator returns what the underlying driver returns, usually tuples.
 
 .. code:: python
 
-    def get_all_blogs(self) -> List:
+    def get_all_blogs(self) -> Generator[Any]:
         pass
 
-    def get_user_blogs(self, username: str) -> List:
+    def get_user_blogs(self, username: str) -> Generator[Any]:
         pass
 
 From an SQL String
@@ -152,13 +156,6 @@ The ``example/sql`` directory below contains three ``.sql`` files and can be loa
 
 The resulting ``queries`` object will have a mixture of methods from all the files.
 
-.. warning::
-
-    Don't name queries the same in various files in the same directory.
-    The last one loaded will win.
-    See :ref:`subdirectories` below to namespace queries.
-
-
 Subdirectories
 ^^^^^^^^^^^^^^
 
@@ -213,7 +210,7 @@ Here is a more code complete example that shows the connection creation and call
 
     >>> import sqlite3
     >>> import aiosql
-    >>> conn = sqlite3.connect("./mydb.sql")
+    >>> conn = sqlite3.connect("./blogs.db")
     >>> # Note the "sqlite3" driver_adapter argument is what tells 
     >>> # aiosql it should be expecting a sqlite3 connection object.
     >>> queries = aiosql.from_path("./blogs.sql", "sqlite3")
@@ -260,7 +257,7 @@ name of the subsitution variable.
 
     >>> import sqlite3
     >>> import aiosql
-    >>> conn = sqlite3.connect("./mydb.sql")
+    >>> conn = sqlite3.connect("./blogs.db")
     >>> queries = aiosql.from_path("./blogs.sql", "sqlite3")
     >>>
     >>> # Using keyword args
@@ -274,5 +271,22 @@ name of the subsitution variable.
 .. warning::
 
     When passing positional arguments aiosql will apply them in the order that the substitutions appear in your SQL.
-    This can be convenient and clear in some cases, but confusing in others.
+    This can be convenient and clear in some cases, but very confusing in others.
     You might want to choose to always name your arguments for clarity.
+    Consider enforcing this behavior by passing ``kwargs_only=True`` when creating the queries.
+
+It is also possible to access simple object attributes in a query, with the dot syntax:
+
+.. code:: sql
+
+    -- name: add_user
+    insert into users(username, name)
+      values (:u.username, :u.name);
+
+Then simple pass your object as ``u``:
+
+.. code:: python
+
+    # User is some class with attributes username and name
+    calvin = User("calvin", "Calvin")
+    queries.add_user(u=calvin)
