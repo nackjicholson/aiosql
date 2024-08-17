@@ -8,8 +8,8 @@ TODO
 - once 3.9 support is dropped, remove old-style type hints.
 - write a small SQLite3-based tutorial?
 
-11.0 on ?
----------
+11.0 on 2024-08-17
+------------------
 
 - update and improve documentation.
 - do not allow to override existing queries, as it can lead to hard to
