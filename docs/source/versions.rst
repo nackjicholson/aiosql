@@ -1,11 +1,20 @@
 AioSQL - Versions
 =================
 
+TODO
+----
+
+- maintain up-to-date wrt Python moving target…
+- once 3.9 support is dropped, remove old-style type hints.
+- write a small SQLite3-based tutorial?
+
 11.0 on ?
 ---------
 
+- update and improve documentation.
 - do not allow to override existing queries, as it can lead to hard to
   understand bugs.
+- use ``pytest.fail`` instead of ``assert False`` in tests.
 
 10.4 on 2024-08-08
 ------------------
