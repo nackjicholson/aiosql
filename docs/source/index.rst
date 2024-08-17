@@ -1,8 +1,3 @@
-.. aiosql documentation master file, created by
-   sphinx-quickstart on Sun Jul 18 12:49:31 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 aiosql - Simple SQL in Python
 =============================
 
@@ -60,7 +55,7 @@ Badges
    :alt: Build status
    :target: https://github.com/nackjicholson/aiosql/actions/
 ..
-   hardcoded coverage and tests, 100% and 162/15 if docker run is ok
+   NOTE hardcoded, this is maintained manually.
 .. image:: https://img.shields.io/badge/coverage-100%25-success
    :alt: Code Coverage
    :target: https://github.com/nackjicholson/aiosql/actions/
@@ -101,7 +96,7 @@ Badges
    :alt: Python Versions
    :target: https://www.python.org/
 ..
-   some non-sense badge about badges:-)
+   NOTE some non-sense badge about badges:-)
 .. image:: https://img.shields.io/badge/badges-16-informational
    :alt: Badges
    :target: https://shields.io/
