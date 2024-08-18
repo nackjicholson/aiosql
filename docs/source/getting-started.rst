@@ -12,7 +12,7 @@ Why?
 -  Alternatives are good. No approach fits all use cases, no matter how predominant.
 -  SQL is the most expressive and performant way to interact with a SQL database.
 -  Investigating where a query came from is simpler when it is source controlled, named, and written by a human.
--  Writing SQL in files gives you built-in compatibility with powerful SQL tools like `DataGrip <https://www.jetbrains.com/datagrip/>`__ and `psql <https://www.postgresql.org/docs/12/app-psql.html>`__.
+-  Writing SQL in files gives you built-in compatibility with powerful SQL tools like `DataGrip <https://www.jetbrains.com/datagrip/>`__ and `psql <https://www.postgresql.org/docs/current/app-psql.html>`__.
 
 About ORMs
 ~~~~~~~~~~
@@ -159,7 +159,7 @@ The resulting ``queries`` object will have a mixture of methods from all the fil
 Subdirectories
 ^^^^^^^^^^^^^^
 
-Introducing subdirectories allows namspacing queries.
+Introducing subdirectories allows namespacing queries.
 This provides a way to further organize and group queries conceptually.
 For instance, you could define blog queries separate from user queries access them on distinct
 properties of the queries object.
@@ -168,12 +168,12 @@ Assume the *blogs.sql* and *users.sql* files both contain a ``-- name: get_all``
 
 ::
 
-    example/sql
-    ├── blogs
-    │   └── blogs.sql
-    ├── create_schema.sql
-    └── users
-        └── users.sql
+    example/sql/
+            ├── blogs/
+            │   └── blogs.sql
+            ├── create_schema.sql
+            └── users/
+                └── users.sql
 
 .. code:: python
 
@@ -229,6 +229,8 @@ Here is a more code complete example that shows the connection creation and call
       'How to make a pie.',
       '1. Make crust\n2. Fill\n3. Bake\n4. Eat\n',
       '2018-11-23')]
+
+See the associated `AnoDB Project <https://pypi.org/project/anodb/>`__ for embedding both a connection pool and queries.
 
 Passing Parameters
 ~~~~~~~~~~~~~~~~~~
