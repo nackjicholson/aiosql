@@ -150,7 +150,7 @@ check.black: $(VENV)
 .PHONY: check.rstcheck
 check.rstcheck: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	rstcheck --ignore-directives=toctree --ignore-roles=doc,ref docs/source/*.rst
+	rstcheck --ignore-directives=toctree,literalinclude --ignore-roles=doc,ref docs/source/*.rst
 
 .PHONY: check.pytest
 check.pytest: check.pytest.local
