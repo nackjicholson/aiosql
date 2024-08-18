@@ -8,11 +8,13 @@ TODO
 - once 3.9 support is dropped, remove old-style type hints.
 - write a small SQLite3-based tutorial?
 - tests with other database and drivers?
+- allow to pass parameters to connection, cursor…
+- rethink classes?
 
 ? on ?
 ------
 
-- improve documentation
+- improve documentation.
 
 11.0 on 2024-08-17
 ------------------
