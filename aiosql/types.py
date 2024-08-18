@@ -90,12 +90,10 @@ class SyncDriverAdapterProtocol(Protocol):
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> ContextManager[Any]: ...  # pragma: no cover
 
-    # TODO: Next major version introduce a return? Optional return?
     def insert_update_delete(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> int: ...  # pragma: no cover
 
-    # TODO: Next major version introduce a return? Optional return?
     def insert_update_delete_many(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
     ) -> int: ...  # pragma: no cover
