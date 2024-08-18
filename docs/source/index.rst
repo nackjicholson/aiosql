@@ -123,20 +123,9 @@ Install from `pypi <https://pypi.org/project/aiosql>`__, for instance by running
 Then write parametric SQL queries in a file and execute it from Python methods,
 eg this *greetings.sql* file:
 
-.. code:: sql
-
-    -- name: get_all_greetings
-    -- Get all the greetings in the database
-    select greeting_id, greeting
-      from greetings
-     order by 1;
-
-    -- name: get_user_by_username^
-    -- Get a user from the database using a named parameter
-    select user_id, username, name
-      from users
-     where username = :username;
-
+.. literalinclude:: ../../example/greetings.sql
+   :language: sql
+   :caption: Greetings Queries
 
 This example has an imaginary SQLite database with greetings and users.
 It prints greetings in various languages to the user and showcases the basic
@@ -146,56 +135,22 @@ in python code.
 You can use ``aiosql`` to load the queries in this file for use in your Python
 application:
 
-.. code:: python
-
-    import aiosql
-    import sqlite3
-
-    queries = aiosql.from_path("greetings.sql", "sqlite3")
-
-    with sqlite3.connect("greetings.db") as conn:
-        user = queries.get_user_by_username(conn, username="willvaughn")
-        # user: (1, "willvaughn", "William")
-
-        for _, greeting in queries.get_all_greetings(conn):
-            # scan [(1, "Hi"), (2, "Aloha"), (3, "Hola"), …]
-            print(f"{greeting}, {user[2]}!")
-        # Hi, William!
-        # Aloha, William!
-        # …
-
+.. literalinclude:: ../../example/greetings.py
+   :language: python
+   :caption: Synchronous Queries
 
 Or even in an asynchroneous way, with two SQL queries running in parallel
 using ``aiosqlite`` and ``asyncio``:
 
-.. code:: python
-
-    import asyncio
-    import aiosql
-    import aiosqlite
-
-    queries = aiosql.from_path("greetings.sql", "aiosqlite")
-
-    async def main():
-        async with aiosqlite.connect("greetings.db") as conn:
-            # Parallel queries!
-            greetings, user = await asyncio.gather(
-                queries.get_all_greetings(conn),
-                queries.get_user_by_username(conn, username="willvaughn")
-            )
-
-            for _, greeting in greetings:
-                print(f"{greeting}, {user[2]}!")
-
-    asyncio.run(main())
-
+.. literalinclude:: ../../example/greetings_async.py
+   :language: python
+   :caption: Asynchronous Queries
 
 It may seem inconvenient to provide a connection on each call.
 You may have a look at the `AnoDB <https://github.com/zx80/anodb>`__ `DB`
-class which wraps both a database connection and query functions in one
+class which wraps both a database connection *and* queries in one
 connection-like extended object, including managing a pool and performing
 automatic reconnection if needed.
-
 
 Why you might want to use this
 ------------------------------
