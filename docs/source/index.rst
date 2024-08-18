@@ -36,7 +36,7 @@ However, some detailed feature support may vary depending on the underlying driv
 and database engine actual capabilities.
 
 Other SQL database drivers which support the ``pyformat`` or ``named``
-[PEP 249](https://peps.python.org/pep-0249/) paramstyles should work as well
+`PEP 249 <https://peps.python.org/pep-0249/>`__ paramstyles should work as well
 by just passing the driver as a parameter when building queries.  Thus
 `MS SQL Server <:https//en.wikipedia.org/wiki/Microsoft_SQL_Server>`__
 (`pymssql <https://pypi.org/project/pymssql/>`__),
