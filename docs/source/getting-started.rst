@@ -9,10 +9,12 @@ Most database libraries are intended to reduce the amount of SQL developers need
 aiosql takes an alternative approach.
 Why?
 
--  Alternatives are good. No approach fits all use cases, no matter how predominant.
--  SQL is the most expressive and performant way to interact with a SQL database.
--  Investigating where a query came from is simpler when it is source controlled, named, and written by a human.
--  Writing SQL in files gives you built-in compatibility with powerful SQL tools like `DataGrip <https://www.jetbrains.com/datagrip/>`__ and `psql <https://www.postgresql.org/docs/current/app-psql.html>`__.
+- Alternatives are good. No approach fits all use cases, no matter how predominant.
+- SQL is the most expressive and performant way to interact with a SQL database.
+- Investigating where a query came from is simpler when it is source controlled, named, and written by a human.
+- Writing SQL in files gives you built-in compatibility with powerful SQL tools like
+  `DataGrip <https://www.jetbrains.com/datagrip/>`__ and
+  `psql <https://www.postgresql.org/docs/current/app-psql.html>`__.
 
 About ORMs
 ~~~~~~~~~~
@@ -200,7 +202,7 @@ or otherwise set connection level properties that affect driver behavior.
 
 .. note::
 
-    For more see: :ref:`leveraging-driver-specific-features`.
+    For more see: :doc:`advanced-topics`.
 
 In the examples throughout this page a ``conn`` object has been passed.
 Here is a more code complete example that shows the connection creation and call to
