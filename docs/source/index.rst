@@ -31,20 +31,30 @@ based drivers for
 `MariaDB <https://mariadb.org/>`__
 (`mariadb <https://pypi.org/project/mariadb/>`__) and
 `DuckDB <https://www.duckdb.org/>`__
-(`duckdb <https://duckdb.org/docs/api/python/dbapi>`__),
-out of the box.
-Note that some detailed feature support may vary depending on the underlying driver
+(`duckdb <https://duckdb.org/docs/api/python/dbapi>`__).
+However, some detailed feature support may vary depending on the underlying driver
 and database engine actual capabilities.
+
+Other SQL database drivers which support the ``pyformat`` or ``named``
+[PEP 249](https://peps.python.org/pep-0249/) paramstyles should work as well
+by just passing the driver as a parameter when building queries.  Thus
+`MS SQL Server <:https//en.wikipedia.org/wiki/Microsoft_SQL_Server>`__
+(`pymssql <https://pypi.org/project/pymssql/>`__),
+`Oracle Database <https://en.wikipedia.org/wiki/Oracle_Database>`__
+(`oracledb <https://oracle.github.io/python-oracledb/>`__) or
+`Snowflake <https://en.wikipedia.org/wiki/Snowflake_Inc.>`__
+(`snowflake.connector <https://docs.snowflake.com/en/developer-guide/python-connector/>`__)
+should work out of the box.
+
+Otherwise, extensions to support other database drivers can be written by you!
+See: `Database Driver Adapters <./database-driver-adapters.html>`__.
+Feel free to pull request!
 
 This module is an implementation of
 `Kris Jenkins' yesql <https://github.com/krisajenkins/yesql>`__
 `Clojure <https://clojure.org/>`__ library to the
 `Python <https://www.python.org/>`__
 `ecosystem <https://pypi.org/>`__.
-Extensions to support other database drivers can be written by you!
-See: `Database Driver Adapters <./database-driver-adapters.html>`__.
-Feel free to pull request!
-
 
 Badges
 ------
@@ -183,8 +193,8 @@ using ``aiosqlite`` and ``asyncio``:
 It may seem inconvenient to provide a connection on each call.
 You may have a look at the `AnoDB <https://github.com/zx80/anodb>`__ `DB`
 class which wraps both a database connection and query functions in one
-connection-like extended object, including managing automatic reconnection if
-needed.
+connection-like extended object, including managing a pool and performing
+automatic reconnection if needed.
 
 
 Why you might want to use this
@@ -194,7 +204,7 @@ Why you might want to use this
 * You don't want to write your SQL in strings intermixed with your python code.
 * You're not using an ORM like `SQLAlchemy <https://www.sqlalchemy.org/>`__ or
   `Django <https://www.djangoproject.com/>`__ ,
-  with large (100k lines) code imprints vs about 800 for `aiosql`,
+  with large (100k lines) code imprints vs under 900 for `aiosql`,
   and you don't need to.
 * You want to be able to reuse your SQL in other contexts.
   Loading it into `psql` or other database tools.
