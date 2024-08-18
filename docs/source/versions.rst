@@ -15,6 +15,7 @@ TODO
 ------
 
 - improve documentation.
+- upgrade sphinx and corresponding read-the-doc theme.
 
 11.0 on 2024-08-17
 ------------------
