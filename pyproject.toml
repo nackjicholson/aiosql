@@ -48,7 +48,7 @@ dev-mariadb = [
 ]
 dist = [
     "build", "wheel", "twine",
-    "sphinx >= 4, < 5", "sphinx-rtd-theme >= 0.5.2"
+    "sphinx", "sphinx-rtd-theme"
 ]
 
 [tool.setuptools.package-data]
