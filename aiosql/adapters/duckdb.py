@@ -3,9 +3,9 @@ from ..utils import VAR_REF
 from typing import List
 
 
-def _colon_to_dollar(match):
+def _colon_to_dollar(ma):
     """Convert 'WHERE :id = 1' to 'WHERE $id = 1'."""
-    gd = match.groupdict()
+    gd = ma.groupdict()
     if gd["dquote"] is not None:
         return gd["dquote"]
     elif gd["squote"] is not None:
