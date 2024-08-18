@@ -6,7 +6,7 @@ Query Names
 
 Name definitions are how aiosql determines the name of the methods that SQL
 code blocks are accessible by.
-A query name is defined by a SQL comment of the form "-- name: ".
+A query name is defined by a SQL comment of the form ``"-- name: "``.
 As a readability convenience, dash characters (``-``) in the name are turned
 into underlines (``_``).
 
@@ -34,8 +34,7 @@ You can use ``help()`` in the Python REPL to view these comments while using pyt
 
 .. code:: pycon
 
-    Python 3.8.3 (default, Jul 29 2020, 11:15:42)
-    [GCC 10.1.0] on linux
+    Python 3 on Linux
     Type "help", "copyright", "credits" or "license" for more information.
     >>> import aiosql
     >>> queries = aiosql.from_path("sql", "sqlite3")
@@ -82,19 +81,19 @@ name is written without any trailing operators.
 
     -- name: get-all-blogs
 
-The lack of an operator is actually the most basic operator used by default for
-your queries. This tells aiosql to execute the query and to return all the results.
-In the case of ``get-all-blogs`` that means a ``select`` statement will be executed
-and a list of rows will be returned. When writing your application you will often
-need to perform other operations besides ``select``, like ``insert``, ``delete``,
-and perhaps bulk operations. The operators detailed in the other sections of this
-doc let you declare in your SQL code how that query should be executed by a python
-database driver.
+The lack of an explicit operator tells aiosql to execute the query and
+to return **all** the results.
+In the case of ``get-all-blogs`` that means a ``select`` statement will be
+executed and all the resulting rows will be returned.
+When writing your application you will often need to perform other operations
+besides ``select``, like ``insert``, ``delete``, and perhaps bulk operations.
+The operators detailed in the next sections let you declare in your SQL code
+how that query should be executed by a Python database driver.
 
 ``^`` Select One
 ~~~~~~~~~~~~~~~~
 
-The ``^`` operator executes a query and returns the first row of a result set.
+The ``^`` operator executes a query and returns the **first row** of a result set.
 When there are no rows in the result set it returns ``None``.
 This is useful when you know there should be one, and exactly one result from your query.
 
@@ -122,23 +121,23 @@ When used from Python this query will either return ``None`` or the singular sel
 ``$`` Select Value
 ~~~~~~~~~~~~~~~~~~
 
-The ``$`` operator will execute the query, and only return the first value of the first row
+The ``$`` operator will execute the query, and only return the **first value of the first row**
 of a result set. If there are no rows in the result set it returns ``None``.
 This is implemented by returing the first element of the tuple returned by ``cur.fetchone()``
-from the underlying driver. This is mostly useful for queries returning IDs, COUNTs or
-other aggregates.
+from the underlying driver.
+This is mostly useful for queries returning IDs, COUNTs or other aggregates.
 
 .. code:: sql
 
-    -- name: get-count$
+    -- name: count-users$
     select count(*) from users
 
 When used from Python:
 
 .. code:: python
 
-    queries.get_count(conn)
-    # => 3
+    queries.count_users(conn)
+    # => 3 or None
 
 ``!`` Insert/Update/Delete
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -166,19 +165,36 @@ The methods generated are:
 Each can be called to alter the database, and returns the number of affected rows
 if available.
 
-``<!`` Insert/Update/Delete Returning
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Note that some SQL databases allow to return a relation after ``insert``,
+``update`` or ``delete`` by using a ``returning`` clause.
+For such queries the result is a relation like a ``select``, so the same operators
+apply:
+
+.. code:: sql
+
+    -- name: publish_new_blog$
+    insert into blogs(userid, title, content)
+        values (:userid, :title, :content)
+        returning blogid;
+
+.. code:: python
+
+    blogid = queries.publish_new_blog(conn, userid=1, title="AioSQL New Features", content="…")
+
+``<!`` Insert/Update/Delete Implicit Returning
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When performing a modification of rows, or adding new rows, sometimes it is
-necessary to return values using the ``returning`` clause where available.
+necessary to return values using the ``returning`` clause where available,
+as described above.
 
-When using SQLite this operator will return the id of the inserted row using
+When using old versions of SQLite this special operator will return the id of
+the inserted row using
 ```cur.lastrowid`` <https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.lastrowid>`__.
 
-As recent version of SQLite do support the ``returning`` clause, forget about
-this, use the clause explicitely and treat the whole command as a standard
-select with the *empty* operator (relation), or ``^`` (tuple), or ``$``
-(scalar).
+As recent version of SQLite do support the ``returning`` clause, simply forget
+about this, use the clause explicitely and treat the whole command as a standard
+select with the *empty* operator (relation), or ``^`` (tuple), or ``$`` (scalar).
 
 .. code:: sql
 
