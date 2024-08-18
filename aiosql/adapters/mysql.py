@@ -3,7 +3,8 @@ from .pyformat import PyFormatAdapter
 
 class BrokenMySQLAdapter(PyFormatAdapter):
     """
-    Work around PyMySQL and MySQLDB mishandling of empty parameters.
+    Work around PyMySQL and MySQLDB mishandling of empty parameters
+    and lack of willingness to fix the issue.
 
     See: https://github.com/PyMySQL/PyMySQL/issues/1059
     """
