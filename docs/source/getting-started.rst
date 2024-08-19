@@ -148,9 +148,9 @@ The ``example/sql`` directory below contains three ``.sql`` files and can be loa
 ::
 
     example/sql
-    ├── blogs.sql
-    ├── create_schema.sql
-    └── users.sql
+            ├── blogs.sql
+            ├── create_schema.sql
+            └── users.sql
 
 .. code:: python
 

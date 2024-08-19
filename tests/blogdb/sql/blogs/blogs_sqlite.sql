@@ -22,3 +22,24 @@ values (?, ?, ?, ?);
 -- name: sqlite-get-modulo$
 -- no-escaped percent modulo operator
 SELECT :numerator % :denominator;
+
+-- name: publish-a-blog<!
+insert into blogs(userid, title, content)
+  values (:userid, :title, :content);
+
+-- name: create_schema#
+create table users (
+    userid integer not null primary key,
+    username text not null,
+    firstname integer not null,
+    lastname text not null
+);
+
+create table blogs (
+    blogid integer not null primary key,
+    userid integer not null,
+    title text not null,
+    content text not null,
+    published date not null default CURRENT_DATE,
+    foreign key(userid) references users(userid)
+);

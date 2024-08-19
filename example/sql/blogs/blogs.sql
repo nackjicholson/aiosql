@@ -12,7 +12,6 @@ insert into blogs(userid, title, content) values (:userid, :title, :content);
 -- name: insert_many*!
 insert into blogs(userid, title, content, published) values (?, ?, ?, ?);
 
-
 -- name: get_user_blogs
 -- Get blogs with a fancy formatted published date and author field
     select b.blogid,

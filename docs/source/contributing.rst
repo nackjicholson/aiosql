@@ -53,6 +53,7 @@ The bare minimum of version pinning is declared in the dependencies.
     pip install .[dev]
     # per-database stuff
     pip install .[dev-sqlite]
+    pip install .[dev-postgres]
     pip install .[dev-duckdb]
     pip install .[dev-mysql]
     pip install .[dev-mariadb]

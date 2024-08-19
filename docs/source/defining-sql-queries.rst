@@ -10,40 +10,37 @@ A query name is defined by a SQL comment of the form ``"-- name: "``.
 As a readability convenience, dash characters (``-``) in the name are turned
 into underlines (``_``).
 
-.. code:: sql
-
-    -- name: get-all-blogs
-    select * from blogs;
+.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
+   :language: sql
+   :lines: 5,7
 
 This query will be available in aiosql under the python method name ``.get_all_blogs(conn)``
 
 Query Comments
 --------------
 
-*./sql/blogs.sql*
-
-.. code:: sql
-
-    -- name: get-all-blogs
-    -- Fetch all fields for every blog in the database.
-    select * from blogs;
+.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
+   :language: sql
+   :lines: 5-7
 
 Any other SQL comments you make between the name definition and your code will
 be used a the python documentation string for the generated method.
 You can use ``help()`` in the Python REPL to view these comments while using python.
 
+..
+   FIXME method parameters are not shown…
+
 .. code:: pycon
 
-    Python 3 on Linux
+    Python 3 … on Linux
     Type "help", "copyright", "credits" or "license" for more information.
     >>> import aiosql
-    >>> queries = aiosql.from_path("sql", "sqlite3")
+    >>> queries = aiosql.from_path("blogs.sql", "sqlite3")
     >>> help(queries.get_all_blogs)
     Help on method get_all_blogs in module aiosql.queries:
 
     get_all_blogs(conn, *args, **kwargs) method of aiosql.queries.Queries instance
         Fetch all fields for every blog in the database.
-
 
 Named Parameters
 ----------------
@@ -52,10 +49,9 @@ Named parameters ``:param`` are accepted by all supported drivers and taken
 from Python named parameters passed to the query.
 In addition, simple attributes can be referenced with the ``.``-syntax.
 
-.. code:: sql
-
-    -- name: with-params
-    select length(:name), :x.real + :x.imaj;
+.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
+   :language: sql
+   :lines: 59-60
 
 Then the generated function expects two named parameters:
 
@@ -77,9 +73,9 @@ No Operator (Default)
 In the above `Query Names <#query-names>`__ section the ``get-all-blogs``
 name is written without any trailing operators.
 
-.. code:: sql
-
-    -- name: get-all-blogs
+.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
+   :language: sql
+   :lines: 5
 
 The lack of an explicit operator tells aiosql to execute the query and
 to return **all** the results.
@@ -102,14 +98,9 @@ As an example, if you have a unique constraint on the ``username`` field in your
 you could use ``^`` to direct aiosql to select a single user rather than a list of
 rows of length 1.
 
-.. code:: sql
-
-    -- name: get_user_by_username^
-    select userid,
-           username,
-           name
-      from users
-     where username = :username;
+.. literalinclude:: ../../tests/blogdb/sql/users/users.sql
+   :language: sql
+   :lines: 9-15
 
 When used from Python this query will either return ``None`` or the singular selected row.
 
@@ -127,16 +118,15 @@ This is implemented by returing the first element of the tuple returned by ``cur
 from the underlying driver.
 This is mostly useful for queries returning IDs, COUNTs or other aggregates.
 
-.. code:: sql
-
-    -- name: count-users$
-    select count(*) from users
+.. literalinclude:: ../../tests/blogdb/sql/users/users.sql
+   :language: sql
+   :lines: 33,35
 
 When used from Python:
 
 .. code:: python
 
-    queries.count_users(conn)
+    queries.get_count(conn)
     # => 3 or None
 
 ``!`` Insert/Update/Delete
@@ -146,21 +136,16 @@ The ``!`` operator executes SQL without returning any results.
 It is meant for statements that use ``insert``, ``update``, and ``delete`` to make
 modifications to database rows without a necessary return value.
 
-.. code:: sql
-
-    -- name: publish_blog!
-    insert into blogs(userid, title, content) values (:userid, :title, :content);
-
-    -- name: remove_blog!
-    -- Remove a blog from the database
-    delete from blogs where blogid = :blogid;
+.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
+   :language: sql
+   :lines: 62-64,22-25
 
 The methods generated are:
 
-.. code:: text
+.. code:: python
 
-    publish_blog(conn, userid: int, title: str, content: str) -> int:
-    remove_blog(conn, blogid: int) -> int:
+    def new_blog(conn, userid: int, title: str, content: str) -> int:
+    def remove_blog(conn, blogid: int) -> int:
 
 Each can be called to alter the database, and returns the number of affected rows
 if available.
@@ -170,12 +155,9 @@ Note that some SQL databases allow to return a relation after ``insert``,
 For such queries the result is a relation like a ``select``, so the same operators
 apply:
 
-.. code:: sql
-
-    -- name: publish_new_blog$
-    insert into blogs(userid, title, content)
-        values (:userid, :title, :content)
-        returning blogid;
+.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
+   :language: sql
+   :lines: 66-69
 
 .. code:: python
 
@@ -196,18 +178,15 @@ As recent version of SQLite do support the ``returning`` clause, simply forget
 about this, use the clause explicitely and treat the whole command as a standard
 select with the *empty* operator (relation), or ``^`` (tuple), or ``$`` (scalar).
 
-.. code:: sql
-
-    -- name: publish_blog<!
-    insert into blogs(userid, title, content) values (:userid, :title, :content);
+.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs_sqlite.sql
+   :language: sql
+   :lines: 26-28
 
 Executing this query in python will return the ``blogid`` of the inserted row.
 
 .. code:: python
 
-    queries = aiosql.from_path("blogs.sql", "sqlite3")
-    # ... connection code ...
-    blogid = queries.publish_blog(conn, userid=1, title="Hi", content="blah blah.")
+    blogid = queries.publish_a_blog(conn, userid=1, title="Hi", content="blah blah.")
 
 ``*!`` Insert/Update/Delete Many
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -219,17 +198,13 @@ for an example.
 
 In aiosql we can use this for a bulk publish method that operates over a list of blog entries.
 
-.. code:: sql
-
-    -- name: bulk_publish*!
-    -- Insert many blogs at once
-    insert into blogs (userid, title, content, published)
-    values (:userid, :title, :content, :published);
+.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs_pg.sql
+   :language: sql
+   :lines: 33-36
 
 .. code:: python
 
     queries = aiosql.from_path("blogs.sql", "psycopg2")
-    # ... connection code ...
     blogs = [
         {"userid": 1, "title": "First Blog", "content": "...", published: datetime(2018, 1, 1)},
         {"userid": 1, "title": "Next Blog", "content": "...", published: datetime(2018, 1, 2)},
@@ -246,27 +221,11 @@ Using this operarator will execute sql statements as a script.
 You can't do variable substitution with the ``#`` operator.
 An example usecase is using data definition statements like create table in order to setup a database.
 
-.. code:: sql
-
-    -- name: create_schema#
-    create table users (
-        userid integer not null primary key,
-        username text not null,
-        firstname integer not null,
-        lastname text not null
-    );
-
-    create table blogs (
-        blogid integer not null primary key,
-        userid integer not null,
-        title text not null,
-        content text not null,
-        published date not null default CURRENT_DATE,
-        foreign key(userid) references users(userid)
-    );
+.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs_sqlite.sql
+   :language: sql
+   :lines: 30-45
 
 .. code:: python
 
     queries = aiosql.from_path("create_schema.sql", "sqlite3")
-    # ... connection code ...
     queries.create_schema(conn)
