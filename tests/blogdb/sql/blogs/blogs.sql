@@ -2,6 +2,10 @@
 is expected
 TO BE IGNORED SILENTLY…
 
+-- name: get-all-blogs
+-- Fetch all fields for every blog in the database.
+select * from blogs;
+
 -- name: publish-blog<!
 insert into blogs (
   userid,
@@ -14,7 +18,7 @@ values (
   :title,
   :contents,
   :published
-)
+);
 
 -- name: remove-blog!
 -- Remove a blog from the database
@@ -51,3 +55,15 @@ select :val::int * :val::int as squared;
 
 -- name: blog_title^
 select blogid, title from blogs where blogid = :blogid;
+
+-- name: with-params^
+select length(:name), :x.real + x.imaj;
+
+-- name: new-blog!
+insert into blogs (userid, title, content)
+  values (:userid, :title, :contents);
+
+-- name: publish-new-blog$
+insert into blogs (userid, title, content)
+  values (:userid, :title, :contents)
+  returning blogid;

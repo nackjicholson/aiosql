@@ -33,7 +33,7 @@ A database driver adapter is a duck-typed class that follows either of the
 .. literalinclude:: ../../aiosql/types.py
    :language: python
    :lines: 62-105
-   :caption: PEP 249 Adapter
+   :caption: PEP 249 Synchronous Adapter
 
 .. literalinclude:: ../../aiosql/types.py
    :language: python
@@ -48,7 +48,7 @@ the other for asynchronous queries:
 - ``process_sql`` is used to preprocess SQL queries so has to handle named
   parameters as they are managed by the target driver.
 - ``select``, ``select_one``, ``insert_update_delete``, ``insert_update_delete_many``,
-  ``insert_returning`` and ``execute_script`` implement the various operations.
+  ``insert_returning`` and ``execute_script`` implement all operations.
 - ``select_cursor`` returns the raw cursor from a ``select``.
 
 There isn't much difference between these two protocols besides the
@@ -74,11 +74,11 @@ Alternatively, an adapter can be registered or overriden:
 .. code:: python
 
     # in AcmeAdapter provider, eg module "acmedb_aiosql"
+    import aiosql
     aiosql.register_adapter("acmedb", AcmeAdapter)
 
     # then use it elsewhere
     import aiosql
-    import acmedb_aiosql
     queries = aiosql.from_path("some.sql", "acmedb")
 
 Please ask questions on `GitHub Issues <https://github.com/nackjicholson/aiosql/issues>`__.

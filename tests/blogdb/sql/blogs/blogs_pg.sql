@@ -32,18 +32,8 @@ where false;
 
 -- name: pg-bulk-publish*!
 -- Insert many blogs at once
-insert into blogs (
-  userid,
-  title,
-  content,
-  published
-)
-values (
-  :userid,
-  :title,
-  :contents,
-  :published
-);
+insert into blogs (userid, title, content, published)
+  values (:userid, :title, :contents, :published);
 
 -- name: pg-get-modulo$
 -- %-escaped percent modulo operator
