@@ -38,7 +38,7 @@ and database engine actual capabilities.
 Other SQL database drivers which support the ``pyformat`` or ``named``
 `PEP 249 <https://peps.python.org/pep-0249/>`__ paramstyles should work as well
 by just passing the driver as a parameter when building queries.  Thus
-`MS SQL Server <:https//en.wikipedia.org/wiki/Microsoft_SQL_Server>`__
+`MS SQL Server <https//en.wikipedia.org/wiki/Microsoft_SQL_Server>`__
 (`pymssql <https://pypi.org/project/pymssql/>`__),
 `Oracle Database <https://en.wikipedia.org/wiki/Oracle_Database>`__
 (`oracledb <https://oracle.github.io/python-oracledb/>`__) or
