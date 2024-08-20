@@ -21,6 +21,8 @@ About ORMs
 
 ORMs and SQL Query Builders offer object interfaces to generate and execute SQL.
 They exist to ease development, not to make it simpler.
+They have a large code base to provide their services, and many complement packages
+to provide more advanced features, resulting in *hundreds of thousand* of lines of code.
 Inheriting object hierarchies, mixing data with behaviors, mirroring a database schema, and generating SQL are not simple.
 ORMs are introduced early in a project's life when requirements are limited and the need to move fast is paramount.
 As a project grows, ORM objects and their relations grow too, they become a source of complexity and coupling.
