@@ -44,7 +44,8 @@ by just passing the driver as a parameter when building queries.  Thus
 (`oracledb <https://oracle.github.io/python-oracledb/>`__) or
 `Snowflake <https://en.wikipedia.org/wiki/Snowflake_Inc.>`__
 (`snowflake.connector <https://docs.snowflake.com/en/developer-guide/python-connector/python-connector>`__)
-should work out of the box.
+should work out of the box…
+Please report with an issue if it actually works for you!
 
 Otherwise, extensions to support other database drivers can be written by you!
 See: `Database Driver Adapters <./database-driver-adapters.html>`__.
