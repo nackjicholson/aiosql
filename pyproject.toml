@@ -41,7 +41,9 @@ dev-postgres = [
 ]
 dev-mysql = [
     "pytest-mysql",
-    "mysqlclient", "mysql-connector-python", "pymysql"
+    "mysqlclient",
+    "mysql-connector-python",
+    "pymysql"
 ]
 dev-mariadb = [
     "mariadb"
