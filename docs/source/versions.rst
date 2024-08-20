@@ -11,6 +11,11 @@ TODO
 - allow to pass parameters to connection, cursor…
 - rethink classes?
 
+11.2 on ?
+---------
+
+- minor doc fixes…
+
 11.1 on 2024-08-20
 ------------------
 
