@@ -43,7 +43,7 @@ by just passing the driver as a parameter when building queries.  Thus
 `Oracle Database <https://en.wikipedia.org/wiki/Oracle_Database>`__
 (`oracledb <https://oracle.github.io/python-oracledb/>`__) or
 `Snowflake <https://en.wikipedia.org/wiki/Snowflake_Inc.>`__
-(`snowflake.connector <https://docs.snowflake.com/en/developer-guide/python-connector/>`__)
+(`snowflake.connector <https://docs.snowflake.com/en/developer-guide/python-connector/python-connector>`__)
 should work out of the box.
 
 Otherwise, extensions to support other database drivers can be written by you!
