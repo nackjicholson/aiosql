@@ -11,8 +11,8 @@ TODO
 - allow to pass parameters to connection, cursor…
 - rethink classes?
 
-11.1 on ?
----------
+11.1 on 2024-08-20
+------------------
 
 - improve documentation.
 - upgrade sphinx and corresponding read-the-doc theme.
