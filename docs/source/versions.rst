@@ -15,6 +15,7 @@ TODO
 ---------
 
 - minor doc fixes…
+- improve one error message.
 
 11.1 on 2024-08-20
 ------------------

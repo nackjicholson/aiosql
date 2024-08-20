@@ -62,7 +62,7 @@ class Queries:
 
         if self._kwargs_only:
             if args:
-                raise ValueError("cannot use positional parameters under kwargs_only")
+                raise ValueError("cannot use positional parameters under kwargs_only, use named parameters (name=value, …)")
             return kwargs
         elif kwargs:
             # FIXME is this true?
