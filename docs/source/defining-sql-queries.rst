@@ -145,7 +145,10 @@ The methods generated are:
 .. code:: python
 
     def new_blog(conn, userid: int, title: str, content: str) -> int:
+        pass
+
     def remove_blog(conn, blogid: int) -> int:
+        pass
 
 Each can be called to alter the database, and returns the number of affected rows
 if available.
