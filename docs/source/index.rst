@@ -27,7 +27,9 @@ based drivers for
 `MySQL <https://www.mysql.com/>`__
 (`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__,
 `mysqlclient <https://pypi.org/project/mysqlclient/>`__,
-`mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__),
+`mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__,
+`asyncmy <https://github.com/long2ice/asyncmy>`__ with
+`this adapter <https://github.com/GoogleCloudPlatform/database-assessment/blob/main/src/dma/lib/db/adapters/asyncmy.py>`__),
 `MariaDB <https://mariadb.org/>`__
 (`mariadb <https://pypi.org/project/mariadb/>`__) and
 `DuckDB <https://www.duckdb.org/>`__
@@ -94,7 +96,7 @@ Badges
 .. image:: https://img.shields.io/badge/databases-5-informational
    :alt: Databases
    :target: https://github.com/nackjicholson/aiosql/
-.. image:: https://img.shields.io/badge/drivers-13-informational
+.. image:: https://img.shields.io/badge/drivers-14-informational
    :alt: Drivers
    :target: https://github.com/nackjicholson/aiosql/
 .. image:: https://img.shields.io/github/languages/count/nackjicholson/aiosql?style=flat
