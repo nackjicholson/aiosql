@@ -15,11 +15,11 @@ from typing import (
     Union,
 )
 
-try:
-    # Python 3.8 (PEP 544)
-    from typing import Protocol
-except ImportError:  # pragma: no cover
-    from typing_extensions import Protocol  # type: ignore
+# FIXME None added for MySQL buggy drivers
+ParamType = Union[Dict[str, Any], List[Any], None]
+
+# Python 3.8 (PEP 544)
+from typing import Protocol
 
 
 class SQLOperationType(Enum):
@@ -70,7 +70,7 @@ class SyncDriverAdapterProtocol(Protocol):
         conn: Any,
         query_name: str,
         sql: str,
-        parameters: Union[List, Dict],
+        parameters: ParamType,
         record_class: Optional[Callable],
     ) -> Generator[Any, None, None]: ...  # pragma: no cover
 
@@ -79,28 +79,28 @@ class SyncDriverAdapterProtocol(Protocol):
         conn: Any,
         query_name: str,
         sql: str,
-        parameters: Union[List, Dict],
+        parameters: ParamType,
         record_class: Optional[Callable],
     ) -> Optional[Tuple[Any, ...]]: ...  # pragma: no cover
 
     def select_value(
-        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
+        self, conn: Any, query_name: str, sql: str, parameters: ParamType
     ) -> Optional[Any]: ...  # pragma: no cover
 
     def select_cursor(
-        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
+        self, conn: Any, query_name: str, sql: str, parameters: ParamType
     ) -> ContextManager[Any]: ...  # pragma: no cover
 
     def insert_update_delete(
-        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
+        self, conn: Any, query_name: str, sql: str, parameters: ParamType
     ) -> int: ...  # pragma: no cover
 
     def insert_update_delete_many(
-        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
+        self, conn: Any, query_name: str, sql: str, parameters: ParamType
     ) -> int: ...  # pragma: no cover
 
     def insert_returning(
-        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
+        self, conn: Any, query_name: str, sql: str, parameters: ParamType
     ) -> Optional[Any]: ...  # pragma: no cover
 
     def execute_script(self, conn: Any, sql: str) -> str: ...  # pragma: no cover
@@ -116,7 +116,7 @@ class AsyncDriverAdapterProtocol(Protocol):
         conn: Any,
         query_name: str,
         sql: str,
-        parameters: Union[List, Dict],
+        parameters: ParamType,
         record_class: Optional[Callable],
     ) -> List: ...  # pragma: no cover
 
@@ -125,30 +125,30 @@ class AsyncDriverAdapterProtocol(Protocol):
         conn: Any,
         query_name: str,
         sql: str,
-        parameters: Union[List, Dict],
+        parameters: ParamType,
         record_class: Optional[Callable],
     ) -> Optional[Any]: ...  # pragma: no cover
 
     async def select_value(
-        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
+        self, conn: Any, query_name: str, sql: str, parameters: ParamType
     ) -> Optional[Any]: ...  # pragma: no cover
 
     async def select_cursor(
-        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
+        self, conn: Any, query_name: str, sql: str, parameters: ParamType
     ) -> AsyncContextManager[Any]: ...  # pragma: no cover
 
     # TODO: Next major version introduce a return? Optional return?
     async def insert_update_delete(
-        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
+        self, conn: Any, query_name: str, sql: str, parameters: ParamType
     ) -> None: ...  # pragma: no cover
 
     # TODO: Next major version introduce a return? Optional return?
     async def insert_update_delete_many(
-        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
+        self, conn: Any, query_name: str, sql: str, parameters: ParamType
     ) -> None: ...  # pragma: no cover
 
     async def insert_returning(
-        self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
+        self, conn: Any, query_name: str, sql: str, parameters: ParamType
     ) -> Optional[Any]: ...  # pragma: no cover
 
     async def execute_script(self, conn: Any, sql: str) -> str: ...  # pragma: no cover
