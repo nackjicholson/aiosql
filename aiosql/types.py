@@ -81,7 +81,7 @@ class SyncDriverAdapterProtocol(Protocol):
         sql: str,
         parameters: Union[List, Dict],
         record_class: Optional[Callable],
-    ) -> Optional[Tuple[...]]: ...  # pragma: no cover
+    ) -> Optional[Tuple[Any, ...]]: ...  # pragma: no cover
 
     def select_value(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]
