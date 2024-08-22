@@ -7,7 +7,7 @@ class SQLite3Adapter(GenericAdapter):
     Overwrites two methods using sqlite3-specific non-standard methods.
     """
 
-    def insert_returning(self, conn, _query_name, sql, parameters):
+    def insert_returning(self, conn, query_name, sql, parameters):
         cur = self._cursor(conn)
         try:
             cur.execute(sql, parameters)

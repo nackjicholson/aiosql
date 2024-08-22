@@ -11,9 +11,11 @@ TODO
 - allow to pass parameters to connection, cursor…
 - rethink classes?
 
-11.2 on ?
+12.0 on ?
 ---------
 
+- pass misc parameters to cursor in generic adapter.
+- further improve typing to please pyright.
 - minor doc fixes…
 - improve one error message.
 

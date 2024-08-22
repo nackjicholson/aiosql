@@ -16,6 +16,6 @@ def _replacer(ma):
 class PyFormatAdapter(GenericAdapter):
     """Convert from named to pyformat parameter style."""
 
-    def process_sql(self, _query_name, _op_type, sql):
+    def process_sql(self, query_name, op_type, sql):
         """From named to pyformat."""
         return VAR_REF.sub(_replacer, sql)

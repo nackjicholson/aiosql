@@ -1,8 +1,9 @@
 from contextlib import contextmanager
 from typing import List
+from ..types import SyncDriverAdapterProtocol
 
 
-class GenericAdapter:
+class GenericAdapter(SyncDriverAdapterProtocol):
     """
     Generic AioSQL Adapter suitable for `named` parameter style and no with support.
 
@@ -11,12 +12,11 @@ class GenericAdapter:
     Miscellaneous parameters are passed to cursor creation.
     """
 
-    def __init__(self, driver=None, *args, **kwargs):
-        self._driver = driver
+    def __init__(self, *args, **kwargs):
         self._args = args
         self._kwargs = kwargs
 
-    def process_sql(self, _query_name, _op_type, sql):
+    def process_sql(self, query_name, op_type, sql):
         """Preprocess SQL query."""
         return sql
 
@@ -24,7 +24,7 @@ class GenericAdapter:
         """Get a cursor from a connection."""
         return conn.cursor(*self._args, **self._kwargs)
 
-    def select(self, conn, _query_name: str, sql: str, parameters, record_class=None):
+    def select(self, conn, query_name: str, sql: str, parameters, record_class=None):
         """Handle a relation-returning SELECT (no suffix)."""
         column_names: List[str] = []
         cur = self._cursor(conn)
@@ -43,7 +43,7 @@ class GenericAdapter:
         finally:
             cur.close()
 
-    def select_one(self, conn, _query_name, sql, parameters, record_class=None):
+    def select_one(self, conn, query_name, sql, parameters, record_class=None):
         """Handle a tuple-returning (one row) SELECT (``^`` suffix).
 
         Return None if empty."""
@@ -59,7 +59,7 @@ class GenericAdapter:
             cur.close()
         return result
 
-    def select_value(self, conn, _query_name, sql, parameters):
+    def select_value(self, conn, query_name, sql, parameters):
         """Handle a scalar-returning (one value) SELECT (``$`` suffix).
 
         Return None if empty."""
@@ -80,7 +80,7 @@ class GenericAdapter:
             cur.close()
 
     @contextmanager
-    def select_cursor(self, conn, _query_name, sql, parameters):
+    def select_cursor(self, conn, query_name, sql, parameters):
         """Return the raw cursor after a SELECT exec."""
         cur = self._cursor(conn)
         cur.execute(sql, parameters)
@@ -89,7 +89,7 @@ class GenericAdapter:
         finally:
             cur.close()
 
-    def insert_update_delete(self, conn, _query_name, sql, parameters):
+    def insert_update_delete(self, conn, query_name, sql, parameters):
         """Handle affected row counts (INSERT UPDATE DELETE) (``!`` suffix)."""
         cur = self._cursor(conn)
         cur.execute(sql, parameters)
@@ -97,7 +97,7 @@ class GenericAdapter:
         cur.close()
         return rc
 
-    def insert_update_delete_many(self, conn, _query_name, sql, parameters):
+    def insert_update_delete_many(self, conn, query_name, sql, parameters):
         """Handle affected row counts (INSERT UPDATE DELETE) (``*!`` suffix)."""
         cur = self._cursor(conn)
         cur.executemany(sql, parameters)
@@ -106,7 +106,7 @@ class GenericAdapter:
         return rc
 
     # FIXME this made sense when SQLite had no RETURNING prefix (v3.35, 2021-03-12)
-    def insert_returning(self, conn, _query_name, sql, parameters):
+    def insert_returning(self, conn, query_name, sql, parameters):
         """Special case for RETURNING (``<!`` suffix) with SQLite."""
         # very similar to select_one but the returned value
         cur = self._cursor(conn)

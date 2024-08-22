@@ -17,15 +17,15 @@ def _colon_to_dollar(ma):
 class DuckDBAdapter(GenericAdapter):
     """DuckDB Adapter"""
 
-    def __init__(self, driver=None, cursor_as_dict: bool = False):
-        super().__init__(driver=driver)
+    def __init__(self, *args, cursor_as_dict: bool = False, **kwargs):
+        super().__init__(*args, **kwargs)
         # whether to converts the default tuple response to a dict.
         self._convert_row_to_dict = cursor_as_dict
 
-    def process_sql(self, _query_name, _op_type, sql):
+    def process_sql(self, query_name, op_type, sql):
         return VAR_REF.sub(_colon_to_dollar, sql)
 
-    def insert_returning(self, conn, _query_name, sql, parameters):  # pragma: no cover
+    def insert_returning(self, conn, query_name, sql, parameters):  # pragma: no cover
         # very similar to select_one but the returned value
         cur = self._cursor(conn)
         cur.execute(sql, parameters)
@@ -37,7 +37,7 @@ class DuckDBAdapter(GenericAdapter):
             res = res[0]
         return res[0] if res and len(res) == 1 else res
 
-    def select(self, conn, _query_name: str, sql: str, parameters, record_class=None):
+    def select(self, conn, query_name: str, sql: str, parameters, record_class=None):
         column_names: List[str] = []
         cur = self._cursor(conn)
         try:
@@ -64,7 +64,7 @@ class DuckDBAdapter(GenericAdapter):
         finally:
             cur.close()
 
-    def select_one(self, conn, _query_name, sql, parameters, record_class=None):
+    def select_one(self, conn, query_name, sql, parameters, record_class=None):
         cur = self._cursor(conn)
         try:
             cur.execute(sql, parameters)
