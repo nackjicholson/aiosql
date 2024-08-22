@@ -7,10 +7,14 @@ class GenericAdapter:
     Generic AioSQL Adapter suitable for `named` parameter style and no with support.
 
     This class also serves as the base class for other adapters.
+
+    Miscellaneous parameters are passed to cursor creation.
     """
 
-    def __init__(self, driver=None):
+    def __init__(self, driver=None, *args, **kwargs):
         self._driver = driver
+        self._args = args
+        self._kwargs = kwargs
 
     def process_sql(self, _query_name, _op_type, sql):
         """Preprocess SQL query."""
@@ -18,7 +22,7 @@ class GenericAdapter:
 
     def _cursor(self, conn):
         """Get a cursor from a connection."""
-        return conn.cursor()
+        return conn.cursor(*self._args, **self._kwargs)
 
     def select(self, conn, _query_name: str, sql: str, parameters, record_class=None):
         """Handle a relation-returning SELECT (no suffix)."""
