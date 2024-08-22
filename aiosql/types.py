@@ -7,11 +7,12 @@ from typing import (
     Callable,
     ContextManager,
     Dict,
+    Generator,
     List,
     NamedTuple,
     Optional,
-    Union,
     Tuple,
+    Union,
 )
 
 try:
@@ -71,7 +72,7 @@ class SyncDriverAdapterProtocol(Protocol):
         sql: str,
         parameters: Union[List, Dict],
         record_class: Optional[Callable],
-    ) -> List: ...  # pragma: no cover
+    ) -> Generator[Any, None, None]: ...  # pragma: no cover
 
     def select_one(
         self,
@@ -80,7 +81,7 @@ class SyncDriverAdapterProtocol(Protocol):
         sql: str,
         parameters: Union[List, Dict],
         record_class: Optional[Callable],
-    ) -> Optional[Any]: ...  # pragma: no cover
+    ) -> Optional[Tuple[...]]: ...  # pragma: no cover
 
     def select_value(
         self, conn: Any, query_name: str, sql: str, parameters: Union[List, Dict]

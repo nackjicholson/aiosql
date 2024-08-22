@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, Dict, Optional, Type, Union, Tuple
+from typing import Callable, Dict, Optional, Type, Union, Tuple, List, Any
 
 from .adapters.aiosqlite import AioSQLiteAdapter
 from .adapters.asyncpg import AsyncPGAdapter
@@ -40,28 +40,31 @@ def register_adapter(name: str, adapter: Callable[..., DriverAdapterProtocol]):
 
 
 def _make_driver_adapter(
-    driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]]
+    driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
+    *args, ** kwargs
 ) -> DriverAdapterProtocol:
     """Get the driver adapter instance registered by the `driver_name`."""
     if isinstance(driver_adapter, str):
         try:
-            driver_adapter = _ADAPTERS[driver_adapter.lower()]
+            adapter = _ADAPTERS[driver_adapter.lower()]
         except KeyError:
             raise ValueError(f"Encountered unregistered driver_adapter: {driver_adapter}")
     # try some guessing if it is a PEP249 module
     elif hasattr(driver_adapter, "paramstyle"):
         style = getattr(driver_adapter, "paramstyle")  # avoid mypy warning?
         if style == "pyformat":
-            driver_adapter = PyFormatAdapter  # type: ignore
+            adapter = PyFormatAdapter  # type: ignore
         elif style == "named":
-            driver_adapter = GenericAdapter  # type: ignore
+            adapter = GenericAdapter  # type: ignore
         else:
             raise ValueError(f"Unexpected driver_adapter: {driver_adapter} ({style})")
     # so, can we just call it?
-    if not callable(driver_adapter):
+    elif callable(driver_adapter):
+        adapter = driver_adapter
+    else:
         raise ValueError(f"Unexpected driver_adapter: {driver_adapter}")
 
-    return driver_adapter()
+    return adapter(*args, **kwargs)
 
 
 def from_str(
@@ -70,7 +73,8 @@ def from_str(
     record_classes: Optional[Dict] = None,
     kwargs_only: bool = False,
     attribute: Optional[str] = "__",
-    *,
+    args: List[Any] = [],
+    kwargs: Dict[str, Any] = {},
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
 ):
@@ -85,6 +89,8 @@ def from_str(
     - **kwargs_only** - Whether to only use named parameters on query execution.
     - **attribute** - ``.`` attribute access substitution, defaults to ``"__"``, *None* disables
       the feature.
+    - **args** - adapter creation args (list), forwarded to cursor creation by default.
+    - **kwargs** - adapter creation args (dict), forwarded to cursor creation by default.
     - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
       declarations to the python classes which aiosql should use when marshaling SQL results.
     - **loader_cls** - *(optional)* Custom constructor for QueryLoader extensions.
@@ -101,7 +107,7 @@ def from_str(
       import sqlite3
       import aiosql
 
-      sql_text = \"""
+      sql_text = \"\"\"
       -- name: get-all-greetings
       -- Get all the greetings in the database
       select * from greetings;
@@ -110,14 +116,14 @@ def from_str(
       -- Get all the users from the database,
       -- and return it as a dict
       select * from users where username = :username;
-      \"""
+      \"\"\"
 
       queries = aiosql.from_str(sql_text, "sqlite3")
       queries.get_all_greetings(conn)
       queries.get_user_by_username(conn, username="willvaughn")
 
     """
-    adapter = _make_driver_adapter(driver_adapter)
+    adapter = _make_driver_adapter(driver_adapter, *args, **kwargs)
     query_loader = loader_cls(adapter, record_classes, attribute=attribute)
     query_data = query_loader.load_query_data_from_sql(sql, [])
     return queries_cls(adapter, kwargs_only=kwargs_only).load_from_list(query_data)
@@ -129,7 +135,8 @@ def from_path(
     record_classes: Optional[Dict] = None,
     kwargs_only: bool = False,
     attribute: Optional[str] = "__",
-    *,
+    args: List[Any] = [],
+    kwargs: Dict[str, Any] = {},
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
     ext: Tuple[str] = (".sql",),
@@ -146,6 +153,8 @@ def from_path(
     - **kwargs_only** - Whether to only use named parameters on query execution.
     - **attribute** - ``.`` attribute access substitution, defaults to ``"__""``, *None* disables
       the feature.
+    - **args** - adapter creation args (list), forwarded to cursor creation by default.
+    - **kwargs** - adapter creation args (dict), forwarded to cursor creation by default.
     - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
       declarations to the python classes which aiosql should use when marshaling SQL results.
     - **loader_cls** - *(optional)* Custom constructor for `QueryLoader` extensions.
@@ -167,7 +176,7 @@ def from_path(
     if not path.exists():
         raise SQLLoadException(f"File does not exist: {path}")
 
-    adapter = _make_driver_adapter(driver_adapter)
+    adapter = _make_driver_adapter(driver_adapter, *args, **kwargs)
     query_loader = loader_cls(adapter, record_classes, attribute=attribute)
 
     if path.is_file():
