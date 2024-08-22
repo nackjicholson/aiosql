@@ -14,12 +14,10 @@ from typing import (
     Tuple,
     Union,
 )
+from typing import Protocol
 
 # FIXME None added for MySQL buggy drivers
 ParamType = Union[Dict[str, Any], List[Any], None]
-
-# Python 3.8 (PEP 544)
-from typing import Protocol
 
 
 class SQLOperationType(Enum):
