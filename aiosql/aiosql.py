@@ -59,7 +59,7 @@ def _make_driver_adapter(
         else:
             raise ValueError(f"Unexpected driver_adapter: {driver_adapter} ({style})")
     # so, can we just call it?
-    elif callable(driver_adapter):
+    elif callable(driver_adapter):  # pragma: no cover
         adapter = driver_adapter
     else:
         raise ValueError(f"Unexpected driver_adapter: {driver_adapter}")
