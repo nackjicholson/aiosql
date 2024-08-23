@@ -160,13 +160,13 @@ def test_adapters():
         aiosql.aiosql._make_driver_adapter(NoSuchConnector)
         pytest.fail("must raise an exception")  # pragma: no cover
     except ValueError as e:
-        assert "Unexpected driver_adapter" in str(e)
+        assert "Unexpected driver" in str(e)
 
     try:
         aiosql.aiosql._make_driver_adapter(True)  # type: ignore
         pytest.fail("must raise an exception")  # pragma: no cover
     except ValueError as e:
-        assert "Unexpected driver_adapter" in str(e)
+        assert "Unexpected driver" in str(e)
 
 
 def test_no_such_path():
