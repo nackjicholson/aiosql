@@ -35,7 +35,7 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
 def register_adapter(name: str, adapter: Callable[..., DriverAdapterProtocol]):
     """Register or override an adapter."""
     if name.lower() in _ADAPTERS:
-        log.warning(f"overriding aiosql adapter {name}")
+        log.debug(f"overriding aiosql adapter {name}")
     _ADAPTERS[name.lower()] = adapter
 
 
