@@ -17,7 +17,7 @@ class GenericAdapter(SyncDriverAdapterProtocol):
         self._kwargs = kwargs
 
     def process_sql(self, query_name, op_type, sql):
-        """Preprocess SQL query."""
+        """Pass-through SQL query preprocessing."""
         return sql
 
     def _cursor(self, conn):
@@ -26,7 +26,6 @@ class GenericAdapter(SyncDriverAdapterProtocol):
 
     def select(self, conn, query_name: str, sql: str, parameters, record_class=None):
         """Handle a relation-returning SELECT (no suffix)."""
-        column_names: List[str] = []
         cur = self._cursor(conn)
         try:
             cur.execute(sql, parameters)
@@ -34,6 +33,7 @@ class GenericAdapter(SyncDriverAdapterProtocol):
                 for row in cur:
                     yield row
             else:
+                column_names: List[str] = []
                 first = True
                 for row in cur:
                     if first:  # only get description on the fly, for apsw
@@ -83,8 +83,8 @@ class GenericAdapter(SyncDriverAdapterProtocol):
     def select_cursor(self, conn, query_name, sql, parameters):
         """Return the raw cursor after a SELECT exec."""
         cur = self._cursor(conn)
-        cur.execute(sql, parameters)
         try:
+            cur.execute(sql, parameters)
             yield cur
         finally:
             cur.close()
