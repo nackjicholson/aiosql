@@ -57,7 +57,7 @@ def _make_driver_adapter(
         elif style == "named":
             adapter = GenericAdapter  # type: ignore
         else:
-            raise ValueError(f"Unexpected driver_adapter: {driver_adapter} ({style})")
+            raise ValueError(f"Unexpected driver: {driver_adapter} ({style})")
     # so, can we just call it?
     elif callable(driver_adapter):  # pragma: no cover
         adapter = driver_adapter
@@ -86,11 +86,11 @@ def from_str(
     - **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
       adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your
       own adapter class, you can pass it's constructor.
-    - **kwargs_only** - Whether to only use named parameters on query execution.
-    - **attribute** - ``.`` attribute access substitution, defaults to ``"__"``, *None* disables
+    - **kwargs_only** - *(optional)* whether to only use named parameters on query execution, default is *False*.
+    - **attribute** - *(optional)* ``.`` attribute access substitution, defaults to ``"__"``, *None* disables
       the feature.
-    - **args** - adapter creation args (list), forwarded to cursor creation by default.
-    - **kwargs** - adapter creation args (dict), forwarded to cursor creation by default.
+    - **args** - *(optional)* adapter creation args (list), forwarded to cursor creation by default.
+    - **kwargs** - *(optional)* adapter creation args (dict), forwarded to cursor creation by default.
     - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
       declarations to the python classes which aiosql should use when marshaling SQL results.
     - **loader_cls** - *(optional)* Custom constructor for QueryLoader extensions.
@@ -121,7 +121,6 @@ def from_str(
       queries = aiosql.from_str(sql_text, "sqlite3")
       queries.get_all_greetings(conn)
       queries.get_user_by_username(conn, username="willvaughn")
-
     """
     adapter = _make_driver_adapter(driver_adapter, *args, **kwargs)
     query_loader = loader_cls(adapter, record_classes, attribute=attribute)
@@ -150,11 +149,11 @@ def from_path(
     - **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
       adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your own
       adapter class, you may pass its constructor.
-    - **kwargs_only** - Whether to only use named parameters on query execution.
-    - **attribute** - ``.`` attribute access substitution, defaults to ``"__""``, *None* disables
+    - **kwargs_only** - *(optional)* Whether to only use named parameters on query execution, default is *False*.
+    - **attribute** - *(optional)* ``.`` attribute access substitution, defaults to ``"__""``, *None* disables
       the feature.
-    - **args** - adapter creation args (list), forwarded to cursor creation by default.
-    - **kwargs** - adapter creation args (dict), forwarded to cursor creation by default.
+    - **args** - *(optional)* adapter creation args (list), forwarded to cursor creation by default.
+    - **kwargs** - *(optional)* adapter creation args (dict), forwarded to cursor creation by default.
     - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
       declarations to the python classes which aiosql should use when marshaling SQL results.
     - **loader_cls** - *(optional)* Custom constructor for `QueryLoader` extensions.
