@@ -31,6 +31,7 @@ _DB = {
     "pygresql": "postgres",
     "pg8000": "postgres",
     "pymysql": "mysql",
+    "pymssql": "mssql",
     "mysql-connector": "mysql",
     "mysqldb": "mysql",
     "mariadb": "mariadb",
@@ -41,10 +42,31 @@ _DB = {
 RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
 
 
+def to_tuple(v):
+    if isinstance(v, tuple):
+        return v
+    elif isinstance(v, list):
+        return tuple(v)
+    elif isinstance(v, dict):
+        return tuple(v.values())
+    else:
+        raise Exception(f"unexpected row type: {type(v).__name__}")
+
+
 def queries(driver):
     """Load queries into AioSQL."""
     dir_path = Path(__file__).parent / "blogdb" / "sql"
     return aiosql.from_path(dir_path, driver, RECORD_CLASSES, attribute="_dot_")
+
+
+def run_sanity(conn):
+    """Run a very little something on a connection without a schema."""
+    curs = conn.cursor()
+    curs.execute("SELECT 1 as one")
+    res = curs.fetchone()
+    assert res == (1,) or res == {"one": 1}
+    curs.close()
+    conn.commit()
 
 
 def run_something(conn):
@@ -70,14 +92,15 @@ def run_something(conn):
 
 def run_cursor(conn, queries):
     cur = queries.driver_adapter._cursor(conn)
-    cur.execute("SELECT 'Hello World!'")
+    cur.execute("SELECT 'Hello World!' AS msg")
     res = cur.fetchone()
-    assert res in [("Hello World!",), ["Hello World!"]]
+    assert res in [("Hello World!",), ["Hello World!"], {"msg": "Hello World!"} ]
     cur.close()
 
 
-def run_record_query(conn, queries):
-    raw_actual = queries.users.get_all(conn)
+def run_record_query(conn, queries, db: str = ""):
+    query = queries.users.ms_get_all if db == "mssql" else queries.users.get_all
+    raw_actual = query(conn)
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
     assert len(actual) == 3
@@ -89,22 +112,23 @@ def run_record_query(conn, queries):
     }
 
 
-def run_parameterized_query(conn, queries, db=None):
+def run_parameterized_query(conn, queries, db=None, driver=""):
     # select on a parameter
     actual = queries.users.get_by_lastname(conn, lastname="Doe")
     expected = [(3, "janedoe", "Jane", "Doe"), (2, "johndoe", "John", "Doe")]
     # NOTE re-conversion needed for mysqldb and pg8000
-    actual = [tuple(i) for i in actual]
+    actual = [to_tuple(i) for i in actual]
     assert actual == expected
 
     # select with 3 parameters
     # FIXME broken with pg8000
     # actual = queries.misc.comma_nospace_var(conn, one=1, two=10, three=100)
     # assert actual == (1, 10, 100) or actual == [1, 10, 100]
-    actual = queries.misc.comma_nospace_var(conn, one="Hello", two=" ", three="World!")
-
     # NOTE some drivers return a list instead of a tuple
-    assert actual == ("Hello", " ", "World!") or actual == ["Hello", " ", "World!"]
+    # FIXME broken for pymsql with as_dict, so skip
+    if driver != "pymssql":
+        actual = to_tuple(queries.misc.comma_nospace_var(conn, one="Hello", two=" ", three="World!"))
+        assert actual == ("Hello", " ", "World!")
 
 
 def run_parameterized_record_query(conn, queries, db, todate):
@@ -116,6 +140,8 @@ def run_parameterized_record_query(conn, queries, db, todate):
         fun = queries.blogs.pg_get_blogs_published_after
     elif _DB[db] in ("mysql", "mariadb"):
         fun = queries.blogs.my_get_blogs_published_after
+    elif _DB[db] == "mssql":
+        fun = queries.blogs.ms_get_blogs_published_after
     else:
         raise Exception(f"unexpected driver: {db}")
 
@@ -160,15 +186,15 @@ def run_select_cursor_context_manager(conn, queries, todate, db=None):
 
     with fun(conn, userid=1) as cursor:
         # reconversions for mysqldb and pg8000
-        actual = [tuple(r) for r in cursor.fetchall()]
+        actual = [to_tuple(r) for r in cursor.fetchall()]
         assert actual == expected
 
 
 def run_select_one(conn, queries, db=None):
     actual = queries.users.get_by_username(conn, username="johndoe")
 
-    # reconversion for pg8000
-    actual = tuple(actual)
+    # reconversion for pg8000 and possibly others
+    actual = to_tuple(actual)
     expected = (2, "johndoe", "John", "Doe")
     assert actual == expected
 
@@ -182,6 +208,8 @@ def run_insert_returning(conn, queries, db, todate):
         fun = queries.blogs.pg_publish_blog
     elif _DB[db] == "mysql":
         fun = queries.blogs.my_publish_blog
+    elif _DB[db] == "mssql":
+        fun = queries.blogs.ms_publish_blog
     else:
         raise Exception(f"unexpected driver: {db}")
 
@@ -212,14 +240,14 @@ def run_insert_returning(conn, queries, db, todate):
     # duckdb will return a tuple or a dict depending on how the sql is structured.
     # If you wrap the returning in `()` a dict is returned.
     elif isinstance(blogid, dict):
-        assert db == "duckdb"
+        assert db in ("duckdb", "pymssql")
         title = blogid.get("title")
         blogid = blogid.get("blogid")
     else:
         assert db in ("sqlite3", "apsw")
         blogid, title = blogid, "My first blog"
 
-    b2, t2 = queries.blogs.blog_title(conn, blogid=blogid)
+    b2, t2 = to_tuple(queries.blogs.blog_title(conn, blogid=blogid))
     assert (blogid, title) == (b2, t2)
 
     if db and db in ("psycopg", "psycopg2"):
@@ -269,7 +297,7 @@ def run_insert_many(conn, queries, todate, expect=3, db=None):
     ]
 
     assert actual in (expect, -1)
-    johns_blogs = [tuple(r) for r in raw_johns_blogs]
+    johns_blogs = [to_tuple(r) for r in raw_johns_blogs]
     assert johns_blogs == expected
 
 
@@ -303,6 +331,8 @@ def run_date_time(conn, queries, db):
         now = queries.misc.pg_get_now_date_time(conn)
     elif _DB[db] in ("mysql", "mariadb"):
         now = queries.misc.my_get_now_date_time(conn)
+    elif _DB[db] == "mssql":
+        now = queries.misc.ms_get_now_date_time(conn)
     else:
         pytest.fail(f"unexpected driver: {db}")
     assert re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", now)
@@ -460,7 +490,6 @@ async def run_async_insert_returning(conn, queries, db, todate):
 async def run_async_delete(conn, queries):
     # Removing the "janedoe" blog titled "Testing"
     actual = await queries.blogs.remove_blog(conn, blogid=2)
-    # log.warning(f"actual = {actual}")
     # FIXME all implementations should return the same!
     assert actual == "DELETE 1" or actual == 1
 

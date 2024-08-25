@@ -21,7 +21,7 @@ values (?, ?, ?, ?);
 
 -- name: sqlite-get-modulo$
 -- no-escaped percent modulo operator
-SELECT :numerator % :denominator;
+SELECT :numerator % :denominator AS modulo;
 
 -- name: publish-a-blog<!
 insert into blogs(userid, title, content)

@@ -25,7 +25,7 @@ CACHE	= --no-cache
 docker.aiosql: \
 	.docker-aiosql-postgres \
 	.docker-aiosql-mysql \
-	.docker-aiosql-mariadb
+	.docker-aiosql-db
 
 #
 # Run tests with docker
@@ -36,9 +36,9 @@ docker.run:
 	echo "# starting up…"
 	$(DOCKER) compose up -d
 	# wait and show results, in probable completion order
-	# $(DOCKER) container logs -f $(NAME)-ma-client-1
-	$(DOCKER) container wait $(NAME)-ma-client-1
-	$(DOCKER) container logs $(NAME)-ma-client-1
+	# $(DOCKER) container logs -f $(NAME)-db-client-1
+	$(DOCKER) container wait $(NAME)-db-client-1
+	$(DOCKER) container logs $(NAME)-db-client-1
 	# $(DOCKER) container logs -f $(NAME)-my-client-1
 	$(DOCKER) container wait $(NAME)-my-client-1
 	$(DOCKER) container logs $(NAME)-my-client-1

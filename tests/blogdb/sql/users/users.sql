@@ -3,8 +3,18 @@
 
 -- name: get-all
 -- Get all user records
-select * from users;
+select * from users order by 1;
 
+
+-- name: ms-get-all
+-- MS SQL Server does not do an implicit "AS" on *
+select
+    userid as userid,
+    username as username,
+    firstname as firstname,
+    lastname as lastname
+from users
+order by 1;
 
 -- name: get-by-username^
 select userid,
@@ -14,6 +24,13 @@ select userid,
   from users
  where username = :username;
 
+-- name: ms-get-by-username^
+select userid as userid,
+       username as username,
+       firstname as firstname,
+       lastname as lastname
+  from users
+ where username = :username;
 
 -- name: get-by-lastname
   select userid,
@@ -32,7 +49,7 @@ select * from users order by username asc;
 
 -- name: get-count$
 -- Get number of users
-select count(*) from users;
+select count(*) as cnt from users;
 
 
 -- name: search
