@@ -22,7 +22,11 @@ services:
       - ..:/code
     depends_on:
       - postgres-server
-    command: make VENV=/venv PG_HOST=postgres-server PG_PORT=5432 check.$TEST.postgres.detached
+    environment:
+      - VENV=/venv
+      - PG_HOST=postgres-server
+      - PG_PORT=5432
+    command: make check.$TEST.postgres.detached
   #
   # mysql tests
   #
@@ -39,9 +43,13 @@ services:
       - mysql-server
     volumes:
       - ..:/code
-    command: make VENV=/venv MY_HOST=mysql-server MY_PORT=3306 check.$TEST.mysql.detached
+    environment:
+      - VENV=/venv
+      - MY_HOST=mysql-server
+      - MY_PORT=3306
+    command: make check.$TEST.mysql.detached
   #
-  # mariadb tests
+  # other tests
   #
   mariadb-server:
     image: mariadb
@@ -50,10 +58,26 @@ services:
       - MYSQL_USER=pytest
       - MYSQL_PASSWORD=pytest
       - MYSQL_DATABASE=pytest
-  ma-client:
-    image: python-aiosql-mariadb
+  mssql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_TCP_PORT=1433
+      - MSSQL_SA_PASSWORD=Abc123..
+      - MSSQL_PID=Developer
+  misc-client:
+    image: python-aiosql-db
     depends_on:
       - mariadb-server
+      - mssql-server
     volumes:
       - ..:/code
-    command: make VENV=/venv MA_HOST=mariadb-server MA_PORT=3306 check.$TEST.mariadb.detached check.$TEST.misc
+    environment:
+      - VENV=/venv
+      - MA_HOST=mariadb-server
+      - MA_PORT=3306
+      - MS_HOST=mssql-server
+      - MS_PORT=1433
+      - MS_PASS=Abc123..
+    command: >
+      make check.$TEST.mariadb.detached check.$TEST.mssql.detached check.$TEST.misc

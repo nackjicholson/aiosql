@@ -38,3 +38,16 @@ make docker.coverage
 docker run -it --add-host=host.docker.internal:host-gateway python bash
 docker build -t aiosql-python-mysql -f dockerfile.python-mysql .
 ```
+
+## MS SQL Server
+
+The online documentation is quite poor.
+
+```sh
+docker pull mcr.microsoft.com/mssql/server:2022-latest
+docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Abc123.." -e "MSSQL_PID=Developer" \
+  -p 1433:1433  --name mssqltest --hostname mssqltest -d mcr.microsoft.com/mssql/server:2022-latest
+docker exec -it mssqltest /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "Abc123.."
+# type a command
+# go
+```

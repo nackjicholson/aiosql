@@ -28,8 +28,8 @@ delete from blogs where blogid = :blogid;
 -- name: get-user-blogs
 -- record_class: UserBlogSummary
 -- Get blogs authored by a user.
-  select title,
-         published
+  select title AS title,
+         published AS published
     from blogs
    where userid = :userid
 order by published desc;
@@ -38,7 +38,7 @@ order by published desc;
 -- name: get-latest-user-blog^
 -- record_class: UserBlogSummary
 -- Get latest blog by user.
-select title, published
+select title AS title, published AS published
 from blogs
 where userid = :userid
 order by published desc

@@ -1,6 +1,8 @@
 import shutil
 import importlib
 import logging
+import time
+import contextlib
 
 log = logging.getLogger("pytest-aiosql")
 logging.basicConfig(level=logging.INFO)
@@ -11,6 +13,7 @@ def has_cmd(cmd):
 
 
 def has_pkg(pkg):
+    """Tell whether a module is available."""
     try:
         importlib.import_module(pkg)
         return True
@@ -19,8 +22,8 @@ def has_pkg(pkg):
 
 
 def has_service(host="localhost", port=22, retry=1):
+    """Tell whether a service (host port) is available."""
     import socket
-    import time
 
     while retry > 0:
         retry -= 1
@@ -39,3 +42,20 @@ def has_service(host="localhost", port=22, retry=1):
         finally:
             tcp_ip.close()
     return False
+
+
+@contextlib.contextmanager
+def db_connect(db, tries, *args, **kwargs):
+    """Return an auto-closing database connection, possibly with several attempts."""
+    fails, done = 0, False
+    while not done and fails < tries:
+        try:
+            with db.connect(*args, **kwargs) as conn:
+                done = True
+                yield conn
+        except Exception as e:
+            fails += 1
+            log.warning(f"{db.__name__} connection failed ({fails}): {e}")
+            time.sleep(1.0)
+    if not done:
+        log.error(f"failed to connect after {tries} attempts")

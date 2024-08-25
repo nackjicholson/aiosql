@@ -18,25 +18,6 @@ VENV	= venv
 PIP		= pip
 WAIT	= ./tests/wait.py
 
-# docker settings
-PG_HOST	= localhost
-PG_PORT	= 15432
-PG_USER	= pytest
-PG_PASS	= pytest
-PG_NAME	= pytest
-
-MY_HOST	= localhost
-MY_PORT	= 13306
-MY_USER	= pytest
-MY_PASS	= pytest
-MY_NAME	= pytest
-
-MA_HOST	= localhost
-MA_PORT	= 23306
-MA_USER	= pytest
-MA_PASS	= pytest
-MA_NAME	= pytest
-
 .PHONY: help
 help:
 	@echo "useful targets:"
@@ -102,16 +83,20 @@ $(INSTALL): $(VENV)
 #
 # CLEANUP
 #
-.PHONY: clean clean.venv
 
+.PHONY: clean
 clean:
 	find . -type d -name __pycache__ -print0 | xargs -0 rm -rf
 	$(RM) -r dist build .mypy_cache .pytest_cache htmlcov .docker.* $(MODULE).egg-info docs/build docs/html
 	$(RM) .coverage .coverage.* poetry.lock
 	$(MAKE) -C docker clean
 
+.PHONY: clean.venv
 clean.venv: clean
 	$(RM) -r venv $(MODULE).egg-info
+
+.PHONY: clean.docker
+clean.docker: docker.clean
 
 #
 # VARIOUS CHECKS
@@ -179,6 +164,12 @@ check.pytest.%.local: $(VENV)
 # Postgres
 #
 
+PG_HOST	= localhost
+PG_PORT	= 15432
+PG_USER	= pytest
+PG_PASS	= pytest
+PG_NAME	= pytest
+
 PG_DETACHED	= \
 	--postgresql-detached \
 	--postgresql-host=$(PG_HOST) \
@@ -211,6 +202,12 @@ check.pytest.postgres: $(INSTALL)
 
 .PHONY: check.pytest.mysql.local
 check.pytest.mysql.local: check.pytest.mysql
+
+MY_HOST	= localhost
+MY_PORT	= 13306
+MY_USER	= pytest
+MY_PASS	= pytest
+MY_NAME	= pytest
 
 MY_DETACHED	= \
 	--mysql-detached \
@@ -247,6 +244,12 @@ check.pytest.skip.local:
 .PHONY: check.pytest.mariadb.local
 check.pytest.mariadb.local: check.pytest.mariadb
 
+MA_HOST	= localhost
+MA_PORT	= 23306
+MA_USER	= pytest
+MA_PASS	= pytest
+MA_NAME	= pytest
+
 MA_DETACHED	= \
 	--mysql-detached \
 	--mysql-tries=2 \
@@ -265,6 +268,35 @@ check.pytest.mariadb: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	$(WAIT) $(MA_HOST) $(MA_PORT) 5 || exit 0
 	$(PYTEST) $(PYTOPT) --mysql-driver=mariadb tests/test_mariadb.py
+
+#
+# MS SQL Sever
+#
+
+MS_HOST = localhost
+MS_PORT = 1433
+MS_USER = sa
+MS_PASS = Abc123..
+MS_NAME = pytest
+
+MS_DETACHED	= \
+	--mssql-tries=10 \
+	--mssql-server=$(MS_HOST) \
+	--mssql-port=$(MS_PORT) \
+	--mssql-user=$(MS_USER) \
+	--mssql-password=$(MS_PASS) \
+	--mssql-database=$(MS_NAME)
+
+.PHONY: check.pytest.mssql.detached
+check.pytest.mssql.detached: PYTOPT+=$(MS_DETACHED)
+check.pytest.mssql.detached: check.pytest.mssql
+
+.PHONY: check.pytest.mssql
+check.pytest.mssql: $(INSTALL)
+	[ "$(VENV)" ] && source $(VENV)/bin/activate
+	sleep 5
+	$(WAIT) $(MS_HOST) $(MS_PORT) 10 || exit 0
+	$(PYTEST) $(PYTOPT) tests/test_pymssql.py
 
 #
 # SQLite3, DuckDB and Misc
@@ -334,6 +366,8 @@ check.coverage.combine: $(VENV)
 
 #
 # Docker runs
+# - servers are started with docker
+# - pytests run against them
 #
 
 .PHONY: docker.pytest
@@ -378,6 +412,16 @@ docker.coverage:
 	sleep 5
 	touch $@
 
+.docker.run.mssql:
+	docker run -d --name aiosql-tests-mssql \
+	  -p $(MS_PORT):1433 \
+	  -e ACCEPT_EULA=1 \
+	  -e MSSQL_PID=Developer \
+	  -e MSSQL_SA_PASSWORD=$(MS_PASS) \
+	  mcr.microsoft.com/mssql/server:2022-latest
+	sleep 5
+	touch $@
+
 .PHONY: check.pytest.docker.postgres
 check.pytest.docker.postgres: .docker.run.postgres
 	$(MAKE) check.pytest.postgres.detached
@@ -390,6 +434,10 @@ check.pytest.docker.mysql: .docker.run.mysql
 check.pytest.docker.mariadb: .docker.run.mariadb
 	$(MAKE) check.pytest.mariadb.detached
 
+.PHONY: check.pytest.docker.mssql
+check.pytest.docker.mssql: .docker.run.mssql
+	$(MAKE) check.pytest.mssql.detached
+
 # FIXME?
 .PHONY: check.pytest.docker
 check.pytest.docker:
@@ -397,11 +445,16 @@ check.pytest.docker:
 	$(MAKE) check.pytest.docker.postgres
 	$(MAKE) check.pytest.docker.mysql
 	$(MAKE) check.pytest.docker.mariadb
-	$(MAKE) docker.stop
+	$(MAKE) check.pytest.docker.mssql
+	$(MAKE) docker.clean
 
 .PHONY: docker.stop
 docker.stop:
-	docker stop aiosql-tests-postgres aiosql-tests-mysql aiosql-tests-mariadb || exit 0
+	docker stop aiosql-tests-postgres aiosql-tests-mysql aiosql-tests-mariadb aiosql-tests-mssql || exit 0
+
+.PHONY: docker.clean
+docker.clean: docker.stop
+	docker container rm aiosql-tests-postgres aiosql-tests-mysql aiosql-tests-mariadb aiosql-tests-mssql
 	$(RM) .docker.run.*
 
 #

@@ -1,3 +1,5 @@
+# non portable SQL statements to create, fill and clear the database schema
+
 import csv
 from pathlib import Path
 
@@ -8,24 +10,29 @@ BLOGS_DATA_PATH = BLOGDB_PATH / "data/blogs_data.csv"
 
 
 def create_user_blogs(db):
-    assert db in ("sqlite", "pgsql", "mysql", "duckdb")
+    assert db in ("sqlite", "pgsql", "mysql", "duckdb", "mssql")
     serial = (
-        "SERIAL"
-        if db == "pgsql"
-        else "INTEGER" if db in ("sqlite", "duckdb") else "INTEGER auto_increment"
+        "SERIAL" if db == "pgsql" else
+        "INTEGER" if db in ("sqlite", "duckdb") else
+        "INTEGER auto_increment" if db == "mysql" else
+        "INTEGER IDENTITY(1, 1)" if db == "mssql" else
+        f"unexpected db: {db}"
     )
+    ifnotexists = "IF NOT EXISTS" if db in ("sqlite", "pgsql", "mysql", "duckdb") else ""
+    current_date = "CURRENT_DATE" if db in ("sqlite", "pgsql", "mysql", "duckdb") else "GETDATE()"
+    text = "VARCHAR(MAX)" if db == "mssql" else "TEXT"
     ddl_statements = [
-        f"""CREATE TABLE IF NOT EXISTS users (
+        f"""CREATE TABLE {ifnotexists} users (
                 userid {serial} PRIMARY KEY,
-                username TEXT NOT NULL,
-                firstname TEXT NOT NULL,
-                lastname TEXT NOT NULL);""",
-        f"""CREATE TABLE IF NOT EXISTS blogs (
+                username {text} NOT NULL,
+                firstname {text} NOT NULL,
+                lastname {text} NOT NULL);""",
+        f"""CREATE TABLE {ifnotexists} blogs (
                 blogid {serial} PRIMARY KEY,
                 userid INTEGER NOT NULL,
-                title TEXT NOT NULL,
-                content TEXT NOT NULL,
-                published DATE NOT NULL DEFAULT (CURRENT_DATE),
+                title {text} NOT NULL,
+                content {text} NOT NULL,
+                published DATE NOT NULL DEFAULT ({current_date}),
                 FOREIGN KEY (userid) REFERENCES users(userid));""",
     ]
     if db and db == "duckdb":
@@ -34,16 +41,25 @@ def create_user_blogs(db):
 
 
 def drop_user_blogs(db):
-    return (
-        "DROP TABLE IF EXISTS comments",
-        "DROP TABLE IF EXISTS blogs",
-        "DROP TABLE IF EXISTS users",
-    )
+    if db == "mssql":
+        # yuk, procedural
+        return [
+            "IF OBJECT_ID('comments', 'U') IS NOT NULL\n\tDROP TABLE comments\n",
+            "IF OBJECT_ID('blogs', 'U') IS NOT NULL\n\tDROP TABLE blogs\n",
+            "IF OBJECT_ID('users', 'U') IS NOT NULL\n\tDROP TABLE users\n",
+        ]
+    else:
+        return [
+            "DROP TABLE IF EXISTS comments",
+            "DROP TABLE IF EXISTS blogs",
+            "DROP TABLE IF EXISTS users",
+        ]
 
 
 def fill_user_blogs(cur, db):
     # NOTE postgres filling relies on copy
-    assert db in ("sqlite", "mysql")
+    # NOTE duckdb filling relies on its own functions
+    assert db in ("sqlite", "mysql", "mssql")
     param = "?" if db == "sqlite" else "%s"
     with USERS_DATA_PATH.open() as fp:
         users = list(csv.reader(fp))

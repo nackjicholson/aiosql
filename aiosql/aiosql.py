@@ -26,6 +26,7 @@ _ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
     "psycopg": PyFormatAdapter,
     "psycopg2": PyFormatAdapter,
     "pygresql": PyFormatAdapter,
+    "pymssql": PyFormatAdapter,
     "pymysql": BrokenMySQLAdapter,
     "sqlite3": SQLite3Adapter,
 }
@@ -149,12 +150,12 @@ def from_path(
     - **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
       adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your own
       adapter class, you may pass its constructor.
+    - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
     - **kwargs_only** - *(optional)* Whether to only use named parameters on query execution, default is *False*.
     - **attribute** - *(optional)* ``.`` attribute access substitution, defaults to ``"__""``, *None* disables
       the feature.
     - **args** - *(optional)* adapter creation args (list), forwarded to cursor creation by default.
     - **kwargs** - *(optional)* adapter creation args (dict), forwarded to cursor creation by default.
-    - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
       declarations to the python classes which aiosql should use when marshaling SQL results.
     - **loader_cls** - *(optional)* Custom constructor for `QueryLoader` extensions.
     - **queries_cls** - *(optional)* Custom constructor for `Queries` extensions.
