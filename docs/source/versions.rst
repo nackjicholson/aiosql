@@ -9,7 +9,8 @@ TODO
 - write a small SQLite3-based tutorial?
 - tests with other database and drivers?
 - allow to pass parameters to connection, cursor…
-- rethink classes?
+- rethink record classes? we just want a function?
+- add documentation about docker runs.
 
 12.0 on ?
 ---------
