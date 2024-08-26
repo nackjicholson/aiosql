@@ -19,7 +19,6 @@ pytestmark = [
 ]
 
 
-
 @pytest.fixture
 def queries():
     return t.queries(DRIVER)

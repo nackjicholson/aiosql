@@ -87,16 +87,17 @@ $(INSTALL): $(VENV)
 .PHONY: clean
 clean:
 	find . -type d -name __pycache__ -print0 | xargs -0 rm -rf
-	$(RM) -r dist build .mypy_cache .pytest_cache htmlcov .docker.* $(MODULE).egg-info docs/build docs/html
+	$(RM) -r dist build .mypy_cache .pytest_cache htmlcov $(MODULE).egg-info docs/build docs/html
 	$(RM) .coverage .coverage.* poetry.lock
-	$(MAKE) -C docker clean
 
 .PHONY: clean.venv
 clean.venv: clean
 	$(RM) -r venv $(MODULE).egg-info
 
 .PHONY: clean.docker
-clean.docker: docker.clean
+clean.docker: clean docker.rm
+	$(MAKE) -C docker clean
+	$(RM) .docker.*
 
 #
 # VARIOUS CHECKS
@@ -448,13 +449,15 @@ check.pytest.docker:
 	$(MAKE) check.pytest.docker.mssql
 	$(MAKE) docker.clean
 
+DOCKER.server = aiosql-tests-postgres aiosql-tests-mysql aiosql-tests-mariadb aiosql-tests-mssql
+
 .PHONY: docker.stop
 docker.stop:
-	docker stop aiosql-tests-postgres aiosql-tests-mysql aiosql-tests-mariadb aiosql-tests-mssql || exit 0
+	docker stop $(DOCKER.server) || exit 0
 
-.PHONY: docker.clean
-docker.clean: docker.stop
-	docker container rm aiosql-tests-postgres aiosql-tests-mysql aiosql-tests-mariadb aiosql-tests-mssql
+.PHONY: docker.rm
+docker.rm: docker.stop
+	docker container rm $(DOCKER.server)
 	$(RM) .docker.run.*
 
 #
