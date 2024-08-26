@@ -14,10 +14,12 @@ TODO
 12.0 on ?
 ---------
 
+- add official support for MS SQL Server with `pymssql`.
 - pass misc parameters to cursor in generic adapter.
 - further improve typing to please pyright.
 - minor doc fixes…
 - improve one error message.
+- reduce verbosity when overriding an adapter.
 
 11.1 on 2024-08-20
 ------------------
