@@ -4,7 +4,7 @@ import utils as u
 import time
 from conf_schema import create_user_blogs, fill_user_blogs, drop_user_blogs
 
-def has_db(conn, database):
+def ms_has_db(conn, database):
     with conn.cursor() as cursor:
         cursor.execute("SELECT COUNT(*) AS cnt FROM sys.databases WHERE name = %s", (database,))
         return cursor.fetchone() in ({"cnt": 1}, (1,))
@@ -33,6 +33,7 @@ try:
 
     @pytest.fixture
     def ms_master(ms_dsn):
+        """Return connection parameters suitable for "system admin" access."""
         dsn = dict(ms_dsn)
         dsn["database"] = "master"
         dsn["autocommit"] = True
@@ -48,10 +49,10 @@ try:
 
     @pytest.fixture
     def ms_db(ms_driver, ms_dsn, ms_master):
-        """Build the test database."""
+        """Build the test database and return a connection to that."""
         with ms_driver.connect(**ms_master) as conn:
-            # initial contents
-            if not has_db(conn, "pytest"):
+            # initial contents if needed
+            if not ms_has_db(conn, "pytest"):
                 with conn.cursor() as cur:
                     cur.execute("CREATE DATABASE pytest")
                     cur.execute("USE pytest")
@@ -62,10 +63,10 @@ try:
                     conn.commit()
             else:
                 u.log.warning("skipping pytest schema creation")
-        # connection to use
+        # connection to pytest possibly database created above
         with ms_driver.connect(**ms_dsn, autocommit=False) as conn:
             yield conn
-        # cleanup
+        # cleanup:
         # with ms_driver.connect(**master, autocommit=True) as conn:
         #     with conn.cursor() as cur:
         #         u.log.warning("cleaning up pytest schema")
