@@ -1,4 +1,4 @@
--- name: my-get-blogs-published-after
+-- name: get-blogs-published-after
 -- Get all blogs by all authors published after the given date.
     select b.title,
            u.username,
@@ -9,7 +9,7 @@ inner join users u on b.userid = u.userid
   order by b.published desc;
 
 
--- name: my-bulk-publish*!
+-- name: bulk-publish*!
 -- Insert many blogs at once
 insert into blogs (
   userid,

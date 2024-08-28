@@ -50,7 +50,7 @@ def test_my_db(conn_db):
     t.run_something(conn_db)
 
 
-@pytest.mark.skip("FIXME users table not found?")
+# @pytest.mark.skip("FIXME users table not found?")
 def test_record_query(conn, queries):
     t.run_record_query(conn, queries)
 
@@ -59,9 +59,9 @@ def test_parameterized_query(conn_db, queries):
     t.run_parameterized_query(conn_db, queries)
 
 
-@pytest.mark.skip("FIXME users table not found?")
+# @pytest.mark.skip("FIXME users table not found?")
 def test_parameterized_record_query(conn_db, queries):
-    t.run_parameterized_record_query(conn_db, queries, DRIVER, date)
+    t.run_parameterized_record_query(conn_db, queries, date)
 
 
 def test_record_class_query(conn_db, queries):
@@ -80,12 +80,12 @@ def test_select_one(conn_db, queries):
 
 
 def test_select_value(conn_db, queries):
-    t.run_select_value(conn_db, queries, DRIVER)
+    t.run_select_value(conn_db, queries)
     conn_db.commit()  # or fail on teardown
 
 
 def test_insert_returning(conn_db, queries):  # pragma: no cover
-    t.run_insert_returning(conn_db, queries, DRIVER, date)
+    t.run_insert_returning(conn_db, queries, date)
     conn_db.commit()  # or fail on teardown
 
 
@@ -100,5 +100,5 @@ def test_insert_many(conn_db, queries):
 
 
 def test_date_time(conn_db, queries):
-    t.run_date_time(conn_db, queries, DRIVER)
+    t.run_date_time(conn_db, queries)
     conn_db.commit()

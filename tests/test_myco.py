@@ -64,7 +64,7 @@ def test_parameterized_query(conn_db, queries):
 @pytest.mark.skip("myco cursor handling is unclear")
 def test_parameterized_record_query(my_dsn, queries):  # pragma: no cover
     with db.connect(**my_dsn, cursorclass=db.cursors.DictCursor) as conn:
-        t.run_parameterized_record_query(conn, queries, DRIVER, date)
+        t.run_parameterized_record_query(conn, queries, date)
 
 
 def test_record_class_query(conn_db, queries):
@@ -80,12 +80,12 @@ def test_select_one(conn_db, queries):
 
 
 def test_select_value(conn_db, queries):
-    t.run_select_value(conn_db, queries, DRIVER)
+    t.run_select_value(conn_db, queries)
 
 
 @pytest.mark.skip("mysql does not support RETURNING, although mariadb does")
 def test_insert_returning(conn_db, queries):  # pragma: no cover
-    t.run_insert_returning(conn_db, queries, DRIVER, date)
+    t.run_insert_returning(conn_db, queries, date)
 
 
 def test_delete(conn_db, queries):
@@ -97,4 +97,4 @@ def test_insert_many(conn_db, queries):
 
 
 def test_date_time(conn_db, queries):
-    t.run_date_time(conn_db, queries, DRIVER)
+    t.run_date_time(conn_db, queries)

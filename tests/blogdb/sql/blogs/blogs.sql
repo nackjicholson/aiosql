@@ -44,14 +44,8 @@ where userid = :userid
 order by published desc
 limit 1;
 
-
 -- name: search
 select title from blogs where title = :title and published = :published;
-
-
--- name: square$
-select :val::int * :val::int as squared;
-
 
 -- name: blog_title^
 select blogid, title from blogs where blogid = :blogid;

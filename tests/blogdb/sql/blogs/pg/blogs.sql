@@ -1,4 +1,4 @@
--- name: pg-get-blogs-published-after
+-- name: get-blogs-published-after
 -- Get all blogs by all authors published after the given date.
   select title,
          username,
@@ -9,7 +9,7 @@
 order by published desc;
 
 
--- name: pg-publish-blog<!
+-- name: publish-blog<!
 insert into blogs (
   userid,
   title,
@@ -24,21 +24,13 @@ values (
 )
 returning blogid, title;
 
--- name: pg-no-publish<!
+-- name: no-publish<!
 -- Test an hypothetical empty returning clause
 select blogid, title
 from blogs
 where false;
 
--- name: pg-bulk-publish*!
+-- name: bulk-publish*!
 -- Insert many blogs at once
 insert into blogs (userid, title, content, published)
   values (:userid, :title, :contents, :published);
-
--- name: pg-get-modulo$
--- %-escaped percent modulo operator
-SELECT :numerator %% :denominator;
-
--- name: pg-get-modulo-2$
--- no-escape modulo + cast
-SELECT :numerator::INT8 % :denominator::INT8;

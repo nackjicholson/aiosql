@@ -69,17 +69,17 @@ def test_select_one(conn, queries):
 
 
 def test_select_value(conn, queries):
-    t.run_select_value(conn, queries, DRIVER)
+    t.run_select_value(conn, queries)
 
 
+# FIXME driver specific, not db specific…
+@pytest.mark.skip(reason="no %-escaping with pg80000")
 def test_modulo(conn, queries):
-    actual = queries.blogs.pg_get_modulo_2(conn, numerator=7, denominator=3)
-    expected = 7 % 3
-    assert actual == expected
+    t.run_modulo(conn, queries)
 
 
 def test_insert_returning(conn, queries):
-    t.run_insert_returning(conn, queries, DRIVER, date)
+    t.run_insert_returning(conn, queries, date)
 
 
 def test_delete(conn, queries):
@@ -91,10 +91,14 @@ def test_insert_many(conn, queries):
 
 
 def test_date_time(conn, queries):
-    t.run_date_time(conn, queries, DRIVER)
+    t.run_date_time(conn, queries)
 
 
-# @pytest.mark.skip("not supported")
 def test_execute_script(conn, queries):
-    actual = queries.comments.pg_create_comments_table(conn)
-    assert actual == "DONE"
+    t.run_execute_script(conn, queries)
+
+
+# FIXME
+@pytest.mark.skip("not supported")
+def test_object_attributes(conn, queries):
+    t.run_object_attributes(conn, queries)

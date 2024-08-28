@@ -13,6 +13,11 @@ def pytest_addoption(parser):
     parser.addoption("--postgresql-detached", action="store_true")
     # MySQL and MariaDB
     parser.addoption("--mysql-detached", action="store_true")
+    parser.addoption("--mysql-server", default="localhost")
+    parser.addoption("--mysql-port", default=3306, type=int)
+    parser.addoption("--mysql-user", default="pytest", type=str)
+    parser.addoption("--mysql-passwd", default="pytest", type=str)
+    parser.addoption("--mysql-dbname", default="pytest", type=str)
     parser.addoption("--mysql-tries", default=1, type=int)
     parser.addoption(
         "--mysql-driver",

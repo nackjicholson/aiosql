@@ -213,7 +213,7 @@ MY_NAME	= pytest
 MY_DETACHED	= \
 	--mysql-detached \
 	--mysql-tries=10 \
-	--mysql-host=$(MY_HOST) \
+	--mysql-server=$(MY_HOST) \
 	--mysql-port=$(MY_PORT) \
 	--mysql-user=$(MY_USER) \
 	--mysql-passwd=$(MY_PASS) \
@@ -254,7 +254,7 @@ MA_NAME	= pytest
 MA_DETACHED	= \
 	--mysql-detached \
 	--mysql-tries=2 \
-	--mysql-host=$(MA_HOST) \
+	--mysql-server=$(MA_HOST) \
 	--mysql-port=$(MA_PORT) \
 	--mysql-user=$(MA_USER) \
 	--mysql-passwd=$(MA_PASS) \
