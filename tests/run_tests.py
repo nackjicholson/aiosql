@@ -38,12 +38,46 @@ _DB = {
     "duckdb": "duckdb",
 }
 
+# map databases to SQL subdirectories
+_DIR = {
+    "sqlite3": "li",
+    "duckdb": "du",
+    "postgres": "pg",
+    "mysql": "my",
+    "mariadb": "ma",
+    "mssql": "ms",
+}
 
-RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
+def _insert_blogs(todate):
+    return [
+        {
+            "userid": 2,
+            "title": "Blog Part 1",
+            "contents": "content - 1",
+            "published": todate(2018, 12, 4),
+        },
+        {
+            "userid": 2,
+            "title": "Blog Part 2",
+            "contents": "content - 2",
+            "published": todate(2018, 12, 5),
+        },
+        {
+            "userid": 2,
+            "title": "Blog Part 3",
+            "contents": "content - 3",
+            "published": todate(2018, 12, 6),
+        },
+    ]
 
+def _expect_blogs(d):
+    return list(reversed([(r["title"], r["published"]) for r in d]))
 
 def to_tuple(v):
-    if isinstance(v, tuple):
+    """Make a tuple out of a row."""
+    if isinstance(v, UserBlogSummary):
+        return (v.title, v.published)
+    elif isinstance(v, tuple):
         return v
     elif isinstance(v, list):
         return tuple(v)
@@ -53,10 +87,38 @@ def to_tuple(v):
         raise Exception(f"unexpected row type: {type(v).__name__}")
 
 
-def queries(driver):
-    """Load queries into AioSQL."""
+class Queries:
+    """Queries wrapper to find the best, possibly database-specific function to call."""
+
+    def __init__(self, driver: str, queries):
+        self._driver = driver
+        self._db = _DB[driver]
+        self._dir = _DIR[self._db]
+        self._queries = queries
+        self.driver_adapter = queries.driver_adapter
+
+    def f(self, name: str):
+        """Return the most precise SQL function of provided name."""
+        if "." in name:
+            dname, fname = name.split(".", 1)
+            fullname = f"{dname}.{self._dir}.{fname}"
+        else:
+            fullname = f"{self._dir}.{fname}"
+        for n in [ fullname, name ]:
+            if n in self._queries.available_queries:
+                o = self._queries
+                for a in n.split("."):
+                    o = getattr(o, a)
+                return o
+        raise Exception(f"query function not found: {name}")
+
+
+def queries(driver: str):
+    """Load queries into AioSQL, plus a convenient test wrapper."""
+    RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
     dir_path = Path(__file__).parent / "blogdb" / "sql"
-    return aiosql.from_path(dir_path, driver, RECORD_CLASSES, attribute="_dot_")
+    queries = aiosql.from_path(dir_path, driver, RECORD_CLASSES, attribute="_dot_")
+    return Queries(driver, queries)
 
 
 def run_sanity(conn):
@@ -73,17 +135,16 @@ def run_something(conn):
     """Run something on a connection without a schema."""
 
     def sel12(cur):
-        cur.execute("SELECT 1, 'un' UNION SELECT 2, 'deux' ORDER BY 1")
-        res = cur.fetchall()
-        assert type(res) in (tuple, list), f"unexpected type: {type(res)}"
-        assert res == ((1, "un"), (2, "deux")) or res == [(1, "un"), (2, "deux")]
+        cur.execute("SELECT 1 AS id, 'Calvin' AS data UNION SELECT 2, 'Susie' ORDER BY 1")
+        res = [ to_tuple(r) for r in cur.fetchall() ]
+        assert res == [(1, "Calvin"), (2, "Susie")] or \
+               res == [{"id": 1, "data": "Calvin"}, {"id": 2, "data": "Susie"}]
 
     cur = conn.cursor()
-    has_with = hasattr(cur, "__enter__")
     sel12(cur)
     cur.close()
 
-    if has_with:  # if available
+    if hasattr(cur, "__enter__"):  # WITH
         with conn.cursor() as cur:
             sel12(cur)
 
@@ -98,9 +159,9 @@ def run_cursor(conn, queries):
     cur.close()
 
 
-def run_record_query(conn, queries, db: str = ""):
-    query = queries.users.ms_get_all if db == "mssql" else queries.users.get_all
-    raw_actual = query(conn)
+def run_record_query(conn, queries):
+    get_all = queries.f("users.get_all")
+    raw_actual = get_all(conn)
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
     assert len(actual) == 3
@@ -112,12 +173,12 @@ def run_record_query(conn, queries, db: str = ""):
     }
 
 
-def run_parameterized_query(conn, queries, db=None, driver=""):
+def run_parameterized_query(conn, queries):
     # select on a parameter
-    actual = queries.users.get_by_lastname(conn, lastname="Doe")
+    get_by_lastname = queries.f("users.get_by_lastname")
+    actual = get_by_lastname(conn, lastname="Doe")
+    actual = [to_tuple(r) for r in actual]
     expected = [(3, "janedoe", "Jane", "Doe"), (2, "johndoe", "John", "Doe")]
-    # NOTE re-conversion needed for mysqldb and pg8000
-    actual = [to_tuple(i) for i in actual]
     assert actual == expected
 
     # select with 3 parameters
@@ -126,26 +187,16 @@ def run_parameterized_query(conn, queries, db=None, driver=""):
     # assert actual == (1, 10, 100) or actual == [1, 10, 100]
     # NOTE some drivers return a list instead of a tuple
     # FIXME broken for pymsql with as_dict, so skip
-    if driver != "pymssql":
-        actual = to_tuple(queries.misc.comma_nospace_var(conn, one="Hello", two=" ", three="World!"))
+    if queries._driver != "pymssql":
+        comma_nospace_var = queries.f("misc.comma_nospace_var")
+        actual = to_tuple(comma_nospace_var(conn, one="Hello", two=" ", three="World!"))
         assert actual == ("Hello", " ", "World!")
 
 
-def run_parameterized_record_query(conn, queries, db, todate):
-    if _DB[db] == "sqlite3":
-        fun = queries.blogs.sqlite_get_blogs_published_after
-    elif _DB[db] == "duckdb":
-        fun = queries.blogs.duckdb_get_blogs_published_after
-    elif _DB[db] == "postgres":
-        fun = queries.blogs.pg_get_blogs_published_after
-    elif _DB[db] in ("mysql", "mariadb"):
-        fun = queries.blogs.my_get_blogs_published_after
-    elif _DB[db] == "mssql":
-        fun = queries.blogs.ms_get_blogs_published_after
-    else:
-        raise Exception(f"unexpected driver: {db}")
+def run_parameterized_record_query(conn, queries, todate):
+    get_blogs_published_after = queries.f("blogs.get_blogs_published_after")
 
-    raw_actual = fun(conn, published=todate(2018, 1, 1))
+    raw_actual = get_blogs_published_after(conn, published=todate(2018, 1, 1))
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
 
@@ -161,8 +212,9 @@ def run_parameterized_record_query(conn, queries, db, todate):
     assert actual == expected
 
 
-def run_record_class_query(conn, queries, todate, db=None):
-    raw_actual = queries.blogs.get_user_blogs(conn, userid=1)
+def run_record_class_query(conn, queries, todate):
+    get_user_blogs = queries.f("blogs.get_user_blogs")
+    raw_actual = get_user_blogs(conn, userid=1)
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
 
@@ -173,12 +225,13 @@ def run_record_class_query(conn, queries, todate, db=None):
     assert all(isinstance(row, UserBlogSummary) for row in actual)
     assert actual == expected
 
-    one = queries.blogs.get_latest_user_blog(conn, userid=1)
+    get_latest_user_blog = queries.f("blogs.get_latest_user_blog")
+    one = get_latest_user_blog(conn, userid=1)
     assert one == UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23))
 
 
 def run_select_cursor_context_manager(conn, queries, todate, db=None):
-    fun = queries.blogs.get_user_blogs_cursor
+    fun = queries.f("blogs.get_user_blogs_cursor")
     expected = [
         ("How to make a pie.", todate(2018, 11, 23)),
         ("What I did Today", todate(2017, 7, 28)),
@@ -190,31 +243,20 @@ def run_select_cursor_context_manager(conn, queries, todate, db=None):
         assert actual == expected
 
 
-def run_select_one(conn, queries, db=None):
-    actual = queries.users.get_by_username(conn, username="johndoe")
-
-    # reconversion for pg8000 and possibly others
-    actual = to_tuple(actual)
+def run_select_one(conn, queries):
+    get_by_username = queries.f("users.get_by_username")
+    actual = to_tuple(get_by_username(conn, username="johndoe"))
     expected = (2, "johndoe", "John", "Doe")
     assert actual == expected
 
 
-def run_insert_returning(conn, queries, db, todate):
-    if _DB[db] in ("sqlite3"):
-        fun = queries.blogs.publish_blog
-    elif _DB[db] in ("duckdb"):
-        fun = queries.blogs.duckdb_publish_blog
-    elif _DB[db] in ("postgres", "mariadb"):
-        fun = queries.blogs.pg_publish_blog
-    elif _DB[db] == "mysql":
-        fun = queries.blogs.my_publish_blog
-    elif _DB[db] == "mssql":
-        fun = queries.blogs.ms_publish_blog
-    else:
-        raise Exception(f"unexpected driver: {db}")
+def run_insert_returning(conn, queries, todate):
+    driver = queries._driver
 
-    if db == "duckdb":
-        blogid = fun(
+    publish_blog = queries.f("blogs.publish_blog")
+
+    if driver == "duckdb":
+        blogid = publish_blog(
             conn,
             2,
             "My first blog",
@@ -222,7 +264,7 @@ def run_insert_returning(conn, queries, db, todate):
             todate(2018, 12, 4),
         )
     else:
-        blogid = fun(
+        blogid = publish_blog(
             conn,
             userid=2,
             title="My first blog",
@@ -232,33 +274,38 @@ def run_insert_returning(conn, queries, db, todate):
 
     # sqlite returns a number while pg query returns a tuple
     if isinstance(blogid, tuple):
-        assert db in ("psycopg", "psycopg2", "pygresql", "mariadb", "duckdb")
+        assert driver in ("psycopg", "psycopg2", "pygresql", "mariadb", "duckdb")
         blogid, title = blogid
     elif isinstance(blogid, list):
-        assert db == "pg8000"
+        assert driver == "pg8000"
         blogid, title = blogid
     # duckdb will return a tuple or a dict depending on how the sql is structured.
     # If you wrap the returning in `()` a dict is returned.
     elif isinstance(blogid, dict):
-        assert db in ("duckdb", "pymssql")
+        assert driver in ("duckdb", "pymssql")
         title = blogid.get("title")
         blogid = blogid.get("blogid")
     else:
-        assert db in ("sqlite3", "apsw")
+        assert driver in ("sqlite3", "apsw")
         blogid, title = blogid, "My first blog"
 
-    b2, t2 = to_tuple(queries.blogs.blog_title(conn, blogid=blogid))
+    blog_title = queries.f("blogs.blog_title")
+    b2, t2 = to_tuple(blog_title(conn, blogid=blogid))
     assert (blogid, title) == (b2, t2)
 
-    if db and db in ("psycopg", "psycopg2"):
-        res = queries.blogs.pg_no_publish(conn)
+    if driver in ("psycopg", "psycopg2"):
+        no_publish = queries.f("blogs.no_publish")
+        res = no_publish(conn)
         assert res is None
 
 
-def run_delete(conn, queries, expect=1, db=None):
-    # Removing the "janedoe" blog titled "Testing"
-    actual = queries.blogs.remove_blog(conn, blogid=2)
-    raw_janes_blogs = queries.blogs.get_user_blogs(conn, userid=3)
+def run_delete(conn, queries, expect=1):
+    """Remove the "janedoe" blog entitled 'Testing'."""
+    remove_blog = queries.f("blogs.remove_blog")
+    get_user_blogs = queries.f("blogs.get_user_blogs")
+
+    actual = remove_blog(conn, blogid=2)
+    raw_janes_blogs = get_user_blogs(conn, userid=3)
     assert actual in (expect, -1)
     assert isinstance(raw_janes_blogs, Iterable)
 
@@ -267,74 +314,56 @@ def run_delete(conn, queries, expect=1, db=None):
 
 
 def run_insert_many(conn, queries, todate, expect=3, db=None):
-    blogs = [
-        {
-            "userid": 2,
-            "title": "Blog Part 1",
-            "contents": "content - 1",
-            "published": todate(2018, 12, 4),
-        },
-        {
-            "userid": 2,
-            "title": "Blog Part 2",
-            "contents": "content - 2",
-            "published": todate(2018, 12, 5),
-        },
-        {
-            "userid": 2,
-            "title": "Blog Part 3",
-            "contents": "content - 3",
-            "published": todate(2018, 12, 6),
-        },
-    ]
 
-    actual = queries.blogs.pg_bulk_publish(conn, blogs)
-    raw_johns_blogs = queries.blogs.get_user_blogs(conn, userid=2)
-    expected = [
-        ("Blog Part 3", todate(2018, 12, 6)),
-        ("Blog Part 2", todate(2018, 12, 5)),
-        ("Blog Part 1", todate(2018, 12, 4)),
-    ]
+    blogs_dict = _insert_blogs(todate)
+    if queries._db in ("sqlite3", "duckdb"):
+        blogs = [ to_tuple(r) for r in blogs_dict ]
+    else:
+        blogs = blogs_dict
 
+    bulk_publish = queries.f("blogs.bulk_publish")
+    actual = bulk_publish(conn, blogs)
     assert actual in (expect, -1)
-    johns_blogs = [to_tuple(r) for r in raw_johns_blogs]
+
+    # check
+    get_user_blogs = queries.f("blogs.get_user_blogs")
+    raw_johns_blogs = get_user_blogs(conn, userid=2)
+    johns_blogs = [ to_tuple(r) for r in raw_johns_blogs ]
+
+    expected = _expect_blogs(blogs_dict)
+
     assert johns_blogs == expected
 
 
-def run_select_value(conn, queries, db, expect=3):
+def run_select_value(conn, queries, expect=3):
     # test $
-    actual = queries.users.get_count(conn)
+    get_count = queries.f("users.get_count")
+    actual = get_count(conn)
     assert actual == expect
-    # also with quote escapes
-    if _DB[db] in ("mysql", "mariadb"):
-        # FIXME does not work
-        # actual = queries.misc.my_escape_quotes(conn)
-        actual = "L'art du rire"
-    else:  # pg, duckdb & sqlite
-        actual = queries.misc.escape_quotes(conn)
-    assert actual == "L'art du rire"
+
+    # FIXME does not work for mysql/mariadb
+    if queries._dir != "my":
+        # also with quote escapes
+        escape_quotes = queries.f("misc.escape_quotes")
+        actual = escape_quotes(conn)
+        # actual = "L'art du rire"
+        assert actual == "L'art du rire"
+
     # pg-specific check
-    if _DB[db] == "postgres":
-        actual = queries.misc.pg_escape_quotes(conn)
+    if queries._db == "postgres":
+        simple = queries.f("misc.escape_simple_quotes")
+        actual = simple(conn)
         assert actual == "'doubled' single quotes"
+
     # empty result
-    none = queries.misc.empty(conn)
+    empty = queries.f("misc.empty")
+    none = empty(conn)
     assert none is None
 
 
-def run_date_time(conn, queries, db):
-    if _DB[db] == "sqlite3":
-        now = queries.misc.get_now_date_time(conn)
-    elif _DB[db] == "duckdb":
-        now = queries.misc.duckdb_get_now_date_time(conn)
-    elif _DB[db] == "postgres":
-        now = queries.misc.pg_get_now_date_time(conn)
-    elif _DB[db] in ("mysql", "mariadb"):
-        now = queries.misc.my_get_now_date_time(conn)
-    elif _DB[db] == "mssql":
-        now = queries.misc.ms_get_now_date_time(conn)
-    else:
-        pytest.fail(f"unexpected driver: {db}")
+def run_date_time(conn, queries):
+    get_now_date_time = queries.f("misc.get_now_date_time")
+    now = get_now_date_time(conn)
     assert re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", now)
 
 
@@ -344,10 +373,11 @@ class Person:
     age: int
 
 
-def run_object_attributes(conn, queries, db):
+def run_object_attributes(conn, queries):
     # success
     calvin = Person(name="Calvin", age=6)
-    r = queries.misc.person_attributes(conn, p=calvin)
+    person_attributes = queries.f("misc.person_attributes")
+    r = person_attributes(conn, p=calvin)
     if isinstance(r, (tuple, list)):
         name, age = r
         assert name == calvin.name and age == calvin.age
@@ -355,27 +385,43 @@ def run_object_attributes(conn, queries, db):
         assert r["name"] == calvin.name and r["age"] == calvin.age
     else:
         pytest.fail("unexpected query output")
+
     # failures
     try:
-        queries.misc.person_attributes(conn, q=calvin)
+        person_attributes(conn, q=calvin)
         pytest.fail("should fail on missing parameter p")
     except ValueError as e:
         assert "missing named parameter p" in str(e)
     del calvin.age
     try:
-        queries.misc.person_attributes(conn, p=calvin)
+        person_attributes(conn, p=calvin)
         pytest.fail("should fail on missing attribute age")
     except ValueError as e:
         assert "parameter p is missing attribute age" in str(e)
 
+def run_execute_script(conn, queries):
+    create_table = queries.f("comments.create_table")
+    actual = create_table(conn)
+    assert actual in ("DONE", "CREATE TABLE")
+
+def run_modulo(conn, queries):
+    get_modulo = queries.f("misc.get_modulo")
+    actual = get_modulo(conn, numerator=7, denominator=3)
+    expected = 7 % 3
+    assert actual == expected
 
 #
 # Asynchronous tests
 #
 
+# TODO
+
 
 async def run_async_record_query(conn, queries):
-    actual = [dict(r) for r in await queries.users.get_all(conn)]
+
+    get_all = queries.f("users.get_all")
+
+    actual = [dict(r) for r in await get_all(conn)]
 
     assert len(actual) == 3
     assert actual[0] == {
@@ -387,7 +433,10 @@ async def run_async_record_query(conn, queries):
 
 
 async def run_async_parameterized_query(conn, queries, todate):
-    actual = await queries.blogs.get_user_blogs(conn, userid=1)
+
+    get_user_blogs = queries.f("blogs.get_user_blogs")
+
+    actual = await get_user_blogs(conn, userid=1)
     expected = [
         ("How to make a pie.", todate(2018, 11, 23)),
         ("What I did Today", todate(2017, 7, 28)),
@@ -395,14 +444,10 @@ async def run_async_parameterized_query(conn, queries, todate):
     assert actual == expected
 
 
-async def run_async_parameterized_record_query(conn, queries, db, todate):
-    fun = (
-        queries.blogs.pg_get_blogs_published_after
-        if _DB[db] == "postgres"
-        else queries.blogs.sqlite_get_blogs_published_after if _DB[db] == "sqlite3" else None
-    )
-    records = await fun(conn, published=todate(2018, 1, 1))
+async def run_async_parameterized_record_query(conn, queries, todate):
+    get_blogs_published_after = queries.f("blogs.get_blogs_published_after")
 
+    records = await get_blogs_published_after(conn, published=todate(2018, 1, 1))
     actual = [dict(rec) for rec in records]
 
     expected = [
@@ -418,7 +463,10 @@ async def run_async_parameterized_record_query(conn, queries, db, todate):
 
 
 async def run_async_record_class_query(conn, queries, todate):
-    actual = await queries.blogs.get_user_blogs(conn, userid=1)
+
+    get_user_blogs = queries.f("blogs.get_user_blogs")
+
+    actual = await get_user_blogs(conn, userid=1)
 
     expected = [
         UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23)),
@@ -428,12 +476,14 @@ async def run_async_record_class_query(conn, queries, todate):
     assert all(isinstance(row, UserBlogSummary) for row in actual)
     assert actual == expected
 
-    one = await queries.blogs.get_latest_user_blog(conn, userid=1)
+    get_latest_user_blog = queries.f("blogs.get_latest_user_blog")
+    one = await get_latest_user_blog(conn, userid=1)
     assert one == UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23))
 
 
 async def run_async_select_cursor_context_manager(conn, queries, todate):
-    async with queries.blogs.get_user_blogs_cursor(conn, userid=1) as cursor:
+    get_user_blogs_cursor = queries.f("blogs.get_user_blogs_cursor")
+    async with get_user_blogs_cursor(conn, userid=1) as cursor:
         actual = [tuple(rec) async for rec in cursor]
         expected = [
             ("How to make a pie.", todate(2018, 11, 23)),
@@ -443,23 +493,23 @@ async def run_async_select_cursor_context_manager(conn, queries, todate):
 
 
 async def run_async_select_one(conn, queries):
-    actual = await queries.users.get_by_username(conn, username="johndoe")
+    get_by_username = queries.f("users.get_by_username")
+    actual = await get_by_username(conn, username="johndoe")
     expected = (2, "johndoe", "John", "Doe")
     assert actual == expected
 
 
 async def run_async_select_value(conn, queries):
-    actual = await queries.users.get_count(conn)
+    get_count = queries.f("users.get_count")
+    actual = await get_count(conn)
     expected = 3
     assert actual == expected
 
 
-async def run_async_insert_returning(conn, queries, db, todate):
-    is_pg = _DB[db] == "postgres"
+async def run_async_insert_returning(conn, queries, todate):
+    publish_blog = queries.f("blogs.publish_blog")
 
-    fun = queries.blogs.pg_publish_blog if is_pg else queries.blogs.publish_blog
-
-    blogid = await fun(
+    blogid = await publish_blog(
         conn,
         userid=2,
         title="My first blog",
@@ -467,12 +517,12 @@ async def run_async_insert_returning(conn, queries, db, todate):
         published=todate(2018, 12, 4),
     )
 
-    if is_pg:
+    if queries._db == "postgres":
         blogid, title = blogid
     else:
         blogid, title = blogid, "My first blog"
 
-    if is_pg:
+    if queries._db == "postgres":
         query = "select blogid, title from blogs where blogid = $1;"
         actual = tuple(
             await conn.fetchrow(
@@ -489,50 +539,39 @@ async def run_async_insert_returning(conn, queries, db, todate):
 
 async def run_async_delete(conn, queries):
     # Removing the "janedoe" blog titled "Testing"
-    actual = await queries.blogs.remove_blog(conn, blogid=2)
+    remove_blog = queries.f("blogs.remove_blog")
+    actual = await remove_blog(conn, blogid=2)
     # FIXME all implementations should return the same!
-    assert actual == "DELETE 1" or actual == 1
+    assert actual in (1, "DELETE 1")
 
-    janes_blogs = await queries.blogs.get_user_blogs(conn, userid=3)
+    get_user_blogs = queries.f("blogs.get_user_blogs")
+    janes_blogs = await get_user_blogs(conn, userid=3)
     assert len(janes_blogs) == 0
 
 
 async def run_async_insert_many(conn, queries, todate):
-    blogs = [
-        {
-            "userid": 2,
-            "title": "Blog Part 1",
-            "contents": "content - 1",
-            "published": todate(2018, 12, 4),
-        },
-        {
-            "userid": 2,
-            "title": "Blog Part 2",
-            "contents": "content - 2",
-            "published": todate(2018, 12, 5),
-        },
-        {
-            "userid": 2,
-            "title": "Blog Part 3",
-            "contents": "content - 3",
-            "published": todate(2018, 12, 6),
-        },
-    ]
-    actual = await queries.blogs.pg_bulk_publish(conn, blogs)
+
+    bulk_publish = queries.f("blogs.bulk_publish")
+
+    blogs_dict = _insert_blogs(todate)
+    if queries._db in ("sqlite3", "duckdb"):
+        blogs = [ to_tuple(r) for r in blogs_dict ]
+    else:
+        blogs = blogs_dict
+
+    actual = await bulk_publish(conn, blogs)
     assert actual is None
 
-    johns_blogs = await queries.blogs.get_user_blogs(conn, userid=2)
-    assert johns_blogs == [
-        ("Blog Part 3", todate(2018, 12, 6)),
-        ("Blog Part 2", todate(2018, 12, 5)),
-        ("Blog Part 1", todate(2018, 12, 4)),
-    ]
+    get_user_blogs = queries.f("blogs.get_user_blogs")
+    johns_blogs = await get_user_blogs(conn, userid=2)
+    assert johns_blogs == _expect_blogs(blogs_dict)
 
 
 async def run_async_methods(conn, queries):
-    users, sorted_users = await asyncio.gather(
-        queries.users.get_all(conn), queries.users.get_all_sorted(conn)
-    )
+    get_all = queries.f("users.get_all")
+    get_all_sorted = queries.f("users.get_all_sorted")
+
+    users, sorted_users = await asyncio.gather(get_all(conn), get_all_sorted(conn))
 
     assert [dict(u) for u in users] == [
         {"userid": 1, "username": "bobsmith", "firstname": "Bob", "lastname": "Smith"},
@@ -544,3 +583,8 @@ async def run_async_methods(conn, queries):
         {"userid": 3, "username": "janedoe", "firstname": "Jane", "lastname": "Doe"},
         {"userid": 2, "username": "johndoe", "firstname": "John", "lastname": "Doe"},
     ]
+
+async def run_async_execute_script(conn, queries):
+    create_table = queries.f("comments.create_table")
+    actual = await create_table(conn)
+    assert actual in ("DONE", "CREATE TABLE")

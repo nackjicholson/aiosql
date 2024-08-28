@@ -44,13 +44,13 @@ def test_record_query(ms_dsn, ms_db, queries):
 
 
 def test_parameterized_query(conn, queries, ms_db):
-    t.run_parameterized_query(conn, queries, db=DB, driver=DRIVER)
+    t.run_parameterized_query(conn, queries)
 
 
 def test_parameterized_record_query(ms_dsn, queries, ms_db):
     # row_factory=dict_row
     with db.connect(**ms_dsn) as conn:
-        t.run_parameterized_record_query(conn, queries, DRIVER, date)
+        t.run_parameterized_record_query(conn, queries, date)
 
 
 @pytest.mark.skip(reason="currently broken with is_dict")
@@ -67,17 +67,15 @@ def test_select_one(conn, queries, ms_db):
 
 
 def test_select_value(conn, queries):
-    t.run_select_value(conn, queries, DRIVER)
+    t.run_select_value(conn, queries)
 
 
 def test_modulo(conn, queries):
-    actual = queries.blogs.sqlite_get_modulo(conn, numerator=7, denominator=3)
-    expected = 7 % 3
-    assert actual == expected
+    t.run_modulo(conn, queries)
 
 
 def test_insert_returning(conn, queries, ms_db):
-    t.run_insert_returning(conn, queries, DRIVER, date)
+    t.run_insert_returning(conn, queries, date)
 
 
 def test_delete(conn, queries, ms_db):
@@ -90,9 +88,8 @@ def test_insert_many(conn, queries, ms_db):
 
 
 def test_date_time(conn, queries):
-    t.run_date_time(conn, queries, DRIVER)
+    t.run_date_time(conn, queries)
 
 
 def test_execute_script(conn, queries, ms_db):
-    actual = queries.comments.ms_create_comments_table(conn)
-    assert actual == "DONE"
+    t.run_execute_scrip(conn, queries)

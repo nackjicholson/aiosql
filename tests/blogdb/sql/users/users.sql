@@ -5,30 +5,11 @@
 -- Get all user records
 select * from users order by 1;
 
-
--- name: ms-get-all
--- MS SQL Server does not do an implicit "AS" on *
-select
-    userid as userid,
-    username as username,
-    firstname as firstname,
-    lastname as lastname
-from users
-order by 1;
-
 -- name: get-by-username^
 select userid,
        username,
        firstname,
        lastname
-  from users
- where username = :username;
-
--- name: ms-get-by-username^
-select userid as userid,
-       username as username,
-       firstname as firstname,
-       lastname as lastname
   from users
  where username = :username;
 
@@ -40,7 +21,6 @@ select userid as userid,
     from users
    where lastname = :lastname
 order by username asc;
-
 
 -- name: get-all-sorted
 -- Get all user records sorted by username

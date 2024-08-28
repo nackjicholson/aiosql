@@ -19,7 +19,7 @@ DRIVER = "aiosqlite"
 
 @pytest.fixture
 def queries():
-    return t.queries("aiosqlite")
+    return t.queries(DRIVER)
 
 
 def dict_factory(cursor, row):
@@ -51,7 +51,7 @@ async def test_parameterized_query(sqlite3_db_path, queries):
 async def test_parameterized_record_query(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
         conn.row_factory = dict_factory
-        await t.run_async_parameterized_record_query(conn, queries, DRIVER, t.todate)
+        await t.run_async_parameterized_record_query(conn, queries, t.todate)
 
 
 @pytest.mark.asyncio
@@ -81,7 +81,7 @@ async def test_select_value(sqlite3_db_path, queries):
 @pytest.mark.asyncio
 async def test_insert_returning(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
-        await t.run_async_insert_returning(conn, queries, DRIVER, t.todate)
+        await t.run_async_insert_returning(conn, queries, t.todate)
 
 
 @pytest.mark.asyncio
@@ -106,5 +106,4 @@ async def test_async_methods(sqlite3_db_path, queries):
 @pytest.mark.asyncio
 async def test_execute_script(sqlite3_db_path, queries):
     async with aiosqlite.connect(sqlite3_db_path) as conn:
-        actual = await queries.comments.sqlite_create_comments_table(conn)
-        assert actual == "DONE"
+        await t.run_async_execute_script(conn, queries)

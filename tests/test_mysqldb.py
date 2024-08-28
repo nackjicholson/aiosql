@@ -66,7 +66,7 @@ def test_parameterized_query(conn_db, queries):
 @pytest.mark.skip("cannot connect obscure issue")
 def test_parameterized_record_query(my_dsn, queries):  # pragma: no cover
     with db.connect(**my_dsn) as conn:
-        t.run_parameterized_record_query(conn, queries, DRIVER, date)
+        t.run_parameterized_record_query(conn, queries, date)
 
 
 def test_record_class_query(conn_db, queries):
@@ -85,13 +85,13 @@ def test_select_one(conn_db, queries):
 
 
 def test_select_value(conn_db, queries):
-    t.run_select_value(conn_db, queries, DRIVER)
+    t.run_select_value(conn_db, queries)
     conn_db.commit()  # or fail on teardown
 
 
 @pytest.mark.skip("MySQL does not support RETURNING")
 def test_insert_returning(conn_db, queries):  # pragma: no cover
-    t.run_insert_returning(conn_db, queries, DRIVER, date)
+    t.run_insert_returning(conn_db, queries, date)
     conn_db.commit()  # or fail on teardown
 
 
@@ -106,5 +106,5 @@ def test_insert_many(conn_db, queries):
 
 
 def test_date_time(conn_db, queries):
-    t.run_date_time(conn_db, queries, DRIVER)
+    t.run_date_time(conn_db, queries)
     conn_db.commit()

@@ -1,6 +1,7 @@
--- name: sqlite-create-comments-table#
+-- name: create-table#
+create sequence comments_seq;
 create table comments (
-    commentid integer not null primary key,
+    commentid integer primary key,
     blogid integer not null,
     author text not null,
     content text not null,

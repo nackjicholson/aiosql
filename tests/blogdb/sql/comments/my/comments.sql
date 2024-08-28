@@ -1,7 +1,6 @@
--- name: duckdb-create-comments-table#
-create sequence comments_seq;
+-- name: create-table#
 create table comments (
-    commentid integer not null primary key,
+    commentid integer primary key auto_increment,
     blogid integer not null,
     author text not null,
     content text not null,

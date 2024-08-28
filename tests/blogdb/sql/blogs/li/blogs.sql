@@ -1,4 +1,4 @@
--- name: sqlite-get-blogs-published-after
+-- name: get-blogs-published-after
 -- Get all blogs by all authors published after the given date.
     select b.title,
            u.username,
@@ -9,7 +9,7 @@ inner join users u on b.userid = u.userid
   order by b.published desc;
 
 
--- name: sqlite-bulk-publish*!
+-- name: bulk-publish*!
 -- Insert many blogs at once
 insert into blogs (
   userid,
@@ -19,24 +19,20 @@ insert into blogs (
 )
 values (?, ?, ?, ?);
 
--- name: sqlite-get-modulo$
--- no-escaped percent modulo operator
-SELECT :numerator % :denominator AS modulo;
-
 -- name: publish-a-blog<!
 insert into blogs(userid, title, content)
   values (:userid, :title, :content);
 
 -- name: create_schema#
 create table users (
-    userid integer not null primary key,
+    userid integer primary key,
     username text not null,
     firstname integer not null,
     lastname text not null
 );
 
 create table blogs (
-    blogid integer not null primary key,
+    blogid integer primary key,
     userid integer not null,
     title text not null,
     content text not null,

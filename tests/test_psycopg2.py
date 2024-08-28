@@ -48,7 +48,7 @@ def test_parameterized_query(conn, queries):
 
 def test_parameterized_record_query(pg_dsn, queries):
     with db.connect(dsn=pg_dsn, cursor_factory=DictCursor) as conn:
-        t.run_parameterized_record_query(conn, queries, DRIVER, date)
+        t.run_parameterized_record_query(conn, queries, date)
 
 
 def test_record_class_query(conn, queries):
@@ -64,17 +64,15 @@ def test_select_one(conn, queries):
 
 
 def test_select_value(conn, queries):
-    t.run_select_value(conn, queries, DRIVER)
+    t.run_select_value(conn, queries)
 
 
 def test_modulo(conn, queries):
-    actual = queries.blogs.pg_get_modulo(conn, numerator=7, denominator=3)
-    expected = 7 % 3
-    assert actual == expected
+    t.run_modulo(conn, queries)
 
 
 def test_insert_returning(conn, queries):
-    t.run_insert_returning(conn, queries, DRIVER, date)
+    t.run_insert_returning(conn, queries, date)
 
 
 def test_delete(conn, queries):
@@ -86,13 +84,12 @@ def test_insert_many(conn, queries):
 
 
 def test_date_time(conn, queries):
-    t.run_date_time(conn, queries, DRIVER)
+    t.run_date_time(conn, queries)
 
 
 def test_execute_script(conn, queries):
-    actual = queries.comments.pg_create_comments_table(conn)
-    assert actual == "CREATE TABLE"
+    t.run_execute_script(conn, queries)
 
 
 def test_object_attributes(conn, queries):
-    t.run_object_attributes(conn, queries, DRIVER)
+    t.run_object_attributes(conn, queries)
