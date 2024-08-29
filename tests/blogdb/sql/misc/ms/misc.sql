@@ -1,4 +1,4 @@
--- name: ms_get_now_date_time$
+-- name: get_now_date_time$
 SELECT CONVERT(VARCHAR, CURRENT_TIMESTAMP, 120) AS now;
 
 -- name: empty$

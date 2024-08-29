@@ -24,4 +24,3 @@ SELECT :numerator % :denominator AS modulo;
 
 -- name: square$
 select :val::int * :val::int as squared;
-
