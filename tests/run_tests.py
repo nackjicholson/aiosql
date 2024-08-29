@@ -316,7 +316,7 @@ def run_delete(conn, queries, expect=1):
 def run_insert_many(conn, queries, todate, expect=3, db=None):
 
     blogs_dict = _insert_blogs(todate)
-    if queries._db in ("sqlite3", "duckdb"):
+    if queries._db in ("sqlite3", "duckdb", "mysql", "mariadb"):
         blogs = [ to_tuple(r) for r in blogs_dict ]
     else:
         blogs = blogs_dict
