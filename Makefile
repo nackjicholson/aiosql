@@ -213,7 +213,7 @@ MY_NAME	= pytest
 MY_DETACHED	= \
 	--mysql-detached \
 	--mysql-tries=10 \
-	--mysql-server=$(MY_HOST) \
+	--mysql-host=$(MY_HOST) \
 	--mysql-port=$(MY_PORT) \
 	--mysql-user=$(MY_USER) \
 	--mysql-passwd=$(MY_PASS) \
@@ -254,7 +254,7 @@ MA_NAME	= pytest
 MA_DETACHED	= \
 	--mysql-detached \
 	--mysql-tries=2 \
-	--mysql-server=$(MA_HOST) \
+	--mysql-host=$(MA_HOST) \
 	--mysql-port=$(MA_PORT) \
 	--mysql-user=$(MA_USER) \
 	--mysql-passwd=$(MA_PASS) \
@@ -339,6 +339,9 @@ check.coverage.mariadb.detached: check.pytest.mariadb.detached
 
 .PHONY: check.coverage.mariadb.local
 check.coverage.mariadb.local: check.pytest.mariadb.local
+
+.PHONY: check.coverage.mssql.detached
+check.coverage.mssql.detached: check.pytest.mssql.detached
 
 .PHONY: check.coverage.skip.local
 check.coverage.skip.local:
