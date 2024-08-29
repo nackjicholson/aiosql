@@ -70,7 +70,7 @@ class GenericAdapter(SyncDriverAdapterProtocol):
             if result:
                 if isinstance(result, (list, tuple)):
                     return result[0]
-                elif isinstance(result, dict):
+                elif isinstance(result, dict):  # pragma: no cover
                     return next(iter(result.values()))
                 else:  # pragma: no cover
                     raise Exception(f"unexpected value type: {type(result)}")

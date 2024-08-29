@@ -1,3 +1,4 @@
+SHELL   = /bin/bash
 .ONESHELL:
 
 DOCKER	= docker
@@ -13,7 +14,8 @@ clean:
 # NOTE it really depends on the base image version and
 # when it is run to know which are the latest packages
 # --no-cache? docker build prune?
-CACHE	= --no-cache
+CACHE   =
+# CACHE	= --no-cache
 
 .docker-aiosql-%: dockerfile.python-%
 	tag=$@
