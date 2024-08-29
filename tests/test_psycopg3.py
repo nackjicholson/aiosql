@@ -18,80 +18,48 @@ pytestmark = [
 
 DRIVER = "psycopg"
 
-
 @pytest.fixture
 def queries():
     return t.queries(DRIVER)
-
 
 @pytest.fixture
 def conn(pg_conn):
     return pg_conn
 
+from run_tests import (
+    run_sanity as test_sanity,
+    run_cursor as test_cursor,
+    run_parameterized_query as test_parameterized_query,
+    run_select_one as test_select_one,
+    run_select_value as test_select_value,
+    run_modulo as test_modulo,
+    run_delete as test_delete,
+    run_date_time as test_date_time,
+    run_execute_script as test_execute_script,
+    run_object_attributes as test_object_attributes,
+)
 
 def test_version():
     assert db.__version__.startswith("3.")
 
-
-def test_cursor(conn, queries):
-    t.run_cursor(conn, queries)
-
-
 def test_record_query(pg_params, queries):
     with db.connect(**pg_params, row_factory=dict_row) as conn:
         t.run_record_query(conn, queries)
-        # test select_value with dict_row
+        # test select_value with dict_row in passing
         t.run_select_value(conn, queries)
-
-
-def test_parameterized_query(conn, queries):
-    t.run_parameterized_query(conn, queries)
-
 
 def test_parameterized_record_query(pg_params, queries):
     with db.connect(**pg_params, row_factory=dict_row) as conn:
         t.run_parameterized_record_query(conn, queries, date)
 
-
 def test_record_class_query(conn, queries):
     t.run_record_class_query(conn, queries, date)
-
 
 def test_select_cursor_context_manager(conn, queries):
     t.run_select_cursor_context_manager(conn, queries, date)
 
-
-def test_select_one(conn, queries):
-    t.run_select_one(conn, queries)
-
-
-def test_select_value(conn, queries):
-    t.run_select_value(conn, queries)
-
-
-def test_modulo(conn, queries):
-    t.run_modulo(conn, queries)
-
-
 def test_insert_returning(conn, queries):
     t.run_insert_returning(conn, queries, date)
 
-
-def test_delete(conn, queries):
-    t.run_delete(conn, queries)
-
-
 def test_insert_many(conn, queries):
     t.run_insert_many(conn, queries, date)
-
-
-def test_date_time(conn, queries):
-    t.run_date_time(conn, queries)
-
-
-def test_execute_script(conn, queries):
-    t.run_execute_script(conn, queries)
-
-
-def test_object_attributes(conn, queries):
-    t.run_object_attributes(conn, queries)
