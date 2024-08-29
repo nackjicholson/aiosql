@@ -271,7 +271,7 @@ check.pytest.mariadb: $(INSTALL)
 	$(PYTEST) $(PYTOPT) --mysql-driver=mariadb tests/test_mariadb.py
 
 #
-# MS SQL Sever
+# MS SQL Server
 #
 
 MS_HOST = localhost
