@@ -23,10 +23,9 @@ services:
     depends_on:
       - postgres-server
     environment:
-      - VENV=/venv
       - PG_HOST=postgres-server
       - PG_PORT=5432
-    command: make check.$TEST.postgres.detached
+    command: make VENV=/venv check.$TEST.postgres.detached
   #
   # mysql tests
   #
@@ -44,10 +43,9 @@ services:
     volumes:
       - ..:/code
     environment:
-      - VENV=/venv
       - MY_HOST=mysql-server
       - MY_PORT=3306
-    command: make check.$TEST.mysql.detached
+    command: make VENV=/venv check.$TEST.mysql.detached
   #
   # other tests
   #
