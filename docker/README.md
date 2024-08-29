@@ -41,7 +41,8 @@ docker build -t aiosql-python-mysql -f dockerfile.python-mysql .
 
 ## MS SQL Server
 
-The online documentation is quite poor.
+See [ubuntu image](https://hub.docker.com/r/microsoft/mssql-server) and its associated
+[documentation](https://learn.microsoft.com/en-us/sql/linux/sql-server-linux-configure-environment-variables)
 
 ```sh
 docker pull mcr.microsoft.com/mssql/server:2022-latest
