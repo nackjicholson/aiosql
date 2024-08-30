@@ -25,6 +25,11 @@ def conn(my_db):
     return my_db
 
 @pytest.fixture
+def dconn(my_dsn):
+    with db.connect(**my_dsn, cursorclass=db.cursors.DictCursor) as conn:
+        yield conn
+
+@pytest.fixture
 def date():
     return datetime.date
 
@@ -39,7 +44,7 @@ from run_tests import (
     run_sanity as test_sanity,
 	run_something as test_something,
 	run_cursor as test_cursor,
-	# run_record_query as test_record_query,
+	run_record_query as test_record_query,
 	run_parameterized_query as test_parameterized_query,
     # FIXME pymysql issue when mogrifying because of date stuff %Y
 	run_parameterized_record_query as test_parameterized_record_query,
@@ -53,9 +58,5 @@ from run_tests import (
 	run_date_time as test_date_time,
 	run_object_attributes as test_object_attributes,
 	run_execute_script as test_execute_script,
-	run_modulo as test_modulo,
+	# run_modulo as test_modulo,
 )
-
-def test_record_query(my_dsn, queries):
-    with db.connect(**my_dsn, cursorclass=db.cursors.DictCursor) as conn:
-        t.run_record_query(conn, queries)
