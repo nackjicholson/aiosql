@@ -21,7 +21,7 @@ TODO
 - minor doc fixes…
 - improve one error message.
 - reduce verbosity when overriding an adapter.
-- refactor tests
+- refactor tests, reducing locs significantly.
 
 11.1 on 2024-08-20
 ------------------

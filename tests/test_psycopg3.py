@@ -1,5 +1,4 @@
-from datetime import date
-
+import datetime
 import aiosql
 import pytest
 import run_tests as t
@@ -26,9 +25,21 @@ def queries():
 def conn(pg_conn):
     return pg_conn
 
+@pytest.fixture
+def dconn(pg_params):
+    with db.connect(**pg_params, row_factory=dict_row) as conn:
+        yield conn
+
+@pytest.fixture
+def date():
+    return datetime.date
+
 from run_tests import (
     run_sanity as test_sanity,
+    run_something as test_something,
     run_cursor as test_cursor,
+    run_record_query as test_record_query,
+    run_parameterized_record_query as test_parameterized_record_query,
     run_parameterized_query as test_parameterized_query,
     run_select_one as test_select_one,
     run_select_value as test_select_value,
@@ -37,29 +48,14 @@ from run_tests import (
     run_date_time as test_date_time,
     run_execute_script as test_execute_script,
     run_object_attributes as test_object_attributes,
+    run_record_class_query as test_record_class_query,
+    run_select_cursor_context_manager as test_select_cursor_context_manager,
+    run_insert_returning as test_insert_returning,
+    run_insert_many as test_insert_many,
 )
 
 def test_version():
     assert db.__version__.startswith("3.")
 
-def test_record_query(pg_params, queries):
-    with db.connect(**pg_params, row_factory=dict_row) as conn:
-        t.run_record_query(conn, queries)
-        # test select_value with dict_row in passing
-        t.run_select_value(conn, queries)
-
-def test_parameterized_record_query(pg_params, queries):
-    with db.connect(**pg_params, row_factory=dict_row) as conn:
-        t.run_parameterized_record_query(conn, queries, date)
-
-def test_record_class_query(conn, queries):
-    t.run_record_class_query(conn, queries, date)
-
-def test_select_cursor_context_manager(conn, queries):
-    t.run_select_cursor_context_manager(conn, queries, date)
-
-def test_insert_returning(conn, queries):
-    t.run_insert_returning(conn, queries, date)
-
-def test_insert_many(conn, queries):
-    t.run_insert_many(conn, queries, date)
+def test_select_value_dict(dconn, queries):
+    t.run_select_value(dconn, queries)
