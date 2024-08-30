@@ -25,7 +25,7 @@ class BrokenMySQLAdapter(PyFormatAdapter):
         return super().insert_update_delete(conn, query_name, sql, parameters or None)
 
     # only called for mariadb, as mysql does not implement RETURNING
-    def insert_returning(self, conn, query_name, sql, parameters: ParamType):  # pragma: no cover
+    def insert_returning(self, conn, query_name, sql, parameters: ParamType):
         return super().insert_returning(conn, query_name, sql, parameters or None)
 
     # left out with parameters: insert_update_delete_many, select_cursor

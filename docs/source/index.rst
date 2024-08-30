@@ -72,7 +72,28 @@ Badges
 .. image:: https://img.shields.io/badge/coverage-100%25-success
    :alt: Code Coverage
    :target: https://github.com/nackjicholson/aiosql/actions/
-.. image:: https://img.shields.io/badge/tests-189%20✓-success
+..
+   NOTE all tests
+   # MIST
+   loading: 15
+   patterns: 5
+   # SYNC
+   sqlite3: 17
+   apsw: 16
+   duckdb: 14
+   mariadb: 18
+   pymysql: 18
+   mysqldb: 16
+   myco: 16
+   pymssql: 17
+   pg8000: 12
+   psycopg2: 17
+   psycopg3: 19
+   pygresql: 15
+   # ASYNC
+   aiosql: 12
+   asyncpg: 15
+.. image:: https://img.shields.io/badge/tests-242%20✓-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 .. image:: https://img.shields.io/github/issues/nackjicholson/aiosql?style=flat

@@ -1,5 +1,4 @@
-from datetime import date
-
+import datetime
 import aiosql
 import pytest
 import run_tests as t
@@ -18,78 +17,40 @@ pytestmark = [
     pytest.mark.skipif(not u.has_pkg(DRIVER), reason=f"no {DRIVER}"),
 ]
 
-
 @pytest.fixture
 def queries():
     return t.queries(DRIVER)
 
+@pytest.fixture
+def conn(ms_db):
+    yield ms_db
 
 @pytest.fixture
-def conn(ms_conn):
-    yield ms_conn
+def date():
+    return datetime.date
 
-
-def test_sanity(ms_master):
+def test_sanity_master(ms_master):
     with db.connect(**ms_master) as conn:
         t.run_sanity(conn)
 
-
-def test_cursor(ms_db, conn, queries):
-    t.run_cursor(conn, queries)
-
-
-def test_record_query(ms_dsn, ms_db, queries):
-    with db.connect(**ms_dsn) as conn:
-        t.run_record_query(conn, queries, db=DB)
-
-
-def test_parameterized_query(conn, queries, ms_db):
-    t.run_parameterized_query(conn, queries)
-
-
-def test_parameterized_record_query(ms_dsn, queries, ms_db):
-    # row_factory=dict_row
-    with db.connect(**ms_dsn) as conn:
-        t.run_parameterized_record_query(conn, queries, date)
-
-
-@pytest.mark.skip(reason="currently broken with is_dict")
-def test_record_class_query(conn, queries):
-    t.run_record_class_query(conn, queries, date)
-
-
-def test_select_cursor_context_manager(conn, queries, ms_db):
-    t.run_select_cursor_context_manager(conn, queries, date)
-
-
-def test_select_one(conn, queries, ms_db):
-    t.run_select_one(conn, queries)
-
-
-def test_select_value(conn, queries):
-    t.run_select_value(conn, queries)
-
-
-def test_modulo(conn, queries):
-    t.run_modulo(conn, queries)
-
-
-def test_insert_returning(conn, queries, ms_db):
-    t.run_insert_returning(conn, queries, date)
-
-
-def test_delete(conn, queries, ms_db):
-    t.run_delete(conn, queries)
-
-
-@pytest.mark.skip(reason="currently broken")
-def test_insert_many(conn, queries, ms_db):
-    t.run_insert_many(conn, queries, date)
-
-
-def test_date_time(conn, queries):
-    t.run_date_time(conn, queries)
-
-
-def test_execute_script(conn, queries, ms_db):
-    t.run_execute_scrip(conn, queries)
+from run_tests import (
+    run_sanity as test_sanity,
+	run_something as test_something,
+	run_cursor as test_cursor,
+	run_record_query as test_record_query,
+	run_parameterized_query as test_parameterized_query,
+	run_parameterized_record_query as test_parameterized_record_query,
+    # FIXME broken with is_dict
+	# run_record_class_query as test_record_class_query,
+	run_select_cursor_context_manager as test_select_cursor_context_manager,
+	run_select_one as test_select_one,
+	run_insert_returning as test_insert_returning,
+	run_delete as test_delete,
+    # FIXME broken?
+	run_insert_many as test_insert_many,
+	run_select_value as test_select_value,
+	run_date_time as test_date_time,
+	run_object_attributes as test_object_attributes,
+	run_execute_script as test_execute_script,
+	run_modulo as test_modulo,
+)

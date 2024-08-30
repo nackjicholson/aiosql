@@ -1,5 +1,4 @@
-from datetime import date
-
+import datetime
 import aiosql
 import pytest
 import run_tests as t
@@ -17,88 +16,38 @@ pytestmark = [
 
 DRIVER = "mariadb"
 
-
 @pytest.fixture
 def queries():
     return t.queries(DRIVER)
 
-
 @pytest.fixture
-def conn(my_conn):
-    return my_conn
-
-
-@pytest.fixture
-def conn_db(my_db):
+def conn(my_db):
     return my_db
 
-
-def test_cursor(conn, queries):
-    t.run_cursor(conn, queries)
-
+@pytest.fixture
+def date():
+    return datetime.date
 
 def test_my_dsn(my_dsn):
     assert "user" in my_dsn and "host" in my_dsn and "port" in my_dsn
     assert "dbname" not in my_dsn and "database" in my_dsn
 
-
-def test_query(conn):
-    t.run_something(conn)
-
-
-def test_my_db(conn_db):
-    t.run_something(conn_db)
-
-
-# @pytest.mark.skip("FIXME users table not found?")
-def test_record_query(conn, queries):
-    t.run_record_query(conn, queries)
-
-
-def test_parameterized_query(conn_db, queries):
-    t.run_parameterized_query(conn_db, queries)
-
-
-# @pytest.mark.skip("FIXME users table not found?")
-def test_parameterized_record_query(conn_db, queries):
-    t.run_parameterized_record_query(conn_db, queries, date)
-
-
-def test_record_class_query(conn_db, queries):
-    t.run_record_class_query(conn_db, queries, date)
-    conn_db.commit()  # or fail on teardown
-
-
-def test_select_cursor_context_manager(conn_db, queries):
-    t.run_select_cursor_context_manager(conn_db, queries, date)
-    conn_db.commit()  # or fail on teardown
-
-
-def test_select_one(conn_db, queries):
-    t.run_select_one(conn_db, queries)
-    conn_db.commit()  # or fail on teardown
-
-
-def test_select_value(conn_db, queries):
-    t.run_select_value(conn_db, queries)
-    conn_db.commit()  # or fail on teardown
-
-
-def test_insert_returning(conn_db, queries):  # pragma: no cover
-    t.run_insert_returning(conn_db, queries, date)
-    conn_db.commit()  # or fail on teardown
-
-
-def test_delete(conn_db, queries):
-    t.run_delete(conn_db, queries)
-    conn_db.commit()  # or fails on teardown
-
-
-def test_insert_many(conn_db, queries):
-    t.run_insert_many(conn_db, queries, date)
-    conn_db.commit()
-
-
-def test_date_time(conn_db, queries):
-    t.run_date_time(conn_db, queries)
-    conn_db.commit()
+from run_tests import (
+    run_sanity as test_sanity,
+	run_something as test_something,
+	run_cursor as test_cursor,
+	run_record_query as test_record_query,
+	run_parameterized_query as test_parameterized_query,
+	run_parameterized_record_query as test_parameterized_record_query,
+	run_record_class_query as test_record_class_query,
+	run_select_cursor_context_manager as test_select_cursor_context_manager,
+	run_select_one as test_select_one,
+	run_insert_returning as test_insert_returning,
+	run_delete as test_delete,
+	run_insert_many as test_insert_many,
+	run_select_value as test_select_value,
+	run_date_time as test_date_time,
+	run_object_attributes as test_object_attributes,
+	run_execute_script as test_execute_script,
+	run_modulo as test_modulo,
+)

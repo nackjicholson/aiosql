@@ -9,16 +9,13 @@ import pytest
 import aiosql
 from utils import log
 
-
 # for sqlite3
 def todate(year, month, day):
     return f"{year:04}-{month:02}-{day:02}"
 
-
 class UserBlogSummary(NamedTuple):
     title: str
     published: date
-
 
 # map drivers to databases
 _DB = {
@@ -86,7 +83,6 @@ def to_tuple(v):
     else:
         raise Exception(f"unexpected row type: {type(v).__name__}")
 
-
 class Queries:
     """Queries wrapper to find the best, possibly database-specific function to call."""
 
@@ -112,7 +108,6 @@ class Queries:
                 return o
         raise Exception(f"query function not found: {name}")
 
-
 def queries(driver: str):
     """Load queries into AioSQL, plus a convenient test wrapper."""
     RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
@@ -120,16 +115,21 @@ def queries(driver: str):
     queries = aiosql.from_path(dir_path, driver, RECORD_CLASSES, attribute="_dot_")
     return Queries(driver, queries)
 
+# actual tests
+#
+# conn: a connection to the database
+# dconn: a connection to the database which returns dicts
+# queries: loaded test queries
+# date: date conversion
 
 def run_sanity(conn):
     """Run a very little something on a connection without a schema."""
     curs = conn.cursor()
     curs.execute("SELECT 1 as one")
     res = curs.fetchone()
-    assert res == (1,) or res == {"one": 1}
+    assert res == (1,) or res == [1] or res == {"one": 1}
     curs.close()
     conn.commit()
-
 
 def run_something(conn):
     """Run something on a connection without a schema."""
@@ -150,18 +150,17 @@ def run_something(conn):
 
     conn.commit()
 
-
 def run_cursor(conn, queries):
     cur = queries.driver_adapter._cursor(conn)
     cur.execute("SELECT 'Hello World!' AS msg")
     res = cur.fetchone()
     assert res in [("Hello World!",), ["Hello World!"], {"msg": "Hello World!"} ]
     cur.close()
+    conn.commit()
 
-
-def run_record_query(conn, queries):
+def run_record_query(dconn, queries):
     get_all = queries.f("users.get_all")
-    raw_actual = get_all(conn)
+    raw_actual = get_all(dconn)
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
     assert len(actual) == 3
@@ -171,7 +170,6 @@ def run_record_query(conn, queries):
         "firstname": "Bob",
         "lastname": "Smith",
     }
-
 
 def run_parameterized_query(conn, queries):
     # select on a parameter
@@ -192,11 +190,12 @@ def run_parameterized_query(conn, queries):
         actual = to_tuple(comma_nospace_var(conn, one="Hello", two=" ", three="World!"))
         assert actual == ("Hello", " ", "World!")
 
+    conn.commit()
 
-def run_parameterized_record_query(conn, queries, todate):
+def run_parameterized_record_query(dconn, queries, date):
     get_blogs_published_after = queries.f("blogs.get_blogs_published_after")
 
-    raw_actual = get_blogs_published_after(conn, published=todate(2018, 1, 1))
+    raw_actual = get_blogs_published_after(dconn, published=date(2018, 1, 1))
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
 
@@ -211,30 +210,33 @@ def run_parameterized_record_query(conn, queries, todate):
 
     assert actual == expected
 
+    dconn.commit()
 
-def run_record_class_query(conn, queries, todate):
+def run_record_class_query(conn, queries, date):
     get_user_blogs = queries.f("blogs.get_user_blogs")
     raw_actual = get_user_blogs(conn, userid=1)
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
 
     expected = [
-        UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23)),
-        UserBlogSummary(title="What I did Today", published=todate(2017, 7, 28)),
+        UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
+        UserBlogSummary(title="What I did Today", published=date(2017, 7, 28)),
     ]
     assert all(isinstance(row, UserBlogSummary) for row in actual)
     assert actual == expected
 
     get_latest_user_blog = queries.f("blogs.get_latest_user_blog")
     one = get_latest_user_blog(conn, userid=1)
-    assert one == UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23))
+    assert one == UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23))
+
+    conn.commit()
 
 
-def run_select_cursor_context_manager(conn, queries, todate, db=None):
+def run_select_cursor_context_manager(conn, queries, date):
     fun = queries.f("blogs.get_user_blogs_cursor")
     expected = [
-        ("How to make a pie.", todate(2018, 11, 23)),
-        ("What I did Today", todate(2017, 7, 28)),
+        ("How to make a pie.", date(2018, 11, 23)),
+        ("What I did Today", date(2017, 7, 28)),
     ]
 
     with fun(conn, userid=1) as cursor:
@@ -250,7 +252,7 @@ def run_select_one(conn, queries):
     assert actual == expected
 
 
-def run_insert_returning(conn, queries, todate):
+def run_insert_returning(conn, queries, date):
     driver = queries._driver
 
     publish_blog = queries.f("blogs.publish_blog")
@@ -261,7 +263,7 @@ def run_insert_returning(conn, queries, todate):
             2,
             "My first blog",
             "Hello, World!",
-            todate(2018, 12, 4),
+            date(2018, 12, 4),
         )
     else:
         blogid = publish_blog(
@@ -269,7 +271,7 @@ def run_insert_returning(conn, queries, todate):
             userid=2,
             title="My first blog",
             contents="Hello, World!",
-            published=todate(2018, 12, 4),
+            published=date(2018, 12, 4),
         )
 
     # sqlite returns a number while pg query returns a tuple
@@ -313,9 +315,9 @@ def run_delete(conn, queries, expect=1):
     assert len(janes_blogs) == 0
 
 
-def run_insert_many(conn, queries, todate, expect=3, db=None):
+def run_insert_many(conn, queries, date, expect=3):
 
-    blogs_dict = _insert_blogs(todate)
+    blogs_dict = _insert_blogs(date)
     if queries._db in ("sqlite3", "duckdb", "mysql", "mariadb"):
         blogs = [ to_tuple(r) for r in blogs_dict ]
     else:
@@ -360,11 +362,14 @@ def run_select_value(conn, queries, expect=3):
     none = empty(conn)
     assert none is None
 
+    conn.commit()
+
 
 def run_date_time(conn, queries):
     get_now_date_time = queries.f("misc.get_now_date_time")
     now = get_now_date_time(conn)
     assert re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", now)
+    conn.commit()
 
 
 @dataclasses.dataclass
@@ -399,16 +404,20 @@ def run_object_attributes(conn, queries):
     except ValueError as e:
         assert "parameter p is missing attribute age" in str(e)
 
+    conn.commit()
+
 def run_execute_script(conn, queries):
     create_table = queries.f("comments.create_table")
     actual = create_table(conn)
     assert actual in ("DONE", "CREATE TABLE")
+    conn.commit()
 
 def run_modulo(conn, queries):
     get_modulo = queries.f("misc.get_modulo")
     actual = get_modulo(conn, numerator=7, denominator=3)
     expected = 7 % 3
     assert actual == expected
+    conn.commit()
 
 #
 # Asynchronous tests
@@ -432,22 +441,22 @@ async def run_async_record_query(conn, queries):
     }
 
 
-async def run_async_parameterized_query(conn, queries, todate):
+async def run_async_parameterized_query(conn, queries, date):
 
     get_user_blogs = queries.f("blogs.get_user_blogs")
 
     actual = await get_user_blogs(conn, userid=1)
     expected = [
-        ("How to make a pie.", todate(2018, 11, 23)),
-        ("What I did Today", todate(2017, 7, 28)),
+        ("How to make a pie.", date(2018, 11, 23)),
+        ("What I did Today", date(2017, 7, 28)),
     ]
     assert actual == expected
 
 
-async def run_async_parameterized_record_query(conn, queries, todate):
+async def run_async_parameterized_record_query(conn, queries, date):
     get_blogs_published_after = queries.f("blogs.get_blogs_published_after")
 
-    records = await get_blogs_published_after(conn, published=todate(2018, 1, 1))
+    records = await get_blogs_published_after(conn, published=date(2018, 1, 1))
     actual = [dict(rec) for rec in records]
 
     expected = [
@@ -462,15 +471,15 @@ async def run_async_parameterized_record_query(conn, queries, todate):
     assert actual == expected
 
 
-async def run_async_record_class_query(conn, queries, todate):
+async def run_async_record_class_query(conn, queries, date):
 
     get_user_blogs = queries.f("blogs.get_user_blogs")
 
     actual = await get_user_blogs(conn, userid=1)
 
     expected = [
-        UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23)),
-        UserBlogSummary(title="What I did Today", published=todate(2017, 7, 28)),
+        UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
+        UserBlogSummary(title="What I did Today", published=date(2017, 7, 28)),
     ]
 
     assert all(isinstance(row, UserBlogSummary) for row in actual)
@@ -478,16 +487,16 @@ async def run_async_record_class_query(conn, queries, todate):
 
     get_latest_user_blog = queries.f("blogs.get_latest_user_blog")
     one = await get_latest_user_blog(conn, userid=1)
-    assert one == UserBlogSummary(title="How to make a pie.", published=todate(2018, 11, 23))
+    assert one == UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23))
 
 
-async def run_async_select_cursor_context_manager(conn, queries, todate):
+async def run_async_select_cursor_context_manager(conn, queries, date):
     get_user_blogs_cursor = queries.f("blogs.get_user_blogs_cursor")
     async with get_user_blogs_cursor(conn, userid=1) as cursor:
         actual = [tuple(rec) async for rec in cursor]
         expected = [
-            ("How to make a pie.", todate(2018, 11, 23)),
-            ("What I did Today", todate(2017, 7, 28)),
+            ("How to make a pie.", date(2018, 11, 23)),
+            ("What I did Today", date(2017, 7, 28)),
         ]
         assert actual == expected
 
@@ -506,7 +515,7 @@ async def run_async_select_value(conn, queries):
     assert actual == expected
 
 
-async def run_async_insert_returning(conn, queries, todate):
+async def run_async_insert_returning(conn, queries, date):
     publish_blog = queries.f("blogs.publish_blog")
 
     blogid = await publish_blog(
@@ -514,7 +523,7 @@ async def run_async_insert_returning(conn, queries, todate):
         userid=2,
         title="My first blog",
         contents="Hello, World!",
-        published=todate(2018, 12, 4),
+        published=date(2018, 12, 4),
     )
 
     if queries._db == "postgres":
@@ -549,11 +558,11 @@ async def run_async_delete(conn, queries):
     assert len(janes_blogs) == 0
 
 
-async def run_async_insert_many(conn, queries, todate):
+async def run_async_insert_many(conn, queries, date):
 
     bulk_publish = queries.f("blogs.bulk_publish")
 
-    blogs_dict = _insert_blogs(todate)
+    blogs_dict = _insert_blogs(date)
     if queries._db in ("sqlite3", "duckdb"):
         blogs = [ to_tuple(r) for r in blogs_dict ]
     else:

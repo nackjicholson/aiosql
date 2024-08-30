@@ -189,7 +189,7 @@ check.pytest.postgres.local: check.pytest.postgres
 .PHONY: check.pytest.postgres
 check.pytest.postgres: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	$(WAIT) $(PG_HOST) $(PG_PORT) 5 || exit 0
+	$(WAIT) $(PG_HOST) $(PG_PORT) 5 || exit 1
 	$(PYTEST) $(PYTOPT) \
 	  tests/test_psycopg2.py \
 	  tests/test_psycopg3.py \
@@ -227,7 +227,7 @@ check.pytest.mysql.detached: check.pytest.mysql
 check.pytest.mysql: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	# FIXME this does not seem to work…
-	$(WAIT) $(MY_HOST) $(MY_PORT) 10 || exit 0
+	$(WAIT) $(MY_HOST) $(MY_PORT) 10 || exit 1
 	set -e
 	# run with all 3 drivers
 	$(PYTEST) $(PYTOPT) --mysql-driver=MySQLdb tests/test_mysqldb.py
@@ -267,7 +267,7 @@ check.pytest.mariadb.detached: check.pytest.mariadb
 .PHONY: check.pytest.mariadb
 check.pytest.mariadb: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	$(WAIT) $(MA_HOST) $(MA_PORT) 5 || exit 0
+	$(WAIT) $(MA_HOST) $(MA_PORT) 5 || exit 1
 	$(PYTEST) $(PYTOPT) --mysql-driver=mariadb tests/test_mariadb.py
 
 #
@@ -296,7 +296,7 @@ check.pytest.mssql.detached: check.pytest.mssql
 check.pytest.mssql: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	sleep 5
-	$(WAIT) $(MS_HOST) $(MS_PORT) 10 || exit 0
+	$(WAIT) $(MS_HOST) $(MS_PORT) 10 || exit 1
 	$(PYTEST) $(PYTOPT) tests/test_pymssql.py
 
 #
