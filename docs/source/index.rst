@@ -83,7 +83,7 @@ Badges
    duckdb: 14
    mariadb: 18
    pymysql: 18
-   mysqldb: 16
+   mysqldb: 15
    myco: 16
    pymssql: 17
    pg8000: 12
