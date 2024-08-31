@@ -369,7 +369,6 @@ def run_select_value(conn, queries, expect=3):
 def run_date_time(conn, queries):
     get_now_date_time = queries.f("misc.get_now_date_time")
     now = get_now_date_time(conn)
-    log.warning(f"now: {now}")
     assert re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$", now)
     conn.commit()
 
