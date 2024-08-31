@@ -231,8 +231,8 @@ check.pytest.mysql: $(INSTALL)
 	set -e
 	# run with all 3 drivers
 	$(PYTEST) $(PYTOPT) --mysql-driver=MySQLdb tests/test_mysqldb.py
-	$(PYTEST) $(PYTOPT) --mysql-driver=pymysql tests/test_pymysql.py
 	$(PYTEST) $(PYTOPT) --mysql-driver=mysql.connector tests/test_myco.py
+	$(PYTEST) $(PYTOPT) --mysql-driver=pymysql tests/test_pymysql.py
 
 .PHONY: check.pytest.skip.local
 check.pytest.skip.local:
