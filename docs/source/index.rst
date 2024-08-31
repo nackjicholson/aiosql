@@ -86,7 +86,7 @@ Badges
    mysqldb: 15
    myco: 16
    pymssql: 17
-   pg8000: 12
+   pg8000: 13
    psycopg2: 17
    psycopg3: 19
    pygresql: 15

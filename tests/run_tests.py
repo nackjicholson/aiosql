@@ -97,10 +97,11 @@ class Queries:
         """Return the most precise SQL function of provided name."""
         if "." in name:
             dname, fname = name.split(".", 1)
-            fullname = f"{dname}.{self._dir}.{fname}"
+            dname = dname + "."
         else:
-            fullname = f"{self._dir}.{fname}"
-        for n in [ fullname, name ]:
+            dname, fname = "", name
+        names = [ f"{dname}{self._dir}.{self._driver}.{fname}", f"{dname}{self._dir}.{fname}", name ]
+        for n in names:
             if n in self._queries.available_queries:
                 o = self._queries
                 for a in n.split("."):
