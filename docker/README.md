@@ -34,9 +34,30 @@ make docker.coverage
 
 ## Miscellaneous Commands
 
+Run a client with access to host:
+
 ```sh
-docker run -it --add-host=host.docker.internal:host-gateway python bash
+docker run -it -v .:/code --add-host=host.docker.internal:host-gateway some-image bash
+```
+
+Build an image:
+
+```sh
 docker build -t aiosql-python-mysql -f dockerfile.python-mysql .
+```
+
+Run docker clients against manually started docker servers:
+
+```sh
+docker run -it -v .:/code --add-host=host.docker.internal:host-gateway \
+  python-aiosql-dbs \
+  make VENV=/venv MA_HOST=host.docker.internal check.pytest.mariadb.detached
+docker run -it -v .:/code --add-host=host.docker.internal:host-gateway \
+  python-aiosql-mysql \
+  make VENV=/venv MY_HOST=host.docker.internal check.pytest.mysql.detached
+docker run -it -v .:/code --add-host=host.docker.internal:host-gateway \
+  python-aiosql-dbs \
+  make VENV=/venv MS_HOST=host.docker.internal check.pytest.mssql.detached
 ```
 
 ## MS SQL Server

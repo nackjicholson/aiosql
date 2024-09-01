@@ -1,3 +1,22 @@
+-- name: create-table-users#
+CREATE TABLE IF NOT EXISTS users(
+  userid INTEGER PRIMARY KEY,
+  username TEXT NOT NULL,
+  firstname TEXT NOT NULL,
+  lastname TEXT NOT NULL
+);
+CREATE SEQUENCE users_seq;
+
+-- name: create-table-blogs#
+CREATE TABLE IF NOT EXISTS blogs(
+  blogid INTEGER PRIMARY KEY,
+  userid INTEGER NOT NULL REFERENCES users,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  published DATE NOT NULL DEFAULT (CURRENT_DATE)
+);
+CREATE SEQUENCE blogs_seq;
+
 -- name: get-blogs-published-after
 -- Get all blogs by all authors published after the given date.
     select b.title,

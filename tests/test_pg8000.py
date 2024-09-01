@@ -21,7 +21,7 @@ def queries():
     return t.queries(DRIVER)
 
 @pytest.fixture
-def conn(pg_params):
+def conn(pg_params, pg_conn):
     dbname = pg_params["dbname"]
     del pg_params["dbname"]
     pg_params["database"] = dbname

@@ -9,7 +9,7 @@ SELECT :one,:two,:three AS comma;
 SELECT 'L''art du rire' AS escaped;
 
 -- name: person-attributes^
-SELECT :p.name AS nom, :p.age AS age;
+SELECT :p.name AS name, :p.age AS age;
 
 -- FIXME this one does not work
 -- name: my-escape-quotes$

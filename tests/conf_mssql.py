@@ -11,14 +11,15 @@ def ms_has_db(conn, database):
 
 try:
 
-    @pytest.fixture
+    # NOTE rhetorical, there is only one ms driver for now
+    @pytest.fixture(scope="module")
     def ms_driver(request):
         """Return driver class."""
         driver = request.config.getoption("mssql_driver") or "pymssql"
         db = importlib.import_module(driver)
         return db
 
-    @pytest.fixture
+    @pytest.fixture(scope="module")
     def ms_dsn(request):
         """Return connection parameters suitable to pymssql driver."""
         yield {
@@ -29,9 +30,10 @@ try:
             "password": request.config.getoption("mssql_password"),
             "database": request.config.getoption("mssql_database") or "pytest",
             "as_dict": True,
+            "autocommit": False,
         }
 
-    @pytest.fixture
+    @pytest.fixture(scope="module")
     def ms_master(ms_dsn):
         """Return connection parameters suitable for "system admin" access."""
         dsn = dict(ms_dsn)
@@ -47,8 +49,8 @@ try:
         with u.db_connect(ms_driver, tries, **ms_dsn) as conn:
             yield conn
 
-    @pytest.fixture
-    def ms_db(ms_driver, ms_dsn, ms_master):
+    @pytest.fixture(scope="module")
+    def ms_db(ms_driver, ms_dsn, ms_master, queries):
         """Build the test database and return a connection to that."""
         with ms_driver.connect(**ms_master) as conn:
             # initial contents if needed
@@ -56,21 +58,20 @@ try:
                 with conn.cursor() as cur:
                     cur.execute("CREATE DATABASE pytest")
                     cur.execute("USE pytest")
-                    for ct in create_user_blogs("mssql"):
-                        cur.execute(ct)
-                    # conn.commit()
-                    fill_user_blogs(cur, "mssql")
                     conn.commit()
+                create_user_blogs(conn, queries)
+                fill_user_blogs(conn, "mssql")
             else:
                 u.log.warning("skipping pytest schema creation")
         # connection to pytest possibly database created above
-        with ms_driver.connect(**ms_dsn, autocommit=False) as conn:
+        with ms_driver.connect(**ms_dsn) as conn:
             yield conn
-        # cleanup:
-        # with ms_driver.connect(**master, autocommit=True) as conn:
-        #     with conn.cursor() as cur:
-        #         u.log.warning("cleaning up pytest schema")
-        #         cur.execute("DROP DATABASE pytest")
+        # cleanup
+        with ms_driver.connect(**ms_master) as conn:
+            with conn.cursor() as cur:
+                # u.log.warning("cleaning up pytest schema")
+                cur.execute("DROP DATABASE pytest")
+            conn.commit()
 
 except ModuleNotFoundError:
     # provide empty fixtures to please pytest "parsing"

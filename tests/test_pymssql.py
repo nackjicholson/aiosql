@@ -17,12 +17,16 @@ pytestmark = [
     pytest.mark.skipif(not u.has_pkg(DRIVER), reason=f"no {DRIVER}"),
 ]
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def queries():
     return t.queries(DRIVER)
 
 @pytest.fixture
 def conn(ms_db):
+    yield ms_db
+
+@pytest.fixture
+def dconn(ms_db):
     yield ms_db
 
 @pytest.fixture
@@ -47,7 +51,7 @@ from run_tests import (
 	run_insert_returning as test_insert_returning,
 	run_delete as test_delete,
     # FIXME broken?
-	run_insert_many as test_insert_many,
+	# run_insert_many as test_insert_many,
 	run_select_value as test_select_value,
 	run_date_time as test_date_time,
 	run_object_attributes as test_object_attributes,

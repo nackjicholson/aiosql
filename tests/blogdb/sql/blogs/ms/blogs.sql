@@ -1,3 +1,32 @@
+-- name: create-table-users#
+CREATE TABLE users(
+  userid INTEGER IDENTITY(1, 1) PRIMARY KEY,
+  username VARCHAR(MAX) NOT NULL,
+  firstname VARCHAR(MAX) NOT NULL,
+  lastname VARCHAR(MAX) NOT NULL
+);
+
+-- name: create-table-blogs#
+CREATE TABLE blogs(
+  blogid INTEGER IDENTITY(1, 1) PRIMARY KEY,
+  userid INTEGER NOT NULL REFERENCES users,
+  title VARCHAR(MAX) NOT NULL,
+  content VARCHAR(MAX) NOT NULL,
+  published DATE NOT NULL DEFAULT (GETDATE())
+);
+
+-- name: drop-table-comments#
+IF OBJECT_ID('comments', 'U') IS NOT NULL
+  DROP TABLE comments;
+
+-- name: drop-table-blogs#
+IF OBJECT_ID('blogs', 'U') IS NOT NULL
+  DROP TABLE blogs;
+
+-- name: drop-table-users#
+IF OBJECT_ID('users', 'U') IS NOT NULL
+  DROP TABLE users;
+
 -- name: get-blogs-published-after
 -- Get all blogs by all authors published after the given date.
   select title,
