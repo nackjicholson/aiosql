@@ -2,6 +2,15 @@
 is expected
 TO BE IGNORED SILENTLY…
 
+-- name: drop-table-users#
+DROP TABLE IF EXISTS users;
+
+-- name: drop-table-blogs#
+DROP TABLE IF EXISTS blogs;
+
+-- name: drop-table-comments#
+DROP TABLE IF EXISTS comments;
+
 -- name: get-all-blogs
 -- Fetch all fields for every blog in the database.
 select * from blogs;
@@ -23,7 +32,6 @@ values (
 -- name: remove-blog!
 -- Remove a blog from the database
 delete from blogs where blogid = :blogid;
-
 
 -- name: get-user-blogs
 -- record_class: UserBlogSummary

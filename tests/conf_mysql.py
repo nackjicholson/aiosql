@@ -42,16 +42,20 @@ try:
         yield dsn
 
     @pytest.fixture
-    def my_conn(request, my_dsn):
-        """Return a connection using the expected driver."""
+    def my_driver(request):
         driver = request.config.getoption("mysql_driver")
-        tries = request.config.getoption("mysql_tries")
         db = importlib.import_module(driver)
+        return db
+
+    @pytest.fixture
+    def my_conn(request, my_dsn, my_driver):
+        """Return a connection using the expected driver."""
+        tries = request.config.getoption("mysql_tries")
         fails = 0
         while tries > 0:
             tries -= 1
             try:
-                with db.connect(**my_dsn) as conn:
+                with my_driver.connect(**my_dsn) as conn:
                     tries = 0
                     yield conn
             except Exception as e:
@@ -60,28 +64,22 @@ try:
                 time.sleep(1.0)
 
     @pytest.fixture
-    def my_db(my_conn):
+    def my_db(my_conn, queries):
         """Build the test database."""
-        # initial contents
-        with my_conn.cursor() as cur:
-            for ct in create_user_blogs("mysql"):
-                cur.execute(ct)
-            my_conn.commit()
-            fill_user_blogs(cur, "mysql")
-            my_conn.commit()
-        # connection to use
+        create_user_blogs(my_conn, queries)
+        fill_user_blogs(my_conn, "mysql")
         yield my_conn
-        # cleanup
-        with my_conn.cursor() as cur:
-            for dt in drop_user_blogs("mysql"):
-                cur.execute(dt)
-            my_conn.commit()
+        drop_user_blogs(my_conn, queries)
 
 except ModuleNotFoundError:
     # provide empty fixtures to please pytest "parsing"
 
     @pytest.fixture
     def my_dsn():
+        raise Exception("undefined fixture")
+
+    @pytest.fixture
+    def my_driver():
         raise Exception("undefined fixture")
 
     @pytest.fixture

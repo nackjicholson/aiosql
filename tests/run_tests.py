@@ -41,7 +41,7 @@ _DIR = {
     "duckdb": "du",
     "postgres": "pg",
     "mysql": "my",
-    "mariadb": "ma",
+    "mariadb": "my",
     "mssql": "ms",
 }
 
@@ -72,6 +72,7 @@ def _expect_blogs(d):
 
 def to_tuple(v):
     """Make a tuple out of a row."""
+    log.debug(f"v = {v}")
     if isinstance(v, UserBlogSummary):
         return (v.title, v.published)
     elif isinstance(v, tuple):
@@ -94,7 +95,7 @@ class Queries:
         self.driver_adapter = queries.driver_adapter
 
     def f(self, name: str):
-        """Return the most precise SQL function of provided name."""
+        """Return the most precise SQL function for provided name."""
         if "." in name:
             dname, fname = name.split(".", 1)
             dname = dname + "."
@@ -116,7 +117,7 @@ def queries(driver: str):
     queries = aiosql.from_path(dir_path, driver, RECORD_CLASSES, attribute="_dot_")
     return Queries(driver, queries)
 
-# actual tests
+# actual tests use these fixtures:
 #
 # conn: a connection to the database
 # dconn: a connection to the database which returns dicts
@@ -319,7 +320,7 @@ def run_delete(conn, queries, expect=1):
 def run_insert_many(conn, queries, date, expect=3):
 
     blogs_dict = _insert_blogs(date)
-    if queries._db in ("sqlite3", "duckdb", "mysql", "mariadb"):
+    if queries._db in ("sqlite3", "duckdb", "mysql", "mariadb", "mssql"):
         blogs = [ to_tuple(r) for r in blogs_dict ]
     else:
         blogs = blogs_dict
@@ -335,6 +336,8 @@ def run_insert_many(conn, queries, date, expect=3):
 
     expected = _expect_blogs(blogs_dict)
 
+    log.warning(f"expected = {expected}")
+    log.warning(f"johns_blogs = {johns_blogs}")
     assert johns_blogs == expected
 
 

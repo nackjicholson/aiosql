@@ -17,7 +17,7 @@ pytestmark = [
 
 DRIVER = "psycopg"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def queries():
     return t.queries(DRIVER)
 

@@ -1,11 +1,10 @@
 import pytest
 from conf_schema import USERS_DATA_PATH, BLOGS_DATA_PATH, create_user_blogs, drop_user_blogs
-
+import run_tests as t
 
 # guess psycopg version from a connection
 def is_psycopg2(conn):
     return hasattr(conn, "get_dsn_parameters")
-
 
 try:
     from pytest_postgresql import factories as pg_factories
@@ -32,11 +31,14 @@ try:
             # which may be psycopg version 2 or 3, depending.
             conn = request.getfixturevalue("postgresql")
 
-        # Loads data from blogdb fixture data
-        with conn.cursor() as cur:
-            for tc in create_user_blogs("pgsql"):
-                cur.execute(tc)
+        # TODO use the tested driver instead?
+        queries = t.queries("psycopg2" if is_psycopg2(conn) else "psycopg")
 
+        # loads data from blogdb fixture data
+        create_user_blogs(conn, queries)
+
+        # TODO improve data loading
+        with conn.cursor() as cur:
             # guess whether we have a psycopg 2 or 3 connection
             with USERS_DATA_PATH.open() as fp:
                 if is_psycopg2(conn):  # pragma: no cover
@@ -61,12 +63,12 @@ try:
                         cope.write(fp.read())
 
         conn.commit()
+
+        # yield the psycopg? connection
         yield conn
+
         # cleanup
-        with conn.cursor() as cur:
-            for q in drop_user_blogs("pgsql"):
-                cur.execute(q)
-        conn.commit()
+        drop_user_blogs(conn, queries)
 
     @pytest.fixture
     def pg_params(request, pg_conn):

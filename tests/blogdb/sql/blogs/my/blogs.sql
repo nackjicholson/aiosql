@@ -1,8 +1,25 @@
+-- name: create-table-users#
+CREATE TABLE IF NOT EXISTS users(
+  userid INTEGER auto_increment PRIMARY KEY,
+  username TEXT NOT NULL,
+  firstname TEXT NOT NULL,
+  lastname TEXT NOT NULL
+);
+
+-- name: create-table-blogs#
+CREATE TABLE IF NOT EXISTS blogs(
+  blogid INTEGER auto_increment PRIMARY KEY,
+  userid INTEGER NOT NULL REFERENCES users,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  published DATE NOT NULL DEFAULT (CURRENT_DATE)
+);
+
 -- name: get-blogs-published-after
 -- Get all blogs by all authors published after the given date.
     select b.title,
            u.username,
-           DATE_FORMAT(b.published, '%Y-%m-%d %H:%M') as published
+           DATE_FORMAT(b.published, '%Y-%m-%d %H:%i') as published
       from blogs b
 inner join users u on b.userid = u.userid
      where b.published >= :published
@@ -18,3 +35,8 @@ insert into blogs (
   published
 )
 values (%s, %s, %s, %s);
+
+-- name: publish-new-blog
+insert into blogs (userid, title, content)
+  values (:userid, :title, :contents)
+  returning blogid, title;

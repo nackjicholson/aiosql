@@ -2,65 +2,50 @@
 
 import csv
 from pathlib import Path
+import utils as u
 
 # CSV data file paths
 BLOGDB_PATH = Path(__file__).parent / "blogdb"
 USERS_DATA_PATH = BLOGDB_PATH / "data/users_data.csv"
 BLOGS_DATA_PATH = BLOGDB_PATH / "data/blogs_data.csv"
 
+# schema creation
+_CREATE_USER_BLOGS = [
+    "blogs.create_table_users",
+    "blogs.create_table_blogs",
+]
 
-def create_user_blogs(db):
-    assert db in ("sqlite", "pgsql", "mysql", "duckdb", "mssql")
-    serial = (
-        "SERIAL" if db == "pgsql" else
-        "INTEGER" if db in ("sqlite", "duckdb") else
-        "INTEGER auto_increment" if db == "mysql" else
-        "INTEGER IDENTITY(1, 1)" if db == "mssql" else
-        f"unexpected db: {db}"
-    )
-    ifnotexists = "IF NOT EXISTS" if db in ("sqlite", "pgsql", "mysql", "duckdb") else ""
-    current_date = "CURRENT_DATE" if db in ("sqlite", "pgsql", "mysql", "duckdb") else "GETDATE()"
-    text = "VARCHAR(MAX)" if db == "mssql" else "TEXT"
-    ddl_statements = [
-        f"""CREATE TABLE {ifnotexists} users (
-                userid {serial} PRIMARY KEY,
-                username {text} NOT NULL,
-                firstname {text} NOT NULL,
-                lastname {text} NOT NULL);""",
-        f"""CREATE TABLE {ifnotexists} blogs (
-                blogid {serial} PRIMARY KEY,
-                userid INTEGER NOT NULL,
-                title {text} NOT NULL,
-                content {text} NOT NULL,
-                published DATE NOT NULL DEFAULT ({current_date}),
-                FOREIGN KEY (userid) REFERENCES users(userid));""",
-    ]
-    if db and db == "duckdb":
-        ddl_statements.extend(["create sequence users_seq;", "create sequence blogs_seq;"])
-    return tuple(ddl_statements)
+def create_user_blogs(conn, queries):
+    for q in _CREATE_USER_BLOGS:
+        u.log.debug(f"executing: {q}")
+        f = queries.f(q)
+        r = f(conn)
+    conn.commit()
+    # sanity check!
+    count = queries.f("users.get_count")
+    assert count(conn) == 0
 
+# schema destruction
+_DROP_USER_BLOGS = [
+    "blogs.drop_table_comments",
+    "blogs.drop_table_blogs",
+    "blogs.drop_table_users",
+]
 
-def drop_user_blogs(db):
-    if db == "mssql":
-        # yuk, procedural
-        return [
-            "IF OBJECT_ID('comments', 'U') IS NOT NULL\n\tDROP TABLE comments\n",
-            "IF OBJECT_ID('blogs', 'U') IS NOT NULL\n\tDROP TABLE blogs\n",
-            "IF OBJECT_ID('users', 'U') IS NOT NULL\n\tDROP TABLE users\n",
-        ]
-    else:
-        return [
-            "DROP TABLE IF EXISTS comments",
-            "DROP TABLE IF EXISTS blogs",
-            "DROP TABLE IF EXISTS users",
-        ]
+def drop_user_blogs(conn, queries):
+    for q in _DROP_USER_BLOGS:
+        u.log.debug(f"executing: {q}")
+        f = queries.f(q)
+        f(conn)
+    conn.commit()
 
-
-def fill_user_blogs(cur, db):
+# TODO improve aiosql integration
+def fill_user_blogs(conn, db):
     # NOTE postgres filling relies on copy
     # NOTE duckdb filling relies on its own functions
     assert db in ("sqlite", "mysql", "mssql")
     param = "?" if db == "sqlite" else "%s"
+    cur = conn.cursor()
     with USERS_DATA_PATH.open() as fp:
         users = list(csv.reader(fp))
         cur.executemany(
@@ -84,3 +69,5 @@ def fill_user_blogs(cur, db):
                 ) VALUES ({param}, {param}, {param}, {param});""",
             blogs,
         )
+    cur.close()
+    conn.commit()
