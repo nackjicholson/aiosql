@@ -13,17 +13,17 @@ pytestmark = [pytest.mark.duckdb]
 
 DRIVER = "duckdb"
 
-@pytest.fixture
-def conn(duckdb_conn):
-    return duckdb_conn
-
-@pytest.fixture
+@pytest.fixture(scope="module")
 def queries():
     return t.queries(DRIVER)
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def date():
     return datetime.date
+
+@pytest.fixture
+def conn(duckdb_conn):
+    return duckdb_conn
 
 from run_tests import (
     run_sanity as test_sanity,

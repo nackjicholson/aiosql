@@ -3,6 +3,7 @@
 import csv
 from pathlib import Path
 import utils as u
+import asyncio
 
 # CSV data file paths
 BLOGDB_PATH = Path(__file__).parent / "blogdb"
@@ -15,15 +16,20 @@ _CREATE_USER_BLOGS = [
     "blogs.create_table_blogs",
 ]
 
+def async_run(awaitable):
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(awaitable)
+
 def create_user_blogs(conn, queries):
+    run = async_run if queries.is_async else lambda x: x
     for q in _CREATE_USER_BLOGS:
         u.log.debug(f"executing: {q}")
         f = queries.f(q)
-        r = f(conn)
+        r = run(f(conn))
     conn.commit()
     # sanity check!
     count = queries.f("users.get_count")
-    assert count(conn) == 0
+    assert run(count(conn)) == 0
 
 # schema destruction
 _DROP_USER_BLOGS = [

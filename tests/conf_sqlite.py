@@ -1,17 +1,15 @@
 import pytest
-import sqlite3
 from pathlib import Path
-from conf_schema import create_user_blogs, fill_user_blogs
-
-def populate_sqlite3_db(db_path, queries):
-    conn = sqlite3.connect(db_path)
-    create_user_blogs(conn, queries)
-    fill_user_blogs(conn, "sqlite")
-    conn.close()
-    # FIXME cleanup?!
+from conf_schema import create_user_blogs, fill_user_blogs, drop_user_blogs
 
 @pytest.fixture
-def sqlite3_db_path(tmpdir, queries):
+def li_dbpath(tmpdir):
     db_path = str(Path(tmpdir.strpath) / "blogdb.db")
-    populate_sqlite3_db(db_path, queries)
-    return db_path
+    yield db_path
+
+@pytest.fixture
+def li_db(rconn, queries):
+    create_user_blogs(rconn, queries)
+    fill_user_blogs(rconn, "sqlite")
+    yield rconn
+    drop_user_blogs(rconn, queries)

@@ -16,9 +16,13 @@ pytestmark = [
 
 DRIVER = "pygresql"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def queries():
     return t.queries(DRIVER)
+
+@pytest.fixture(scope="module")
+def date():
+    return datetime.date
 
 @pytest.fixture
 def conn(pg_params):
@@ -32,10 +36,6 @@ def conn(pg_params):
     u.log.debug(f"params: {pg_params}")
     with db.connect(**pg_params) as conn:
         yield conn
-
-@pytest.fixture
-def date():
-    return datetime.date
 
 from run_tests import (
     run_sanity as test_sanity,

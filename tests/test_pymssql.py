@@ -21,6 +21,10 @@ pytestmark = [
 def queries():
     return t.queries(DRIVER)
 
+@pytest.fixture(scope="module")
+def date():
+    return datetime.date
+
 @pytest.fixture
 def conn(ms_db):
     yield ms_db
@@ -28,10 +32,6 @@ def conn(ms_db):
 @pytest.fixture
 def dconn(ms_db):
     yield ms_db
-
-@pytest.fixture
-def date():
-    return datetime.date
 
 def test_sanity_master(ms_master):
     with db.connect(**ms_master) as conn:
