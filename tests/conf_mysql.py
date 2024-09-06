@@ -67,7 +67,7 @@ try:
     def my_db(my_conn, queries):
         """Build the test database."""
         create_user_blogs(my_conn, queries)
-        fill_user_blogs(my_conn, "mysql")
+        fill_user_blogs(my_conn, queries)
         yield my_conn
         drop_user_blogs(my_conn, queries)
 
