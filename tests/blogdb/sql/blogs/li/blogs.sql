@@ -56,3 +56,8 @@ create table blogs (
     published date not null default CURRENT_DATE,
     foreign key(userid) references users(userid)
 );
+
+-- name: add_many_blogs*!
+-- NOTE same as bulk-publish
+INSERT INTO blogs (userid, title, content, published)
+  VALUES (?, ?, ?, ?);

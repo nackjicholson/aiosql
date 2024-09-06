@@ -3,6 +3,7 @@ import importlib
 import logging
 import time
 import contextlib
+import asyncio
 
 log = logging.getLogger("pytest-aiosql")
 logging.basicConfig(level=logging.INFO)
@@ -61,3 +62,7 @@ def dict_factory(cursor, row):
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
+
+def run_async(awaitable):
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(awaitable)

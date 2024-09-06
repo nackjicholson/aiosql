@@ -39,3 +39,7 @@ select count(*) as cnt from users;
 -- "search" in this case across two different sql files. The blogs.sql has
 -- another function "search" with a :title key as well.
 select username from users where firstname = :title and lastname = :lastname;
+
+-- name: add_many_users*!
+INSERT INTO users(username, firstname, lastname)
+  VALUES (%s, %s, %s);

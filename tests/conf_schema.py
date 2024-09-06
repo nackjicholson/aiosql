@@ -1,9 +1,32 @@
 # non portable SQL statements to create, fill and clear the database schema
 
-import csv
-from pathlib import Path
-import utils as u
 import asyncio
+from pathlib import Path
+import csv
+import utils
+
+# yuk… hide sync/async
+
+def execute_any(conn, queries, name):
+    utils.log.warning(f"executing: {name}")
+    f = queries.f(name)
+    if queries.is_async:
+        return utils.run_async(f(conn))
+    else:
+        return f(conn)
+
+def execute_commit(conn, queries):
+    if queries.is_async:
+        return utils.run_async(conn.commit())
+    else:
+        return conn.commit()
+
+def execute_many(conn, queries, name, data):
+    f = queries.f(name)
+    if queries.is_async:
+        return utils.run_async(f(conn, data))
+    else:
+        return f(conn, data)
 
 # CSV data file paths
 BLOGDB_PATH = Path(__file__).parent / "blogdb"
@@ -16,20 +39,13 @@ _CREATE_USER_BLOGS = [
     "blogs.create_table_blogs",
 ]
 
-def async_run(awaitable):
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(awaitable)
-
 def create_user_blogs(conn, queries):
-    run = async_run if queries.is_async else lambda x: x
     for q in _CREATE_USER_BLOGS:
-        u.log.debug(f"executing: {q}")
-        f = queries.f(q)
-        r = run(f(conn))
-    conn.commit()
+        execute_any(conn, queries, q)
+    execute_commit(conn, queries)
     # sanity check!
-    count = queries.f("users.get_count")
-    assert run(count(conn)) == 0
+    count = execute_any(conn, queries, "users.get_count")
+    assert count == 0
 
 # schema destruction
 _DROP_USER_BLOGS = [
@@ -40,40 +56,15 @@ _DROP_USER_BLOGS = [
 
 def drop_user_blogs(conn, queries):
     for q in _DROP_USER_BLOGS:
-        u.log.debug(f"executing: {q}")
-        f = queries.f(q)
-        f(conn)
-    conn.commit()
+        execute_any(conn, queries, q)
+    execute_commit(conn, queries)
 
-# TODO improve aiosql integration
-def fill_user_blogs(conn, db):
-    # NOTE postgres filling relies on copy
-    # NOTE duckdb filling relies on its own functions
-    assert db in ("sqlite", "mysql", "mssql")
-    param = "?" if db == "sqlite" else "%s"
-    cur = conn.cursor()
+# NOTE not used by postgres nor duckdb
+def fill_user_blogs(conn, queries):
     with USERS_DATA_PATH.open() as fp:
         users = list(csv.reader(fp))
-        cur.executemany(
-            f"""
-               INSERT INTO users (
-                    username,
-                    firstname,
-                    lastname
-               ) VALUES ({param}, {param}, {param});""",
-            users,
-        )
+        execute_many(conn, queries, "users.add_many_users", users)
     with BLOGS_DATA_PATH.open() as fp:
         blogs = list(csv.reader(fp))
-        cur.executemany(
-            f"""
-                INSERT INTO blogs (
-                    userid,
-                    title,
-                    content,
-                    published
-                ) VALUES ({param}, {param}, {param}, {param});""",
-            blogs,
-        )
-    cur.close()
-    conn.commit()
+        execute_many(conn, queries, "blogs.add_many_blogs", blogs)
+    execute_commit(conn, queries)
