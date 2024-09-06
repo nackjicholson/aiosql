@@ -16,9 +16,13 @@ pytestmark = [
     pytest.mark.skipif(not u.has_pkg("pytest_mysql"), reason="no pytest_mysql"),
 ]
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def queries():
     return t.queries(DRIVER)
+
+@pytest.fixture(scope="module")
+def date():
+    return datetime.date
 
 @pytest.fixture
 def conn(my_db):
@@ -28,10 +32,6 @@ def conn(my_db):
 def dconn(my_dsn):
     with db.connect(**my_dsn, cursorclass=db.cursors.DictCursor) as conn:
         yield conn
-
-@pytest.fixture
-def date():
-    return datetime.date
 
 def test_my_dsn(my_dsn):
     assert "user" in my_dsn and "host" in my_dsn and "port" in my_dsn

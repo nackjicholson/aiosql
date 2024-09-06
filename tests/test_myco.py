@@ -16,17 +16,17 @@ pytestmark = [
 
 DRIVER = "mysql-connector"
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def queries():
     return t.queries(DRIVER)
+
+@pytest.fixture(scope="module")
+def date():
+    return datetime.date
 
 @pytest.fixture
 def conn(my_db):
     return my_db
-
-@pytest.fixture
-def date():
-    return datetime.date
 
 def test_my_dsn(my_dsn):
     assert "user" in my_dsn and "host" in my_dsn and "port" in my_dsn

@@ -1,6 +1,7 @@
 import aiosql
 import pytest
 import run_tests as t
+import utils
 
 try:
     import apsw as db
@@ -13,15 +14,18 @@ pytestmark = [
     pytest.mark.sqlite3,
 ]
 
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
-
-@pytest.fixture
+@pytest.fixture(scope="module")
 def queries():
     return t.queries(DRIVER)
+
+@pytest.fixture(scope="module")
+def date():
+    return t.todate
+
+# driver does not seem to return row counts on !
+@pytest.fixture(scope="module")
+def expect():
+    return -1
 
 class APSWConnection(db.Connection):
     """APSW Connection wrapper with autocommit off."""
@@ -49,24 +53,19 @@ class APSWConnection(db.Connection):
         super().close()
 
 @pytest.fixture
-def conn(sqlite3_db_path):
-    conn = APSWConnection(sqlite3_db_path)
+def rconn(li_dbpath):
+    conn = APSWConnection(li_dbpath)
     yield conn
     conn.close()
 
 @pytest.fixture
+def conn(li_db):
+    yield li_db
+
+@pytest.fixture
 def dconn(conn):
-    conn.setrowtrace(dict_factory)
+    conn.setrowtrace(utils.dict_factory)
     return conn
-
-@pytest.fixture
-def date():
-    return t.todate
-
-# driver does not seem to return row counts on !
-@pytest.fixture
-def expect():
-    return -1
 
 from run_tests import (
     run_sanity as test_sanity,

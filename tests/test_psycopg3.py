@@ -21,6 +21,10 @@ DRIVER = "psycopg"
 def queries():
     return t.queries(DRIVER)
 
+@pytest.fixture(scope="module")
+def date():
+    return datetime.date
+
 @pytest.fixture
 def conn(pg_conn):
     return pg_conn
@@ -29,10 +33,6 @@ def conn(pg_conn):
 def dconn(pg_params):
     with db.connect(**pg_params, row_factory=dict_row) as conn:
         yield conn
-
-@pytest.fixture
-def date():
-    return datetime.date
 
 from run_tests import (
     run_sanity as test_sanity,
