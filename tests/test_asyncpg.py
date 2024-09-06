@@ -33,6 +33,11 @@ async def aconn(pg_dsn):
     yield conn
     await conn.close()
 
+@pytest_asyncio.fixture
+async def dconn(aconn):
+    # FIXME dict row?
+    yield aconn
+
 from run_tests import (
     run_async_sanity as test_async_sanity,
     run_async_record_query as test_async_record_query,
@@ -58,7 +63,7 @@ async def test_with_pool(pg_dsn, queries):
 @pytest.mark.asyncio
 async def test_async_methods(pg_dsn, queries):
     async with asyncpg.create_pool(pg_dsn) as pool:
-        t.run_async_methods(pool, queries)
+        await t.run_async_methods(pool, queries)
 
 @pytest.mark.asyncio
 async def test_no_publish(aconn, queries):

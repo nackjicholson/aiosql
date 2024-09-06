@@ -437,11 +437,11 @@ async def run_async_sanity(aconn, queries):
     # await conn.commit()
 
 @pytest.mark.asyncio
-async def run_async_record_query(aconn, queries):
+async def run_async_record_query(dconn, queries):
 
     get_all = queries.f("users.get_all")
 
-    actual = [dict(r) for r in await get_all(aconn)]
+    actual = [dict(r) for r in await get_all(dconn)]
 
     assert len(actual) == 3
     assert actual[0] == {
@@ -464,10 +464,10 @@ async def run_async_parameterized_query(aconn, queries, date):
     assert actual == expected
 
 @pytest.mark.asyncio
-async def run_async_parameterized_record_query(aconn, queries, date):
+async def run_async_parameterized_record_query(dconn, queries, date):
     get_blogs_published_after = queries.f("blogs.get_blogs_published_after")
 
-    records = await get_blogs_published_after(aconn, published=date(2018, 1, 1))
+    records = await get_blogs_published_after(dconn, published=date(2018, 1, 1))
     actual = [dict(rec) for rec in records]
 
     expected = [
@@ -587,11 +587,11 @@ async def run_async_insert_many(aconn, queries, date):
     assert johns_blogs == _expect_blogs(blogs_dict)
 
 @pytest.mark.asyncio
-async def run_async_methods(aconn, queries):
+async def run_async_methods(dconn, queries):
     get_all = queries.f("users.get_all")
     get_all_sorted = queries.f("users.get_all_sorted")
 
-    users, sorted_users = await asyncio.gather(get_all(aconn), get_all_sorted(aconn))
+    users, sorted_users = await asyncio.gather(get_all(dconn), get_all_sorted(dconn))
 
     assert [dict(u) for u in users] == [
         {"userid": 1, "username": "bobsmith", "firstname": "Bob", "lastname": "Smith"},

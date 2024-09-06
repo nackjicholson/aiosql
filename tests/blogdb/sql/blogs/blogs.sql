@@ -69,3 +69,7 @@ insert into blogs (userid, title, content)
 insert into blogs (userid, title, content)
   values (:userid, :title, :contents)
   returning blogid;
+
+-- name: add_many_blogs*!
+INSERT INTO blogs (userid, title, content, published)
+  VALUES (%s, %s, %s, %s);
