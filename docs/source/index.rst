@@ -81,19 +81,19 @@ Badges
    sqlite3: 17
    apsw: 16
    duckdb: 14
-   mariadb: 18
-   pymysql: 18
+   mariadb: 17
+   pymysql: 16
    mysqldb: 15
    myco: 16
-   pymssql: 17
+   pymssql: 16
    pg8000: 13
-   psycopg2: 17
+   psycopg2: 18
    psycopg3: 19
    pygresql: 15
    # ASYNC
-   aiosql: 12
-   asyncpg: 15
-.. image:: https://img.shields.io/badge/tests-242%20✓-success
+   aiosqlite: 13
+   asyncpg: 18
+.. image:: https://img.shields.io/badge/tests-243%20✓-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 .. image:: https://img.shields.io/github/issues/nackjicholson/aiosql?style=flat
