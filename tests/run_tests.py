@@ -337,8 +337,6 @@ def run_insert_many(conn, queries, date, expect=3):
 
     expected = _expect_blogs(blogs_dict)
 
-    log.warning(f"expected = {expected}")
-    log.warning(f"johns_blogs = {johns_blogs}")
     assert johns_blogs == expected
 
 
