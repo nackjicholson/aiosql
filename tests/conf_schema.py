@@ -8,7 +8,7 @@ import utils
 # yuk… hide sync/async
 
 def execute_any(conn, queries, name):
-    utils.log.warning(f"executing: {name}")
+    utils.log.debug(f"executing: {name}")
     f = queries.f(name)
     if queries.is_async:
         return utils.run_async(f(conn))
