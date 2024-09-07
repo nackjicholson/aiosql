@@ -1,7 +1,6 @@
 import datetime
 import aiosql
 import pytest
-import run_tests as t
 import utils as u
 
 try:
@@ -14,18 +13,16 @@ pytestmark = [
     pytest.mark.skipif(not u.has_pkg("pytest_postgresql"), reason="no pytest_postgresql"),
 ]
 
-DRIVER = "pygresql"
-
 @pytest.fixture(scope="module")
-def queries():
-    return t.queries(DRIVER)
+def driver():
+    return "pygresql"
 
 @pytest.fixture(scope="module")
 def date():
     return datetime.date
 
 @pytest.fixture
-def conn(pg_params):
+def rconn(pg_params):
     params = dict(pg_params)
     params["database"] = params["dbname"]
     del params["dbname"]
@@ -35,6 +32,12 @@ def conn(pg_params):
     u.log.debug(f"params: {params}")
     with db.connect(**params) as conn:
         yield conn
+
+@pytest.fixture
+def conn(pg_db):
+    yield pg_db
+
+# FIXME dconn
 
 from run_tests import (
     run_sanity as test_sanity,

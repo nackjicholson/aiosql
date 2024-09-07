@@ -2,12 +2,12 @@ import pytest
 import aiosql
 import utils
 
+from run_tests import queries
 from conf_mysql import my_dsn, my_db, my_conn, my_driver
-from conf_pgsql import pg_conn, pg_params, pg_dsn
+from conf_pgsql import pg_conn, pg_params, pg_dsn, pg_db
 from conf_sqlite import li_dbpath, li_db
 from conf_duckdb import duckdb_conn
 from conf_mssql import ms_dsn, ms_db, ms_conn, ms_driver, ms_master
-
 
 def pytest_addoption(parser):
     # Postgres
@@ -35,7 +35,6 @@ def pytest_addoption(parser):
     parser.addoption("--mssql-server", default="localhost")
     parser.addoption("--mssql-port", default=1433, type=int)
     parser.addoption("--mssql-database", default="master")
-
 
 # test adapter registering and overriding
 aiosql.aiosql.register_adapter("named", aiosql.adapters.GenericAdapter)

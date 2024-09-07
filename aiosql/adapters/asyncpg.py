@@ -29,6 +29,7 @@ class AsyncPGAdapter:
         self.var_sorted = defaultdict(list)
 
     def process_sql(self, query_name, _op_type, sql):
+        """asyncpg seems to only support numeric."""
         adj = 0
 
         for match in VAR_REF.finditer(sql):

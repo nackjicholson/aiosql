@@ -17,21 +17,23 @@ pytestmark = [
     pytest.mark.skipif(not u.has_pkg("pytest_asyncio"), reason="no pytest_asyncio"),
 ]
 
-DRIVER = "asyncpg"
+@pytest.fixture(scope="module")
+def driver():
+    return "asyncpg"
 
 @pytest.fixture(scope="module")
 def date():
     return datetime.date
 
-@pytest.fixture(scope="module")
-def queries():
-    return t.queries(DRIVER)
-
 @pytest_asyncio.fixture
-async def aconn(pg_dsn):
+async def rconn(pg_dsn):
     conn = await asyncpg.connect(pg_dsn)
     yield conn
     await conn.close()
+
+@pytest_asyncio.fixture
+async def aconn(pg_db):
+    yield pg_db
 
 @pytest_asyncio.fixture
 async def dconn(aconn):
@@ -55,13 +57,13 @@ from run_tests import (
 
 # TODO other pools?
 @pytest.mark.asyncio
-async def test_with_pool(pg_dsn, queries):
+async def test_with_pool(pg_dsn, queries, pg_db):
     async with asyncpg.create_pool(pg_dsn) as pool:
         async with pool.acquire() as conn:
             await t.run_async_insert_returning(conn, queries, datetime.date)
 
 @pytest.mark.asyncio
-async def test_async_methods(pg_dsn, queries):
+async def test_async_methods(pg_dsn, queries, pg_db):
     async with asyncpg.create_pool(pg_dsn) as pool:
         await t.run_async_methods(pool, queries)
 

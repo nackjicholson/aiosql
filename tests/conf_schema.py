@@ -4,8 +4,22 @@ import asyncio
 from pathlib import Path
 import csv
 import utils
+import datetime
 
+#
 # yuk… hide sync/async
+#
+# We do not want to replicate schema creation functions for async.
+#
+# I believe that the asynchronous approach is a poor performance kludge
+# against bad interpreter parallelism support (JavaScript, CPython).
+# Because the interpreter is so bad at switching between contexts, the model
+# just offloads the task to the user for a limited benefit as it only really
+# brings improvements to IO-bound loads.
+# This interpreter-level implementation induces significant code complexity and
+# execution overheads.
+# It makes no sense from the hardware and operating system point of view,
+# which already have pretty efficient threads running on multicore cpus.
 
 def execute_any(conn, queries, name):
     utils.log.debug(f"executing: {name}")
@@ -17,6 +31,9 @@ def execute_any(conn, queries, name):
 
 def execute_commit(conn, queries):
     if queries.is_async:
+        # transaction management is different with asyncpg…
+        if queries._driver == "asyncpg":
+            return
         return utils.run_async(conn.commit())
     else:
         return conn.commit()
@@ -47,6 +64,21 @@ def create_user_blogs(conn, queries):
     count = execute_any(conn, queries, "users.get_count")
     assert count == 0
 
+# schema data
+def fill_user_blogs(conn, queries):
+    with USERS_DATA_PATH.open() as fp:
+        users = [ tuple(r) for r in csv.reader(fp) ]
+        if queries._driver in ("pg8000", "asyncpg"):
+            users = [ { "name": t[0], "fname": t[1], "lname": t[2] } for t in users ]
+        execute_many(conn, queries, "users.add_many_users", users)
+    with BLOGS_DATA_PATH.open() as fp:
+        blogs = [ tuple(r) for r in csv.reader(fp) ]
+        if queries._driver in ("pg8000", "asyncpg"):
+            blogs = [ { "userid": int(t[0]), "title": t[1], "content": t[2], "published": datetime.date.fromisoformat(t[3]) }
+                      for t in blogs ]
+        execute_many(conn, queries, "blogs.add_many_blogs", blogs)
+    execute_commit(conn, queries)
+
 # schema destruction
 _DROP_USER_BLOGS = [
     "blogs.drop_table_comments",
@@ -57,14 +89,4 @@ _DROP_USER_BLOGS = [
 def drop_user_blogs(conn, queries):
     for q in _DROP_USER_BLOGS:
         execute_any(conn, queries, q)
-    execute_commit(conn, queries)
-
-# NOTE not used by postgres nor duckdb
-def fill_user_blogs(conn, queries):
-    with USERS_DATA_PATH.open() as fp:
-        users = list(csv.reader(fp))
-        execute_many(conn, queries, "users.add_many_users", users)
-    with BLOGS_DATA_PATH.open() as fp:
-        blogs = list(csv.reader(fp))
-        execute_many(conn, queries, "blogs.add_many_blogs", blogs)
     execute_commit(conn, queries)

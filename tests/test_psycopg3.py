@@ -15,22 +15,25 @@ pytestmark = [
     pytest.mark.skipif(not u.has_pkg("pytest_postgresql"), reason="no pytest_postgresql"),
 ]
 
-DRIVER = "psycopg"
-
 @pytest.fixture(scope="module")
-def queries():
-    return t.queries(DRIVER)
+def driver():
+    return "psycopg"
 
 @pytest.fixture(scope="module")
 def date():
     return datetime.date
 
 @pytest.fixture
-def conn(pg_conn):
-    return pg_conn
+def rconn(pg_params):
+    with db.connect(**pg_params) as conn:
+        yield conn
 
 @pytest.fixture
-def dconn(pg_params):
+def conn(pg_db):
+    yield pg_db
+
+@pytest.fixture
+def dconn(pg_params, pg_db):
     with db.connect(**pg_params, row_factory=dict_row) as conn:
         yield conn
 

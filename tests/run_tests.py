@@ -111,6 +111,7 @@ class Queries:
                 return o
         raise Exception(f"query function not found: {name}")
 
+@pytest.fixture(scope="module")
 def queries(driver: str):
     """Load queries into AioSQL, plus a convenient test wrapper."""
     RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
@@ -120,9 +121,9 @@ def queries(driver: str):
 
 # actual tests use these fixtures:
 #
+# driver: current driver
 # conn: a connection to the database
 # dconn: a connection to the database which returns dicts
-# queries: loaded test queries
 # date: date conversion
 
 def run_sanity(conn):
