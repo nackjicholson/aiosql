@@ -4,6 +4,7 @@ AioSQL - Versions
 TODO
 ----
 
+- add apsw, duckdb, asyncpg and psycopg2 to pypy and python 3.13 when possible
 - maintain up-to-date wrt Python moving target…
 - once 3.9 support is dropped, remove old-style type hints.
 - write a small SQLite3-based tutorial?
@@ -11,8 +12,8 @@ TODO
 - rethink record classes? we just want a function?
 - add documentation about docker runs.
 
-12.0 on ?
----------
+12.0 on 2024-09-07
+------------------
 
 - add official support for MS SQL Server with `pymssql`.
 - pass misc parameters to cursor in generic adapter.
