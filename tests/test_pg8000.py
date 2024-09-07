@@ -14,18 +14,16 @@ pytestmark = [
     pytest.mark.skipif(not u.has_pkg("pytest_postgresql"), reason="no pytest_postgresql"),
 ]
 
-DRIVER = "pg8000"
-
 @pytest.fixture(scope="module")
-def queries():
-    return t.queries(DRIVER)
+def driver():
+    return "pg8000"
 
 @pytest.fixture(scope="module")
 def date():
     return datetime.date
 
 @pytest.fixture
-def conn(pg_params, pg_conn):
+def rconn(pg_params, pg_conn):
     params = dict(pg_params)
     params["database"] = params["dbname"]
     del params["dbname"]
@@ -36,6 +34,10 @@ def conn(pg_params, pg_conn):
     u.log.debug(f"params: {params}")
     with db.connect(**params) as conn:
         yield conn
+
+@pytest.fixture
+def conn(pg_db):
+    yield pg_db
 
 # TODO dconn: dict result is not supported
 

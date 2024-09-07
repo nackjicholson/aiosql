@@ -8,11 +8,9 @@ pytestmark = [
     pytest.mark.sqlite3
 ]
 
-DRIVER = "sqlite3"
-
 @pytest.fixture(scope="module")
-def queries():
-    return t.queries(DRIVER)
+def driver():
+    return "sqlite3"
 
 @pytest.fixture(scope="module")
 def date():

@@ -21,7 +21,8 @@ TODO
 - improve one error message.
 - reduce verbosity when overriding an adapter.
 - refactor tests, simplifying the structure and adding over 50 tests.
-  in particular, schema creation now relies on aiosql scripts where possible.
+  in particular, schema creation now relies on *aiosql* features
+  instead of using driver capabilities directly.
 
 11.1 on 2024-08-20
 ------------------

@@ -9,16 +9,14 @@ try:
 except ModuleNotFoundError:
     pytest.skip("missing driver: pymysql", allow_module_level=True)
 
-DRIVER = "pymysql"
-
 pytestmark = [
     pytest.mark.mysql,
     pytest.mark.skipif(not u.has_pkg("pytest_mysql"), reason="no pytest_mysql"),
 ]
 
 @pytest.fixture(scope="module")
-def queries():
-    return t.queries(DRIVER)
+def driver():
+    return "pymysql"
 
 @pytest.fixture(scope="module")
 def date():

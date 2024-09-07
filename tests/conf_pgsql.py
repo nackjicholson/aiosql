@@ -1,5 +1,5 @@
 import pytest
-from conf_schema import USERS_DATA_PATH, BLOGS_DATA_PATH, create_user_blogs, drop_user_blogs
+from conf_schema import create_user_blogs, fill_user_blogs, drop_user_blogs
 import run_tests as t
 
 # guess psycopg version from a connection
@@ -31,44 +31,11 @@ try:
             # which may be psycopg version 2 or 3, depending.
             conn = request.getfixturevalue("postgresql")
 
-        # TODO use the tested driver instead?
-        queries = t.queries("psycopg2" if is_psycopg2(conn) else "psycopg")
-
-        # loads data from blogdb fixture data
-        create_user_blogs(conn, queries)
-
-        # TODO improve data loading
-        with conn.cursor() as cur:
-            # guess whether we have a psycopg 2 or 3 connection
-            with USERS_DATA_PATH.open() as fp:
-                if is_psycopg2(conn):  # pragma: no cover
-                    cur.copy_from(
-                        fp, "users", sep=",", columns=["username", "firstname", "lastname"]
-                    )
-                else:
-                    with cur.copy(
-                        "COPY users(username, firstname, lastname) FROM STDIN (FORMAT CSV)"
-                    ) as cope:
-                        cope.write(fp.read())
-
-            with BLOGS_DATA_PATH.open() as fp:
-                if is_psycopg2(conn):  # pragma: no cover
-                    cur.copy_from(
-                        fp, "blogs", sep=",", columns=["userid", "title", "content", "published"]
-                    )
-                else:  # assume psycopg 3
-                    with cur.copy(
-                        "COPY blogs(userid, title, content, published) FROM STDIN (FORMAT CSV)"
-                    ) as cope:
-                        cope.write(fp.read())
-
-        conn.commit()
-
         # yield the psycopg? connection
         yield conn
 
-        # cleanup
-        drop_user_blogs(conn, queries)
+        # done
+        conn.close()
 
     @pytest.fixture
     def pg_params(request, pg_conn):
@@ -91,17 +58,28 @@ try:
         p = pg_params
         yield f"postgres://{p['user']}:{p['password']}@{p['host']}:{p['port']}/{p['dbname']}"
 
+    @pytest.fixture
+    def pg_db(rconn, queries):
+        create_user_blogs(rconn, queries)
+        fill_user_blogs(rconn, queries)
+        yield rconn
+        drop_user_blogs(rconn, queries)
+
 except ModuleNotFoundError:
     # FIXME empty fixtures to please pytest
 
     @pytest.fixture
     def pg_conn():
-        raise Exception("undefined fixture")
+        raise Exception("unimplemented fixture")
 
     @pytest.fixture
     def pg_params():
-        raise Exception("undefined fixture")
+        raise Exception("unimplemented fixture")
 
     @pytest.fixture
     def pg_dsn():
-        raise Exception("undefined fixture")
+        raise Exception("unimplemented fixture")
+
+    @pytest.fixture
+    def pg_db():
+        raise Exception("unimplemented fixture")

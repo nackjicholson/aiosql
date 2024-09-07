@@ -2,24 +2,19 @@ import datetime
 import aiosql
 import pytest
 import run_tests as t
-import utils as u
-
-DB = "mssql"
-DRIVER = "pymssql"
 
 try:
     import pymssql as db  # Python MS SQL driver
 except ModuleNotFoundError:
-    pytest.skip(f"missing driver: {DRIVER}", allow_module_level=True)
+    pytest.skip("missing driver: pymssql", allow_module_level=True)
 
 pytestmark = [
-    pytest.mark.mssql,
-    pytest.mark.skipif(not u.has_pkg(DRIVER), reason=f"no {DRIVER}"),
+    pytest.mark.mssql
 ]
 
 @pytest.fixture(scope="module")
-def queries():
-    return t.queries(DRIVER)
+def driver():
+    return "pymssql"
 
 @pytest.fixture(scope="module")
 def date():

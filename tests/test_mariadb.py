@@ -2,7 +2,6 @@ import datetime
 import aiosql
 import pytest
 import run_tests as t
-import utils as u
 
 try:
     import mariadb as db
@@ -15,11 +14,9 @@ pytestmark = [
     # pytest.mark.skipif(not u.has_pkg("pytest_mysql"), reason="no pytest_mysql"),
 ]
 
-DRIVER = "mariadb"
-
 @pytest.fixture(scope="module")
-def queries():
-    return t.queries(DRIVER)
+def driver():
+    return "mariadb"
 
 @pytest.fixture(scope="module")
 def date():

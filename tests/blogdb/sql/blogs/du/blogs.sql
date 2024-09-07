@@ -51,3 +51,7 @@ values (
   nextval('blogs_seq'), ?, ?, ? , ?
 )
 returning (blogid, title);
+
+-- name: add_many_blogs*!
+INSERT INTO blogs (blogid, userid, title, content, published)
+  VALUES (NEXTVAL('blogs_seq'), ?, ?, ?, ?);

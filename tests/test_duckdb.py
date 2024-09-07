@@ -1,8 +1,6 @@
 import datetime
 import aiosql
 import pytest
-import run_tests as t
-import utils as u
 
 try:
     import duckdb as db
@@ -11,11 +9,9 @@ except ModuleNotFoundError:
 
 pytestmark = [pytest.mark.duckdb]
 
-DRIVER = "duckdb"
-
 @pytest.fixture(scope="module")
-def queries():
-    return t.queries(DRIVER)
+def driver():
+    return "duckdb"
 
 @pytest.fixture(scope="module")
 def date():
@@ -24,6 +20,8 @@ def date():
 @pytest.fixture
 def conn(duckdb_conn):
     return duckdb_conn
+
+# FIXME dconn
 
 from run_tests import (
     run_sanity as test_sanity,

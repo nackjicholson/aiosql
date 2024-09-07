@@ -1,25 +1,20 @@
 import aiosql
 import pytest
 import run_tests as t
-import utils
 
 try:
     import aiosqlite
     import pytest_asyncio
 except ModuleNotFoundError as m:
-    pytest.skip(f"missing driver: {m}", allow_module_level=True)
+    pytest.skip(f"missing module: {m}", allow_module_level=True)
 
 pytestmark = [
     pytest.mark.sqlite3,
-    # pytest.mark.asyncio,
-    pytest.mark.skipif(not utils.has_pkg("pytest_asyncio"), reason="no pytest_asyncio"),
 ]
 
-DRIVER = "aiosqlite"
-
 @pytest.fixture(scope="module")
-def queries():
-    return t.queries(DRIVER)
+def driver():
+    return "aiosqlite"
 
 @pytest.fixture(scope="module")
 def date():

@@ -8,15 +8,13 @@ try:
 except ModuleNotFoundError:
     pytest.skip("missing driver: apsw", allow_module_level=True)
 
-DRIVER = "apsw"
-
 pytestmark = [
     pytest.mark.sqlite3,
 ]
 
 @pytest.fixture(scope="module")
-def queries():
-    return t.queries(DRIVER)
+def driver():
+    return "apsw"
 
 @pytest.fixture(scope="module")
 def date():
