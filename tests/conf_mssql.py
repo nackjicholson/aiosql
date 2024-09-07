@@ -60,7 +60,7 @@ try:
                     cur.execute("USE pytest")
                     conn.commit()
                 create_user_blogs(conn, queries)
-                fill_user_blogs(conn, "mssql")
+                fill_user_blogs(conn, queries)
             else:
                 u.log.warning("skipping pytest schema creation")
         # connection to pytest possibly database created above
@@ -78,20 +78,20 @@ except ModuleNotFoundError:
 
     @pytest.fixture
     def ms_driver():
-        raise Exception("undefined fixture")
+        raise Exception("unimplemented fixture")
 
     @pytest.fixture
     def ms_dsn():
-        raise Exception("undefined fixture")
+        raise Exception("unimplemented fixture")
 
     @pytest.fixture
     def ms_master():
-        raise Exception("undefined fixture")
+        raise Exception("unimplemented fixture")
 
     @pytest.fixture
     def ms_conn():
-        raise Exception("undefined fixture")
+        raise Exception("unimplemented fixture")
 
     @pytest.fixture
     def ms_db():
-        raise Exception("undefined fixture")
+        raise Exception("unimplemented fixture")
