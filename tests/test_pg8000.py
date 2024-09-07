@@ -26,24 +26,26 @@ def date():
 
 @pytest.fixture
 def conn(pg_params, pg_conn):
-    dbname = pg_params["dbname"]
-    del pg_params["dbname"]
-    pg_params["database"] = dbname
+    params = dict(pg_params)
+    params["database"] = params["dbname"]
+    del params["dbname"]
     # cleanup unsupported keyword arguments
     for kw in ("sslcertmode", "connect_timeout", "hostaddr"):
-        if kw in pg_params:
-            del pg_params[kw]
-    u.log.debug(f"params: {pg_params}")
-    with db.connect(**pg_params) as conn:
+        if kw in params:
+            del params[kw]
+    u.log.debug(f"params: {params}")
+    with db.connect(**params) as conn:
         yield conn
+
+# TODO dconn: dict result is not supported
 
 from run_tests import (
     run_sanity as test_sanity,
 	run_something as test_something,
 	run_cursor as test_cursor,
 	# run_record_query as test_record_query,
-	# run_parameterized_query as test_parameterized_query,
 	# run_parameterized_record_query as test_parameterized_record_query,
+	run_parameterized_query as test_parameterized_query,
 	run_record_class_query as test_record_class_query,
 	run_select_cursor_context_manager as test_select_cursor_context_manager,
 	run_select_one as test_select_one,
