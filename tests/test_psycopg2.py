@@ -26,8 +26,9 @@ def date():
     return datetime.date
 
 @pytest.fixture
-def conn(pg_conn):
-    return pg_conn
+def conn(pg_dsn):
+    with db.connect(dsn=pg_dsn) as conn:
+        yield conn
 
 @pytest.fixture
 def dconn(pg_dsn):

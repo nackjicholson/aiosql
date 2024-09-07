@@ -26,15 +26,14 @@ def date():
 
 @pytest.fixture
 def conn(pg_params):
-    dbname = pg_params["dbname"]
-    del pg_params["dbname"]
-    pg_params["database"] = dbname
-    if "port" in pg_params:
-        port = pg_params["port"]
-        del pg_params["port"]
-        pg_params["host"] += f":{port}"
-    u.log.debug(f"params: {pg_params}")
-    with db.connect(**pg_params) as conn:
+    params = dict(pg_params)
+    params["database"] = params["dbname"]
+    del params["dbname"]
+    if "port" in params:
+        params["host"] += ":" + params["port"]
+        del params["port"]
+    u.log.debug(f"params: {params}")
+    with db.connect(**params) as conn:
         yield conn
 
 from run_tests import (
