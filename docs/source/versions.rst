@@ -8,7 +8,6 @@ TODO
 - once 3.9 support is dropped, remove old-style type hints.
 - write a small SQLite3-based tutorial?
 - tests with other database and drivers?
-- allow to pass parameters to connection, cursor…
 - rethink record classes? we just want a function?
 - add documentation about docker runs.
 
@@ -22,6 +21,7 @@ TODO
 - improve one error message.
 - reduce verbosity when overriding an adapter.
 - refactor tests, simplifying the structure and adding over 50 tests.
+  in particular, schema creation now relies on aiosql scripts where possible.
 
 11.1 on 2024-08-20
 ------------------
