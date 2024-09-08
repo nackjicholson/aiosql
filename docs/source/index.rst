@@ -48,7 +48,6 @@ by just passing the driver as a parameter when building queries.  Thus
 (`snowflake.connector <https://docs.snowflake.com/en/developer-guide/python-connector/python-connector>`__)
 should work out of the box…
 Please report with an issue if it actually works for you!
-
 Otherwise, extensions to support other database drivers can be written by you!
 See: `Database Driver Adapters <./database-driver-adapters.html>`__.
 Feel free to pull request!
