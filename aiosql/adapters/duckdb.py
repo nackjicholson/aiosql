@@ -22,6 +22,11 @@ class DuckDBAdapter(GenericAdapter):
         # whether to converts the default tuple response to a dict.
         self._convert_row_to_dict = cursor_as_dict
 
+    def _cursor(self, conn):
+        """Get a cursor from a connection."""
+        # For DuckDB cursor is duplicated connection so we don't want to use it
+        return conn
+
     def process_sql(self, query_name, op_type, sql):
         return VAR_REF.sub(_colon_to_dollar, sql)
 
