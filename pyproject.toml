@@ -71,7 +71,7 @@ package = "https://pypi.org/project/aiosql/"
 
 [tool.black]
 line-length = 100
-target-version = ["py38"]
+target-version = ["py39"]
 
 [tool.mypy]
 exclude = ["(build|venv)/", ".*/virtualenvs/.*"]
