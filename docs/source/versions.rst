@@ -4,13 +4,18 @@ AioSQL - Versions
 TODO
 ----
 
-- add apsw, duckdb, asyncpg and psycopg2 to pypy and python 3.13 when possible
+- add apsw, duckdb, asyncpg and psycopg2 to pypy and python 3.13 when possible.
 - maintain up-to-date wrt Python moving target…
 - once 3.9 support is dropped, remove old-style type hints.
 - write a small SQLite3-based tutorial?
 - tests with other database and drivers?
-- rethink record classes? we just want a function?
+- rethink record classes? we just really want a row conversion function?
 - add documentation about docker runs.
+
+? on ?
+------
+
+- drop support for _Python 3.8_.
 
 12.0 on 2024-09-07
 ------------------
