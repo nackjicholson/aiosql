@@ -16,6 +16,7 @@ TODO
 ------
 
 - drop support for *Python 3.8*.
+- enable *DuckDB* with *Python 3.13*.
 
 12.0 on 2024-09-07
 ------------------

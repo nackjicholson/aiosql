@@ -24,8 +24,7 @@ dev = [
 ]
 dev-duckdb = [
     # skip, wheel compilation takes 12 minutes…
-    # "duckdb; python_version < '3.13' and implementation_name != 'pypy'"
-    "duckdb"
+    "duckdb; implementation_name != 'pypy'"
 ]
 dev-sqlite = [
     "aiosqlite",
