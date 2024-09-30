@@ -42,7 +42,7 @@ class DuckDBAdapter(GenericAdapter):
             # https://github.com/duckdb/duckdb/issues/6008
             res = cur.fetchall()
         finally:
-            if not self._use_cursor:
+            if self._use_cursor:
                 cur.close()
         if isinstance(res, list):
             res = res[0]
@@ -73,7 +73,7 @@ class DuckDBAdapter(GenericAdapter):
                     # strict=False: requires 3.10
                     yield record_class(**dict(zip(column_names, row)))
         finally:
-            if not self._use_cursor:
+            if self._use_cursor:
                 cur.close()
 
     def select_one(self, conn, query_name, sql, parameters, record_class=None):
@@ -89,6 +89,6 @@ class DuckDBAdapter(GenericAdapter):
                 column_names = [c[0] for c in cur.description or []]
                 result = dict(zip(column_names, result))
         finally:
-            if not self._use_cursor:
+            if self._use_cursor:
                 cur.close()
         return result
