@@ -43,3 +43,8 @@ from run_tests import (
 	run_execute_script as test_execute_script,
 	run_modulo as test_modulo,
 )
+
+def test_no_cursor(conn):
+    adapter = aiosql.adapters.duckdb.DuckDBAdapter(use_cursor=False)
+    cursor = adapter._cursor(conn)
+    assert cursor == conn
