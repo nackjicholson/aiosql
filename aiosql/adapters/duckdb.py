@@ -17,10 +17,18 @@ def _colon_to_dollar(ma):
 class DuckDBAdapter(GenericAdapter):
     """DuckDB Adapter"""
 
-    def __init__(self, *args, cursor_as_dict: bool = False, **kwargs):
+    def __init__(self, *args, cursor_as_dict: bool = False, use_cursor: bool = True, **kwargs):
         super().__init__(*args, **kwargs)
         # whether to converts the default tuple response to a dict.
         self._convert_row_to_dict = cursor_as_dict
+        self._use_cursor = use_cursor
+
+    def _cursor(self, conn):
+        """Get a cursor from a connection."""
+        # For DuckDB cursor is duplicated connection so we don't want to use it
+        if self._use_cursor:
+            return conn.cursor(*self._args, **self._kwargs)
+        return conn
 
     def process_sql(self, query_name, op_type, sql):
         return VAR_REF.sub(_colon_to_dollar, sql)
@@ -28,11 +36,14 @@ class DuckDBAdapter(GenericAdapter):
     def insert_returning(self, conn, query_name, sql, parameters):  # pragma: no cover
         # very similar to select_one but the returned value
         cur = self._cursor(conn)
-        cur.execute(sql, parameters)
-        # we have to use fetchall instead of fetchone for now due to this:
-        # https://github.com/duckdb/duckdb/issues/6008
-        res = cur.fetchall()
-        cur.close()
+        try:
+            cur.execute(sql, parameters)
+            # we have to use fetchall instead of fetchone for now due to this:
+            # https://github.com/duckdb/duckdb/issues/6008
+            res = cur.fetchall()
+        finally:
+            if not self._use_cursor:
+                cur.close()
         if isinstance(res, list):
             res = res[0]
         return res[0] if res and len(res) == 1 else res
@@ -62,7 +73,8 @@ class DuckDBAdapter(GenericAdapter):
                     # strict=False: requires 3.10
                     yield record_class(**dict(zip(column_names, row)))
         finally:
-            cur.close()
+            if not self._use_cursor:
+                cur.close()
 
     def select_one(self, conn, query_name, sql, parameters, record_class=None):
         cur = self._cursor(conn)
@@ -77,5 +89,6 @@ class DuckDBAdapter(GenericAdapter):
                 column_names = [c[0] for c in cur.description or []]
                 result = dict(zip(column_names, result))
         finally:
-            cur.close()
+            if not self._use_cursor:
+                cur.close()
         return result
