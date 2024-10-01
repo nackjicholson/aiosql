@@ -12,8 +12,8 @@ TODO
 - rethink record classes? we just really want a row conversion function?
 - add documentation about docker runs.
 
-? on ?
-------
+12.1 on 2024-10-01
+------------------
 
 - drop support for *Python 3.8*.
 - enable *DuckDB* with *Python 3.13*.
