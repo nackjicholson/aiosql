@@ -23,14 +23,13 @@ dev = [
     "mypy", "pyright", "types-setuptools", "build"
 ]
 dev-duckdb = [
-    # skip, wheel compilation takes 12 minutes…
+    # skip, wheel compilation takes too much time… (confirmed 2024-09-30)
     "duckdb; implementation_name != 'pypy'"
 ]
 dev-sqlite = [
     "aiosqlite",
-    # fails on missing symbol with pypy
-    # "apsw; implementation_name != 'pypy'"
-    "apsw"
+    # fails on missing symbol with pypy (confirmed 2024-10-01)
+    "apsw; implementation_name != 'pypy'"
 ]
 dev-postgres = [
     "pytest-postgresql",
