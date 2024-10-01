@@ -29,7 +29,8 @@ dev-duckdb = [
 dev-sqlite = [
     "aiosqlite",
     # fails on missing symbol with pypy
-    "apsw; implementation_name != 'pypy'"
+    # "apsw; implementation_name != 'pypy'"
+    "apsw"
 ]
 dev-postgres = [
     "pytest-postgresql",
