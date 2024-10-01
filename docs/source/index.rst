@@ -92,7 +92,7 @@ Badges
    # ASYNC
    aiosqlite: 13
    asyncpg: 18
-.. image:: https://img.shields.io/badge/tests-244%20✓-success
+.. image:: https://img.shields.io/badge/tests-245%20✓-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 .. image:: https://img.shields.io/github/issues/nackjicholson/aiosql?style=flat
