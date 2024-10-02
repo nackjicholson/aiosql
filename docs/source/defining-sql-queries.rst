@@ -12,7 +12,7 @@ into underlines (``_``).
 
 .. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
    :language: sql
-   :lines: 5,7
+   :lines: 14,16
 
 This query will be available in aiosql under the python method name ``.get_all_blogs(conn)``
 
@@ -21,7 +21,7 @@ Query Comments
 
 .. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
    :language: sql
-   :lines: 5-7
+   :lines: 14-16
 
 Any other SQL comments you make between the name definition and your code will
 be used a the python documentation string for the generated method.
@@ -51,7 +51,7 @@ In addition, simple attributes can be referenced with the ``.``-syntax.
 
 .. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
    :language: sql
-   :lines: 59-60
+   :lines: 61-62
 
 Then the generated function expects two named parameters:
 
@@ -75,7 +75,7 @@ name is written without any trailing operators.
 
 .. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
    :language: sql
-   :lines: 5
+   :lines: 14
 
 The lack of an explicit operator tells aiosql to execute the query and
 to return **all** the results.
@@ -100,7 +100,7 @@ rows of length 1.
 
 .. literalinclude:: ../../tests/blogdb/sql/users/users.sql
    :language: sql
-   :lines: 9-15
+   :lines: 8-14
 
 When used from Python this query will either return ``None`` or the singular selected row.
 
@@ -120,7 +120,7 @@ This is mostly useful for queries returning IDs, COUNTs or other aggregates.
 
 .. literalinclude:: ../../tests/blogdb/sql/users/users.sql
    :language: sql
-   :lines: 33,35
+   :lines: 30,32
 
 When used from Python:
 
@@ -138,7 +138,7 @@ modifications to database rows without a necessary return value.
 
 .. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
    :language: sql
-   :lines: 62-64,22-25
+   :lines: 64-66, 31,34
 
 The methods generated are:
 
@@ -160,7 +160,7 @@ apply:
 
 .. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
    :language: sql
-   :lines: 66-69
+   :lines: 68-71
 
 .. code:: python
 
@@ -181,9 +181,9 @@ As recent version of SQLite do support the ``returning`` clause, simply forget
 about this, use the clause explicitely and treat the whole command as a standard
 select with the *empty* operator (relation), or ``^`` (tuple), or ``$`` (scalar).
 
-.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs_sqlite.sql
+.. literalinclude:: ../../tests/blogdb/sql/blogs/li/blogs.sql
    :language: sql
-   :lines: 26-28
+   :lines: 39-41
 
 Executing this query in python will return the ``blogid`` of the inserted row.
 
@@ -201,9 +201,9 @@ for an example.
 
 In aiosql we can use this for a bulk publish method that operates over a list of blog entries.
 
-.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs_pg.sql
+.. literalinclude:: ../../tests/blogdb/sql/blogs/pg/blogs.sql
    :language: sql
-   :lines: 33-36
+   :lines: 50-53
 
 .. code:: python
 
@@ -224,11 +224,11 @@ Using this operarator will execute sql statements as a script.
 You can't do variable substitution with the ``#`` operator.
 An example usecase is using data definition statements like create table in order to setup a database.
 
-.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs_sqlite.sql
+.. literalinclude:: ../../tests/blogdb/sql/blogs/pg/blogs.sql
    :language: sql
-   :lines: 30-45
+   :lines: 9-16
 
 .. code:: python
 
     queries = aiosql.from_path("create_schema.sql", "sqlite3")
-    queries.create_schema(conn)
+    queries.create_table_blogs(conn)
