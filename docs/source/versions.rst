@@ -12,6 +12,11 @@ TODO
 - rethink record classes? we just really want a row conversion function?
 - add documentation about docker runs.
 
+? on ?
+------
+
+- fix included source lines in documentation.
+
 12.1 on 2024-10-01
 ------------------
 
