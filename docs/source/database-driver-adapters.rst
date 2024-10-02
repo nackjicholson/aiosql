@@ -32,12 +32,12 @@ A database driver adapter is a duck-typed class that follows either of the
 
 .. literalinclude:: ../../aiosql/types.py
    :language: python
-   :lines: 62-105
+   :lines: 61-104
    :caption: PEP 249 Synchronous Adapter
 
 .. literalinclude:: ../../aiosql/types.py
    :language: python
-   :lines: 108-153
+   :lines: 107-152
    :caption: Asynchronous Adapter
 
 Some comments about these classes, one for synchronous queries (PEP 249) and
