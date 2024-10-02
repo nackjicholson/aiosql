@@ -79,7 +79,7 @@ Badges
    # SYNC
    sqlite3: 17
    apsw: 16
-   duckdb: 14
+   duckdb: 15
    mariadb: 17
    pymysql: 16
    mysqldb: 15
