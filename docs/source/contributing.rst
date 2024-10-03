@@ -7,7 +7,7 @@ All kinds of contributions are helpful and welcome.
 
 -  Report issues `<https://github.com/nackjicholson/aiosql/issues>`__
 -  Review or make your own pull requests `<https://github.com/nackjicholson/aiosql/pulls>`__
--  Write documentation `<https://github.com/nackjicholson/aiosql/tree/master/docs>`__
+-  Write documentation `<https://github.com/nackjicholson/aiosql/tree/main/docs/source>`__
 
 Whether you have an idea for a feature improvement or have found a troubling bug, thank you for being here.
 
@@ -84,4 +84,4 @@ For development you need to test with various databases and even more drivers,
 see above for generating a working python environment.
 
 See also the ``docker`` sub-directory which contains dockerfiles for testing
-with Postgres, MySQL and MariaDB.
+with Postgres, MySQL, MariaDB and MS SQL Server.
