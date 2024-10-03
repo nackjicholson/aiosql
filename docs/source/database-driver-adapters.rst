@@ -6,8 +6,8 @@ additional database drivers.
 If you are using a driver other than the ones currently supported by built-in
 driver adapters (``sqlite3``, ``apsw``, ``aiosqlite``, ``psycopg``,
 ``psycopg2``, ``pg8000``, ``pygresql``, ``asyncpg``, ``pymysql``,
-``mysqlclient``, ``mysql-connector``, ``duckdb``), first check whether your
-driver supports *pyformat* or *named* paramstyles.
+``mysqlclient``, ``mysql-connector``, ``duckdb``, ``pymssql``),
+first check whether your driver supports *pyformat* or *named* paramstyles.
 If so, check (manually) whether the default PEP 249 drivers work:
 
 .. code:: python
