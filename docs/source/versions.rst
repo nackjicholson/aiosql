@@ -11,6 +11,7 @@ TODO
 - tests with other database and drivers?
 - rethink record classes? we just really want a row conversion function?
 - add documentation about docker runs.
+- allow tagging queries, eg whether it can be cached
 
 12.2 on 2024-10-02
 ------------------
