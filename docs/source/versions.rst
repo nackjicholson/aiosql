@@ -13,6 +13,12 @@ TODO
 - add documentation about docker runs.
 - allow tagging queries, eg whether it can be cached
 
+? on ?
+------
+
+- add *psycopg2* to CI.
+- improve documentation.
+
 12.2 on 2024-10-02
 ------------------
 
