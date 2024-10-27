@@ -24,3 +24,6 @@ SELECT :numerator % :denominator AS modulo;
 
 -- name: square$
 select :val::int * :val::int as squared;
+
+-- name: not_a_select
+INSERT INTO Foo VALUES (1);
