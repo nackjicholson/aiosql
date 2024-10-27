@@ -22,12 +22,11 @@ WAIT	= ./tests/wait.py
 help:
 	@echo "useful targets:"
 	echo " - help: show this help"
-	echo " - venv: generate python virtual environment directory"
-	echo " - venv.dev: make venv suitable for development"
+	echo " - dev: make environment suitable for development"
 	echo " - venv.prod: make venv suitable for production"
 	echo " - venv.last: fill venv with latests packages"
 	echo " - clean: clean up various generated files and directories"
-	echo " - clean.venv: also remove the venv directory"
+	echo " - clean.dev: also remove the development environment"
 	echo " - check.pytest: run pytest tests"
 	echo " - check.mypy: run mypy type checker"
 	echo " - check.flake8: run flake8 code style checks"
@@ -47,26 +46,32 @@ help:
 # so the result is kind of a mess, so we attempt at doing nearly nothing and
 # hope for the best, i.e. dependencies will not break the library.
 #
-.PHONY: venv.dev venv.prod venv.last
 
 venv:
 	$(PYTHON) -m venv venv
 	source venv/bin/activate
 	$(PIP) install --upgrade pip
 
-venv.dev: venv
+venv/.dev: venv
 	source venv/bin/activate
 	$(PIP) install .[dev,dev-postgres,dev-sqlite,dev-duckdb]
+	touch $@
 
-venv.dist: venv
+venv/.dist: venv
 	source venv/bin/activate
 	$(PIP) install .[dist]
+	touch $@
 
+.PHONY: venv.prod
 venv.prod: venv
 
+.PHONY: venv.last
 venv.last: venv
 	source venv/bin/activate
 	$(PIP) install $$($(PIP) freeze | cut -d= -f1 | grep -v -- '^-e') -U
+
+.PHONY: dev
+dev: venv/.dev
 
 # direct module installation for github or docker
 ifdef VENV
@@ -93,6 +98,9 @@ clean:
 .PHONY: clean.venv
 clean.venv: clean
 	$(RM) -r venv $(MODULE).egg-info
+
+.PHONY: clean.dev
+clean.dev: clean.venv
 
 .PHONY: clean.docker
 clean.docker: clean docker.rm
