@@ -16,6 +16,8 @@ TODO
 ? on ?
 ------
 
+- improve Makefile.
+- warn on probable mission operation.
 - add *psycopg2* to CI.
 - improve documentation.
 

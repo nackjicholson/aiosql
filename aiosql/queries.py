@@ -1,3 +1,4 @@
+import re
 import inspect
 from pathlib import Path
 from types import MethodType
@@ -6,7 +7,7 @@ from types import MethodType
 from typing import Any, Callable, List, Optional, Set, Tuple, Union, Dict, cast
 
 from .types import DriverAdapterProtocol, QueryDatum, QueryDataTree, QueryFn, SQLOperationType
-from .utils import SQLLoadException
+from .utils import SQLLoadException, log
 
 
 class Queries:
@@ -72,6 +73,10 @@ class Queries:
         else:
             return args
 
+    def _look_like_a_select(self, sql: str) -> bool:
+        # skipped: VALUES, SHOW
+        return re.search(r"(?i)\b(SELECT|RETURNING|TABLE|EXECUTE)\b", sql) is not None
+
     def _query_fn(
         self,
         fn: Callable[..., Any],
@@ -93,6 +98,9 @@ class Queries:
         qfn.sql = sql
         qfn.operation = operation
         qfn.attributes = attributes
+        # sanity check in passing…
+        if operation == SQLOperationType.SELECT and not self._look_like_a_select(sql):
+            log.warning(f"query {fname} may not be a select, consider adding an operator, eg '!'")
         return qfn
 
     # NOTE about coverage: because __code__ is set to reflect the actual SQL file
