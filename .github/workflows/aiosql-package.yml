@@ -17,7 +17,8 @@ jobs:
       matrix:
         # https://github.com/actions/python-versions (versions-manifest.json)
         # https://downloads.python.org/pypy/versions.json
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "pypy3.10"]
+        # 3.14 KO on pydantic build dependences 2024-10-27
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.10"]
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
