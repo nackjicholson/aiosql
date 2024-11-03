@@ -223,7 +223,7 @@ Why you might want to use this
 * You don't want to write your SQL in strings intermixed with your python code.
 * You're not using an ORM like `SQLAlchemy <https://www.sqlalchemy.org/>`__ or
   `Django <https://www.djangoproject.com/>`__ ,
-  with large (100k lines) code imprints vs under 900 for `aiosql`,
+  with large (100k lines) code imprints vs under 900 for `aiosql` and under 300 for `anodb`,
   and you don't need to.
 * You want to be able to reuse your SQL in other contexts.
   Loading it into `psql` or other database tools.
