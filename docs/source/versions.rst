@@ -12,6 +12,13 @@ TODO
 - rethink record classes? we just really want a row conversion function?
 - add documentation about docker runs.
 - allow tagging queries, eg whether it can be cached
+- add ability to _declare_ named query parameters for readability and reliability,
+  allowing to check for unused or undeclared parameters
+
+  ```sql
+  -- name: get_foo_by_id(id)^
+  SELECT * FROM Foo WHERE fooid = :id:
+  ```
 
 ? on ?
 ------
