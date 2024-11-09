@@ -7,7 +7,7 @@ from types import MethodType
 from typing import Any, Callable, List, Optional, Set, Tuple, Union, Dict, cast
 
 from .types import DriverAdapterProtocol, QueryDatum, QueryDataTree, QueryFn, SQLOperationType
-from .utils import SQLLoadException, log
+from .utils import SQLLoadException, SQLParseException, log
 
 
 class Queries:
@@ -27,10 +27,10 @@ class Queries:
     """
 
     def __init__(
-        self,
-        driver_adapter: DriverAdapterProtocol,
-        kwargs_only: bool = False,
-    ):
+            self,
+            driver_adapter: DriverAdapterProtocol,
+            kwargs_only: bool = False,
+        ):
         self.driver_adapter: DriverAdapterProtocol = driver_adapter
         self.is_aio: bool = getattr(driver_adapter, "is_aio_driver", False)
         self._kwargs_only = kwargs_only
@@ -40,8 +40,12 @@ class Queries:
     # INTERNAL UTILS
     #
     def _params(
-        self, attributes, args: Union[List[Any], Tuple[Any]], kwargs: Dict[str, Any]
-    ) -> Union[List[Any], Tuple[Any], Dict[str, Any]]:
+            self,
+            attributes: Optional[Dict[str, Dict[str, str]]],
+            params: Optional[List[str]],
+            args: Union[List[Any], Tuple[Any]],
+            kwargs: Dict[str, Any],
+        ) -> Union[List[Any], Tuple[Any], Dict[str, Any]]:
         """Handle query parameters.
 
         - update attribute references ``:u.a`` to ``:u__a``.
@@ -66,28 +70,31 @@ class Queries:
                 raise ValueError("cannot use positional parameters under kwargs_only, use named parameters (name=value, …)")
             return kwargs
         elif kwargs:
-            # FIXME is this true?
             if args:
                 raise ValueError("cannot mix positional and named parameters in query")
             return kwargs
-        else:
+        else:  # args
+            if args and params is not None:
+                raise ValueError("cannot use positional parameters with declared named parameters")
             return args
 
     def _look_like_a_select(self, sql: str) -> bool:
+        """Tell whether sql may return a relation."""
         # skipped: VALUES, SHOW, TABLE, EXECUTE
         return re.search(r"(?i)\b(SELECT|RETURNING)\b", sql) is not None
 
     def _query_fn(
-        self,
-        fn: Callable[..., Any],
-        name: str,
-        doc: Optional[str],
-        sql: str,
-        operation: SQLOperationType,
-        signature: Optional[inspect.Signature],
-        floc: Tuple[Union[Path, str], int] = ("<unknown>", 0),
-        attributes: Optional[Dict[str, Dict[str, str]]] = None,
-    ) -> QueryFn:
+            self,
+            fn: Callable[..., Any],
+            name: str,
+            doc: Optional[str],
+            sql: str,
+            operation: SQLOperationType,
+            signature: Optional[inspect.Signature],
+            floc: Tuple[Union[Path, str], int] = ("<unknown>", 0),
+            attributes: Optional[Dict[str, Dict[str, str]]] = None,
+            params: Optional[List[str]] = None,
+        ) -> QueryFn:
         """Add custom-made metadata to a dynamically generated function."""
         fname, lineno = floc
         fn.__code__ = fn.__code__.replace(co_filename=str(fname), co_firstlineno=lineno)  # type: ignore
@@ -95,9 +102,11 @@ class Queries:
         qfn.__name__ = name
         qfn.__doc__ = doc
         qfn.__signature__ = signature
+        # query details
         qfn.sql = sql
         qfn.operation = operation
         qfn.attributes = attributes
+        qfn.parameters = params
         # sanity check in passing…
         if operation == SQLOperationType.SELECT and not self._look_like_a_select(sql):
             log.warning(f"query {fname} may not be a select, consider adding an operator, eg '!'")
@@ -109,7 +118,7 @@ class Queries:
     def _make_sync_fn(self, query_datum: QueryDatum) -> QueryFn:
         """Build a dynamic method from a parsed query."""
 
-        query_name, doc_comments, operation_type, sql, record_class, signature, floc, attributes = (
+        query_name, doc_comments, operation_type, sql, record_class, signature, floc, attributes, params = (
             query_datum
         )
 
@@ -117,14 +126,14 @@ class Queries:
 
             def fn(self, conn, *args, **kwargs):  # pragma: no cover
                 return self.driver_adapter.insert_returning(
-                    conn, query_name, sql, self._params(attributes, args, kwargs)
+                    conn, query_name, sql, self._params(attributes, params, args, kwargs)
                 )
 
         elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE:
 
             def fn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover
                 return self.driver_adapter.insert_update_delete(
-                    conn, query_name, sql, self._params(attributes, args, kwargs)
+                    conn, query_name, sql, self._params(attributes, params, args, kwargs)
                 )
 
         elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
@@ -135,36 +144,39 @@ class Queries:
 
         elif operation_type == SQLOperationType.SCRIPT:
 
+            if params:
+                raise SQLParseException(f"cannot use named parameters in SQL script: {query_name}")
+
             def fn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover
-                # FIXME parameters are ignored?
+                assert not args and not kwargs, f"cannot use parameters in SQL script: {query_name}"
                 return self.driver_adapter.execute_script(conn, sql)
 
         elif operation_type == SQLOperationType.SELECT:
 
             def fn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover
                 return self.driver_adapter.select(
-                    conn, query_name, sql, self._params(attributes, args, kwargs), record_class
+                    conn, query_name, sql, self._params(attributes, params, args, kwargs), record_class
                 )
 
         elif operation_type == SQLOperationType.SELECT_ONE:
 
             def fn(self, conn, *args, **kwargs):  # pragma: no cover
                 return self.driver_adapter.select_one(
-                    conn, query_name, sql, self._params(attributes, args, kwargs), record_class
+                    conn, query_name, sql, self._params(attributes, params, args, kwargs), record_class
                 )
 
         elif operation_type == SQLOperationType.SELECT_VALUE:
 
             def fn(self, conn, *args, **kwargs):  # pragma: no cover
                 return self.driver_adapter.select_value(
-                    conn, query_name, sql, self._params(attributes, args, kwargs)
+                    conn, query_name, sql, self._params(attributes, params, args, kwargs)
                 )
 
         else:
             raise ValueError(f"Unknown operation_type: {operation_type}")
 
         return self._query_fn(
-            fn, query_name, doc_comments, sql, operation_type, signature, floc, attributes
+            fn, query_name, doc_comments, sql, operation_type, signature, floc, attributes, params
         )
 
     # NOTE does this make sense?
@@ -181,7 +193,7 @@ class Queries:
 
         def ctx_mgr(self, conn, *args, **kwargs):  # pragma: no cover
             return self.driver_adapter.select_cursor(
-                conn, fn.__name__, fn.sql, self._params(fn.attributes, args, kwargs)
+                conn, fn.__name__, fn.sql, self._params(fn.attributes, fn.parameters, args, kwargs)
             )
 
         return self._query_fn(
@@ -194,9 +206,8 @@ class Queries:
         if is_aio:
             fn = self._make_async_fn(fn)
 
-        ctx_mgr = self._make_ctx_mgr(fn)
-
         if query_datum.operation_type == SQLOperationType.SELECT:
+            ctx_mgr = self._make_ctx_mgr(fn)
             return [fn, ctx_mgr]
         else:
             return [fn]
