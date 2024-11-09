@@ -39,7 +39,7 @@ def test_frompath_queries_cls(sql_dir):
     class TestQueries(Queries):
         pass
 
-    queries = aiosql.from_path(sql_dir, "aiosqlite", queries_cls=TestQueries)
+    queries = aiosql.from_path(sql_dir, "aiosqlite", queries_cls=TestQueries, kwargs_only=False)
     assert isinstance(queries, TestQueries)
 
     assert repr(queries).startswith("Queries(")
@@ -48,7 +48,7 @@ def test_frompath_queries_cls(sql_dir):
 def test_frompath_queryloader_cls(sql_dir):
     mock_loader = mock.MagicMock(wraps=QueryLoader)
 
-    aiosql.from_path(sql_dir, "aiosqlite", loader_cls=mock_loader)
+    aiosql.from_path(sql_dir, "aiosqlite", loader_cls=mock_loader, kwargs_only=False)
 
     assert mock_loader.called
 

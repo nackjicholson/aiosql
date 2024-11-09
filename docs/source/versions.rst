@@ -12,11 +12,12 @@ TODO
 - rethink record classes? we just really want a row conversion function?
 - add documentation about docker runs.
 - allow tagging queries, eg whether it can be cached
-- change `kwargs_only` default to true?
 
 13.0 on ?
 ---------
 
+- change `kwargs_only` parameter default value to _True_.
+  **This breaks compatibility.**
 - add optional parameter declarations to queries, and check them when provided.
 - forbid positional parameters when named parameters are declared.
 - warn on probable mission operation.

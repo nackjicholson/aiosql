@@ -116,7 +116,8 @@ def queries(driver: str):
     """Load queries into AioSQL, plus a convenient test wrapper."""
     RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
     dir_path = Path(__file__).parent / "blogdb" / "sql"
-    queries = aiosql.from_path(dir_path, driver, RECORD_CLASSES, attribute="_dot_")
+    queries = aiosql.from_path(dir_path, driver, RECORD_CLASSES, attribute="_dot_", kwargs_only=False)
+    # log.warning(f"queries: {queries}")
     return Queries(driver, queries)
 
 # actual tests use these fixtures:

@@ -18,18 +18,18 @@ class Queries:
 
     Much of the needed pre-processing is performed in ``QueryLoader``.
 
-    **Parameters:**
+    Parameters:
 
-    - **driver_adapter**: Either a string to designate one of the aiosql built-in database driver
+    - :param driver_adapter: Either a string to designate one of the aiosql built-in database driver
       adapters (e.g. "sqlite3", "psycopg").
       If you have defined your own adapter class, you can pass its constructor.
-    - **kwargs_only**: whether to reject positional parameters, defaults to false.
+    - :param kwargs_only: whether to reject positional parameters, defaults to true.
     """
 
     def __init__(
             self,
             driver_adapter: DriverAdapterProtocol,
-            kwargs_only: bool = False,
+            kwargs_only: bool = True,
         ):
         self.driver_adapter: DriverAdapterProtocol = driver_adapter
         self.is_aio: bool = getattr(driver_adapter, "is_aio_driver", False)
@@ -272,7 +272,7 @@ class Queries:
         """Load Queries from a `QueryDataTree`"""
         for key, value in query_data_tree.items():
             if isinstance(value, dict):
-                self.add_child_queries(key, Queries(self.driver_adapter).load_from_tree(value))
+                self.add_child_queries(key, Queries(self.driver_adapter, self._kwargs_only).load_from_tree(value))
             else:
                 self.add_queries(self._create_methods(value, self.is_aio))
         return self
