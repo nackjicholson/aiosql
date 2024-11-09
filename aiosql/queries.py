@@ -74,8 +74,8 @@ class Queries:
             return args
 
     def _look_like_a_select(self, sql: str) -> bool:
-        # skipped: VALUES, SHOW
-        return re.search(r"(?i)\b(SELECT|RETURNING|TABLE|EXECUTE)\b", sql) is not None
+        # skipped: VALUES, SHOW, TABLE, EXECUTE
+        return re.search(r"(?i)\b(SELECT|RETURNING)\b", sql) is not None
 
     def _query_fn(
         self,
