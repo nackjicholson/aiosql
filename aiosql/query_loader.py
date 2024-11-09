@@ -15,7 +15,7 @@ _RECORD_DEF = re.compile(r"--\s*record_class\s*:\s*(\w+)\s*")
 # extract a valid query name followed by an optional operation spec
 # FIXME this accepts "1st" but seems to reject "é"
 _NAME_OP = re.compile(
-    # name
+    # query name
     r"^(?P<name>\w+)"
     # optional list of parameters (foo, bla) or ()
     r"(|\((?P<params>(\s*|\s*\w+\s*(,\s*\w+\s*)*))\))"
@@ -102,6 +102,10 @@ class QueryLoader:
 
     This class holds the various utilities to read SQL files and build
     QueryDatum, which will be transformed as functions in Queries.
+
+    - :param driver_adapter: driver name or class.
+    - :param record_classes: nothing of dict.
+    - :param attribute: string to insert in place of ``.``.
     """
 
     def __init__(
@@ -120,10 +124,12 @@ class QueryLoader:
         ns_parts: List[str],
         floc: Tuple[Union[Path, str], int],
     ) -> QueryDatum:
-        # Build a query datum
-        # - query: the spec and name ("query-name!\n-- comments\nSQL;\n")
-        # - ns_parts: name space parts, i.e. subdirectories of loaded files
-        # - floc: file name and lineno the query was extracted from
+        """Build a query datum.
+
+        - :param query: the spec and name (``query-name!\n-- comments\nSQL;\n``)
+        - :param ns_parts: name space parts, i.e. subdirectories of loaded files
+        - :param floc: file name and lineno the query was extracted from
+        """
         lines = [line.strip() for line in query.strip().splitlines()]
         qname, qop, qsig = self._get_name_op(lines[0])
         if re.search(r"[^A-Za-z0-9_]", qname):
@@ -140,6 +146,7 @@ class QueryLoader:
         return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, floc, attributes)
 
     def _get_name_op(self, text: str) -> Tuple[str, SQLOperationType, Optional[List[str]]]:
+        """Extract name, parameters and operation from spec."""
         qname_spec = text.replace("-", "_")
         matched = _NAME_OP.match(qname_spec)
         if not matched or _BAD_PREFIX.match(qname_spec):
@@ -153,12 +160,14 @@ class QueryLoader:
         return nameop["name"], _OP_TYPES[nameop["op"]], params
 
     def _get_record_class(self, text: str) -> Optional[Type]:
+        """Extract record class from spec."""
         rc_match = _RECORD_DEF.match(text)
         rc_name = rc_match.group(1) if rc_match else None
         # TODO: Probably will want this to be a class, marshal in, and marshal out
         return self.record_classes.get(rc_name) if isinstance(rc_name, str) else None
 
     def _get_sql_doc(self, lines: Sequence[str]) -> Tuple[str, str]:
+        """Separate SQL-comment documentation and SQL code."""
         doc, sql = "", ""
         for line in lines:
             doc_match = _SQL_COMMENT.match(line)
@@ -170,6 +179,8 @@ class QueryLoader:
         return sql.strip(), doc.rstrip()
 
     def _build_signature(self, sql: str, qname: str, sig: Optional[List[str]]) -> inspect.Signature:
+        """Return signature object for generated dynamic function."""
+        # FIXME what about the connection?!
         params = [inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)]
         names = set()
         for match in VAR_REF.finditer(sql):
@@ -197,6 +208,7 @@ class QueryLoader:
     def load_query_data_from_sql(
         self, sql: str, ns_parts: List[str], fname: Union[Path, str] = "<unknown>"
     ) -> List[QueryDatum]:
+        """Load queries from a string."""
         usql = _remove_ml_comments(sql)
         qdefs = _QUERY_DEF.split(usql)
         # FIXME lineno is from the uncommented file
@@ -211,11 +223,13 @@ class QueryLoader:
     def load_query_data_from_file(
         self, path: Path, ns_parts: List[str] = [], encoding=None
     ) -> List[QueryDatum]:
+        """Load queries from a file."""
         return self.load_query_data_from_sql(path.read_text(encoding=encoding), ns_parts, path)
 
     def load_query_data_from_dir_path(
         self, dir_path, ext=(".sql",), encoding=None
     ) -> QueryDataTree:
+        """Load queries from a directory."""
         if not dir_path.is_dir():
             raise ValueError(f"The path {dir_path} must be a directory")
 
