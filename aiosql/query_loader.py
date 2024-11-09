@@ -14,7 +14,14 @@ _RECORD_DEF = re.compile(r"--\s*record_class\s*:\s*(\w+)\s*")
 
 # extract a valid query name followed by an optional operation spec
 # FIXME this accepts "1st" but seems to reject "é"
-_NAME_OP = re.compile(r"^(?P<name>\w+)(|\((?P<params>(\s*|\s*\w+\s*(,\s*\w+\s*)*))\))(?P<op>(|\^|\$|!|<!|\*!|#))$")
+_NAME_OP = re.compile(
+    # name
+    r"^(?P<name>\w+)"
+    # optional list of parameters (foo, bla) or ()
+    r"(|\((?P<params>(\s*|\s*\w+\s*(,\s*\w+\s*)*))\))"
+    # operation, empty for simple select
+    r"(?P<op>(|\^|\$|!|<!|\*!|#))$"
+)
 
 # forbid numbers as first character
 _BAD_PREFIX = re.compile(r"^\d")
@@ -132,7 +139,7 @@ class QueryLoader:
         sql = self.driver_adapter.process_sql(query_fqn, qop, sql)
         return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, floc, attributes)
 
-    def _get_name_op(self, text: str) -> Tuple[str, SQLOperationType, List[str]|None]:
+    def _get_name_op(self, text: str) -> Tuple[str, SQLOperationType, Optional[List[str]]]:
         qname_spec = text.replace("-", "_")
         matched = _NAME_OP.match(qname_spec)
         if not matched or _BAD_PREFIX.match(qname_spec):
