@@ -33,7 +33,7 @@ values (
 -- Remove a blog from the database
 delete from blogs where blogid = :blogid;
 
--- name: get-user-blogs
+-- name: get-user-blogs(userid)
 -- record_class: UserBlogSummary
 -- Get blogs authored by a user.
   select title AS title,
@@ -43,7 +43,7 @@ delete from blogs where blogid = :blogid;
 order by published desc;
 
 
--- name: get-latest-user-blog^
+-- name: get-latest-user-blog(userid)^
 -- record_class: UserBlogSummary
 -- Get latest blog by user.
 select title AS title, published AS published
@@ -52,8 +52,8 @@ where userid = :userid
 order by published desc
 limit 1;
 
--- name: search
-select title from blogs where title = :title and published = :published;
+-- name: search(title, published)
+select title from blogs where title LIKE :title and published = :published;
 
 -- name: blog_title^
 select blogid, title from blogs where blogid = :blogid;

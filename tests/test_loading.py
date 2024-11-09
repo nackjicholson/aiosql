@@ -224,3 +224,28 @@ def test_kwargs():
         pytest.fail("must raise an exception")  # pragma: no cover
     except ValueError as e:
         assert "mix" in str(e)
+
+def test_parameter_declarations():
+    # ok
+    import sqlite3
+    conn = sqlite3.connect(":memory:")
+    q = aiosql.from_str(
+        "-- name: xlii()$\nSELECT 42;\n"
+        "-- name: next(n)$\nSELECT :n+1;\n"
+        "-- name: add(n, m)$\nSELECT :n+:m;\n",
+        "sqlite3")
+    assert q.xlii(conn) == 42
+    assert q.next(conn, n=41) == 42
+    assert q.add(conn, n=20, m=22) == 42
+    conn.close()
+    # errors
+    try:
+        aiosql.from_str("-- name: foo()\nSELECT :N + 1;\n", "sqlite3")
+        pytest.fail("must raise an exception")
+    except SQLParseException as e:
+        assert "undeclared" in str(e) and "N" in str(e)
+    try:
+        aiosql.from_str("-- name: foo(N, M)\nSELECT :N + 1;\n", "sqlite3")
+        pytest.fail("must raise an exception")
+    except SQLParseException as e:
+        assert "unused" in str(e) and "M" in str(e)
