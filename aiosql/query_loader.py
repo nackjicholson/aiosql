@@ -169,7 +169,7 @@ class QueryLoader:
 
         return sql.strip(), doc.rstrip()
 
-    def _build_signature(self, sql: str, qname: str, sig: List[str]|None) -> inspect.Signature:
+    def _build_signature(self, sql: str, qname: str, sig: Optional[List[str]]) -> inspect.Signature:
         params = [inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)]
         names = set()
         for match in VAR_REF.finditer(sql):
