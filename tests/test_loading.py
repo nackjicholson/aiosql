@@ -237,6 +237,12 @@ def test_parameter_declarations():
     assert q.xlii(conn) == 42
     assert q.next(conn, n=41) == 42
     assert q.add(conn, n=19, m=23) == 42
+    # usage errors
+    try:
+        q.next(conn, 41)
+        pytest.fail("must complain about positional parameter")
+    except ValueError as e:
+        assert "positional" in str(e)
     conn.close()
     # errors
     try:
@@ -249,3 +255,8 @@ def test_parameter_declarations():
         pytest.fail("must raise an exception")
     except SQLParseException as e:
         assert "unused" in str(e) and "M" in str(e)
+    try:
+        aiosql.from_str("-- name: foo(a)#\nCREATE TABLE :a();\n", "sqlite3")
+        pytest.fail("must raise an exception")
+    except SQLParseException as e:
+        assert "script" in str(e)

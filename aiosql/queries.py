@@ -144,7 +144,8 @@ class Queries:
 
         elif operation_type == SQLOperationType.SCRIPT:
 
-            if params:
+            if params:  # pragma: no cover
+                # NOTE this is caught earlier
                 raise SQLParseException(f"cannot use named parameters in SQL script: {query_name}")
 
             def fn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover

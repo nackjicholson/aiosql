@@ -157,7 +157,10 @@ class QueryLoader:
             params = [p.strip() for p in rawparams.split(",")]
             if params == ['']:  # handle "( )"
                 params = []
-        return nameop["name"], _OP_TYPES[nameop["op"]], params
+        operation = _OP_TYPES[nameop["op"]]
+        if params and operation == "#":
+            raise SQLParseException(f'cannot use named parameters in SQL script: "{qname_spec}"')
+        return nameop["name"], operation, params
 
     def _get_record_class(self, text: str) -> Optional[Type]:
         """Extract record class from spec."""
