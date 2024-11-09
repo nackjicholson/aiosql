@@ -13,8 +13,8 @@ TODO
 - add documentation about docker runs.
 - allow tagging queries, eg whether it can be cached
 
-? on ?
-------
+13.0 on ?
+---------
 
 - add optional parameter declarations to queries, and check them when provided.
 - warn on probable mission operation.
