@@ -164,7 +164,7 @@ This example has an imaginary SQLite database with greetings and users.
 It prints greetings in various languages to the user and showcases the basic
 feature of being able to load queries from a SQL file and call them by name
 in python code.
-Query parameter declarations (eg ``(username)``) are optional, but enforced
+Query parameter declarations (eg ``(username)``) are optional, and enforced
 when provided.
 
 You can use ``aiosql`` to load the queries in this file for use in your Python
