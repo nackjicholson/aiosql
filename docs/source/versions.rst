@@ -12,6 +12,7 @@ TODO
 - rethink record classes? we just really want a row conversion function?
 - add documentation about docker runs.
 - allow tagging queries, eg whether it can be cached
+- change `kwargs_only` default to true?
 
 13.0 on ?
 ---------
