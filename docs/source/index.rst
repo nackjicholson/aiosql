@@ -74,7 +74,7 @@ Badges
 ..
    NOTE all tests
    # MIST
-   loading: 15
+   loading: 16
    patterns: 5
    # SYNC
    sqlite3: 17
@@ -92,7 +92,7 @@ Badges
    # ASYNC
    aiosqlite: 13
    asyncpg: 18
-.. image:: https://img.shields.io/badge/tests-245%20✓-success
+.. image:: https://img.shields.io/badge/tests-246%20✓-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 .. image:: https://img.shields.io/github/issues/nackjicholson/aiosql?style=flat
@@ -148,13 +148,13 @@ eg this *greetings.sql* file:
 
 .. code:: sql
 
-    -- name: get_all_greetings
+    -- name: get_all_greetings()
     -- Get all the greetings in the database
     select greeting_id, greeting
       from greetings
      order by 1;
 
-    -- name: get_user_by_username^
+    -- name: get_user_by_username(username)^
     -- Get a user from the database using a named parameter
     select user_id, username, name
       from users
@@ -164,6 +164,8 @@ This example has an imaginary SQLite database with greetings and users.
 It prints greetings in various languages to the user and showcases the basic
 feature of being able to load queries from a SQL file and call them by name
 in python code.
+Query parameter declarations (eg ``(username)``) are optional, but enforced
+when provided.
 
 You can use ``aiosql`` to load the queries in this file for use in your Python
 application:

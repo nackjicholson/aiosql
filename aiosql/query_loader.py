@@ -14,7 +14,7 @@ _RECORD_DEF = re.compile(r"--\s*record_class\s*:\s*(\w+)\s*")
 
 # extract a valid query name followed by an optional operation spec
 # FIXME this accepts "1st" but seems to reject "é"
-_NAME_OP = re.compile(r"^(?P<name>\w+)(?P<op>(|\^|\$|!|<!|\*!|#))$")
+_NAME_OP = re.compile(r"^(?P<name>\w+)(|\((?P<params>(\s*|\s*\w+\s*(,\s*\w+\s*)*))\))(?P<op>(|\^|\$|!|<!|\*!|#))$")
 
 # forbid numbers as first character
 _BAD_PREFIX = re.compile(r"^\d")
@@ -118,12 +118,12 @@ class QueryLoader:
         # - ns_parts: name space parts, i.e. subdirectories of loaded files
         # - floc: file name and lineno the query was extracted from
         lines = [line.strip() for line in query.strip().splitlines()]
-        qname, qop = self._get_name_op(lines[0])
+        qname, qop, qsig = self._get_name_op(lines[0])
         if re.search(r"[^A-Za-z0-9_]", qname):
             log.warning(f"non ASCII character in query name: {qname}")
         record_class = self._get_record_class(lines[1])
         sql, doc = self._get_sql_doc(lines[2 if record_class else 1 :])
-        signature = self._build_signature(sql)
+        signature = self._build_signature(sql, qname, qsig)
         query_fqn = ".".join(ns_parts + [qname])
         if self.attribute:  # :u.a -> :u__a, **after** signature generation
             sql, attributes = _preprocess_object_attributes(self.attribute, sql)
@@ -132,13 +132,18 @@ class QueryLoader:
         sql = self.driver_adapter.process_sql(query_fqn, qop, sql)
         return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, floc, attributes)
 
-    def _get_name_op(self, text: str) -> Tuple[str, SQLOperationType]:
+    def _get_name_op(self, text: str) -> Tuple[str, SQLOperationType, List[str]|None]:
         qname_spec = text.replace("-", "_")
         matched = _NAME_OP.match(qname_spec)
         if not matched or _BAD_PREFIX.match(qname_spec):
             raise SQLParseException(f'invalid query name and operation spec: "{qname_spec}"')
         nameop = matched.groupdict()
-        return nameop["name"], _OP_TYPES[nameop["op"]]
+        params, rawparams = None, nameop["params"]
+        if rawparams is not None:
+            params = [p.strip() for p in rawparams.split(",")]
+            if params == ['']:  # handle "( )"
+                params = []
+        return nameop["name"], _OP_TYPES[nameop["op"]], params
 
     def _get_record_class(self, text: str) -> Optional[Type]:
         rc_match = _RECORD_DEF.match(text)
@@ -157,7 +162,7 @@ class QueryLoader:
 
         return sql.strip(), doc.rstrip()
 
-    def _build_signature(self, sql: str) -> inspect.Signature:
+    def _build_signature(self, sql: str, qname: str, sig: List[str]|None) -> inspect.Signature:
         params = [inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)]
         names = set()
         for match in VAR_REF.finditer(sql):
@@ -167,6 +172,9 @@ class QueryLoader:
             name = gd["var_name"]
             if name.isdigit() or name in names:
                 continue
+            if sig is not None:  # optional parameter declarations
+                if name not in sig:
+                    raise SQLParseException(f"undeclared parameter name in query {qname}: {name}")
             names.add(name)
             params.append(
                 inspect.Parameter(
@@ -174,6 +182,9 @@ class QueryLoader:
                     kind=inspect.Parameter.KEYWORD_ONLY,
                 )
             )
+        if sig is not None and len(sig) != len(names):
+            unused = sorted(n for n in sig if n not in names)
+            raise SQLParseException(f"unused declared parameter in query {qname}: {unused}")
         return inspect.Signature(parameters=params)
 
     def load_query_data_from_sql(
