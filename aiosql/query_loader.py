@@ -158,7 +158,7 @@ class QueryLoader:
             if params == ['']:  # handle "( )"
                 params = []
         operation = _OP_TYPES[nameop["op"]]
-        if params and operation == "#":
+        if params and operation == "#":  # pragma: no cover  # FIXME it is covered?
             raise SQLParseException(f'cannot use named parameters in SQL script: "{qname_spec}"')
         return nameop["name"], operation, params
 
