@@ -236,7 +236,7 @@ def test_parameter_declarations():
         "sqlite3")
     assert q.xlii(conn) == 42
     assert q.next(conn, n=41) == 42
-    assert q.add(conn, n=20, m=22) == 42
+    assert q.add(conn, n=19, m=23) == 42
     conn.close()
     # errors
     try:
