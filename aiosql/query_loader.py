@@ -143,7 +143,7 @@ class QueryLoader:
         else:  # pragma: no cover
             attributes = None
         sql = self.driver_adapter.process_sql(query_fqn, qop, sql)
-        return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, floc, attributes)
+        return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, floc, attributes, qsig)
 
     def _get_name_op(self, text: str) -> Tuple[str, SQLOperationType, Optional[List[str]]]:
         """Extract name, parameters and operation from spec."""
