@@ -16,17 +16,6 @@ into underlines (``_``).
 
 This query will be available in aiosql under the python method name ``.get_all_blogs(conn)``
 
-Query Parameters
-----------------
-
-Query parameters may be declared in parentheses just after the method name.
-
-.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
-   :language: sql
-   :lines: 55,56
-
-When declared they are checked, raising errors when parameters are unused or undeclared.
-
 Query Comments
 --------------
 
@@ -70,6 +59,17 @@ Then the generated function expects two named parameters:
 
     res = queries.with_params(name="Calvin", x=(1+1j))
     # => (6, 2.0)
+
+Parameters Declarations
+-----------------------
+
+Query parameters names may be declared in parentheses just after the method name.
+
+.. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
+   :language: sql
+   :lines: 55,56
+
+When declared they are checked, raising errors when parameters are unused or undeclared.
 
 Operators
 ---------
