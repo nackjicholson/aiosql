@@ -14,7 +14,7 @@ _RECORD_DEF = re.compile(r"--\s*record_class\s*:\s*(\w+)\s*")
 
 # extract a valid query name followed by an optional operation spec
 # FIXME this accepts "1st" but seems to reject "é"
-_NAME_OP = re.compile(r"^(\w+)(|\^|\$|!|<!|\*!|#)$")
+_NAME_OP = re.compile(r"^(?P<name>\w+)(?P<op>(|\^|\$|!|<!|\*!|#))$")
 
 # forbid numbers as first character
 _BAD_PREFIX = re.compile(r"^\d")
@@ -108,7 +108,10 @@ class QueryLoader:
         self.attribute = attribute
 
     def _make_query_datum(
-        self, query: str, ns_parts: List[str], floc: Tuple[Union[Path, str], int]
+        self,
+        query: str,
+        ns_parts: List[str],
+        floc: Tuple[Union[Path, str], int],
     ) -> QueryDatum:
         # Build a query datum
         # - query: the spec and name ("query-name!\n-- comments\nSQL;\n")
@@ -122,7 +125,7 @@ class QueryLoader:
         sql, doc = self._get_sql_doc(lines[2 if record_class else 1 :])
         signature = self._build_signature(sql)
         query_fqn = ".".join(ns_parts + [qname])
-        if self.attribute:
+        if self.attribute:  # :u.a -> :u__a, **after** signature generation
             sql, attributes = _preprocess_object_attributes(self.attribute, sql)
         else:  # pragma: no cover
             attributes = None
@@ -131,11 +134,11 @@ class QueryLoader:
 
     def _get_name_op(self, text: str) -> Tuple[str, SQLOperationType]:
         qname_spec = text.replace("-", "_")
-        nameop = _NAME_OP.match(qname_spec)
-        if not nameop or _BAD_PREFIX.match(qname_spec):
+        matched = _NAME_OP.match(qname_spec)
+        if not matched or _BAD_PREFIX.match(qname_spec):
             raise SQLParseException(f'invalid query name and operation spec: "{qname_spec}"')
-        qname, qop = nameop.group(1, 2)
-        return qname, _OP_TYPES[qop]
+        nameop = matched.groupdict()
+        return nameop["name"], _OP_TYPES[nameop["op"]]
 
     def _get_record_class(self, text: str) -> Optional[Type]:
         rc_match = _RECORD_DEF.match(text)
