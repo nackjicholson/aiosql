@@ -216,7 +216,7 @@ It may seem inconvenient to provide a connection on each call.
 You may have a look at the `AnoDB <https://github.com/zx80/anodb>`__ `DB`
 class which wraps both a database connection *and* queries in one
 connection-like extended object, including performing automatic reconnection
-when needed.
+when needed. The wrapper also allows to cache query results.
 
 Why you might want to use this
 ------------------------------
