@@ -37,7 +37,7 @@ insert into blogs (
   content,
   published
 )
-values (nextval('blogs_seq'), ?, ?, ? , ?);
+values (nextval('blogs_seq'), ?, ?, ?, ?);
 
 -- name: publish-blog<!
 insert into blogs (
@@ -48,7 +48,7 @@ insert into blogs (
   published
 )
 values (
-  nextval('blogs_seq'), ?, ?, ? , ?
+  nextval('blogs_seq'), ?, ?, ?, ?
 )
 returning (blogid, title);
 

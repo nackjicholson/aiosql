@@ -72,7 +72,7 @@ def from_str(
     sql: str,
     driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
     record_classes: Optional[Dict] = None,
-    kwargs_only: bool = False,
+    kwargs_only: bool = True,
     attribute: Optional[str] = "__",
     args: List[Any] = [],
     kwargs: Dict[str, Any] = {},
@@ -87,7 +87,7 @@ def from_str(
     - **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
       adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your
       own adapter class, you can pass it's constructor.
-    - **kwargs_only** - *(optional)* whether to only use named parameters on query execution, default is *False*.
+    - **kwargs_only** - *(optional)* whether to only use named parameters on query execution, default is *True*.
     - **attribute** - *(optional)* ``.`` attribute access substitution, defaults to ``"__"``, *None* disables
       the feature.
     - **args** - *(optional)* adapter creation args (list), forwarded to cursor creation by default.
@@ -133,7 +133,7 @@ def from_path(
     sql_path: Union[str, Path],
     driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
     record_classes: Optional[Dict] = None,
-    kwargs_only: bool = False,
+    kwargs_only: bool = True,
     attribute: Optional[str] = "__",
     args: List[Any] = [],
     kwargs: Dict[str, Any] = {},
@@ -151,7 +151,7 @@ def from_path(
       adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your own
       adapter class, you may pass its constructor.
     - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
-    - **kwargs_only** - *(optional)* Whether to only use named parameters on query execution, default is *False*.
+    - **kwargs_only** - *(optional)* Whether to only use named parameters on query execution, default is *True*.
     - **attribute** - *(optional)* ``.`` attribute access substitution, defaults to ``"__""``, *None* disables
       the feature.
     - **args** - *(optional)* adapter creation args (list), forwarded to cursor creation by default.
