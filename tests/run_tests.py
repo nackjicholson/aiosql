@@ -50,19 +50,19 @@ def _insert_blogs(todate):
         {
             "userid": 2,
             "title": "Blog Part 1",
-            "contents": "content - 1",
+            "content": "content - 1",
             "published": todate(2018, 12, 4),
         },
         {
             "userid": 2,
             "title": "Blog Part 2",
-            "contents": "content - 2",
+            "content": "content - 2",
             "published": todate(2018, 12, 5),
         },
         {
             "userid": 2,
             "title": "Blog Part 3",
-            "contents": "content - 3",
+            "content": "content - 3",
             "published": todate(2018, 12, 6),
         },
     ]
@@ -278,7 +278,7 @@ def run_insert_returning(conn, queries, date):
             conn,
             userid=2,
             title="My first blog",
-            contents="Hello, World!",
+            content="Hello, World!",
             published=date(2018, 12, 4),
         )
 
@@ -538,7 +538,7 @@ async def run_async_insert_returning(aconn, queries, date):
         aconn,
         userid=2,
         title="My first blog",
-        contents="Hello, World!",
+        content="Hello, World!",
         published=date(2018, 12, 4),
     )
 

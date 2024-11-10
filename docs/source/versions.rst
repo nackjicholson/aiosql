@@ -14,6 +14,13 @@ TODO
 - test with nogil once available in GitHub CI.
 - test with py 3.14 once available in GitHub CI (pydantic/rust issue for now).
 
+? on ?
+------
+
+- improve documentation with declared parameters in examples.
+- homogeneise test consistency wrt attribute and parameter names.
+- fix doc typos.
+
 13.0 on 2024-11-10
 ------------------
 

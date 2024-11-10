@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS blogs;
 -- name: drop-table-comments#
 DROP TABLE IF EXISTS comments;
 
--- name: get-all-blogs
+-- name: get-all-blogs()
 -- Fetch all fields for every blog in the database.
 select * from blogs;
 
@@ -25,11 +25,11 @@ insert into blogs (
 values (
   :userid,
   :title,
-  :contents,
+  :content,
   :published
 );
 
--- name: remove-blog!
+-- name: remove-blog(blogid)!
 -- Remove a blog from the database
 delete from blogs where blogid = :blogid;
 
@@ -61,13 +61,13 @@ select blogid, title from blogs where blogid = :blogid;
 -- name: with-params^
 select length(:name), :x.real + x.imaj;
 
--- name: new-blog!
+-- name: new-blog(userid, title, content)!
 insert into blogs (userid, title, content)
-  values (:userid, :title, :contents);
+  values (:userid, :title, :content);
 
--- name: publish-new-blog$
+-- name: publish-new-blog(userid, title, content)$
 insert into blogs (userid, title, content)
-  values (:userid, :title, :contents)
+  values (:userid, :title, :content)
   returning blogid;
 
 -- name: add_many_blogs*!

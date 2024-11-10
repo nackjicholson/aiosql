@@ -5,7 +5,7 @@
 -- Get all user records
 select * from users order by 1;
 
--- name: get-by-username^
+-- name: get-by-username(username)^
 select userid,
        username,
        firstname,
@@ -27,7 +27,7 @@ order by username asc;
 select * from users order by username asc;
 
 
--- name: get-count$
+-- name: get-count()$
 -- Get number of users
 select count(*) as cnt from users;
 
