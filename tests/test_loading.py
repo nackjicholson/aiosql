@@ -1,7 +1,8 @@
+import sys
+import re
 import inspect
 from pathlib import Path
 from unittest import mock
-import re
 
 import aiosql
 from aiosql import SQLParseException, SQLLoadException
@@ -225,24 +226,51 @@ def test_kwargs():
     except ValueError as e:
         assert "mix" in str(e)
 
-def test_parameter_declarations():
-    # ok
-    import sqlite3
-    conn = sqlite3.connect(":memory:")
-    q = aiosql.from_str(
-        "-- name: xlii()$\nSELECT 42;\n"
-        "-- name: next(n)$\nSELECT :n+1;\n"
-        "-- name: add(n, m)$\nSELECT :n+:m;\n",
-        "sqlite3")
+import sqlite3
+
+PARAM_QUERIES = """
+-- name: xlii()$
+SELECT 42;
+
+-- name: next(n)$
+SELECT :n+1;
+
+-- name: add(n, m)$
+SELECT :n+:m;
+
+-- name: sub$
+SELECT :n - :m;
+"""
+
+def run_param_queries(conn, kwargs_only: bool = True):
+    q = aiosql.from_str(PARAM_QUERIES, "sqlite3", kwargs_only=kwargs_only)
     assert q.xlii(conn) == 42
     assert q.next(conn, n=41) == 42
     assert q.add(conn, n=19, m=23) == 42
+    assert q.sub(conn, n=47, m=5) == 42
     # usage errors
     try:
         q.next(conn, 41)
         pytest.fail("must complain about positional parameter")
     except ValueError as e:
         assert "positional" in str(e)
+    try:
+        ft = q.sub(conn, 47, 5)
+        if kwargs_only:
+            pytest.fail("must complain about positional parameter")
+        else:
+            assert sys.version_info < (3, 14)
+            assert ft == 42
+    except sqlite3.ProgrammingError as e:  # scheduled deprecation
+        assert sys.version_info >= (3, 14)
+    except ValueError as e:
+        assert "positional" in str(e)
+
+def test_parameter_declarations():
+    # ok
+    conn = sqlite3.connect(":memory:")
+    run_param_queries(conn, kwargs_only=True)
+    run_param_queries(conn, kwargs_only=False)
     conn.close()
     # errors
     try:

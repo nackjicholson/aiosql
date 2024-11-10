@@ -85,7 +85,10 @@ def to_tuple(v):
         raise Exception(f"unexpected row type: {type(v).__name__}")
 
 class Queries:
-    """Queries wrapper to find the best, possibly database-specific function to call."""
+    """Queries wrapper
+
+    Find the best, possibly database and driver-specific function to call.
+    """
 
     def __init__(self, driver: str, queries):
         self._driver = driver
@@ -96,7 +99,7 @@ class Queries:
         self.driver_adapter = queries.driver_adapter
 
     def f(self, name: str):
-        """Return the most precise SQL function for provided name."""
+        """Return the most precise SQL function for name."""
         if "." in name:
             dname, fname = name.split(".", 1)
             dname = dname + "."
