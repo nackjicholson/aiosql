@@ -17,6 +17,8 @@ TODO
 ? on ?
 ------
 
+- improve documentation with declared parameters in examples.
+- homogeneise test consistency wrt attribute and parameter names.
 - fix doc typos.
 
 13.0 on 2024-11-10

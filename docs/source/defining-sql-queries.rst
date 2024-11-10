@@ -149,7 +149,7 @@ modifications to database rows without a necessary return value.
 
 .. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
    :language: sql
-   :lines: 64-66, 31,34
+   :lines: 64-66,32,34
 
 The methods generated are:
 
@@ -243,3 +243,5 @@ An example usecase is using data definition statements like create table in orde
 
     queries = aiosql.from_path("create_schema.sql", "sqlite3")
     queries.create_table_blogs(conn)
+
+Note: SQL scripts do not accept parameters.
