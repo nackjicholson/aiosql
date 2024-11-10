@@ -11,6 +11,8 @@ TODO
 - tests with even more database and drivers?
 - rethink record classes? we just really want a row conversion function?
 - add documentation about docker runs.
+- test with nogil once available in GitHub CI.
+- test with py 3.14 once available in GitHub CI (pydantic/rust issue for now).
 
 13.0 on 2024-11-10
 ------------------
