@@ -60,10 +60,10 @@ Then the generated function expects two named parameters:
     res = queries.with_params(name="Calvin", x=(1+1j))
     # => (6, 2.0)
 
-Parameters Declarations
------------------------
+Parameter Declarations
+----------------------
 
-Query parameters names may be declared in parentheses just after the method name.
+Query parameter names may be declared in parentheses just after the method name.
 
 .. literalinclude:: ../../tests/blogdb/sql/blogs/blogs.sql
    :language: sql
