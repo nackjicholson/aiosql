@@ -49,7 +49,7 @@ output inserted.blogid, inserted.title
 values (
   :userid,
   :title,
-  :contents,
+  :content,
   :published
 );
 
@@ -62,4 +62,4 @@ where 0 = 1;
 -- name: bulk-publish*!
 -- Insert many blogs at once
 insert into blogs (userid, title, content, published)
-  values (:userid, :title, :contents, :published);
+  values (:userid, :title, :content, :published);
