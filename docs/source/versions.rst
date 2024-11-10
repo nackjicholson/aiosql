@@ -8,23 +8,21 @@ TODO
 - maintain up-to-date wrt Python moving target…
 - once 3.9 support is dropped, remove old-style type hints.
 - write a small SQLite3-based tutorial?
-- tests with other database and drivers?
+- tests with even more database and drivers?
 - rethink record classes? we just really want a row conversion function?
 - add documentation about docker runs.
-- allow tagging queries, eg whether it can be cached
 
-13.0 on ?
----------
+13.0 on 2024-11-10
+------------------
 
-- change `kwargs_only` parameter default value to _True_.
-  **This breaks compatibility.**
+- change `kwargs_only` parameter default value to _True_. **Compatibility break.**
 - add optional parameter declarations to queries, and check them when provided.
 - forbid positional parameters when named parameters are declared.
 - warn on probable mission operation.
-- add *psycopg2* to CI.
+- silent some test warnings.
+- add *psycopg2* back to CI with Python 3.13.
 - improve documentation.
 - improve Makefile.
-- silent some test warnings.
 
 12.2 on 2024-10-02
 ------------------
