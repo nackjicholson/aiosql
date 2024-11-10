@@ -475,7 +475,7 @@ docker.rm: docker.stop
 # PYPI PUBLICATION
 #
 
-dist: venv.dist
+dist: venv/.dist
 	source venv/bin/activate
 	$(PYTHON) -m build
 
