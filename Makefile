@@ -479,6 +479,7 @@ dist: venv/.dist
 	source venv/bin/activate
 	$(PYTHON) -m build
 
+.PHONY: check.publish
 check.publish: dist
 	source venv/bin/activate
 	twine check dist/*
