@@ -17,6 +17,7 @@ TODO
 ? on ?
 ------
 
+- fix warning repetition and display for missing '!" on non-SELECT
 - improve documentation with declared parameters in examples.
 - homogeneise test consistency wrt attribute and parameter names.
 - fix doc typos.
