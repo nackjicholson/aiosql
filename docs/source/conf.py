@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "aiosql"
-copyright = "2018-2024, William Vaughn et alii."
+copyright = "2018-2025, William Vaughn et alii."
 author = "William Vaughn <vaughnwilld@gmail.com>"
 github_doc_root = "https://github.com/nackjicholson/aiosql/tree/master/docs/source/"
 
