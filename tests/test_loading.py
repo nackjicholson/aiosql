@@ -189,7 +189,7 @@ def test_misc(sql_file):
         queries._make_sync_fn(("hello", None, -1, "SELECT NULL;", None, None, None, None, None))
         pytest.fail("must raise an exception")  # pragma: no cover
     except ValueError as e:
-        assert "Unknown operation_type" in str(e)
+        assert "Unknown operation" in str(e)
     try:
         db = aiosql.from_str("-- name: a*b\nSELECT 'ab'\n", "sqlite3")
         pytest.fail("must raise en exception")  # pragma: no cover

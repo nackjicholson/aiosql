@@ -107,9 +107,6 @@ class Queries:
         qfn.operation = operation
         qfn.attributes = attributes
         qfn.parameters = params
-        # sanity check in passing…
-        if operation == SQLOperationType.SELECT and not self._look_like_a_select(sql):
-            log.warning(f"query {fname} may not be a select, consider adding an operator, eg '!'")
         return qfn
 
     # NOTE about coverage: because __code__ is set to reflect the actual SQL file
@@ -118,31 +115,31 @@ class Queries:
     def _make_sync_fn(self, query_datum: QueryDatum) -> QueryFn:
         """Build a dynamic method from a parsed query."""
 
-        query_name, doc_comments, operation_type, sql, record_class, signature, floc, attributes, params = (
+        query_name, doc_comments, operation, sql, record_class, signature, floc, attributes, params = (
             query_datum
         )
 
-        if operation_type == SQLOperationType.INSERT_RETURNING:
+        if operation == SQLOperationType.INSERT_RETURNING:
 
             def fn(self, conn, *args, **kwargs):  # pragma: no cover
                 return self.driver_adapter.insert_returning(
                     conn, query_name, sql, self._params(attributes, params, args, kwargs)
                 )
 
-        elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE:
+        elif operation == SQLOperationType.INSERT_UPDATE_DELETE:
 
             def fn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover
                 return self.driver_adapter.insert_update_delete(
                     conn, query_name, sql, self._params(attributes, params, args, kwargs)
                 )
 
-        elif operation_type == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
+        elif operation == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
 
             def fn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover
                 assert not kwargs, "cannot use named parameters in many query"  # help type checker
                 return self.driver_adapter.insert_update_delete_many(conn, query_name, sql, *args)
 
-        elif operation_type == SQLOperationType.SCRIPT:
+        elif operation == SQLOperationType.SCRIPT:
 
             if params:  # pragma: no cover
                 # NOTE this is caught earlier
@@ -152,21 +149,26 @@ class Queries:
                 assert not args and not kwargs, f"cannot use parameters in SQL script: {query_name}"
                 return self.driver_adapter.execute_script(conn, sql)
 
-        elif operation_type == SQLOperationType.SELECT:
+        elif operation == SQLOperationType.SELECT:
+
+            # sanity check in passing…
+            if not self._look_like_a_select(sql):
+                fname, lineno = floc
+                log.warning(f"query {query_name} at {fname}:{lineno} may not be a select, consider adding an operator, eg '!'")
 
             def fn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover
                 return self.driver_adapter.select(
                     conn, query_name, sql, self._params(attributes, params, args, kwargs), record_class
                 )
 
-        elif operation_type == SQLOperationType.SELECT_ONE:
+        elif operation == SQLOperationType.SELECT_ONE:
 
             def fn(self, conn, *args, **kwargs):  # pragma: no cover
                 return self.driver_adapter.select_one(
                     conn, query_name, sql, self._params(attributes, params, args, kwargs), record_class
                 )
 
-        elif operation_type == SQLOperationType.SELECT_VALUE:
+        elif operation == SQLOperationType.SELECT_VALUE:
 
             def fn(self, conn, *args, **kwargs):  # pragma: no cover
                 return self.driver_adapter.select_value(
@@ -174,10 +176,10 @@ class Queries:
                 )
 
         else:
-            raise ValueError(f"Unknown operation_type: {operation_type}")
+            raise ValueError(f"Unknown operation: {operation}")
 
         return self._query_fn(
-            fn, query_name, doc_comments, sql, operation_type, signature, floc, attributes, params
+            fn, query_name, doc_comments, sql, operation, signature, floc, attributes, params
         )
 
     # NOTE does this make sense?
@@ -203,10 +205,15 @@ class Queries:
 
     def _create_methods(self, query_datum: QueryDatum, is_aio: bool) -> List[QueryFn]:
         """Internal function to feed add_queries."""
+
+        # standarc version
         fn = self._make_sync_fn(query_datum)
+
+        # asynchroneous wrapper
         if is_aio:
             fn = self._make_async_fn(fn)
 
+        # context manager
         if query_datum.operation_type == SQLOperationType.SELECT:
             ctx_mgr = self._make_ctx_mgr(fn)
             return [fn, ctx_mgr]
