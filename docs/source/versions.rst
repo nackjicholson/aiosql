@@ -17,7 +17,7 @@ TODO
 13.1 on 2025-01-23
 ------------------
 
-- fix warning repetition and display for missing '!" on non-SELECT
+- fix warning repetition and display for missing `!` on non-SELECT
 - improve documentation with declared parameters in examples.
 - homogeneise test consistency wrt attribute and parameter names.
 - fix doc typos.
