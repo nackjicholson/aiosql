@@ -28,7 +28,7 @@ TODO
 - change `kwargs_only` parameter default value to _True_. **Compatibility break.**
 - add optional parameter declarations to queries, and check them when provided.
 - forbid positional parameters when named parameters are declared.
-- warn on probable mission operation.
+- warn on probable missing operation.
 - silent some test warnings.
 - add *psycopg2* back to CI with Python 3.13.
 - improve documentation.
