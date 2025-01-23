@@ -14,8 +14,8 @@ TODO
 - test with nogil once available in GitHub CI.
 - test with py 3.14 once available in GitHub CI (pydantic/rust issue for now).
 
-? on ?
-------
+13.1 on 2025-01-23
+------------------
 
 - fix warning repetition and display for missing '!" on non-SELECT
 - improve documentation with declared parameters in examples.
