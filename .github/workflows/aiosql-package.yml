@@ -18,7 +18,8 @@ jobs:
         # https://github.com/actions/python-versions (versions-manifest.json)
         # https://downloads.python.org/pypy/versions.json
         # 3.14 KO on pydantic build dependences 2024-10-27
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "pypy3.10"]
+        # 3.14 way too slow duckdb wheel build 2025-01-28
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.10"]
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -26,6 +27,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
+        cache: "pip"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
