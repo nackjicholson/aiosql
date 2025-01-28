@@ -134,6 +134,8 @@ class QueryLoader:
         qname, qop, qsig = self._get_name_op(lines[0])
         if re.search(r"[^A-Za-z0-9_]", qname):
             log.warning(f"non ASCII character in query name: {qname}")
+        if len(lines) <= 1:
+            raise SQLParseException(f"empty query for: {qname}")
         record_class = self._get_record_class(lines[1])
         sql, doc = self._get_sql_doc(lines[2 if record_class else 1 :])
         signature = self._build_signature(sql, qname, qsig)
