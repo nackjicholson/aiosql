@@ -135,9 +135,11 @@ class QueryLoader:
         if re.search(r"[^A-Za-z0-9_]", qname):
             log.warning(f"non ASCII character in query name: {qname}")
         if len(lines) <= 1:
-            raise SQLParseException(f"empty query for: {qname}")
+            raise SQLParseException(f"empty query for: {qname} at {floc[0]}:{floc[1]}")
         record_class = self._get_record_class(lines[1])
         sql, doc = self._get_sql_doc(lines[2 if record_class else 1 :])
+        if re.search("(?s)^[\t\n\r ;]*$", sql):
+            raise SQLParseException(f"empty sql for: {qname} at {floc[0]}:{floc[1]}")
         signature = self._build_signature(sql, qname, qsig)
         query_fqn = ".".join(ns_parts + [qname])
         if self.attribute:  # :u.a -> :u__a, **after** signature generation
