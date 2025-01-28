@@ -304,9 +304,14 @@ def test_empty_query():
         aiosql.from_str("-- name: foo\n-- just a comment\n--name: bla\n", "sqlite3")
         pytest.fail("must raise an exception")
     except SQLParseException as e:
-        assert "empty query" in str(e)
+        assert "empty sql" in str(e)
     try:
-        aiosql.from_str("-- name: foo\n-- just a comment\n   \n-- hop\n--name: bla\n", "sqlite3")
+        aiosql.from_str("-- name: foo\n-- just a comment\n  ;  \n-- hop\n--name: bla\n", "sqlite3")
         pytest.fail("must raise an exception")
     except SQLParseException as e:
-        assert "empty query" in str(e)
+        assert "empty sql" in str(e)
+    try:
+        aiosql.from_str("-- name: foo\n-- just a comment\n;\n", "sqlite3")
+        pytest.fail("must raise an exception")
+    except SQLParseException as e:
+        assert "empty sql" in str(e)
