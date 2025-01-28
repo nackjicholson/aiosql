@@ -288,3 +288,10 @@ def test_parameter_declarations():
         pytest.fail("must raise an exception")
     except SQLParseException as e:
         assert "script" in str(e)
+
+def test_empty_query():
+    try:
+        aiosql.from_str("-- name: foo\n--name: bla\n", "sqlite3")
+        pytest.fail("must raise an exception")
+    except SQLParseException as e:
+        assert "empty query" in str(e)
