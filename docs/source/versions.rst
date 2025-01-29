@@ -14,10 +14,11 @@ TODO
 - test with nogil once available in GitHub CI.
 - test with py 3.14 once available in GitHub CI (pydantic/rust issue for now).
 
-? on ?
-------
+13.2 on 2025-01-29
+------------------
 
 - improve empty query handling.
+- update documentation.
 
 13.1 on 2025-01-23
 ------------------
