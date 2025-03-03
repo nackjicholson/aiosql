@@ -227,8 +227,8 @@ Why you might want to use this
   `Django <https://www.djangoproject.com/>`__ ,
   with large (100k lines) code imprints vs under 1000 for `aiosql` and about 300 for `anodb`,
   and you don't need to or don't want to write SQL-like code with a Python syntax.
-* You want to be able to reuse your SQL in other contexts.
-  Loading it into `psql` or other database tools.
+* You want to be able to reuse your SQL in other contexts,
+  eg loading it into `psql` or other database tools.
 
 
 Why you might NOT want to use this
