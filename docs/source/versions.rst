@@ -14,6 +14,11 @@ TODO
 - test with nogil once available in GitHub CI.
 - test with py 3.14 once available in GitHub CI (pydantic/rust issue for now).
 
+? on ?
+------
+
+- enable *PyPy 3.11*, *Python 3.13t* and *Python 3.14* in GitHub CI.
+
 13.2 on 2025-01-29
 ------------------
 
