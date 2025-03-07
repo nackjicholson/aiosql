@@ -15,8 +15,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install -U pip
-          python -m pip install sphinx sphinx-rtd-theme
-          python -m pip install .
+          python -m pip install .[doc]
+      - name: Check RST files
+        run: make check.rstcheck
       - name: Generate documentation
         run: .github/scripts/docs.sh
       - name: Deploy to GitHub Pages
