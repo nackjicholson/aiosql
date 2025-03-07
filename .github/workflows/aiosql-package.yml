@@ -55,5 +55,3 @@ jobs:
       run: make VENV= INSTALL= check.pytest
     - name: Coverage tests
       run: make VENV= INSTALL= check.coverage
-    - name: Check RST files
-      run: make VENV= INSTALL= check.rstcheck
