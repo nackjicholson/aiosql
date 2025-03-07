@@ -18,9 +18,9 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest", "pytest-asyncio",
-    "rstcheck", "black", "coverage", "flake8", "ruff",
-    "mypy", "pyright", "types-setuptools", "build"
+    "pytest", "pytest-asyncio", "coverage",
+     "black", "flake8", "ruff",
+    "mypy", "pyright", "types-setuptools",
 ]
 dev-duckdb = [
     # skip, wheel compilation takes too much time… (confirmed 2024-09-30)
@@ -52,9 +52,14 @@ dev-mariadb = [
 dev-mssql = [
     "pymssql"
 ]
+doc = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    # FIXME 3.13t rstcheck depends on pydantic
+    "rstcheck",
+]
 dist = [
     "build", "wheel", "twine",
-    "sphinx", "sphinx-rtd-theme"
 ]
 
 [tool.setuptools.package-data]
