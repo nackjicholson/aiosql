@@ -28,10 +28,14 @@ jobs:
         - version: "3.12"
         - version: "3.13"
         - version: "3.13t"
-          env: PYTHON_GIL=1
+          gil: 1
         - version: "3.13t"
-          env: PYTHON_GIL=0
+          gil: 0
         - version: "3.14"
+        # - version: "3.14t"
+        #   gil: 1
+        # - version: "3.14t"
+        #   gil: 0
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python.version }}
@@ -52,6 +56,6 @@ jobs:
     - name: Lint with ruff
       run: make VENV= INSTALL= check.ruff
     - name: Test with pytest and databases
-      run: make VENV= INSTALL= check.pytest
+      run: PYTHON_GIL=${{ python.version.gil }} make VENV= INSTALL= check.pytest
     - name: Coverage tests
-      run: make VENV= INSTALL= check.coverage
+      run: PYTHON_GIL=${{ python.version.gil }} make VENV= INSTALL= check.coverage
