@@ -56,6 +56,6 @@ jobs:
     - name: Lint with ruff
       run: make VENV= INSTALL= check.ruff
     - name: Test with pytest and databases
-      run: PYTHON_GIL=${{ python.version.gil }} make VENV= INSTALL= check.pytest
+      run: PYTHON_GIL=${{ matrix.python.gil }} make VENV= INSTALL= check.pytest
     - name: Coverage tests
-      run: PYTHON_GIL=${{ python.version.gil }} make VENV= INSTALL= check.coverage
+      run: PYTHON_GIL=${{ matrix.python.gil }} make VENV= INSTALL= check.coverage
