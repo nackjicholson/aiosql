@@ -52,7 +52,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install .[dev,dev-postgres,dev-mysql,dev-sqlite,dev-duckdb]
-        echo "PYTHON_GIL=$PYTHON_GIL"
     - name: Check types with mypy
       run: make VENV= INSTALL= check.mypy
     - name: Check types with pyright
@@ -60,6 +59,6 @@ jobs:
     - name: Lint with ruff
       run: make VENV= INSTALL= check.ruff
     - name: Test with pytest and databases
-      run: PYTHON_GIL=${{ matrix.python.gil }} make VENV= INSTALL= check.pytest
+      run: make VENV= INSTALL= check.pytest
     - name: Coverage tests
-      run: PYTHON_GIL=${{ matrix.python.gil }} make VENV= INSTALL= check.coverage
+      run: make VENV= INSTALL= check.coverage
