@@ -21,6 +21,7 @@ Table of Contents
    Contributing <contributing>
    API <pydoc/modules>
    Versions <versions>
+   Backlog <todo>
 EOF
 
 sphinx-apidoc -f -o docs/source/pydoc aiosql
