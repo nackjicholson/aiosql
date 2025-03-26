@@ -42,8 +42,7 @@ jobs:
     - name: Checkout Project
       uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python.version }}
-      # uses: actions/setup-python@v5
-      uses: actions/setup-python@main
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python.version }}
         allow-prereleases: true
