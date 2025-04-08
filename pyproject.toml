@@ -9,10 +9,9 @@ authors = [ { name = "William Vaughn et al.", email = "vaughnwilld@gmail.com" } 
 description = "Simple SQL in Python"
 readme = "README.rst"
 requires-python = ">=3.9"
-license = { text = "BSD 2-Clause License" }
+license = "BSD-2-Clause"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent"
 ]
 
