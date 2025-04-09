@@ -10,19 +10,19 @@ Todo or not, that is the question…
 - tests with even more database and drivers?
 - rethink record classes? we just really want a row conversion function?
 - add documentation about docker runs? isn't `docker/README.md` enough?
-- [HugSQL](https://www.hugsql.org/) Clojure library as support for multiple
+- `HugSQL <https://www.hugsql.org/>`_ Clojure library as support for multiple
   kind of substitutions, maybe we could do the same.
 
   For instance for identifiers:
 
-  ```sql
-  -- name: select(cols, table)
-  SELECT :i*:cols FROM :i:table ORDER BY 1;
-  ```
+  .. code:: sql
 
-  ```python
-  res = db.select(conn, cols=["uid", "name"], table="users")
-  ```
+      -- name: select(cols, table)
+      SELECT :i*:cols FROM :i:table ORDER BY 1;
+
+  .. code:: python
+
+      res = db.select(conn, cols=["uid", "name"], table="users")
 
   This would require separating identifiers management and to build
   and memoize the query variants.
