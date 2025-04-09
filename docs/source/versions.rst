@@ -1,12 +1,12 @@
 AioSQL - Versions
 =================
 
-? on ?
-------
+13.4 on 2025-04-09
+------------------
 
-- separate backlog from versions.
-- use SPDX format for licensing informations.
 - update GitHub CI configuration.
+- use SPDX format for licensing informations and add topics.
+- doc, separate backlog from versions.
 
 13.3 on 2025-03-07
 ------------------
