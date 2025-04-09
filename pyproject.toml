@@ -11,8 +11,13 @@ readme = "README.rst"
 requires-python = ">=3.9"
 license = "BSD-2-Clause"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent"
+    "Programming Language :: Python",
+    "Programming Language :: SQL",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 
 [project.optional-dependencies]
