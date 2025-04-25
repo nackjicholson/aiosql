@@ -220,9 +220,9 @@ In aiosql we can use this for a bulk publish method that operates over a list of
 
     queries = aiosql.from_path("blogs.sql", "psycopg2")
     blogs = [
-        {"userid": 1, "title": "First Blog", "content": "...", published: datetime(2018, 1, 1)},
-        {"userid": 1, "title": "Next Blog", "content": "...", published: datetime(2018, 1, 2)},
-        {"userid": 2, "title": "Hey, Hey!", "content": "...", published: datetime(2018, 7, 28)},
+        {"userid": 1, "title": "First Blog", "content": "...", "published": datetime(2018, 1, 1)},
+        {"userid": 1, "title": "Next Blog", "content": "...", "published": datetime(2018, 1, 2)},
+        {"userid": 2, "title": "Hey, Hey!", "content": "...", "published": datetime(2018, 7, 28)},
     ]
     queries.bulk_publish(conn, blogs)
 
