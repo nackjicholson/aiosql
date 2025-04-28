@@ -1,6 +1,12 @@
 AioSQL - Versions
 =================
 
+? on ?
+------
+
+- improved documentation
+- minor packaging fix
+
 13.4 on 2025-04-09
 ------------------
 
