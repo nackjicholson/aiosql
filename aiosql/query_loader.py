@@ -130,7 +130,7 @@ class QueryLoader:
         - :param ns_parts: name space parts, i.e. subdirectories of loaded files
         - :param floc: file name and lineno the query was extracted from
         """
-        lines = [line.strip() for line in query.strip().splitlines()]
+        lines = [line.rstrip() for line in query.strip().splitlines()]
         qname, qop, qsig = self._get_name_op(lines[0])
         if re.search(r"[^A-Za-z0-9_]", qname):
             log.warning(f"non ASCII character in query name: {qname}")
