@@ -6,6 +6,8 @@ AioSQL - Versions
 
 - improved documentation
 - minor packaging fix
+- only right strip queries to improve traces readability
+- remove Python 3.9 support
 
 13.4 on 2025-04-09
 ------------------
