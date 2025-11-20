@@ -4,7 +4,7 @@ from pathlib import Path
 from types import MethodType
 
 # TODO drop most of this ugly stuff when >= 3.10
-from typing import Any, Callable, List, Optional, Set, Tuple, Union, Dict, cast
+from typing import Any, Callable, cast
 
 from .types import DriverAdapterProtocol, QueryDatum, QueryDataTree, QueryFn, SQLOperationType
 from .utils import SQLLoadException, SQLParseException, log
@@ -34,18 +34,18 @@ class Queries:
         self.driver_adapter: DriverAdapterProtocol = driver_adapter
         self.is_aio: bool = getattr(driver_adapter, "is_aio_driver", False)
         self._kwargs_only = kwargs_only
-        self._available_queries: Set[str] = set()
+        self._available_queries: set[str] = set()
 
     #
     # INTERNAL UTILS
     #
     def _params(
             self,
-            attributes: Optional[Dict[str, Dict[str, str]]],
-            params: Optional[List[str]],
-            args: Union[List[Any], Tuple[Any]],
-            kwargs: Dict[str, Any],
-        ) -> Union[List[Any], Tuple[Any], Dict[str, Any]]:
+            attributes: dict[str, dict[str, str]]|None,
+            params: list[str]|None,
+            args: list[Any]|tuple[Any],
+            kwargs: dict[str, Any],
+        ) -> list[Any]|tuple[Any]|dict[str, Any]:
         """Handle query parameters.
 
         - update attribute references ``:u.a`` to ``:u__a``.
@@ -87,13 +87,13 @@ class Queries:
             self,
             fn: Callable[..., Any],
             name: str,
-            doc: Optional[str],
+            doc: str|None,
             sql: str,
             operation: SQLOperationType,
-            signature: Optional[inspect.Signature],
-            floc: Tuple[Union[Path, str], int] = ("<unknown>", 0),
-            attributes: Optional[Dict[str, Dict[str, str]]] = None,
-            params: Optional[List[str]] = None,
+            signature: inspect.Signature|None,
+            floc: tuple[Path|str, int] = ("<unknown>", 0),
+            attributes: dict[str, dict[str, str]]|None = None,
+            params: list[str]|None = None,
         ) -> QueryFn:
         """Add custom-made metadata to a dynamically generated function."""
         fname, lineno = floc
@@ -203,7 +203,7 @@ class Queries:
             ctx_mgr, f"{fn.__name__}_cursor", fn.__doc__, fn.sql, fn.operation, fn.__signature__
         )
 
-    def _create_methods(self, query_datum: QueryDatum, is_aio: bool) -> List[QueryFn]:
+    def _create_methods(self, query_datum: QueryDatum, is_aio: bool) -> list[QueryFn]:
         """Internal function to feed add_queries."""
 
         # standarc version
@@ -224,7 +224,7 @@ class Queries:
     # PUBLIC INTERFACE
     #
     @property
-    def available_queries(self) -> List[str]:
+    def available_queries(self) -> list[str]:
         """Returns listing of all the available query methods loaded in this class.
 
         **Returns:** ``list[str]`` List of dot-separated method accessor names.
@@ -248,7 +248,7 @@ class Queries:
         setattr(self, query_name, fn)
         self._available_queries.add(query_name)
 
-    def add_queries(self, queries: List[QueryFn]) -> None:
+    def add_queries(self, queries: list[QueryFn]) -> None:
         """Add query methods to `Queries` instance."""
         for fn in queries:
             query_name = fn.__name__.rpartition(".")[2]
@@ -269,7 +269,7 @@ class Queries:
         for child_query_name in child_queries.available_queries:
             self._available_queries.add(f"{child_name}.{child_query_name}")
 
-    def load_from_list(self, query_data: List[QueryDatum]):
+    def load_from_list(self, query_data: list[QueryDatum]):
         """Load Queries from a list of `QueryDatum`"""
         for query_datum in query_data:
             self.add_queries(self._create_methods(query_datum, self.is_aio))

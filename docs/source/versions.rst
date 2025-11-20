@@ -1,13 +1,14 @@
 AioSQL - Versions
 =================
 
-? on ?
-------
+14.0 on ?
+---------
 
 - improved documentation
 - minor packaging fix
 - only right strip queries to improve traces readability
 - remove Python 3.9 support
+- modernize Python type declarations
 
 13.4 on 2025-04-09
 ------------------

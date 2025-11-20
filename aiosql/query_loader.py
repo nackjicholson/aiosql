@@ -1,7 +1,7 @@
 import re
 import inspect
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Type, Sequence, Any, Union
+from typing import Type, Sequence, Any
 
 from .utils import SQLParseException, SQLLoadException, VAR_REF, VAR_REF_DOT, log
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
@@ -111,8 +111,8 @@ class QueryLoader:
     def __init__(
         self,
         driver_adapter: DriverAdapterProtocol,
-        record_classes: Optional[Dict[str, Any]],
-        attribute: Optional[str] = None,
+        record_classes: dict[str, Any]|None,
+        attribute: str|None = None,
     ):
         self.driver_adapter = driver_adapter
         self.record_classes = record_classes if record_classes is not None else {}
@@ -121,8 +121,8 @@ class QueryLoader:
     def _make_query_datum(
         self,
         query: str,
-        ns_parts: List[str],
-        floc: Tuple[Union[Path, str], int],
+        ns_parts: list[str],
+        floc: tuple[Path|str, int],
     ) -> QueryDatum:
         """Build a query datum.
 
@@ -149,7 +149,7 @@ class QueryLoader:
         sql = self.driver_adapter.process_sql(query_fqn, qop, sql)
         return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, floc, attributes, qsig)
 
-    def _get_name_op(self, text: str) -> Tuple[str, SQLOperationType, Optional[List[str]]]:
+    def _get_name_op(self, text: str) -> tuple[str, SQLOperationType, list[str]|None]:
         """Extract name, parameters and operation from spec."""
         qname_spec = text.replace("-", "_")
         matched = _NAME_OP.match(qname_spec)
@@ -166,14 +166,14 @@ class QueryLoader:
             raise SQLParseException(f'cannot use named parameters in SQL script: "{qname_spec}"')
         return nameop["name"], operation, params
 
-    def _get_record_class(self, text: str) -> Optional[Type]:
+    def _get_record_class(self, text: str) -> Type|None:
         """Extract record class from spec."""
         rc_match = _RECORD_DEF.match(text)
         rc_name = rc_match.group(1) if rc_match else None
         # TODO: Probably will want this to be a class, marshal in, and marshal out
         return self.record_classes.get(rc_name) if isinstance(rc_name, str) else None
 
-    def _get_sql_doc(self, lines: Sequence[str]) -> Tuple[str, str]:
+    def _get_sql_doc(self, lines: Sequence[str]) -> tuple[str, str]:
         """Separate SQL-comment documentation and SQL code."""
         doc, sql = "", ""
         for line in lines:
@@ -185,7 +185,7 @@ class QueryLoader:
 
         return sql.strip(), doc.rstrip()
 
-    def _build_signature(self, sql: str, qname: str, sig: Optional[List[str]]) -> inspect.Signature:
+    def _build_signature(self, sql: str, qname: str, sig: list[str]|None) -> inspect.Signature:
         """Return signature object for generated dynamic function."""
         # FIXME what about the connection?!
         params = [inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD)]
@@ -213,8 +213,8 @@ class QueryLoader:
         return inspect.Signature(parameters=params)
 
     def load_query_data_from_sql(
-        self, sql: str, ns_parts: List[str], fname: Union[Path, str] = "<unknown>"
-    ) -> List[QueryDatum]:
+        self, sql: str, ns_parts: list[str], fname: Path|str = "<unknown>"
+    ) -> list[QueryDatum]:
         """Load queries from a string."""
         usql = _remove_ml_comments(sql)
         qdefs = _QUERY_DEF.split(usql)
@@ -228,8 +228,8 @@ class QueryLoader:
         return data
 
     def load_query_data_from_file(
-        self, path: Path, ns_parts: List[str] = [], encoding=None
-    ) -> List[QueryDatum]:
+        self, path: Path, ns_parts: list[str] = [], encoding=None
+    ) -> list[QueryDatum]:
         """Load queries from a file."""
         return self.load_query_data_from_sql(path.read_text(encoding=encoding), ns_parts, path)
 

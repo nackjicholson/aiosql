@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, Dict, Optional, Type, Union, Tuple, List, Any
+from typing import Callable, Type, Any
 
 from .adapters.aiosqlite import AioSQLiteAdapter
 from .adapters.asyncpg import AsyncPGAdapter
@@ -14,7 +14,7 @@ from .queries import Queries
 from .query_loader import QueryLoader
 from .types import DriverAdapterProtocol
 
-_ADAPTERS: Dict[str, Callable[..., DriverAdapterProtocol]] = {
+_ADAPTERS: dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore
     "apsw": GenericAdapter,
     "asyncpg": AsyncPGAdapter,  # type: ignore
@@ -41,7 +41,7 @@ def register_adapter(name: str, adapter: Callable[..., DriverAdapterProtocol]):
 
 
 def _make_driver_adapter(
-    driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
+    driver_adapter: str|Callable[..., DriverAdapterProtocol],
     *args, ** kwargs
 ) -> DriverAdapterProtocol:
     """Get the driver adapter instance registered by the `driver_name`."""
@@ -70,12 +70,12 @@ def _make_driver_adapter(
 
 def from_str(
     sql: str,
-    driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
-    record_classes: Optional[Dict] = None,
+    driver_adapter: str|Callable[..., DriverAdapterProtocol],
+    record_classes: dict|None = None,
     kwargs_only: bool = True,
-    attribute: Optional[str] = "__",
-    args: List[Any] = [],
-    kwargs: Dict[str, Any] = {},
+    attribute: str|None = "__",
+    args: list[Any] = [],
+    kwargs: dict[str, Any] = {},
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
 ):
@@ -130,16 +130,16 @@ def from_str(
 
 
 def from_path(
-    sql_path: Union[str, Path],
-    driver_adapter: Union[str, Callable[..., DriverAdapterProtocol]],
-    record_classes: Optional[Dict] = None,
+    sql_path: str|Path,
+    driver_adapter: str|Callable[..., DriverAdapterProtocol],
+    record_classes: dict|None = None,
     kwargs_only: bool = True,
-    attribute: Optional[str] = "__",
-    args: List[Any] = [],
-    kwargs: Dict[str, Any] = {},
+    attribute: str|None = "__",
+    args: list[Any] = [],
+    kwargs: dict[str, Any] = {},
     loader_cls: Type[QueryLoader] = QueryLoader,
     queries_cls: Type[Queries] = Queries,
-    ext: Tuple[str] = (".sql",),
+    ext: tuple[str] = (".sql",),
     encoding=None,
 ):
     """Load queries from a `.sql` file, or directory of `.sql` files.
