@@ -1,5 +1,4 @@
 from contextlib import contextmanager
-from typing import List
 from ..types import SyncDriverAdapterProtocol
 
 
@@ -33,7 +32,7 @@ class GenericAdapter(SyncDriverAdapterProtocol):
                 for row in cur:
                     yield row
             else:
-                column_names: List[str] = []
+                column_names: list[str] = []
                 first = True
                 for row in cur:
                     if first:  # only get description on the fly, for apsw

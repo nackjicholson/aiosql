@@ -1,9 +1,8 @@
 from .generic import GenericAdapter
 from ..utils import VAR_REF
-from typing import List
 
 
-def _colon_to_dollar(ma):
+def _colon_to_dollar(ma) -> str:
     """Convert 'WHERE :id = 1' to 'WHERE $id = 1'."""
     gd = ma.groupdict()
     if gd["dquote"] is not None:
@@ -49,7 +48,7 @@ class DuckDBAdapter(GenericAdapter):
         return res[0] if res and len(res) == 1 else res
 
     def select(self, conn, query_name: str, sql: str, parameters, record_class=None):
-        column_names: List[str] = []
+        column_names: list[str] = []
         cur = self._cursor(conn)
         try:
             cur.execute(sql, parameters)

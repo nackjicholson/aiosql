@@ -1,7 +1,6 @@
-from typing import Dict, List, Union
 from .pyformat import PyFormatAdapter
 
-ParamType = Union[Dict, List, None]
+ParamType = dict|list|None
 
 
 class BrokenMySQLAdapter(PyFormatAdapter):

@@ -6,18 +6,14 @@ from typing import (
     AsyncContextManager,
     Callable,
     ContextManager,
-    Dict,
     Generator,
-    List,
     NamedTuple,
-    Optional,
-    Tuple,
-    Union,
+    Protocol,
 )
-from typing import Protocol
 
 # FIXME None added for MySQL buggy drivers
-ParamType = Union[Dict[str, Any], List[Any], None]
+# Python 3.13 type ...
+ParamType = dict[str, Any]|list[Any]|None
 
 
 class SQLOperationType(Enum):
@@ -38,27 +34,26 @@ class QueryDatum(NamedTuple):
     operation_type: SQLOperationType
     sql: str
     record_class: Any
-    signature: Optional[inspect.Signature]
-    floc: Tuple[Union[Path, str], int]
-    attributes: Optional[Dict[str, Dict[str, str]]]
-    parameters: Optional[List[str]]
+    signature: inspect.Signature|None
+    floc: tuple[Path|str, int]
+    attributes: dict[str, dict[str, str]]|None
+    parameters: list[str]|None
 
 
 class QueryFn(Protocol):
     __name__: str
-    __signature__: Optional[inspect.Signature]
+    __signature__: inspect.Signature|None
     sql: str
     operation: SQLOperationType
-    attributes: Optional[Dict[str, Dict[str, str]]]
-    parameters: Optional[List[str]]
+    attributes: dict[str, dict[str, str]]|None
+    parameters: list[str]|None
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any: ...  # pragma: no cover
 
 
 # Can't make this a recursive type in terms of itself
-# QueryDataTree = Dict[str, Union[QueryDatum, 'QueryDataTree']]
-QueryDataTree = Dict[str, Union[QueryDatum, Dict]]
-
+# QueryDataTree = dict[str, QueryDatum|"QueryDataTree"]
+QueryDataTree = dict[str, QueryDatum|dict]
 
 class SyncDriverAdapterProtocol(Protocol):
     def process_sql(
@@ -71,7 +66,7 @@ class SyncDriverAdapterProtocol(Protocol):
         query_name: str,
         sql: str,
         parameters: ParamType,
-        record_class: Optional[Callable],
+        record_class: Callable|None,
     ) -> Generator[Any, None, None]: ...  # pragma: no cover
 
     def select_one(
@@ -80,12 +75,12 @@ class SyncDriverAdapterProtocol(Protocol):
         query_name: str,
         sql: str,
         parameters: ParamType,
-        record_class: Optional[Callable],
-    ) -> Optional[Tuple[Any, ...]]: ...  # pragma: no cover
+        record_class: Callable|None,
+    ) -> tuple[Any, ...]|None: ...  # pragma: no cover
 
     def select_value(
         self, conn: Any, query_name: str, sql: str, parameters: ParamType
-    ) -> Optional[Any]: ...  # pragma: no cover
+    ) -> Any|None: ...  # pragma: no cover
 
     def select_cursor(
         self, conn: Any, query_name: str, sql: str, parameters: ParamType
@@ -101,7 +96,7 @@ class SyncDriverAdapterProtocol(Protocol):
 
     def insert_returning(
         self, conn: Any, query_name: str, sql: str, parameters: ParamType
-    ) -> Optional[Any]: ...  # pragma: no cover
+    ) -> Any|None: ...  # pragma: no cover
 
     def execute_script(self, conn: Any, sql: str) -> str: ...  # pragma: no cover
 
@@ -117,8 +112,8 @@ class AsyncDriverAdapterProtocol(Protocol):
         query_name: str,
         sql: str,
         parameters: ParamType,
-        record_class: Optional[Callable],
-    ) -> List: ...  # pragma: no cover
+        record_class: Callable|None,
+    ) -> list: ...  # pragma: no cover
 
     async def select_one(
         self,
@@ -126,12 +121,12 @@ class AsyncDriverAdapterProtocol(Protocol):
         query_name: str,
         sql: str,
         parameters: ParamType,
-        record_class: Optional[Callable],
-    ) -> Optional[Any]: ...  # pragma: no cover
+        record_class: Callable|None,
+    ) -> Any|None: ...  # pragma: no cover
 
     async def select_value(
         self, conn: Any, query_name: str, sql: str, parameters: ParamType
-    ) -> Optional[Any]: ...  # pragma: no cover
+    ) -> Any|None: ...  # pragma: no cover
 
     async def select_cursor(
         self, conn: Any, query_name: str, sql: str, parameters: ParamType
@@ -149,9 +144,9 @@ class AsyncDriverAdapterProtocol(Protocol):
 
     async def insert_returning(
         self, conn: Any, query_name: str, sql: str, parameters: ParamType
-    ) -> Optional[Any]: ...  # pragma: no cover
+    ) -> Any|None: ...  # pragma: no cover
 
     async def execute_script(self, conn: Any, sql: str) -> str: ...  # pragma: no cover
 
 
-DriverAdapterProtocol = Union[SyncDriverAdapterProtocol, AsyncDriverAdapterProtocol]
+DriverAdapterProtocol = SyncDriverAdapterProtocol|AsyncDriverAdapterProtocol
