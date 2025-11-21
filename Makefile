@@ -54,7 +54,7 @@ venv:
 
 venv/.dev: venv
 	source venv/bin/activate
-	$(PIP) install .[dev,dev-postgres,dev-sqlite,dev-duckdb]
+	$(PIP) install -e .[dev,dev-postgres,dev-sqlite,dev-duckdb]
 	touch $@
 
 venv/.dist: venv
