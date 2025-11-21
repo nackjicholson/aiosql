@@ -248,7 +248,7 @@ class Queries:
                 )
 
         else:
-            raise ValueError(f"Unknown operation: {operation}")
+            raise ValueError(f"Unknown operation: {operation}")  # pragma: no cover
 
         return self._query_fn(
             afn, query_name, doc_comments, sql, operation, signature, floc, attributes, params

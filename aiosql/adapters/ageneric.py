@@ -7,7 +7,7 @@ class AsyncGenericAdapter(AsyncDriverAdapterProtocol):
     is_aio_driver = True
 
     def process_sql(self, query_name, op_type, sql):
-        return sql
+        return sql  # pragma: no cover
 
     # this is an asynchronous generator
     async def select(self, conn, query_name, sql, parameters, record_class=None):
