@@ -10,6 +10,7 @@ AioSQL - Versions
 - remove Python 3.9 support
 - modernize Python type declarations
 - make asynchronous select return an asynchronous generator
+- add `apsycopg3` driver for asynchronous psycopg
 
 13.4 on 2025-04-09
 ------------------
