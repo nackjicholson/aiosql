@@ -11,6 +11,7 @@ AioSQL - Versions
 - modernize Python type declarations
 - make asynchronous select return an asynchronous generator
 - add `apsycopg3` driver for asynchronous psycopg
+- update GitHub CI configuration
 
 13.4 on 2025-04-09
 ------------------
