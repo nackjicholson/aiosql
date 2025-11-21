@@ -1,8 +1,8 @@
 AioSQL - Versions
 =================
 
-14.0 on ?
----------
+14.0 on 2025-11-21
+------------------
 
 - improved documentation
 - minor packaging fix
