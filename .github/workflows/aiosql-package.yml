@@ -39,9 +39,9 @@ jobs:
       PYTHON_GIL: ${{ matrix.python.gil }}
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python.version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python.version }}
         allow-prereleases: true
