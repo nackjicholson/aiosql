@@ -1,4 +1,5 @@
 import inspect
+import collections.abc
 from enum import Enum
 from pathlib import Path
 from typing import (
@@ -56,6 +57,7 @@ class QueryFn(Protocol):
 QueryDataTree = dict[str, QueryDatum|dict]
 
 class SyncDriverAdapterProtocol(Protocol):
+
     def process_sql(
         self, query_name: str, op_type: SQLOperationType, sql: str
     ) -> str: ...  # pragma: no cover
@@ -102,18 +104,19 @@ class SyncDriverAdapterProtocol(Protocol):
 
 
 class AsyncDriverAdapterProtocol(Protocol):
+
     def process_sql(
         self, query_name: str, op_type: SQLOperationType, sql: str
     ) -> str: ...  # pragma: no cover
 
-    async def select(
+    def select(
         self,
         conn: Any,
         query_name: str,
         sql: str,
         parameters: ParamType,
         record_class: Callable|None,
-    ) -> list: ...  # pragma: no cover
+    ) -> collections.abc.AsyncGenerator[Any, None]: ...  # pragma: no cover
 
     async def select_one(
         self,
@@ -128,7 +131,7 @@ class AsyncDriverAdapterProtocol(Protocol):
         self, conn: Any, query_name: str, sql: str, parameters: ParamType
     ) -> Any|None: ...  # pragma: no cover
 
-    async def select_cursor(
+    def select_cursor(
         self, conn: Any, query_name: str, sql: str, parameters: ParamType
     ) -> AsyncContextManager[Any]: ...  # pragma: no cover
 

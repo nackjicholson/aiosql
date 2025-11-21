@@ -22,11 +22,13 @@ class AioSQLiteAdapter:
 
     async def select(self, conn, _query_name, sql, parameters, record_class=None):
         async with conn.execute(sql, parameters) as cur:
-            results = await cur.fetchall()
             if record_class is not None:
                 column_names = [c[0] for c in cur.description]
-                results = [record_class(**dict(zip(column_names, row))) for row in results]
-        return results
+                for row in await cur.fetchall():
+                    yield record_class(**dict(zip(column_names, row)))
+            else:
+                for row in await cur.fetchall():
+                    yield row
 
     async def select_one(self, conn, _query_name, sql, parameters, record_class=None):
         async with conn.execute(sql, parameters) as cur:

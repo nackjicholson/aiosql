@@ -113,7 +113,7 @@ class Queries:
     # source, coverage does note detect that the "fn" functions are actually called,
     # hence the "no cover" hints.
     def _make_sync_fn(self, query_datum: QueryDatum) -> QueryFn:
-        """Build a dynamic method from a parsed query."""
+        """Build a synchronous dynamic method from a parsed query."""
 
         query_name, doc_comments, operation, sql, record_class, signature, floc, attributes, params = (
             query_datum
@@ -182,14 +182,77 @@ class Queries:
             fn, query_name, doc_comments, sql, operation, signature, floc, attributes, params
         )
 
-    # NOTE does this make sense?
-    def _make_async_fn(self, fn: QueryFn) -> QueryFn:
-        """Wrap in an async function."""
+    def _make_async_fn(self, query_datum: QueryDatum) -> QueryFn:
+        """Build an asynchronous dynamic method from a parsed query."""
 
-        async def afn(self, conn, *args, **kwargs):  # pragma: no cover
-            return await fn(self, conn, *args, **kwargs)
+        query_name, doc_comments, operation, sql, record_class, signature, floc, attributes, params = (
+            query_datum
+        )
 
-        return self._query_fn(afn, fn.__name__, fn.__doc__, fn.sql, fn.operation, fn.__signature__)
+        if operation == SQLOperationType.INSERT_RETURNING:
+
+            async def afn(self, conn, *args, **kwargs):  # pragma: no cover
+                return await self.driver_adapter.insert_returning(
+                    conn, query_name, sql, self._params(attributes, params, args, kwargs)
+                )
+
+        elif operation == SQLOperationType.INSERT_UPDATE_DELETE:
+
+            async def afn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover
+                return await self.driver_adapter.insert_update_delete(
+                    conn, query_name, sql, self._params(attributes, params, args, kwargs)
+                )
+
+        elif operation == SQLOperationType.INSERT_UPDATE_DELETE_MANY:
+
+            async def afn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover
+                assert not kwargs, "cannot use named parameters in many query"  # help type checker
+                return await self.driver_adapter.insert_update_delete_many(conn, query_name, sql, *args)
+
+        elif operation == SQLOperationType.SCRIPT:
+
+            if params:  # pragma: no cover
+                # NOTE this is caught earlier
+                raise SQLParseException(f"cannot use named parameters in SQL script: {query_name}")
+
+            async def afn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover
+                assert not args and not kwargs, f"cannot use parameters in SQL script: {query_name}"
+                return await self.driver_adapter.execute_script(conn, sql)
+
+        elif operation == SQLOperationType.SELECT:
+
+            # sanity check in passing…
+            if not self._look_like_a_select(sql):
+                fname, lineno = floc
+                log.warning(f"query {query_name} at {fname}:{lineno} may not be a select, consider adding an operator, eg '!'")
+
+            # async generator
+            async def afn(self, conn, *args, **kwargs):  # type: ignore # pragma: no cover
+                async for row in self.driver_adapter.select(
+                    conn, query_name, sql, self._params(attributes, params, args, kwargs), record_class
+                ):
+                    yield row
+
+        elif operation == SQLOperationType.SELECT_ONE:
+
+            async def afn(self, conn, *args, **kwargs):  # pragma: no cover
+                return await self.driver_adapter.select_one(
+                    conn, query_name, sql, self._params(attributes, params, args, kwargs), record_class
+                )
+
+        elif operation == SQLOperationType.SELECT_VALUE:
+
+            async def afn(self, conn, *args, **kwargs):  # pragma: no cover
+                return await self.driver_adapter.select_value(
+                    conn, query_name, sql, self._params(attributes, params, args, kwargs)
+                )
+
+        else:
+            raise ValueError(f"Unknown operation: {operation}")
+
+        return self._query_fn(
+            afn, query_name, doc_comments, sql, operation, signature, floc, attributes, params
+        )
 
     def _make_ctx_mgr(self, fn: QueryFn) -> QueryFn:
         """Wrap in a context manager function."""
@@ -206,12 +269,7 @@ class Queries:
     def _create_methods(self, query_datum: QueryDatum, is_aio: bool) -> list[QueryFn]:
         """Internal function to feed add_queries."""
 
-        # standarc version
-        fn = self._make_sync_fn(query_datum)
-
-        # asynchroneous wrapper
-        if is_aio:
-            fn = self._make_async_fn(fn)
+        fn = self._make_async_fn(query_datum) if is_aio else self._make_sync_fn(query_datum)
 
         # context manager
         if query_datum.operation_type == SQLOperationType.SELECT:

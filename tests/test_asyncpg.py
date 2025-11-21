@@ -105,7 +105,7 @@ async def test_variable_replacement(aconn, queries):
     users_sql = "select username from users where firstname = $1 and lastname = $2;"
     assert search.sql == users_sql
 
-    users_res = await search(aconn, title="John", lastname="Doe")
+    users_res = [ row async for row in search(aconn, title="John", lastname="Doe") ]
     assert users_res == [("johndoe",)]
 
     square = queries.f("misc.square")

@@ -23,6 +23,7 @@ _DB = {
     "apsw": "sqlite3",
     "aiosqlite": "sqlite3",
     "psycopg": "postgres",
+    "apsycopg": "postgres",
     "psycopg2": "postgres",
     "asyncpg": "postgres",
     "pygresql": "postgres",
@@ -95,8 +96,9 @@ class Queries:
         self._db = _DB[driver]
         self._dir = _DIR[self._db]
         self._queries = queries
-        self.is_async = driver in ("asyncpg", "aiosqlite")
+        self.is_async = driver in ("asyncpg", "aiosqlite", "apsycopg")
         self.driver_adapter = queries.driver_adapter
+        assert self.is_async == hasattr(queries.driver_adapter, "is_aio_driver")
 
     def f(self, name: str):
         """Return the most precise SQL function for name."""
@@ -303,7 +305,7 @@ def run_insert_returning(conn, queries, date):
     b2, t2 = to_tuple(blog_title(conn, blogid=blogid))
     assert (blogid, title) == (b2, t2)
 
-    if driver in ("psycopg", "psycopg2"):
+    if driver in ("psycopg", "psycopg2", "apsycopg"):
         no_publish = queries.f("blogs.no_publish")
         res = no_publish(conn)
         assert res is None
@@ -446,7 +448,7 @@ async def run_async_record_query(dconn, queries):
 
     get_all = queries.f("users.get_all")
 
-    actual = [dict(r) for r in await get_all(dconn)]
+    actual = [dict(r) async for r in get_all(dconn)]
 
     assert len(actual) == 3
     assert actual[0] == {
@@ -461,7 +463,7 @@ async def run_async_parameterized_query(aconn, queries, date):
 
     get_user_blogs = queries.f("blogs.get_user_blogs")
 
-    actual = await get_user_blogs(aconn, userid=1)
+    actual = [ row async for row in get_user_blogs(aconn, userid=1) ]
     expected = [
         ("How to make a pie.", date(2018, 11, 23)),
         ("What I did Today", date(2017, 7, 28)),
@@ -472,8 +474,8 @@ async def run_async_parameterized_query(aconn, queries, date):
 async def run_async_parameterized_record_query(dconn, queries, date):
     get_blogs_published_after = queries.f("blogs.get_blogs_published_after")
 
-    records = await get_blogs_published_after(dconn, published=date(2018, 1, 1))
-    actual = [dict(rec) for rec in records]
+    records = get_blogs_published_after(dconn, published=date(2018, 1, 1))
+    actual = [ dict(rec) async for rec in records ]
 
     expected = [
         {
@@ -491,7 +493,7 @@ async def run_async_record_class_query(aconn, queries, date):
 
     get_user_blogs = queries.f("blogs.get_user_blogs")
 
-    actual = await get_user_blogs(aconn, userid=1)
+    actual = [ row async for row in get_user_blogs(aconn, userid=1) ]
 
     expected = [
         UserBlogSummary(title="How to make a pie.", published=date(2018, 11, 23)),
@@ -533,6 +535,7 @@ async def run_async_select_value(aconn, queries):
 @pytest.mark.asyncio
 async def run_async_insert_returning(aconn, queries, date):
     publish_blog = queries.f("blogs.publish_blog")
+    blog_title = queries.f("blogs.blog_title")
 
     blogid = await publish_blog(
         aconn,
@@ -543,34 +546,25 @@ async def run_async_insert_returning(aconn, queries, date):
     )
 
     if queries._db == "postgres":
+        # assert isinstance(blogid, (tuple, list))
         blogid, title = blogid
     else:
         blogid, title = blogid, "My first blog"
 
-    if queries._db == "postgres":
-        query = "select blogid, title from blogs where blogid = $1;"
-        actual = tuple(
-            await aconn.fetchrow(
-                query,
-                blogid,
-            )
-        )
-    else:
-        query = "select blogid, title from blogs where blogid = :blogid;"
-        async with aconn.execute(query, {"blogid": blogid}) as cur:
-            actual = await cur.fetchone()
+    actual = await blog_title(aconn, blogid=blogid)
     assert actual == (blogid, title)
 
 @pytest.mark.asyncio
 async def run_async_delete(aconn, queries):
     # Removing the "janedoe" blog titled "Testing"
     remove_blog = queries.f("blogs.remove_blog")
+
     actual = await remove_blog(aconn, blogid=2)
     # FIXME all implementations should return the same!
     assert actual in (1, "DELETE 1")
 
     get_user_blogs = queries.f("blogs.get_user_blogs")
-    janes_blogs = await get_user_blogs(aconn, userid=3)
+    janes_blogs = [ r async for r in get_user_blogs(aconn, userid=3) ]
     assert len(janes_blogs) == 0
 
 @pytest.mark.asyncio
@@ -588,7 +582,8 @@ async def run_async_insert_many(aconn, queries, date):
     assert actual is None
 
     get_user_blogs = queries.f("blogs.get_user_blogs")
-    johns_blogs = await get_user_blogs(aconn, userid=2)
+    raw_johns_blogs = get_user_blogs(aconn, userid=2)
+    johns_blogs = [ tuple(r) async for r in raw_johns_blogs ]
     assert johns_blogs == _expect_blogs(blogs_dict)
 
 @pytest.mark.asyncio
@@ -596,14 +591,15 @@ async def run_async_methods(dconn, queries):
     get_all = queries.f("users.get_all")
     get_all_sorted = queries.f("users.get_all_sorted")
 
-    users, sorted_users = await asyncio.gather(get_all(dconn), get_all_sorted(dconn))
+    users = get_all(dconn)
+    sorted_users = get_all_sorted(dconn)
 
-    assert [dict(u) for u in users] == [
+    assert [dict(u) async for u in users] == [
         {"userid": 1, "username": "bobsmith", "firstname": "Bob", "lastname": "Smith"},
         {"userid": 2, "username": "johndoe", "firstname": "John", "lastname": "Doe"},
         {"userid": 3, "username": "janedoe", "firstname": "Jane", "lastname": "Doe"},
     ]
-    assert [dict(u) for u in sorted_users] == [
+    assert [dict(u) async for u in sorted_users] == [
         {"userid": 1, "username": "bobsmith", "firstname": "Bob", "lastname": "Smith"},
         {"userid": 3, "username": "janedoe", "firstname": "Jane", "lastname": "Doe"},
         {"userid": 2, "username": "johndoe", "firstname": "John", "lastname": "Doe"},
