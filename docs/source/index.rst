@@ -73,7 +73,7 @@ Badges
    :target: https://github.com/nackjicholson/aiosql/actions/
 ..
    NOTE all tests
-   # MIST
+   # MISC
    loading: 17
    patterns: 5
    # SYNC
