@@ -51,18 +51,13 @@ async def dconn(pg_params, pg_db):
 
 from run_tests import (
     run_async_sanity as test_sanity,
-    # run_async_something as test_something,
-    # run_async_cursor as test_cursor,
     run_async_record_query as test_record_query,
     run_async_parameterized_record_query as test_parameterized_record_query,
     run_async_parameterized_query as test_parameterized_query,
     run_async_select_one as test_select_one,
     run_async_select_value as test_select_value,
-    # run_async_modulo as test_modulo,
     run_async_delete as test_delete,
-    # run_async_date_time as test_date_time,
     run_async_execute_script as test_execute_script,
-    # run_async_object_attributes as test_object_attributes,
     run_async_record_class_query as test_record_class_query,
     run_async_methods as test_methods,
     run_async_select_cursor_context_manager as test_select_cursor_context_manager,
