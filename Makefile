@@ -201,6 +201,7 @@ check.pytest.postgres: $(INSTALL)
 	$(PYTEST) $(PYTOPT) \
 	  tests/test_psycopg2.py \
 	  tests/test_psycopg3.py \
+	  tests/test_apsycopg3.py \
 	  tests/test_pygresql.py \
 	  tests/test_pg8000.py \
 	  tests/test_asyncpg.py

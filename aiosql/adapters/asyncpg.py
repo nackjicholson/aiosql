@@ -77,8 +77,11 @@ class AsyncPGAdapter:
         async with MaybeAcquire(conn) as connection:
             results = await connection.fetch(sql, *parameters)
             if record_class is not None:
-                results = [record_class(**dict(rec)) for rec in results]
-        return results
+                for rec in results:
+                    yield record_class(**dict(rec))
+            else:
+                for rec in results:
+                    yield rec
 
     async def select_one(self, conn, query_name, sql, parameters, record_class=None):
         parameters = self.maybe_order_params(query_name, parameters)

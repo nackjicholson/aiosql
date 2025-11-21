@@ -92,7 +92,8 @@ Badges
    # ASYNC
    aiosqlite: 13
    asyncpg: 18
-.. image:: https://img.shields.io/badge/tests-247%20✓-success
+   apsycopg3: 14
+.. image:: https://img.shields.io/badge/tests-261%20✓-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 .. image:: https://img.shields.io/github/issues/nackjicholson/aiosql?style=flat
@@ -201,13 +202,9 @@ using ``aiosqlite`` and ``asyncio``:
 
     async def main():
         async with aiosqlite.connect("greetings.db") as conn:
-            # possibly in parallel…
-            greetings, user = await asyncio.gather(
-                queries.get_all_greetings(conn),
-                queries.get_user_by_username(conn, username="willvaughn")
-            )
+            user = await queries.get_user_by_username(conn, username="willvaughn")
 
-            for _, greeting in greetings:
+            async for _, greeting in queries.get_all_greetings(conn),
                 print(f"{greeting}, {user[2]}!")
 
     asyncio.run(main())

@@ -6,6 +6,7 @@ from .adapters.asyncpg import AsyncPGAdapter
 from .adapters.pyformat import PyFormatAdapter
 from .adapters.mysql import BrokenMySQLAdapter
 from .adapters.generic import GenericAdapter
+from .adapters.apyformat import AsyncPyFormatAdapter
 from .adapters.sqlite3 import SQLite3Adapter
 from .adapters.pg8000 import Pg8000Adapter
 from .adapters.duckdb import DuckDBAdapter
@@ -17,6 +18,7 @@ from .types import DriverAdapterProtocol
 _ADAPTERS: dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore
     "apsw": GenericAdapter,
+    "apsycopg": AsyncPyFormatAdapter,  # type: ignore
     "asyncpg": AsyncPGAdapter,  # type: ignore
     "duckdb": DuckDBAdapter,
     "mariadb": BrokenMySQLAdapter,
