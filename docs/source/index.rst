@@ -118,7 +118,7 @@ Badges
 .. image:: https://img.shields.io/badge/databases-6-informational
    :alt: Databases
    :target: https://github.com/nackjicholson/aiosql/
-.. image:: https://img.shields.io/badge/drivers-17-informational
+.. image:: https://img.shields.io/badge/drivers-16-informational
    :alt: Drivers
    :target: https://github.com/nackjicholson/aiosql/
 .. image:: https://img.shields.io/github/languages/count/nackjicholson/aiosql?style=flat
