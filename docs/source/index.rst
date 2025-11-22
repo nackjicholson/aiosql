@@ -20,6 +20,7 @@ based drivers for
 `apsw <https://pypi.org/project/apsw/>`__),
 `PostgreSQL <https://postgresql.org/>`__
 (`psycopg (3) <https://www.psycopg.org/psycopg3/>`__,
+`apsycopg (3) <https://www.psycopg.org/psycopg3/>`__,
 `psycopg2 <https://www.psycopg.org/docs/>`__,
 `pg8000 <https://pypi.org/project/pg8000/>`__,
 `pygresql <http://www.pygresql.org/>`__,
@@ -117,7 +118,7 @@ Badges
 .. image:: https://img.shields.io/badge/databases-6-informational
    :alt: Databases
    :target: https://github.com/nackjicholson/aiosql/
-.. image:: https://img.shields.io/badge/drivers-15-informational
+.. image:: https://img.shields.io/badge/drivers-17-informational
    :alt: Drivers
    :target: https://github.com/nackjicholson/aiosql/
 .. image:: https://img.shields.io/github/languages/count/nackjicholson/aiosql?style=flat
@@ -204,7 +205,7 @@ using ``aiosqlite`` and ``asyncio``:
         async with aiosqlite.connect("greetings.db") as conn:
             user = await queries.get_user_by_username(conn, username="willvaughn")
 
-            async for _, greeting in queries.get_all_greetings(conn),
+            async for _, greeting in queries.get_all_greetings(conn):
                 print(f"{greeting}, {user[2]}!")
 
     asyncio.run(main())
