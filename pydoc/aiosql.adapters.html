@@ -1,0 +1,552 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aiosql.adapters package &mdash; aiosql 14.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=3e12ff1b"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="AioSQL - Versions" href="../versions.html" />
+    <link rel="prev" title="aiosql package" href="aiosql.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            aiosql
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../defining-sql-queries.html">Defining SQL Queries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced-topics.html">Advanced Topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../database-driver-adapters.html">Database Driver Adapters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="aiosql.html">aiosql package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="aiosql.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">aiosql.adapters package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="aiosql.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aiosql.html#module-aiosql.aiosql">aiosql.aiosql module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aiosql.html#module-aiosql.queries">aiosql.queries module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aiosql.html#module-aiosql.query_loader">aiosql.query_loader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aiosql.html#module-aiosql.types">aiosql.types module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aiosql.html#module-aiosql.utils">aiosql.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aiosql.html#module-aiosql">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../versions.html">Versions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../todo.html">Backlog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">aiosql</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">aiosql</a></li>
+          <li class="breadcrumb-item"><a href="aiosql.html">aiosql package</a></li>
+      <li class="breadcrumb-item active">aiosql.adapters package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/pydoc/aiosql.adapters.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aiosql-adapters-package">
+<h1>aiosql.adapters package<a class="headerlink" href="#aiosql-adapters-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-aiosql.adapters.ageneric">
+<span id="aiosql-adapters-ageneric-module"></span><h2>aiosql.adapters.ageneric module<a class="headerlink" href="#module-aiosql.adapters.ageneric" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aiosql.adapters.ageneric.AsyncGenericAdapter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiosql.adapters.ageneric.</span></span><span class="sig-name descname"><span class="pre">AsyncGenericAdapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.ageneric.AsyncGenericAdapter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="aiosql.html#aiosql.types.AsyncDriverAdapterProtocol" title="aiosql.types.AsyncDriverAdapterProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncDriverAdapterProtocol</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.ageneric.AsyncGenericAdapter.execute_script">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">execute_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.ageneric.AsyncGenericAdapter.execute_script" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.ageneric.AsyncGenericAdapter.insert_returning">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">insert_returning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.ageneric.AsyncGenericAdapter.insert_returning" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.ageneric.AsyncGenericAdapter.insert_update_delete">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">insert_update_delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.ageneric.AsyncGenericAdapter.insert_update_delete" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.ageneric.AsyncGenericAdapter.insert_update_delete_many">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">insert_update_delete_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.ageneric.AsyncGenericAdapter.insert_update_delete_many" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="aiosql.adapters.ageneric.AsyncGenericAdapter.is_aio_driver">
+<span class="sig-name descname"><span class="pre">is_aio_driver</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#aiosql.adapters.ageneric.AsyncGenericAdapter.is_aio_driver" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.ageneric.AsyncGenericAdapter.process_sql">
+<span class="sig-name descname"><span class="pre">process_sql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.ageneric.AsyncGenericAdapter.process_sql" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.ageneric.AsyncGenericAdapter.select">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.ageneric.AsyncGenericAdapter.select" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.ageneric.AsyncGenericAdapter.select_cursor">
+<span class="sig-name descname"><span class="pre">select_cursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.ageneric.AsyncGenericAdapter.select_cursor" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.ageneric.AsyncGenericAdapter.select_one">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.ageneric.AsyncGenericAdapter.select_one" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.ageneric.AsyncGenericAdapter.select_value">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.ageneric.AsyncGenericAdapter.select_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aiosql.adapters.aiosqlite">
+<span id="aiosql-adapters-aiosqlite-module"></span><h2>aiosql.adapters.aiosqlite module<a class="headerlink" href="#module-aiosql.adapters.aiosqlite" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aiosql.adapters.aiosqlite.AioSQLiteAdapter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiosql.adapters.aiosqlite.</span></span><span class="sig-name descname"><span class="pre">AioSQLiteAdapter</span></span><a class="headerlink" href="#aiosql.adapters.aiosqlite.AioSQLiteAdapter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.aiosqlite.AioSQLiteAdapter.execute_script">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">execute_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.aiosqlite.AioSQLiteAdapter.execute_script" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.aiosqlite.AioSQLiteAdapter.insert_returning">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">insert_returning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.aiosqlite.AioSQLiteAdapter.insert_returning" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.aiosqlite.AioSQLiteAdapter.insert_update_delete">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">insert_update_delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.aiosqlite.AioSQLiteAdapter.insert_update_delete" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.aiosqlite.AioSQLiteAdapter.insert_update_delete_many">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">insert_update_delete_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.aiosqlite.AioSQLiteAdapter.insert_update_delete_many" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="aiosql.adapters.aiosqlite.AioSQLiteAdapter.is_aio_driver">
+<span class="sig-name descname"><span class="pre">is_aio_driver</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#aiosql.adapters.aiosqlite.AioSQLiteAdapter.is_aio_driver" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.aiosqlite.AioSQLiteAdapter.process_sql">
+<span class="sig-name descname"><span class="pre">process_sql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_op_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.aiosqlite.AioSQLiteAdapter.process_sql" title="Link to this definition"></a></dt>
+<dd><p>Pass through function because the <code class="docutils literal notranslate"><span class="pre">aiosqlite</span></code> driver can already handle the
+<code class="docutils literal notranslate"><span class="pre">:var_name</span></code> format used by aiosql and doesn’t need any additional processing.</p>
+<p>Args:</p>
+<ul class="simple">
+<li><p>_query_name (str): The name of the sql query.</p></li>
+<li><p>_op_type (SQLOperationType): The type of SQL operation performed by the query.</p></li>
+<li><p>sql (str): The sql as written before processing.</p></li>
+</ul>
+<p>Returns:</p>
+<ul class="simple">
+<li><p>str: Original SQL text unchanged.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.aiosqlite.AioSQLiteAdapter.select">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.aiosqlite.AioSQLiteAdapter.select" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.aiosqlite.AioSQLiteAdapter.select_cursor">
+<span class="sig-name descname"><span class="pre">select_cursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.aiosqlite.AioSQLiteAdapter.select_cursor" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.aiosqlite.AioSQLiteAdapter.select_one">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.aiosqlite.AioSQLiteAdapter.select_one" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.aiosqlite.AioSQLiteAdapter.select_value">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.aiosqlite.AioSQLiteAdapter.select_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aiosql.adapters.apyformat">
+<span id="aiosql-adapters-apyformat-module"></span><h2>aiosql.adapters.apyformat module<a class="headerlink" href="#module-aiosql.adapters.apyformat" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aiosql.adapters.apyformat.AsyncPyFormatAdapter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiosql.adapters.apyformat.</span></span><span class="sig-name descname"><span class="pre">AsyncPyFormatAdapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.apyformat.AsyncPyFormatAdapter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aiosql.adapters.ageneric.AsyncGenericAdapter" title="aiosql.adapters.ageneric.AsyncGenericAdapter"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsyncGenericAdapter</span></code></a></p>
+<p>Convert from named to pyformat parameter style.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.apyformat.AsyncPyFormatAdapter.process_sql">
+<span class="sig-name descname"><span class="pre">process_sql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.apyformat.AsyncPyFormatAdapter.process_sql" title="Link to this definition"></a></dt>
+<dd><p>From named to pyformat.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aiosql.adapters.asyncpg">
+<span id="aiosql-adapters-asyncpg-module"></span><h2>aiosql.adapters.asyncpg module<a class="headerlink" href="#module-aiosql.adapters.asyncpg" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.AsyncPGAdapter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiosql.adapters.asyncpg.</span></span><span class="sig-name descname"><span class="pre">AsyncPGAdapter</span></span><a class="headerlink" href="#aiosql.adapters.asyncpg.AsyncPGAdapter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.AsyncPGAdapter.execute_script">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">execute_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.asyncpg.AsyncPGAdapter.execute_script" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.AsyncPGAdapter.insert_returning">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">insert_returning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.asyncpg.AsyncPGAdapter.insert_returning" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.AsyncPGAdapter.insert_update_delete">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">insert_update_delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.asyncpg.AsyncPGAdapter.insert_update_delete" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.AsyncPGAdapter.insert_update_delete_many">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">insert_update_delete_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.asyncpg.AsyncPGAdapter.insert_update_delete_many" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.AsyncPGAdapter.is_aio_driver">
+<span class="sig-name descname"><span class="pre">is_aio_driver</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#aiosql.adapters.asyncpg.AsyncPGAdapter.is_aio_driver" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.AsyncPGAdapter.maybe_order_params">
+<span class="sig-name descname"><span class="pre">maybe_order_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.asyncpg.AsyncPGAdapter.maybe_order_params" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.AsyncPGAdapter.process_sql">
+<span class="sig-name descname"><span class="pre">process_sql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_op_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.asyncpg.AsyncPGAdapter.process_sql" title="Link to this definition"></a></dt>
+<dd><p>asyncpg seems to only support numeric.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.AsyncPGAdapter.select">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.asyncpg.AsyncPGAdapter.select" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.AsyncPGAdapter.select_cursor">
+<span class="sig-name descname"><span class="pre">select_cursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.asyncpg.AsyncPGAdapter.select_cursor" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.AsyncPGAdapter.select_one">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.asyncpg.AsyncPGAdapter.select_one" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.AsyncPGAdapter.select_value">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.asyncpg.AsyncPGAdapter.select_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="aiosql.adapters.asyncpg.MaybeAcquire">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiosql.adapters.asyncpg.</span></span><span class="sig-name descname"><span class="pre">MaybeAcquire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">driver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.asyncpg.MaybeAcquire" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</section>
+<section id="module-aiosql.adapters.duckdb">
+<span id="aiosql-adapters-duckdb-module"></span><h2>aiosql.adapters.duckdb module<a class="headerlink" href="#module-aiosql.adapters.duckdb" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aiosql.adapters.duckdb.DuckDBAdapter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiosql.adapters.duckdb.</span></span><span class="sig-name descname"><span class="pre">DuckDBAdapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursor_as_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cursor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.duckdb.DuckDBAdapter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aiosql.adapters.generic.GenericAdapter" title="aiosql.adapters.generic.GenericAdapter"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAdapter</span></code></a></p>
+<p>DuckDB Adapter</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.duckdb.DuckDBAdapter.insert_returning">
+<span class="sig-name descname"><span class="pre">insert_returning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.duckdb.DuckDBAdapter.insert_returning" title="Link to this definition"></a></dt>
+<dd><p>Special case for RETURNING (<code class="docutils literal notranslate"><span class="pre">&lt;!</span></code> suffix) with SQLite.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.duckdb.DuckDBAdapter.process_sql">
+<span class="sig-name descname"><span class="pre">process_sql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.duckdb.DuckDBAdapter.process_sql" title="Link to this definition"></a></dt>
+<dd><p>Pass-through SQL query preprocessing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.duckdb.DuckDBAdapter.select">
+<span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.duckdb.DuckDBAdapter.select" title="Link to this definition"></a></dt>
+<dd><p>Handle a relation-returning SELECT (no suffix).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.duckdb.DuckDBAdapter.select_one">
+<span class="sig-name descname"><span class="pre">select_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.duckdb.DuckDBAdapter.select_one" title="Link to this definition"></a></dt>
+<dd><p>Handle a tuple-returning (one row) SELECT (<code class="docutils literal notranslate"><span class="pre">^</span></code> suffix).</p>
+<p>Return None if empty.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aiosql.adapters.generic">
+<span id="aiosql-adapters-generic-module"></span><h2>aiosql.adapters.generic module<a class="headerlink" href="#module-aiosql.adapters.generic" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aiosql.adapters.generic.GenericAdapter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiosql.adapters.generic.</span></span><span class="sig-name descname"><span class="pre">GenericAdapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.generic.GenericAdapter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="aiosql.html#aiosql.types.SyncDriverAdapterProtocol" title="aiosql.types.SyncDriverAdapterProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">SyncDriverAdapterProtocol</span></code></a></p>
+<p>Generic AioSQL Adapter suitable for <cite>named</cite> parameter style and no with support.</p>
+<p>This class also serves as the base class for other adapters.</p>
+<p>Miscellaneous parameters are passed to cursor creation.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.generic.GenericAdapter.execute_script">
+<span class="sig-name descname"><span class="pre">execute_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.generic.GenericAdapter.execute_script" title="Link to this definition"></a></dt>
+<dd><p>Handle an SQL script (<code class="docutils literal notranslate"><span class="pre">#</span></code> suffix).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.generic.GenericAdapter.insert_returning">
+<span class="sig-name descname"><span class="pre">insert_returning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.generic.GenericAdapter.insert_returning" title="Link to this definition"></a></dt>
+<dd><p>Special case for RETURNING (<code class="docutils literal notranslate"><span class="pre">&lt;!</span></code> suffix) with SQLite.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.generic.GenericAdapter.insert_update_delete">
+<span class="sig-name descname"><span class="pre">insert_update_delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.generic.GenericAdapter.insert_update_delete" title="Link to this definition"></a></dt>
+<dd><p>Handle affected row counts (INSERT UPDATE DELETE) (<code class="docutils literal notranslate"><span class="pre">!</span></code> suffix).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.generic.GenericAdapter.insert_update_delete_many">
+<span class="sig-name descname"><span class="pre">insert_update_delete_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.generic.GenericAdapter.insert_update_delete_many" title="Link to this definition"></a></dt>
+<dd><p>Handle affected row counts (INSERT UPDATE DELETE) (<code class="docutils literal notranslate"><span class="pre">*!</span></code> suffix).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.generic.GenericAdapter.process_sql">
+<span class="sig-name descname"><span class="pre">process_sql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.generic.GenericAdapter.process_sql" title="Link to this definition"></a></dt>
+<dd><p>Pass-through SQL query preprocessing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.generic.GenericAdapter.select">
+<span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.generic.GenericAdapter.select" title="Link to this definition"></a></dt>
+<dd><p>Handle a relation-returning SELECT (no suffix).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.generic.GenericAdapter.select_cursor">
+<span class="sig-name descname"><span class="pre">select_cursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.generic.GenericAdapter.select_cursor" title="Link to this definition"></a></dt>
+<dd><p>Return the raw cursor after a SELECT exec.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.generic.GenericAdapter.select_one">
+<span class="sig-name descname"><span class="pre">select_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.generic.GenericAdapter.select_one" title="Link to this definition"></a></dt>
+<dd><p>Handle a tuple-returning (one row) SELECT (<code class="docutils literal notranslate"><span class="pre">^</span></code> suffix).</p>
+<p>Return None if empty.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.generic.GenericAdapter.select_value">
+<span class="sig-name descname"><span class="pre">select_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.generic.GenericAdapter.select_value" title="Link to this definition"></a></dt>
+<dd><p>Handle a scalar-returning (one value) SELECT (<code class="docutils literal notranslate"><span class="pre">$</span></code> suffix).</p>
+<p>Return None if empty.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aiosql.adapters.mysql">
+<span id="aiosql-adapters-mysql-module"></span><h2>aiosql.adapters.mysql module<a class="headerlink" href="#module-aiosql.adapters.mysql" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aiosql.adapters.mysql.BrokenMySQLAdapter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiosql.adapters.mysql.</span></span><span class="sig-name descname"><span class="pre">BrokenMySQLAdapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.mysql.BrokenMySQLAdapter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aiosql.adapters.pyformat.PyFormatAdapter" title="aiosql.adapters.pyformat.PyFormatAdapter"><code class="xref py py-class docutils literal notranslate"><span class="pre">PyFormatAdapter</span></code></a></p>
+<p>Work around PyMySQL and MySQLDB mishandling of empty parameters
+and lack of willingness to fix the issue.</p>
+<p>See: <a class="reference external" href="https://github.com/PyMySQL/PyMySQL/issues/1059">https://github.com/PyMySQL/PyMySQL/issues/1059</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.mysql.BrokenMySQLAdapter.insert_returning">
+<span class="sig-name descname"><span class="pre">insert_returning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.mysql.BrokenMySQLAdapter.insert_returning" title="Link to this definition"></a></dt>
+<dd><p>Special case for RETURNING (<code class="docutils literal notranslate"><span class="pre">&lt;!</span></code> suffix) with SQLite.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.mysql.BrokenMySQLAdapter.insert_update_delete">
+<span class="sig-name descname"><span class="pre">insert_update_delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.mysql.BrokenMySQLAdapter.insert_update_delete" title="Link to this definition"></a></dt>
+<dd><p>Handle affected row counts (INSERT UPDATE DELETE) (<code class="docutils literal notranslate"><span class="pre">!</span></code> suffix).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.mysql.BrokenMySQLAdapter.select">
+<span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.mysql.BrokenMySQLAdapter.select" title="Link to this definition"></a></dt>
+<dd><p>Handle a relation-returning SELECT (no suffix).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.mysql.BrokenMySQLAdapter.select_one">
+<span class="sig-name descname"><span class="pre">select_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.mysql.BrokenMySQLAdapter.select_one" title="Link to this definition"></a></dt>
+<dd><p>Handle a tuple-returning (one row) SELECT (<code class="docutils literal notranslate"><span class="pre">^</span></code> suffix).</p>
+<p>Return None if empty.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.mysql.BrokenMySQLAdapter.select_value">
+<span class="sig-name descname"><span class="pre">select_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.mysql.BrokenMySQLAdapter.select_value" title="Link to this definition"></a></dt>
+<dd><p>Handle a scalar-returning (one value) SELECT (<code class="docutils literal notranslate"><span class="pre">$</span></code> suffix).</p>
+<p>Return None if empty.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aiosql.adapters.pg8000">
+<span id="aiosql-adapters-pg8000-module"></span><h2>aiosql.adapters.pg8000 module<a class="headerlink" href="#module-aiosql.adapters.pg8000" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aiosql.adapters.pg8000.Pg8000Adapter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiosql.adapters.pg8000.</span></span><span class="sig-name descname"><span class="pre">Pg8000Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.pg8000.Pg8000Adapter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aiosql.adapters.generic.GenericAdapter" title="aiosql.adapters.generic.GenericAdapter"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAdapter</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-aiosql.adapters.pyformat">
+<span id="aiosql-adapters-pyformat-module"></span><h2>aiosql.adapters.pyformat module<a class="headerlink" href="#module-aiosql.adapters.pyformat" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aiosql.adapters.pyformat.PyFormatAdapter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiosql.adapters.pyformat.</span></span><span class="sig-name descname"><span class="pre">PyFormatAdapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.pyformat.PyFormatAdapter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aiosql.adapters.generic.GenericAdapter" title="aiosql.adapters.generic.GenericAdapter"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAdapter</span></code></a></p>
+<p>Convert from named to pyformat parameter style.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.pyformat.PyFormatAdapter.process_sql">
+<span class="sig-name descname"><span class="pre">process_sql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.pyformat.PyFormatAdapter.process_sql" title="Link to this definition"></a></dt>
+<dd><p>From named to pyformat.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aiosql.adapters.sqlite3">
+<span id="aiosql-adapters-sqlite3-module"></span><h2>aiosql.adapters.sqlite3 module<a class="headerlink" href="#module-aiosql.adapters.sqlite3" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aiosql.adapters.sqlite3.SQLite3Adapter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiosql.adapters.sqlite3.</span></span><span class="sig-name descname"><span class="pre">SQLite3Adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.sqlite3.SQLite3Adapter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#aiosql.adapters.generic.GenericAdapter" title="aiosql.adapters.generic.GenericAdapter"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericAdapter</span></code></a></p>
+<p>SQLite3 Adapter for AioSQL.</p>
+<p>Overwrites two methods using sqlite3-specific non-standard methods.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.sqlite3.SQLite3Adapter.execute_script">
+<span class="sig-name descname"><span class="pre">execute_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.sqlite3.SQLite3Adapter.execute_script" title="Link to this definition"></a></dt>
+<dd><p>Handle an SQL script (<code class="docutils literal notranslate"><span class="pre">#</span></code> suffix).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="aiosql.adapters.sqlite3.SQLite3Adapter.insert_returning">
+<span class="sig-name descname"><span class="pre">insert_returning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aiosql.adapters.sqlite3.SQLite3Adapter.insert_returning" title="Link to this definition"></a></dt>
+<dd><p>Special case for RETURNING (<code class="docutils literal notranslate"><span class="pre">&lt;!</span></code> suffix) with SQLite.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-aiosql.adapters">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aiosql.adapters" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="aiosql.html" class="btn btn-neutral float-left" title="aiosql package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../versions.html" class="btn btn-neutral float-right" title="AioSQL - Versions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2025, William Vaughn et alii..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contributing &mdash; aiosql 14.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3e12ff1b"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="aiosql" href="pydoc/modules.html" />
+    <link rel="prev" title="Database Driver Adapters" href="database-driver-adapters.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            aiosql
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defining-sql-queries.html">Defining SQL Queries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced-topics.html">Advanced Topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database-driver-adapters.html">Database Driver Adapters</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#packaging-distribution">Packaging &amp; Distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#development-setup">Development Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependency-management">Dependency Management</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pydoc/modules.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="versions.html">Versions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="todo.html">Backlog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">aiosql</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Contributing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/contributing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Link to this heading"></a></h1>
+<p>First, thank you for considering to make a contribution to this project.
+Spending your valuable time helping make this project better is deeply appreciated.
+All kinds of contributions are helpful and welcome.</p>
+<ul class="simple">
+<li><p>Report issues <a class="reference external" href="https://github.com/nackjicholson/aiosql/issues">https://github.com/nackjicholson/aiosql/issues</a></p></li>
+<li><p>Review or make your own pull requests <a class="reference external" href="https://github.com/nackjicholson/aiosql/pulls">https://github.com/nackjicholson/aiosql/pulls</a></p></li>
+<li><p>Write documentation <a class="reference external" href="https://github.com/nackjicholson/aiosql/tree/main/docs/source">https://github.com/nackjicholson/aiosql/tree/main/docs/source</a></p></li>
+</ul>
+<p>Whether you have an idea for a feature improvement or have found a troubling bug, thank you for being here.</p>
+<section id="packaging-distribution">
+<h2>Packaging &amp; Distribution<a class="headerlink" href="#packaging-distribution" title="Link to this heading"></a></h2>
+<p>This aiosql repository uses the Python standard packaging tools.
+Read about them in more detail at the following links.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://packaging.python.org/">Python Packaging User Guide</a></p></li>
+<li><p><a class="reference external" href="https://packaging.python.org/guides/distributing-packages-using-setuptools/">PyPA - Packaging &amp; Distributing projects</a></p></li>
+<li><p><a class="reference external" href="https://setuptools.readthedocs.io/en/latest/index.html">setuptools</a></p></li>
+<li><p><a class="reference external" href="https://pypa-build.readthedocs.io/en/stable/">build</a></p></li>
+<li><p><a class="reference external" href="https://twine.readthedocs.io/en/latest/#configuration">twine</a></p></li>
+</ul>
+</section>
+<section id="development-setup">
+<h2>Development Setup<a class="headerlink" href="#development-setup" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Create a virtual environment</p></li>
+</ol>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># get the project sources</span>
+git<span class="w"> </span>clone<span class="w"> </span>git@github.com:nackjicholson/aiosql.git
+<span class="nb">cd</span><span class="w"> </span>aiosql
+<span class="c1"># create a venv manually</span>
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate
+pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+</pre></div>
+</div>
+<p>All subsequent steps will assume you are using python within your activated virtual environment.</p>
+<ol class="arabic simple">
+<li><p>Install the development dependencies</p></li>
+</ol>
+<p>As a development library, aiosql is expected to work with all supported
+versions of Python, and many drivers.
+The bare minimum of version pinning is declared in the dependencies.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># development tools</span>
+pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>dev<span class="o">]</span>
+<span class="c1"># per-database stuff</span>
+pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>dev-sqlite<span class="o">]</span>
+pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>dev-postgres<span class="o">]</span>
+pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>dev-duckdb<span class="o">]</span>
+pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>dev-mysql<span class="o">]</span>
+pip<span class="w"> </span>install<span class="w"> </span>.<span class="o">[</span>dev-mariadb<span class="o">]</span>
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li><p>Run tests</p></li>
+</ol>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pytest
+</pre></div>
+</div>
+<p>Alternatively, there is a convenient <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> to automate the above tasks:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>venv.dev<span class="w">  </span><span class="c1"># install dev virtual environment</span>
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate
+make<span class="w"> </span>check<span class="w">  </span><span class="c1"># run all checks: pytest, flake8, coverage…</span>
+</pre></div>
+</div>
+<p>Also, there is a working <code class="docutils literal notranslate"><span class="pre">poetry</span></code> setup in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>.</p>
+</section>
+<section id="dependency-management">
+<h2>Dependency Management<a class="headerlink" href="#dependency-management" title="Link to this heading"></a></h2>
+<p>There is no dependency for using <code class="docutils literal notranslate"><span class="pre">aiosql</span></code> other than installing your
+driver of choice.</p>
+<p>For development you need to test with various databases and even more drivers,
+see above for generating a working python environment.</p>
+<p>See also the <code class="docutils literal notranslate"><span class="pre">docker</span></code> sub-directory which contains dockerfiles for testing
+with Postgres, MySQL, MariaDB and MS SQL Server.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="database-driver-adapters.html" class="btn btn-neutral float-left" title="Database Driver Adapters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pydoc/modules.html" class="btn btn-neutral float-right" title="aiosql" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2025, William Vaughn et alii..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

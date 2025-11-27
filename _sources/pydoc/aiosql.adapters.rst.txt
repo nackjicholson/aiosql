@@ -1,0 +1,93 @@
+aiosql.adapters package
+=======================
+
+Submodules
+----------
+
+aiosql.adapters.ageneric module
+-------------------------------
+
+.. automodule:: aiosql.adapters.ageneric
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.adapters.aiosqlite module
+--------------------------------
+
+.. automodule:: aiosql.adapters.aiosqlite
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.adapters.apyformat module
+--------------------------------
+
+.. automodule:: aiosql.adapters.apyformat
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.adapters.asyncpg module
+------------------------------
+
+.. automodule:: aiosql.adapters.asyncpg
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.adapters.duckdb module
+-----------------------------
+
+.. automodule:: aiosql.adapters.duckdb
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.adapters.generic module
+------------------------------
+
+.. automodule:: aiosql.adapters.generic
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.adapters.mysql module
+----------------------------
+
+.. automodule:: aiosql.adapters.mysql
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.adapters.pg8000 module
+-----------------------------
+
+.. automodule:: aiosql.adapters.pg8000
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.adapters.pyformat module
+-------------------------------
+
+.. automodule:: aiosql.adapters.pyformat
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.adapters.sqlite3 module
+------------------------------
+
+.. automodule:: aiosql.adapters.sqlite3
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: aiosql.adapters
+   :members:
+   :show-inheritance:
+   :undoc-members:

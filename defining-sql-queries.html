@@ -1,0 +1,356 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Defining SQL Queries &mdash; aiosql 14.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3e12ff1b"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Advanced Topics" href="advanced-topics.html" />
+    <link rel="prev" title="Getting Started" href="getting-started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            aiosql
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Defining SQL Queries</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#query-names">Query Names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#query-comments">Query Comments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#named-parameters">Named Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parameter-declarations">Parameter Declarations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#operators">Operators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#no-operator-default">No Operator (Default)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#select-one"><code class="docutils literal notranslate"><span class="pre">^</span></code> Select One</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#select-value"><code class="docutils literal notranslate"><span class="pre">$</span></code> Select Value</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#insert-update-delete"><code class="docutils literal notranslate"><span class="pre">!</span></code> Insert/Update/Delete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#insert-update-delete-implicit-returning"><code class="docutils literal notranslate"><span class="pre">&lt;!</span></code> Insert/Update/Delete Implicit Returning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#insert-update-delete-many"><code class="docutils literal notranslate"><span class="pre">*!</span></code> Insert/Update/Delete Many</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#execute-scripts"><code class="docutils literal notranslate"><span class="pre">#</span></code> Execute Scripts</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="advanced-topics.html">Advanced Topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database-driver-adapters.html">Database Driver Adapters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pydoc/modules.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="versions.html">Versions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="todo.html">Backlog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">aiosql</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Defining SQL Queries</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/defining-sql-queries.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="defining-sql-queries">
+<h1>Defining SQL Queries<a class="headerlink" href="#defining-sql-queries" title="Link to this heading"></a></h1>
+<section id="query-names">
+<h2>Query Names<a class="headerlink" href="#query-names" title="Link to this heading"></a></h2>
+<p>Name definitions are how aiosql determines the name of the methods that SQL
+code blocks are accessible by.
+A query name is defined by a SQL comment of the form <code class="docutils literal notranslate"><span class="pre">&quot;--</span> <span class="pre">name:</span> <span class="pre">&quot;</span></code>.
+As a readability convenience, dash characters (<code class="docutils literal notranslate"><span class="pre">-</span></code>) in the name are turned
+into underlines (<code class="docutils literal notranslate"><span class="pre">_</span></code>).</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: get-all-blogs()</span>
+<span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">blogs</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>This query will be available in aiosql under the python method name <code class="docutils literal notranslate"><span class="pre">.get_all_blogs(conn)</span></code></p>
+</section>
+<section id="query-comments">
+<h2>Query Comments<a class="headerlink" href="#query-comments" title="Link to this heading"></a></h2>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: get-all-blogs()</span>
+<span class="c1">-- Fetch all fields for every blog in the database.</span>
+<span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">blogs</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Any other SQL comments you make between the name definition and your code will
+be used a the python documentation string for the generated method.
+You can use <code class="docutils literal notranslate"><span class="pre">help()</span></code> in the Python REPL to view these comments while using python.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="go">Python 3 … on Linux</span>
+<span class="go">Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">aiosql</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="s2">&quot;blogs.sql&quot;</span><span class="p">,</span> <span class="s2">&quot;sqlite3&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">help</span><span class="p">(</span><span class="n">queries</span><span class="o">.</span><span class="n">get_all_blogs</span><span class="p">)</span>
+<span class="go">Help on method get_all_blogs in module aiosql.queries:</span>
+
+<span class="go">get_all_blogs(conn, *args, **kwargs) method of aiosql.queries.Queries instance</span>
+<span class="go">    Fetch all fields for every blog in the database.</span>
+</pre></div>
+</div>
+</section>
+<section id="named-parameters">
+<h2>Named Parameters<a class="headerlink" href="#named-parameters" title="Link to this heading"></a></h2>
+<p>Named parameters <code class="docutils literal notranslate"><span class="pre">:param</span></code> are accepted by all supported drivers and taken
+from Python named parameters passed to the query.
+In addition, simple attributes can be referenced with the <code class="docutils literal notranslate"><span class="pre">.</span></code>-syntax.</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: with-params^</span>
+<span class="k">select</span><span class="w"> </span><span class="k">length</span><span class="p">(:</span><span class="n">name</span><span class="p">),</span><span class="w"> </span><span class="p">:</span><span class="n">x</span><span class="p">.</span><span class="nb">real</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">imaj</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Then the generated function expects two named parameters:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">queries</span><span class="o">.</span><span class="n">with_params</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Calvin&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="p">))</span>
+<span class="c1"># =&gt; (6, 2.0)</span>
+</pre></div>
+</div>
+</section>
+<section id="parameter-declarations">
+<h2>Parameter Declarations<a class="headerlink" href="#parameter-declarations" title="Link to this heading"></a></h2>
+<p>Query parameter names may be declared in parentheses just after the method name.</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: search(title, published)</span>
+<span class="k">select</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">blogs</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="p">:</span><span class="n">title</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">published</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">published</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>When declared they are checked, raising errors when parameters are unused or undeclared.</p>
+</section>
+<section id="operators">
+<h2>Operators<a class="headerlink" href="#operators" title="Link to this heading"></a></h2>
+<p>This section describes the usage of various query operator symbols that you can
+annotate query names with in order to direct how aiosql will execute and return
+results.</p>
+<section id="no-operator-default">
+<h3>No Operator (Default)<a class="headerlink" href="#no-operator-default" title="Link to this heading"></a></h3>
+<p>In the above <a class="reference external" href="#query-names">Query Names</a> section the <code class="docutils literal notranslate"><span class="pre">get-all-blogs</span></code>
+name is written without any trailing operators.</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: get-all-blogs()</span>
+</pre></div>
+</div>
+<p>The lack of an explicit operator tells aiosql to execute the query and
+to return <strong>all</strong> the results.
+In the case of <code class="docutils literal notranslate"><span class="pre">get-all-blogs</span></code> that means a <code class="docutils literal notranslate"><span class="pre">select</span></code> statement will be
+executed and all the resulting rows will be returned.
+When writing your application you will often need to perform other operations
+besides <code class="docutils literal notranslate"><span class="pre">select</span></code>, like <code class="docutils literal notranslate"><span class="pre">insert</span></code>, <code class="docutils literal notranslate"><span class="pre">delete</span></code>, and perhaps bulk operations.
+The operators detailed in the next sections let you declare in your SQL code
+how that query should be executed by a Python database driver.</p>
+</section>
+<section id="select-one">
+<h3><code class="docutils literal notranslate"><span class="pre">^</span></code> Select One<a class="headerlink" href="#select-one" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">^</span></code> operator executes a query and returns the <strong>first row</strong> of a result set.
+When there are no rows in the result set it returns <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+This is useful when you know there should be one, and exactly one result from your query.</p>
+<p>As an example, if you have a unique constraint on the <code class="docutils literal notranslate"><span class="pre">username</span></code> field in your
+<code class="docutils literal notranslate"><span class="pre">users</span></code> table which makes it impossible for two users to share the same username,
+you could use <code class="docutils literal notranslate"><span class="pre">^</span></code> to direct aiosql to select a single user rather than a list of
+rows of length 1.</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: get-by-username(username)^</span>
+<span class="k">select</span><span class="w"> </span><span class="n">userid</span><span class="p">,</span>
+<span class="w">       </span><span class="n">username</span><span class="p">,</span>
+<span class="w">       </span><span class="n">firstname</span><span class="p">,</span>
+<span class="w">       </span><span class="n">lastname</span>
+<span class="w">  </span><span class="k">from</span><span class="w"> </span><span class="n">users</span>
+<span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">username</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>When used from Python this query will either return <code class="docutils literal notranslate"><span class="pre">None</span></code> or the singular selected row.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">queries</span><span class="o">.</span><span class="n">get_user_by_username</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="s2">&quot;willvaughn&quot;</span><span class="p">)</span>
+<span class="c1"># =&gt; (1, &quot;willvaughn&quot;, &quot;William Vaughn&quot;) or None</span>
+</pre></div>
+</div>
+</section>
+<section id="select-value">
+<h3><code class="docutils literal notranslate"><span class="pre">$</span></code> Select Value<a class="headerlink" href="#select-value" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">$</span></code> operator will execute the query, and only return the <strong>first value of the first row</strong>
+of a result set. If there are no rows in the result set it returns <code class="docutils literal notranslate"><span class="pre">None</span></code>.
+This is implemented by returing the first element of the tuple returned by <code class="docutils literal notranslate"><span class="pre">cur.fetchone()</span></code>
+from the underlying driver.
+This is mostly useful for queries returning IDs, COUNTs or other aggregates.</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: get-count()$</span>
+<span class="k">select</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">cnt</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">users</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>When used from Python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">queries</span><span class="o">.</span><span class="n">get_count</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+<span class="c1"># =&gt; 3 or None</span>
+</pre></div>
+</div>
+</section>
+<section id="insert-update-delete">
+<h3><code class="docutils literal notranslate"><span class="pre">!</span></code> Insert/Update/Delete<a class="headerlink" href="#insert-update-delete" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">!</span></code> operator executes SQL without returning any results.
+It is meant for statements that use <code class="docutils literal notranslate"><span class="pre">insert</span></code>, <code class="docutils literal notranslate"><span class="pre">update</span></code>, and <code class="docutils literal notranslate"><span class="pre">delete</span></code> to make
+modifications to database rows without a necessary return value.</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: new-blog(userid, title, content)!</span>
+<span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">blogs</span><span class="w"> </span><span class="p">(</span><span class="n">userid</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="p">)</span>
+<span class="w">  </span><span class="k">values</span><span class="w"> </span><span class="p">(:</span><span class="n">userid</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">content</span><span class="p">);</span>
+<span class="c1">-- name: remove-blog(blogid)!</span>
+<span class="k">delete</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">blogs</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">blogid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">blogid</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The methods generated are:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">new_blog</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">userid</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">remove_blog</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">blogid</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Each can be called to alter the database, and returns the number of affected rows
+if available.</p>
+<p>Note that some SQL databases allow to return a relation after <code class="docutils literal notranslate"><span class="pre">insert</span></code>,
+<code class="docutils literal notranslate"><span class="pre">update</span></code> or <code class="docutils literal notranslate"><span class="pre">delete</span></code> by using a <code class="docutils literal notranslate"><span class="pre">returning</span></code> clause.
+For such queries the result is a relation like a <code class="docutils literal notranslate"><span class="pre">select</span></code>, so the same operators
+apply:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: publish-new-blog(userid, title, content)$</span>
+<span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">blogs</span><span class="w"> </span><span class="p">(</span><span class="n">userid</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="p">)</span>
+<span class="w">  </span><span class="k">values</span><span class="w"> </span><span class="p">(:</span><span class="n">userid</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">content</span><span class="p">)</span>
+<span class="w">  </span><span class="n">returning</span><span class="w"> </span><span class="n">blogid</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">blogid</span> <span class="o">=</span> <span class="n">queries</span><span class="o">.</span><span class="n">publish_new_blog</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">userid</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;AioSQL New Features&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="insert-update-delete-implicit-returning">
+<h3><code class="docutils literal notranslate"><span class="pre">&lt;!</span></code> Insert/Update/Delete Implicit Returning<a class="headerlink" href="#insert-update-delete-implicit-returning" title="Link to this heading"></a></h3>
+<p>When performing a modification of rows, or adding new rows, sometimes it is
+necessary to return values using the <code class="docutils literal notranslate"><span class="pre">returning</span></code> clause where available,
+as described above.</p>
+<p>When using old versions of SQLite this special operator will return the id of
+the inserted row using
+<code class="docutils literal notranslate"><span class="pre">`cur.lastrowid</span></code> &lt;<a class="reference external" href="https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.lastrowid">https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.lastrowid</a>&gt;`__.</p>
+<p>As recent version of SQLite do support the <code class="docutils literal notranslate"><span class="pre">returning</span></code> clause, simply forget
+about this, use the clause explicitely and treat the whole command as a standard
+select with the <em>empty</em> operator (relation), or <code class="docutils literal notranslate"><span class="pre">^</span></code> (tuple), or <code class="docutils literal notranslate"><span class="pre">$</span></code> (scalar).</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: publish-a-blog&lt;!</span>
+<span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">blogs</span><span class="p">(</span><span class="n">userid</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="p">)</span>
+<span class="w">  </span><span class="k">values</span><span class="w"> </span><span class="p">(:</span><span class="n">userid</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">content</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Executing this query in python will return the <code class="docutils literal notranslate"><span class="pre">blogid</span></code> of the inserted row.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">blogid</span> <span class="o">=</span> <span class="n">queries</span><span class="o">.</span><span class="n">publish_a_blog</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">userid</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Hi&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;blah blah.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="insert-update-delete-many">
+<h3><code class="docutils literal notranslate"><span class="pre">*!</span></code> Insert/Update/Delete Many<a class="headerlink" href="#insert-update-delete-many" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">*!</span></code> operator directs aiosql to execute a SQL statement over all items of a given sequence.
+Under the hood this calls the <code class="docutils literal notranslate"><span class="pre">executemany</span></code> method of many database drivers.
+See <a class="reference external" href="https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.executemany">sqlite3 Cursor.executemany</a>
+for an example.</p>
+<p>In aiosql we can use this for a bulk publish method that operates over a list of blog entries.</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: bulk-publish*!</span>
+<span class="c1">-- Insert many blogs at once</span>
+<span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">blogs</span><span class="w"> </span><span class="p">(</span><span class="n">userid</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="p">,</span><span class="w"> </span><span class="n">published</span><span class="p">)</span>
+<span class="w">  </span><span class="k">values</span><span class="w"> </span><span class="p">(:</span><span class="n">userid</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">content</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">published</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="s2">&quot;blogs.sql&quot;</span><span class="p">,</span> <span class="s2">&quot;psycopg2&quot;</span><span class="p">)</span>
+<span class="n">blogs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;userid&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;First Blog&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;published&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)},</span>
+    <span class="p">{</span><span class="s2">&quot;userid&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Next Blog&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;published&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)},</span>
+    <span class="p">{</span><span class="s2">&quot;userid&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Hey, Hey!&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="s2">&quot;published&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">28</span><span class="p">)},</span>
+<span class="p">]</span>
+<span class="n">queries</span><span class="o">.</span><span class="n">bulk_publish</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">blogs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The methods returns the number of affected rows, if available.</p>
+</section>
+<section id="execute-scripts">
+<h3><code class="docutils literal notranslate"><span class="pre">#</span></code> Execute Scripts<a class="headerlink" href="#execute-scripts" title="Link to this heading"></a></h3>
+<p>Using this operarator will execute sql statements as a script.
+You can’t do variable substitution with the <code class="docutils literal notranslate"><span class="pre">#</span></code> operator.
+An example usecase is using data definition statements like create table in order to setup a database.</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: create-table-blogs#</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">blogs</span><span class="p">(</span>
+<span class="w">  </span><span class="n">blogid</span><span class="w"> </span><span class="nb">SERIAL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">  </span><span class="n">userid</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">,</span>
+<span class="w">  </span><span class="n">title</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">content</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">published</span><span class="w"> </span><span class="nb">DATE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_DATE</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="s2">&quot;create_schema.sql&quot;</span><span class="p">,</span> <span class="s2">&quot;sqlite3&quot;</span><span class="p">)</span>
+<span class="n">queries</span><span class="o">.</span><span class="n">create_table_blogs</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note: SQL scripts do not accept parameters.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting-started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="advanced-topics.html" class="btn btn-neutral float-right" title="Advanced Topics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2025, William Vaughn et alii..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

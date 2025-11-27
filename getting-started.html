@@ -1,0 +1,396 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started &mdash; aiosql 14.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3e12ff1b"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Defining SQL Queries" href="defining-sql-queries.html" />
+    <link rel="prev" title="aiosql - Simple SQL in Python (aka YeSQL for Python)" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            aiosql
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#philosophy">Philosophy</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#about-orms">About ORMs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#loading-queries">Loading Queries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#from-a-sql-file">From a SQL File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-an-sql-string">From an SQL String</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-a-directory-of-sql-files">From a Directory of SQL Files</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#subdirectories">Subdirectories</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#calling-query-methods">Calling Query Methods</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#connections">Connections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#passing-parameters">Passing Parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="defining-sql-queries.html">Defining SQL Queries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced-topics.html">Advanced Topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database-driver-adapters.html">Database Driver Adapters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pydoc/modules.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="versions.html">Versions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="todo.html">Backlog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">aiosql</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/getting-started.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<section id="philosophy">
+<h2>Philosophy<a class="headerlink" href="#philosophy" title="Link to this heading"></a></h2>
+<p>The aiosql project is for writing SQL to interact with a database.
+Most database libraries are intended to reduce the amount of SQL developers need to write,
+aiosql takes an alternative approach.
+Why?</p>
+<ul class="simple">
+<li><p>Alternatives are good. No approach fits all use cases, no matter how predominant.</p></li>
+<li><p>SQL is the most expressive and performant way to interact with a SQL database.</p></li>
+<li><p>Investigating where a query came from is simpler when it is source controlled, named, and written by a human.</p></li>
+<li><p>Writing SQL in files gives you built-in compatibility with powerful SQL tools like
+<a class="reference external" href="https://www.jetbrains.com/datagrip/">DataGrip</a> and
+<a class="reference external" href="https://www.postgresql.org/docs/current/app-psql.html">psql</a>.</p></li>
+</ul>
+<section id="about-orms">
+<h3>About ORMs<a class="headerlink" href="#about-orms" title="Link to this heading"></a></h3>
+<p>ORMs and SQL Query Builders offer object interfaces to generate and execute SQL.
+They exist to ease development, not to make it simpler.
+They have a large code base to provide their services, and many complement packages
+to provide more advanced features, resulting in over a <em>hundred of thousand</em> lines of code.
+Inheriting object hierarchies, mixing data with behaviors, mirroring a database schema, and generating SQL are not simple.
+ORMs are introduced early in a project’s life when requirements are limited and the need to move fast is paramount.
+As a project grows, ORM objects and their relations grow too, they become a source of complexity and coupling.</p>
+<p><code class="docutils literal notranslate"><span class="pre">aiosql</span></code> doesn’t solve these problems directly either, your application will still get more complex with time.
+You can write bad SQL and bad python.
+But, with aiosql there is no mandate that all interaction with the database go
+through a complex network of related python objects that mirror a database schema.
+The only mandates are that you write SQL to talk to the database and python to use the data.
+From there you start with a system in which the database and the application are intentionally
+separate and independent from each other so they can change independently.
+The architecture of your application and the boundaries you choose between it and the database is left to you.</p>
+<p>The documentation for projects like <a class="reference external" href="https://www.sqlalchemy.org/">SQLAlchemy</a> and
+<a class="reference external" href="https://www.djangoproject.com/">Django DB</a> can give you a better vision
+for the class of problems that ORMs do solve and the productivity gains they intend.
+Please choose these projects over <code class="docutils literal notranslate"><span class="pre">aiosql</span></code> if you find that they fit the needs of your application better.</p>
+</section>
+</section>
+<section id="loading-queries">
+<h2>Loading Queries<a class="headerlink" href="#loading-queries" title="Link to this heading"></a></h2>
+<p>This section goes over the three ways to make SQL queries available for execution in python.
+You’ll learn the basics of defining queries so aiosql can find them and turn them into methods
+on a <code class="docutils literal notranslate"><span class="pre">Queries</span></code> object.
+For more details reference the <a class="reference internal" href="defining-sql-queries.html"><span class="doc">Defining SQL Queries</span></a> documentation.</p>
+<section id="from-a-sql-file">
+<h3>From a SQL File<a class="headerlink" href="#from-a-sql-file" title="Link to this heading"></a></h3>
+<p>SQL can be loaded by providing a path to a <code class="docutils literal notranslate"><span class="pre">.sql</span></code> file.
+Below is a <em>blogs.sql</em> file that defines two queries.</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: get_all_blogs</span>
+<span class="k">select</span><span class="w"> </span><span class="n">blogid</span><span class="p">,</span>
+<span class="w">       </span><span class="n">userid</span><span class="p">,</span>
+<span class="w">       </span><span class="n">title</span><span class="p">,</span>
+<span class="w">       </span><span class="n">content</span><span class="p">,</span>
+<span class="w">       </span><span class="n">published</span>
+<span class="w">  </span><span class="k">from</span><span class="w"> </span><span class="n">blogs</span><span class="p">;</span>
+
+<span class="c1">-- name: get_user_blogs</span>
+<span class="c1">-- Get blogs with a fancy formatted published date and author field</span>
+<span class="w">    </span><span class="k">select</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="n">blogid</span><span class="p">,</span>
+<span class="w">           </span><span class="n">b</span><span class="p">.</span><span class="n">title</span><span class="p">,</span>
+<span class="w">           </span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-%d %H:%M&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="n">published</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">published</span><span class="p">,</span>
+<span class="w">           </span><span class="n">u</span><span class="p">.</span><span class="n">username</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">author</span>
+<span class="w">      </span><span class="k">from</span><span class="w"> </span><span class="n">blogs</span><span class="w"> </span><span class="n">b</span>
+<span class="k">inner</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="n">userid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">userid</span>
+<span class="w">     </span><span class="k">where</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">username</span>
+<span class="w">  </span><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="n">published</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Notice the <code class="docutils literal notranslate"><span class="pre">--</span> <span class="pre">name:</span> <span class="pre">&lt;name_of_method&gt;</span></code> comments and the <code class="docutils literal notranslate"><span class="pre">:username</span></code> substitution variable.
+The comments that start with <code class="docutils literal notranslate"><span class="pre">--</span> <span class="pre">name:</span></code> are the magic of aiosql.
+They are used by <code class="docutils literal notranslate"><span class="pre">`aiosql.from_path</span></code> &lt;./api.md#aiosqlfrom_path&gt;`__ to parse the file
+into separate methods accessible by the name.
+The <code class="docutils literal notranslate"><span class="pre">aiosql.from_path</span></code> function takes a path to a sql file or directory
+and the name of the database driver intended for use with the methods.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="s2">&quot;blogs.sql&quot;</span><span class="p">,</span> <span class="s2">&quot;sqlite3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the case of <em>blogs.sql</em> we expect the following two methods to be available.
+The <code class="docutils literal notranslate"><span class="pre">username</span></code> parameter of <code class="docutils literal notranslate"><span class="pre">get_user_blogs</span></code> will substitute in for the <code class="docutils literal notranslate"><span class="pre">:username</span></code> variable in the SQL.
+Standard <code class="docutils literal notranslate"><span class="pre">SELECT</span></code> statements return a generator, i.e. something which can be iterated upon,
+for instance with a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop.
+Just cast the result to <code class="docutils literal notranslate"><span class="pre">list</span></code> to get an actual list.
+The generator returns what the underlying driver returns, usually tuples.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_all_blogs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">get_user_blogs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+<section id="from-an-sql-string">
+<h3>From an SQL String<a class="headerlink" href="#from-an-sql-string" title="Link to this heading"></a></h3>
+<p>SQL can be loaded from a string as well.
+The result below is the same as the first example above that loads from a SQL file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sql_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">-- name: get_all_blogs</span>
+<span class="s2">select blogid,</span>
+<span class="s2">       userid,</span>
+<span class="s2">       title,</span>
+<span class="s2">       content,</span>
+<span class="s2">       published</span>
+<span class="s2">  from blogs;</span>
+
+<span class="s2">-- name: get_user_blogs</span>
+<span class="s2">-- Get blogs with a fancy formatted published date and author field</span>
+<span class="s2">    select b.blogid,</span>
+<span class="s2">           b.title,</span>
+<span class="s2">           strftime(&#39;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M&#39;, b.published) as published,</span>
+<span class="s2">           u.username as author</span>
+<span class="s2">      from blogs b</span>
+<span class="s2">inner join users u on b.userid = u.userid</span>
+<span class="s2">     where u.username = :username</span>
+<span class="s2">  order by b.published desc;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="n">sql_str</span><span class="p">,</span> <span class="s2">&quot;sqlite3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">Queries</span></code> object here will have two methods:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">queries</span><span class="o">.</span><span class="n">get_all_blogs</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+<span class="n">queries</span><span class="o">.</span><span class="n">get_user_blogs</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="s2">&quot;johndoe&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="from-a-directory-of-sql-files">
+<h3>From a Directory of SQL Files<a class="headerlink" href="#from-a-directory-of-sql-files" title="Link to this heading"></a></h3>
+<p>Loading a directory of SQL files loads all of the queries defined in those files into a single object.
+The <code class="docutils literal notranslate"><span class="pre">example/sql</span></code> directory below contains three <code class="docutils literal notranslate"><span class="pre">.sql</span></code> files and can be loaded using
+<code class="docutils literal notranslate"><span class="pre">aiosql.from_path</span></code> <a class="reference external" href="./api.md#aiosqlfrom_path">./api.md#aiosqlfrom_path</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>example/sql
+        ├── blogs.sql
+        ├── create_schema.sql
+        └── users.sql
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="s2">&quot;example/sql&quot;</span><span class="p">,</span> <span class="s2">&quot;sqlite3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting <code class="docutils literal notranslate"><span class="pre">queries</span></code> object will have a mixture of methods from all the files.</p>
+<section id="subdirectories">
+<h4>Subdirectories<a class="headerlink" href="#subdirectories" title="Link to this heading"></a></h4>
+<p>Introducing subdirectories allows namespacing queries.
+This provides a way to further organize and group queries conceptually.
+For instance, you could define blog queries separate from user queries access them on distinct
+properties of the queries object.</p>
+<p>Assume the <em>blogs.sql</em> and <em>users.sql</em> files both contain a <code class="docutils literal notranslate"><span class="pre">--</span> <span class="pre">name:</span> <span class="pre">get_all</span></code> query.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>example/sql/
+        ├── blogs/
+        │   └── blogs.sql
+        ├── create_schema.sql
+        └── users/
+            └── users.sql
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="s2">&quot;example/sql&quot;</span><span class="p">,</span> <span class="s2">&quot;sqlite3&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">Queries</span></code> object has two nested <code class="docutils literal notranslate"><span class="pre">get_all</span></code> methods accessible on attributes <code class="docutils literal notranslate"><span class="pre">.blogs</span></code> and <code class="docutils literal notranslate"><span class="pre">.users</span></code>.
+The attributes reflect the names of the subdirectories.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">queries</span><span class="o">.</span><span class="n">blogs</span><span class="o">.</span><span class="n">get_all</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+<span class="n">queries</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">get_all</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="calling-query-methods">
+<h2>Calling Query Methods<a class="headerlink" href="#calling-query-methods" title="Link to this heading"></a></h2>
+<section id="connections">
+<h3>Connections<a class="headerlink" href="#connections" title="Link to this heading"></a></h3>
+<p>The connection or <code class="docutils literal notranslate"><span class="pre">conn</span></code> is always the first argument to an <code class="docutils literal notranslate"><span class="pre">aiosql</span></code> method.
+The <code class="docutils literal notranslate"><span class="pre">conn</span></code> is an open connection to a database driver that your aiosql method can use for executing the sql it contains.
+Controlling connections outside of aiosql queries means you can call multiple queries and control them under one transaction,
+or otherwise set connection level properties that affect driver behavior.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For more see: <a class="reference internal" href="advanced-topics.html"><span class="doc">Advanced Topics</span></a>.</p>
+</div>
+<p>In the examples throughout this page a <code class="docutils literal notranslate"><span class="pre">conn</span></code> object has been passed.
+Here is a more code complete example that shows the connection creation and call to
+<code class="docutils literal notranslate"><span class="pre">aiosql.from_path</span></code> <a class="reference external" href="./api.md#aiosqlfrom_path">./api.md#aiosqlfrom_path</a> that make a queries object.</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">aiosql</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;./blogs.db&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Note the &quot;sqlite3&quot; driver_adapter argument is what tells</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># aiosql it should be expecting a sqlite3 connection object.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="s2">&quot;./blogs.sql&quot;</span><span class="p">,</span> <span class="s2">&quot;sqlite3&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">queries</span><span class="o">.</span><span class="n">get_all_blogs</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+<span class="go">[(1,</span>
+<span class="go">  1,</span>
+<span class="go">  &#39;What I did Today&#39;,</span>
+<span class="go">  &#39;I mowed the lawn, washed some clothes, and ate a burger.\n&#39;</span>
+<span class="go">  &#39;\n&#39;</span>
+<span class="go">  &#39;Until next time,\n&#39;</span>
+<span class="go">  &#39;Bob&#39;,</span>
+<span class="go">  &#39;2017-07-28&#39;),</span>
+<span class="go"> (2, 3, &#39;Testing&#39;, &#39;Is this thing on?\n&#39;, &#39;2018-01-01&#39;),</span>
+<span class="go"> (3,</span>
+<span class="go">  1,</span>
+<span class="go">  &#39;How to make a pie.&#39;,</span>
+<span class="go">  &#39;1. Make crust\n2. Fill\n3. Bake\n4. Eat\n&#39;,</span>
+<span class="go">  &#39;2018-11-23&#39;)]</span>
+</pre></div>
+</div>
+<p>See the associated <a class="reference external" href="https://pypi.org/project/anodb/">AnoDB Project</a> for embedding both a connection pool and queries.</p>
+</section>
+<section id="passing-parameters">
+<h3>Passing Parameters<a class="headerlink" href="#passing-parameters" title="Link to this heading"></a></h3>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: get_user_blogs</span>
+<span class="c1">-- Get blogs with a fancy formatted published date and author field</span>
+<span class="w">    </span><span class="k">select</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="n">blogid</span><span class="p">,</span>
+<span class="w">           </span><span class="n">b</span><span class="p">.</span><span class="n">title</span><span class="p">,</span>
+<span class="w">           </span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-%d %H:%M&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="n">published</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">published</span><span class="p">,</span>
+<span class="w">           </span><span class="n">u</span><span class="p">.</span><span class="n">username</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">author</span>
+<span class="w">      </span><span class="k">from</span><span class="w"> </span><span class="n">blogs</span><span class="w"> </span><span class="n">b</span>
+<span class="k">inner</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="n">userid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">userid</span>
+<span class="w">     </span><span class="k">where</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">username</span>
+<span class="w">  </span><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="n">published</span><span class="w"> </span><span class="k">desc</span><span class="p">;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">aiosql</span></code> allows parameterization of queries by parsing values like <code class="docutils literal notranslate"><span class="pre">:username</span></code>
+in the above query and having the resultant method expect an inbound argument to
+substitute for <code class="docutils literal notranslate"><span class="pre">:username</span></code>.</p>
+<p>You can call the <code class="docutils literal notranslate"><span class="pre">get_user_blogs</span></code> function with plain arguments or keyword arguments with the
+name of the subsitution variable.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">aiosql</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;./blogs.db&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">queries</span> <span class="o">=</span> <span class="n">aiosql</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="s2">&quot;./blogs.sql&quot;</span><span class="p">,</span> <span class="s2">&quot;sqlite3&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Using keyword args</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">queries</span><span class="o">.</span><span class="n">get_user_blogs</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="s2">&quot;bobsmith&quot;</span><span class="p">)</span>
+<span class="go">[(3, &#39;How to make a pie.&#39;, &#39;2018-11-23 00:00&#39;, &#39;bobsmith&#39;), (1, &#39;What I did Today&#39;, &#39;2017-07-28 00:00&#39;, &#39;bobsmith&#39;)]</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Using positional argument</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">queries</span><span class="o">.</span><span class="n">get_user_blogs</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;janedoe&quot;</span><span class="p">)</span>
+<span class="go">[(2, &#39;Testing&#39;, &#39;2018-01-01 00:00&#39;, &#39;janedoe&#39;)]</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When passing positional arguments aiosql will apply them in the order that the substitutions appear in your SQL.
+This can be convenient and clear in some cases, but very confusing in others.
+You might want to choose to always name your arguments for clarity.
+Consider enforcing this behavior by passing <code class="docutils literal notranslate"><span class="pre">kwargs_only=True</span></code> when creating the queries.</p>
+</div>
+<p>It is also possible to access simple object attributes in a query, with the dot syntax:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- name: add_user</span>
+<span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span>
+<span class="w">  </span><span class="k">values</span><span class="w"> </span><span class="p">(:</span><span class="n">u</span><span class="p">.</span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="p">:</span><span class="n">u</span><span class="p">.</span><span class="n">name</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Then simple pass your object as <code class="docutils literal notranslate"><span class="pre">u</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># User is some class with attributes username and name</span>
+<span class="n">calvin</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="s2">&quot;calvin&quot;</span><span class="p">,</span> <span class="s2">&quot;Calvin&quot;</span><span class="p">)</span>
+<span class="n">queries</span><span class="o">.</span><span class="n">add_user</span><span class="p">(</span><span class="n">u</span><span class="o">=</span><span class="n">calvin</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="aiosql - Simple SQL in Python (aka YeSQL for Python)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="defining-sql-queries.html" class="btn btn-neutral float-right" title="Defining SQL Queries" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2018-2025, William Vaughn et alii..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
