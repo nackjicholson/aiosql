@@ -1,5 +1,5 @@
-aiosql - Simple SQL in Python
-=============================
+aiosql - Simple SQL in Python (aka YeSQL for Python)
+====================================================
 
 `SQL <https://en.wikipedia.org/wiki/SQL>`__ is code.
 Write it, version control it, comment it, and run it using files.
