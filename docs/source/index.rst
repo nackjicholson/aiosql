@@ -76,7 +76,7 @@ Badges
    NOTE all tests
    # MISC
    loading: 17
-   patterns: 5
+   patterns: 6
    # SYNC
    sqlite3: 17
    apsw: 16
@@ -94,7 +94,7 @@ Badges
    aiosqlite: 13
    asyncpg: 18
    apsycopg3: 14
-.. image:: https://img.shields.io/badge/tests-261%20✓-success
+.. image:: https://img.shields.io/badge/tests-262%20✓-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 .. image:: https://img.shields.io/github/issues/nackjicholson/aiosql?style=flat

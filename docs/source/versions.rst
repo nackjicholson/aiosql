@@ -6,7 +6,8 @@ AioSQL - Versions
 
 - make function parameter declarations mandatory by default
 - but avoidable with ``mandatory_parameters=False``
-- add more tests around parameter handling
+- upgrade and add more tests around parameter handling
+- work around recent `mypy` incompatibilities with `pypy`
 
 14.1 on 2025-11-27
 ------------------
