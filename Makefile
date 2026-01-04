@@ -29,6 +29,7 @@ help:
 	echo " - clean.dev: also remove the development environment"
 	echo " - check.pytest: run pytest tests"
 	echo " - check.mypy: run mypy type checker"
+	echo " - check.pyright: run pyright type checker"
 	echo " - check.flake8: run flake8 code style checks"
 	echo " - check.ruff: run ruff code style checks"
 	echo " - check.black: run black formatter checks"
