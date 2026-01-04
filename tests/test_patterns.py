@@ -1,4 +1,7 @@
+import sys
 import pytest
+import aiosql
+import sqlite3
 from aiosql.utils import VAR_REF
 from aiosql.query_loader import _UNCOMMENT, _remove_ml_comments
 
@@ -150,3 +153,45 @@ def test_uncomment():
         n += 1
         assert _remove_ml_comments(c) == u
     assert n == len(COMMENT_UNCOMMENT)
+
+
+def test_parameters():
+    conn = sqlite3.connect(":memory:")
+    # mandatory parameters
+    FT = "-- name: forty-two$\nSELECT 42;\n"
+    P1 = "-- name: inc$\nSELECT 1 + :n\n"
+    try:
+        aiosql.from_str(FT, "sqlite3")
+        pytest.fail("must reject sql without params")
+    except aiosql.SQLParseException as e:
+        assert "mandatory parameter" in str(e)
+    try:
+        aiosql.from_str(P1, "sqlite3")
+        pytest.fail("must reject sql without params")
+    except aiosql.SQLParseException as e:
+        assert "mandatory parameter" in str(e)
+    # parsed but runtime error
+    queries = aiosql.from_str(FT + P1, "sqlite3", mandatory_parameters=False)
+    assert queries.forty_two(conn) == 42
+    assert queries.inc(conn, n=42) == 43
+    try:
+        queries.inc(conn, 17)
+    except ValueError as e:
+        assert " named " in str(e)
+    # parsed and possibly no runtime error depending on python version
+    queries = aiosql.from_str(FT + P1, "sqlite3", mandatory_parameters=False, kwargs_only=False)
+    try:
+        dh = queries.inc(conn, 17)
+        assert dh == 18
+        assert sys.version_info.major == 3 and sys.version_info.minor < 14
+    except sqlite3.ProgrammingError as e:
+        # positional parameters rejected by sqlite3 with named parameters
+        assert sys.version_info.major == 3 and sys.version_info.minor >= 14
+    # no parameters in scripts (#)
+    BAD_SCRIPT = "-- name: script(foo)#\nCREATE TABLE :foo;\n"
+    try:
+        aiosql.from_str(BAD_SCRIPT, "sqlite3")
+        pytest.fail("must reject sql script with params")
+    except aiosql.SQLParseException as e:
+        assert "SQL script" in str(e)
+    conn.close()
