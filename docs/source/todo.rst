@@ -7,6 +7,7 @@ Todo or not, that is the question…
 - add apsw, duckdb, asyncpg and psycopg2 to pypy 3.13 when possible.
 - once 3.9 support is dropped, update old-style type hints.
 - write a small SQLite3-based tutorial?
+- make parameters mandatory by default, optional under some option?
 - tests with even more database and drivers?
 - rethink record classes? we just really want a row conversion function?
 - add documentation about docker runs? isn't `docker/README.md` enough?
