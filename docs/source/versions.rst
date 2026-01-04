@@ -1,6 +1,13 @@
 AioSQL - Versions
 =================
 
+15.0 on 2026-?
+--------------
+
+- make function parameter declarations mandatory by default
+- but avoidable with ``mandatory_parameters=False``
+- add more tests around parameter handling
+
 14.1 on 2025-11-27
 ------------------
 

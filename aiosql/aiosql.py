@@ -75,6 +75,7 @@ def from_str(
     driver_adapter: str|Callable[..., DriverAdapterProtocol],
     record_classes: dict|None = None,
     kwargs_only: bool = True,
+    mandatory_parameters: bool = True,
     attribute: str|None = "__",
     args: list[Any] = [],
     kwargs: dict[str, Any] = {},
@@ -90,6 +91,8 @@ def from_str(
       adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your
       own adapter class, you can pass it's constructor.
     - **kwargs_only** - *(optional)* whether to only use named parameters on query execution,
+      default is *True*.
+    - **mandatory_parameters** - *(optional)* whether function parameters must be declared,
       default is *True*.
     - **attribute** - *(optional)* ``.`` internal attribute access substitution,
       defaults to ``"__"``, *None* disables the feature.
@@ -127,7 +130,8 @@ def from_str(
       queries.get_user_by_username(conn, username="willvaughn")
     """
     adapter = _make_driver_adapter(driver_adapter, *args, **kwargs)
-    query_loader = loader_cls(adapter, record_classes, attribute=attribute)
+    query_loader = loader_cls(adapter, record_classes, attribute=attribute,
+                              mandatory_parameters=mandatory_parameters)
     query_data = query_loader.load_query_data_from_sql(sql, [])
     return queries_cls(adapter, kwargs_only=kwargs_only).load_from_list(query_data)
 
@@ -137,6 +141,7 @@ def from_path(
     driver_adapter: str|Callable[..., DriverAdapterProtocol],
     record_classes: dict|None = None,
     kwargs_only: bool = True,
+    mandatory_parameters: bool = True,
     attribute: str|None = "__",
     args: list[Any] = [],
     kwargs: dict[str, Any] = {},
@@ -154,9 +159,12 @@ def from_path(
       adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your own
       adapter class, you may pass its constructor.
     - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
-    - **kwargs_only** - *(optional)* Whether to only use named parameters on query execution, default is *True*.
-    - **attribute** - *(optional)* ``.`` attribute access substitution, defaults to ``"__""``, *None* disables
-      the feature.
+    - **kwargs_only** - *(optional)* Whether to only use named parameters on query execution,
+      default is *True*.
+    - **mandatory_parameters** - *(optional)* whether function parameters must be declared,
+      default is *True*.
+    - **attribute** - *(optional)* ``.`` attribute access substitution, defaults to ``"__""``,
+      *None* disables the feature.
     - **args** - *(optional)* adapter creation args (list), forwarded to cursor creation by default.
     - **kwargs** - *(optional)* adapter creation args (dict), forwarded to cursor creation by default.
       declarations to the python classes which aiosql should use when marshaling SQL results.
@@ -180,15 +188,14 @@ def from_path(
         raise SQLLoadException(f"File does not exist: {path}")
 
     adapter = _make_driver_adapter(driver_adapter, *args, **kwargs)
-    query_loader = loader_cls(adapter, record_classes, attribute=attribute)
+    query_loader = loader_cls(adapter, record_classes, attribute=attribute,
+                              mandatory_parameters=mandatory_parameters)
 
     if path.is_file():
         query_data = query_loader.load_query_data_from_file(path, encoding=encoding)
         return queries_cls(adapter, kwargs_only=kwargs_only).load_from_list(query_data)
     elif path.is_dir():
-        query_data_tree = query_loader.load_query_data_from_dir_path(
-            path, ext=ext, encoding=encoding
-        )
+        query_data_tree = query_loader.load_query_data_from_dir_path(path, ext=ext, encoding=encoding)
         return queries_cls(adapter, kwargs_only=kwargs_only).load_from_tree(query_data_tree)
     else:  # pragma: no cover
         raise SQLLoadException(f"The sql_path must be a directory or file, got {sql_path}")

@@ -16,9 +16,9 @@ _RECORD_DEF = re.compile(r"--\s*record_class\s*:\s*(\w+)\s*")
 # FIXME this accepts "1st" but seems to reject "é"
 _NAME_OP = re.compile(
     # query name
-    r"^(?P<name>\w+)"
+    r"^(?P<name>\w+)\s*"
     # optional list of parameters (foo, bla) or ()
-    r"(|\((?P<params>(\s*|\s*\w+\s*(,\s*\w+\s*)*))\))"
+    r"(|\((?P<params>(\s*|\s*\w+\s*(,\s*\w+\s*)*))\))\s*"
     # operation, empty for simple select
     r"(?P<op>(|\^|\$|!|<!|\*!|#))$"
 )
@@ -106,6 +106,7 @@ class QueryLoader:
     - :param driver_adapter: driver name or class.
     - :param record_classes: nothing of dict.
     - :param attribute: string to insert in place of ``.``.
+    - :param mandatory_parameters: whether params are required.
     """
 
     def __init__(
@@ -113,10 +114,12 @@ class QueryLoader:
         driver_adapter: DriverAdapterProtocol,
         record_classes: dict[str, Any]|None,
         attribute: str|None = None,
+        mandatory_parameters: bool = True,
     ):
-        self.driver_adapter = driver_adapter
-        self.record_classes = record_classes if record_classes is not None else {}
-        self.attribute = attribute
+        self._driver_adapter = driver_adapter
+        self._record_classes = record_classes if record_classes is not None else {}
+        self._attribute = attribute
+        self._mandatory_parameters = mandatory_parameters
 
     def _make_query_datum(
         self,
@@ -126,7 +129,7 @@ class QueryLoader:
     ) -> QueryDatum:
         """Build a query datum.
 
-        - :param query: the spec and name (``query-name!\n-- comments\nSQL;\n``)
+        - :param query: the spec and name (``query-name(…)!\n-- comments\nSQL;\n``)
         - :param ns_parts: name space parts, i.e. subdirectories of loaded files
         - :param floc: file name and lineno the query was extracted from
         """
@@ -142,11 +145,11 @@ class QueryLoader:
             raise SQLParseException(f"empty sql for: {qname} at {floc[0]}:{floc[1]}")
         signature = self._build_signature(sql, qname, qsig)
         query_fqn = ".".join(ns_parts + [qname])
-        if self.attribute:  # :u.a -> :u__a, **after** signature generation
-            sql, attributes = _preprocess_object_attributes(self.attribute, sql)
+        if self._attribute:  # :u.a -> :u__a, **after** signature generation
+            sql, attributes = _preprocess_object_attributes(self._attribute, sql)
         else:  # pragma: no cover
             attributes = None
-        sql = self.driver_adapter.process_sql(query_fqn, qop, sql)
+        sql = self._driver_adapter.process_sql(query_fqn, qop, sql)
         return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, floc, attributes, qsig)
 
     def _get_name_op(self, text: str) -> tuple[str, SQLOperationType, list[str]|None]:
@@ -156,13 +159,19 @@ class QueryLoader:
         if not matched or _BAD_PREFIX.match(qname_spec):
             raise SQLParseException(f'invalid query name and operation spec: "{qname_spec}"')
         nameop = matched.groupdict()
+        # extract operation
+        operation = _OP_TYPES[nameop["op"]]
+        # extract parameters
         params, rawparams = None, nameop["params"]
+        if self._mandatory_parameters and rawparams is None and operation != "#":
+            raise SQLParseException('missing mandatory parameter list: '
+                                    'use "mandatory_parameters=False" to allow')
         if rawparams is not None:
             params = [p.strip() for p in rawparams.split(",")]
             if params == ['']:  # handle "( )"
                 params = []
-        operation = _OP_TYPES[nameop["op"]]
-        if params and operation == "#":  # pragma: no cover  # FIXME it is covered?
+        # sanity check for scripts
+        if params and operation == "#":
             raise SQLParseException(f'cannot use named parameters in SQL script: "{qname_spec}"')
         return nameop["name"], operation, params
 
@@ -171,7 +180,7 @@ class QueryLoader:
         rc_match = _RECORD_DEF.match(text)
         rc_name = rc_match.group(1) if rc_match else None
         # TODO: Probably will want this to be a class, marshal in, and marshal out
-        return self.record_classes.get(rc_name) if isinstance(rc_name, str) else None
+        return self._record_classes.get(rc_name) if isinstance(rc_name, str) else None
 
     def _get_sql_doc(self, lines: Sequence[str]) -> tuple[str, str]:
         """Separate SQL-comment documentation and SQL code."""
