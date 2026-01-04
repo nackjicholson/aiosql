@@ -171,7 +171,7 @@ class QueryLoader:
             if params == ['']:  # handle "( )"
                 params = []
         # sanity check for scripts
-        if params and operation == "#":
+        if params and nameop["op"] == "#":
             raise SQLParseException(f'cannot use named parameters in SQL script at {floc[0]}:{floc[1]} on "{qname_spec}"')
         return nameop["name"], operation, params
 
