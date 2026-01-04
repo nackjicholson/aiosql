@@ -1,13 +1,14 @@
 AioSQL - Versions
 =================
 
-15.0 on 2026-?
---------------
+15.0 on 2026-01-04
+------------------
 
 - make function parameter declarations mandatory by default
 - but avoidable with ``mandatory_parameters=False``
 - upgrade and add more tests around parameter handling
 - work around recent `mypy` incompatibilities with `pypy`
+- work around `duckdb` overslow installation with Python *3.13t* and *3.14t*
 
 14.1 on 2025-11-27
 ------------------
