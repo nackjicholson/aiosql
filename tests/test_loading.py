@@ -72,7 +72,7 @@ def test_fromstr_queryloader_cls(sql):
 
 def test_trailing_space_on_lines_does_not_error():
     # There is whitespace in this string after the line ends
-    sql_str = "-- name: trailing-space^    \n"
+    sql_str = "-- name: trailing-space    ()    ^    \n"
     sql_str += "select * from test;     \n"
 
     try:
@@ -83,16 +83,16 @@ def test_trailing_space_on_lines_does_not_error():
 
 def test_non_ascii_char():
     # this triggers a warning, that we do not really check but for coverage
-    q = aiosql.from_str("-- name: zéro\nSELECT 0;\n", "sqlite3")
+    q = aiosql.from_str("-- name: zéro()\nSELECT 0;\n", "sqlite3")
     assert "zéro" in q._available_queries
-    q = aiosql.from_str("-- name: éêèëÉÊÈË\nSELECT 'eeeeeeee!';\n", "sqlite3")
+    q = aiosql.from_str("-- name: éêèëÉÊÈË()\nSELECT 'eeeeeeee!';\n", "sqlite3")
     assert "éêèëÉÊÈË" in q._available_queries
-    q = aiosql.from_str("-- name: 안녕하세요\nSELECT 'hello!';\n", "sqlite3")
+    q = aiosql.from_str("-- name: 안녕하세요()\nSELECT 'hello!';\n", "sqlite3")
     assert "안녕하세요" in q._available_queries
 
 
 def test_loading_query_signature():
-    sql_str = "-- name: get^\n" "select * from test where foo=:foo and bar=:bar"
+    sql_str = "-- name: get(foo, bar)^\n" "select * from test where foo=:foo and bar=:bar"
     queries = aiosql.from_str(sql_str, "aiosqlite")
     assert queries.get.__signature__ == inspect.Signature(
         [
@@ -105,27 +105,27 @@ def test_loading_query_signature():
 
 def test_names():
     try:
-        queries = aiosql.from_str("-- name: 1st\nSELECT 1;\n", "sqlite3")
+        queries = aiosql.from_str("-- name: 1st()\nSELECT 1;\n", "sqlite3")
         pytest.fail("'1st' should be rejected")
     except SQLParseException as e:
-        assert '"1st"' in str(e)
+        assert '"1st()"' in str(e)
     try:
-        queries = aiosql.from_str("-- name: one$garbage\nSELECT 1;\n", "sqlite3")
+        queries = aiosql.from_str("-- name: one()$garbage\nSELECT 1;\n", "sqlite3")
         pytest.fail("garbage should be rejected")
     except SQLParseException as e:
         assert 'garbage"' in str(e)
     try:
-        queries = aiosql.from_str("-- name: foo-bla\nSELECT 1;\n" * 2, "sqlite3")
+        queries = aiosql.from_str("-- name: foo-bla()\nSELECT 1;\n" * 2, "sqlite3")
         pytest.fail("must reject homonymous queries")
     except SQLLoadException as e:
         assert "foo_bla" in str(e)
     # - is okay because mapped to _
-    queries = aiosql.from_str("-- name: -dash\nSELECT 1;\n", "sqlite3")
+    queries = aiosql.from_str("-- name: -dash()\nSELECT 1;\n", "sqlite3")
     assert "_dash" in queries.available_queries
 
 
 def test_loading_query_signature_with_duplicate_parameter():
-    sql_str = "-- name: get^\n" "select * from test where foo=:foo and foo=:foo"
+    sql_str = "-- name: get(foo)^\n" "select * from test where foo=:foo and foo=:foo"
     queries = aiosql.from_str(sql_str, "aiosqlite")
     assert queries.get.__signature__ == inspect.Signature(
         [
@@ -205,7 +205,9 @@ def test_misc(sql_file):
 
 def test_kwargs():
     # kwargs_only == True
-    queries = aiosql.from_str("-- name: plus_one$\nSELECT 1 + :val;\n", "sqlite3", kwargs_only=True)
+    queries = aiosql.from_str(
+        "-- name: plus_one(val)$\nSELECT 1 + :val;\n", "sqlite3", kwargs_only=True
+    )
     import sqlite3
 
     conn = sqlite3.connect(":memory:")
@@ -217,7 +219,7 @@ def test_kwargs():
         assert "kwargs" in str(e)
     # kwargs_only == False
     queries = aiosql.from_str(
-        "-- name: plus_two$\nSELECT 2 + :val;\n", "sqlite3", kwargs_only=False
+        "-- name: plus-two(val)$\nSELECT 2 + :val;\n", "sqlite3", kwargs_only=False
     )
     assert 42 == queries.plus_two(conn, val=40)
     try:
@@ -238,7 +240,7 @@ SELECT :n+1;
 -- name: add(n, m)$
 SELECT :n+:m;
 
--- name: sub$
+-- name: sub(n, m)$
 SELECT :n - :m;
 """
 
@@ -291,42 +293,42 @@ def test_parameter_declarations():
 
 def test_empty_query():
     try:
-        aiosql.from_str("-- name: foo\n--name: bla\n", "sqlite3")
+        aiosql.from_str("-- name: foo()\n--name: bla()\n", "sqlite3")
         pytest.fail("must raise an exception")
     except SQLParseException as e:
         assert "empty query" in str(e)
     try:
-        aiosql.from_str("-- name: foo\n-- record_class: Foo\n--name: bla\n", "sqlite3")
+        aiosql.from_str("-- name: foo()\n-- record_class: Foo\n--name: bla\n", "sqlite3")
         pytest.fail("must raise an exception")
     except SQLParseException as e:
         assert "empty sql" in str(e)
     try:
-        aiosql.from_str("-- name: foo\n \r\n\t  --name: bla\n", "sqlite3")
+        aiosql.from_str("-- name: foo()\n \r\n\t  --name: bla()\n", "sqlite3")
         pytest.fail("must raise an exception")
     except SQLParseException as e:
         assert "empty query" in str(e)
     try:
-        aiosql.from_str("-- name: foo\n-- just a comment\n--name: bla\n", "sqlite3")
+        aiosql.from_str("-- name: foo()\n-- just a comment\n--name: bla()\n", "sqlite3")
         pytest.fail("must raise an exception")
     except SQLParseException as e:
         assert "empty sql" in str(e)
     try:
-        aiosql.from_str("-- name: foo\n-- record_class: Foo\n-- just a comment\n--name: bla\n", "sqlite3")
+        aiosql.from_str("-- name: foo()\n-- record_class: Foo\n-- just a comment\n--name: bla()\n", "sqlite3")
         pytest.fail("must raise an exception")
     except SQLParseException as e:
         assert "empty sql" in str(e)
     try:
-        aiosql.from_str("-- name: foo\n-- just a comment\n  ;  \n-- hop\n--name: bla\n", "sqlite3")
+        aiosql.from_str("-- name: foo()\n-- just a comment\n  ;  \n-- hop\n--name: bla()\n", "sqlite3")
         pytest.fail("must raise an exception")
     except SQLParseException as e:
         assert "empty sql" in str(e)
     try:
-        aiosql.from_str("-- name: foo\n-- just a comment\n;\n", "sqlite3")
+        aiosql.from_str("-- name: foo()\n-- just a comment\n;\n", "sqlite3")
         pytest.fail("must raise an exception")
     except SQLParseException as e:
         assert "empty sql" in str(e)
     try:
-        aiosql.from_str("-- name: foo\n-- record_class: Foo\n-- just a comment\n;\n", "sqlite3")
+        aiosql.from_str("-- name: foo()\n-- record_class: Foo\n-- just a comment\n;\n", "sqlite3")
         pytest.fail("must raise an exception")
     except SQLParseException as e:
         assert "empty sql" in str(e)

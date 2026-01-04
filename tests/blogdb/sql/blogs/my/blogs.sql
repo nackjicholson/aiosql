@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS blogs(
   published DATE NOT NULL DEFAULT (CURRENT_DATE)
 );
 
--- name: get-blogs-published-after
+-- name: get-blogs-published-after(published)
 -- Get all blogs by all authors published after the given date.
     select b.title,
            u.username,
@@ -36,7 +36,7 @@ insert into blogs (
 )
 values (%s, %s, %s, %s);
 
--- name: publish-new-blog
+-- name: publish-new-blog(userid, title, content)
 insert into blogs (userid, title, content)
-  values (:userid, :title, :contents)
+  values (:userid, :title, :content)
   returning blogid, title;

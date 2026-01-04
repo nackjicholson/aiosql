@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS comments;
 -- Fetch all fields for every blog in the database.
 select * from blogs;
 
--- name: publish-blog<!
+-- name: publish-blog(userid, title, content, published)<!
 insert into blogs (
   userid,
   title,
@@ -55,10 +55,10 @@ limit 1;
 -- name: search(title, published)
 select title from blogs where title LIKE :title and published = :published;
 
--- name: blog_title^
+-- name: blog_title(blogid)^
 select blogid, title from blogs where blogid = :blogid;
 
--- name: with-params^
+-- name: with-params(name, x)^
 select length(:name), :x.real + x.imaj;
 
 -- name: new-blog(userid, title, content)!

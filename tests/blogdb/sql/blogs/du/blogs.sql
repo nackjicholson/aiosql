@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS blogs(
 );
 CREATE SEQUENCE blogs_seq;
 
--- name: get-blogs-published-after
+-- name: get-blogs-published-after(published)
 -- Get all blogs by all authors published after the given date.
     select b.title,
            u.username,

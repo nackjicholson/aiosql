@@ -134,7 +134,7 @@ class QueryLoader:
         - :param floc: file name and lineno the query was extracted from
         """
         lines = [line.rstrip() for line in query.strip().splitlines()]
-        qname, qop, qsig = self._get_name_op(lines[0])
+        qname, qop, qsig = self._get_name_op(lines[0], floc)
         if re.search(r"[^A-Za-z0-9_]", qname):
             log.warning(f"non ASCII character in query name: {qname}")
         if len(lines) <= 1:
@@ -152,19 +152,19 @@ class QueryLoader:
         sql = self._driver_adapter.process_sql(query_fqn, qop, sql)
         return QueryDatum(query_fqn, doc, qop, sql, record_class, signature, floc, attributes, qsig)
 
-    def _get_name_op(self, text: str) -> tuple[str, SQLOperationType, list[str]|None]:
+    def _get_name_op(self, text: str, floc: tuple[Path|str, int]) -> tuple[str, SQLOperationType, list[str]|None]:
         """Extract name, parameters and operation from spec."""
         qname_spec = text.replace("-", "_")
         matched = _NAME_OP.match(qname_spec)
         if not matched or _BAD_PREFIX.match(qname_spec):
-            raise SQLParseException(f'invalid query name and operation spec: "{qname_spec}"')
+            raise SQLParseException(f'invalid query name and operation spec at {floc[0]}:{floc[1]} on "{qname_spec}"')
         nameop = matched.groupdict()
         # extract operation
         operation = _OP_TYPES[nameop["op"]]
         # extract parameters
         params, rawparams = None, nameop["params"]
-        if self._mandatory_parameters and rawparams is None and operation != "#":
-            raise SQLParseException('missing mandatory parameter list: '
+        if self._mandatory_parameters and rawparams is None and nameop["op"] not in ("#", "*!", "<!"):
+            raise SQLParseException(f'missing mandatory parameter list at {floc[0]}:{floc[1]} on "{qname_spec}", '
                                     'use "mandatory_parameters=False" to allow')
         if rawparams is not None:
             params = [p.strip() for p in rawparams.split(",")]
@@ -172,7 +172,7 @@ class QueryLoader:
                 params = []
         # sanity check for scripts
         if params and operation == "#":
-            raise SQLParseException(f'cannot use named parameters in SQL script: "{qname_spec}"')
+            raise SQLParseException(f'cannot use named parameters in SQL script at {floc[0]}:{floc[1]} on "{qname_spec}"')
         return nameop["name"], operation, params
 
     def _get_record_class(self, text: str) -> Type|None:
