@@ -24,7 +24,10 @@ classifiers = [
 dev = [
     "pytest", "pytest-asyncio", "coverage",
     "black", "flake8", "ruff",
-    "mypy", "pyright", "types-setuptools",
+    # FIXME mypy librt installation issue with pypy
+    "mypy < 1.19; implementation_name == 'pypy'",
+    "mypy; implementation_name != 'pypy'",
+    "pyright", "types-setuptools",
 ]
 dev-duckdb = [
     # skip, wheel compilation takes too much time… (confirmed 2024-09-30)
@@ -38,7 +41,7 @@ dev-sqlite = [
 dev-postgres = [
     "pytest-postgresql",
     "asyncpg; python_version < '3.13' and implementation_name != 'pypy'",
-    "psycopg>=3",
+    "psycopg >= 3",
     # 2.9.10 needed for 3.13
     "psycopg2 >= 2.9.10; implementation_name != 'pypy'",
     "pygresql",
