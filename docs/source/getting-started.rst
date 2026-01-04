@@ -61,7 +61,7 @@ Below is a *blogs.sql* file that defines two queries.
 
 .. code:: sql
 
-    -- name: get_all_blogs
+    -- name: get_all_blogs()
     select blogid,
            userid,
            title,
@@ -69,7 +69,7 @@ Below is a *blogs.sql* file that defines two queries.
            published
       from blogs;
 
-    -- name: get_user_blogs
+    -- name: get_user_blogs(username)
     -- Get blogs with a fancy formatted published date and author field
         select b.blogid,
                b.title,
@@ -84,6 +84,7 @@ Notice the ``-- name: <name_of_method>`` comments and the ``:username`` substitu
 The comments that start with ``-- name:`` are the magic of aiosql.
 They are used by ```aiosql.from_path`` <./api.md#aiosqlfrom_path>`__ to parse the file
 into separate methods accessible by the name.
+If present, the parameter lists are enforced.
 The ``aiosql.from_path`` function takes a path to a sql file or directory
 and the name of the database driver intended for use with the methods.
 
@@ -115,7 +116,7 @@ The result below is the same as the first example above that loads from a SQL fi
 .. code:: python
 
     sql_str = """
-    -- name: get_all_blogs
+    -- name: get_all_blogs()
     select blogid,
            userid,
            title,
@@ -123,7 +124,7 @@ The result below is the same as the first example above that loads from a SQL fi
            published
       from blogs;
 
-    -- name: get_user_blogs
+    -- name: get_user_blogs(username)
     -- Get blogs with a fancy formatted published date and author field
         select b.blogid,
                b.title,
@@ -245,7 +246,7 @@ Passing Parameters
 
 .. code:: sql
 
-    -- name: get_user_blogs
+    -- name: get_user_blogs(username)
     -- Get blogs with a fancy formatted published date and author field
         select b.blogid,
                b.title,
@@ -262,6 +263,9 @@ substitute for ``:username``.
 
 You can call the ``get_user_blogs`` function with plain arguments or keyword arguments with the
 name of the subsitution variable.
+
+If a parameter list is explicitely declared, here ``(username)`` it is checked
+statically and enforced dynamically by required named parameters.
 
 .. code:: python
 
@@ -289,7 +293,7 @@ It is also possible to access simple object attributes in a query, with the dot 
 
 .. code:: sql
 
-    -- name: add_user
+    -- name: add_user(u)
     insert into users(username, name)
       values (:u.username, :u.name);
 

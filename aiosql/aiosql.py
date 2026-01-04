@@ -89,9 +89,10 @@ def from_str(
     - **driver_adapter** - Either a string to designate one of the aiosql built-in database driver
       adapters. One of many available for SQLite, Postgres and MySQL. If you have defined your
       own adapter class, you can pass it's constructor.
-    - **kwargs_only** - *(optional)* whether to only use named parameters on query execution, default is *True*.
-    - **attribute** - *(optional)* ``.`` attribute access substitution, defaults to ``"__"``, *None* disables
-      the feature.
+    - **kwargs_only** - *(optional)* whether to only use named parameters on query execution,
+      default is *True*.
+    - **attribute** - *(optional)* ``.`` internal attribute access substitution,
+      defaults to ``"__"``, *None* disables the feature.
     - **args** - *(optional)* adapter creation args (list), forwarded to cursor creation by default.
     - **kwargs** - *(optional)* adapter creation args (dict), forwarded to cursor creation by default.
     - **record_classes** - *(optional)* **DEPRECATED** Mapping of strings used in "record_class"
@@ -111,11 +112,11 @@ def from_str(
       import aiosql
 
       sql_text = \"\"\"
-      -- name: get-all-greetings
+      -- name: get-all-greetings()
       -- Get all the greetings in the database
       select * from greetings;
 
-      -- name: get-user-by-username^
+      -- name: get-user-by-username(username)^
       -- Get all the users from the database,
       -- and return it as a dict
       select * from users where username = :username;
