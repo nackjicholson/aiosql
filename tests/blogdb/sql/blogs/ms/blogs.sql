@@ -27,7 +27,7 @@ IF OBJECT_ID('blogs', 'U') IS NOT NULL
 IF OBJECT_ID('users', 'U') IS NOT NULL
   DROP TABLE users;
 
--- name: get-blogs-published-after
+-- name: get-blogs-published-after(published)
 -- Get all blogs by all authors published after the given date.
   select title,
          username,
@@ -38,7 +38,7 @@ IF OBJECT_ID('users', 'U') IS NOT NULL
 order by published desc;
 
 
--- name: publish-blog<!
+-- name: publish-blog(userid, title, content, published)<!
 insert into blogs (
   userid,
   title,
@@ -53,13 +53,13 @@ values (
   :published
 );
 
--- name: no-publish<!
+-- name: no-publish()<!
 -- Test an hypothetical empty returning clause
 select blogid, title
 from blogs
 where 0 = 1;
 
--- name: bulk-publish*!
+-- name: bulk-publish(userid, title, content, published)*!
 -- Insert many blogs at once
 insert into blogs (userid, title, content, published)
   values (:userid, :title, :content, :published);
