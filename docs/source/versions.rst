@@ -31,7 +31,7 @@ AioSQL - Versions
 ------------------
 
 - update GitHub CI configuration.
-- use SPDX format for licensing informations and add topics.
+- use SPDX format for licensing information and add topics.
 - doc, separate backlog from versions.
 
 13.3 on 2025-03-07
@@ -381,6 +381,6 @@ AioSQL - Versions
 2.0.0 on 2018-12-07
 -------------------
 
-- adaptater refactoring, including breaking changes.
+- adapter refactoring, including breaking changes.
 - add ``_cursor`` variants for full control.
 - remove some stuff

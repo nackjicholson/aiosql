@@ -125,7 +125,7 @@ When used from Python this query will either return ``None`` or the singular sel
 
 The ``$`` operator will execute the query, and only return the **first value of the first row**
 of a result set. If there are no rows in the result set it returns ``None``.
-This is implemented by returing the first element of the tuple returned by ``cur.fetchone()``
+This is implemented by returning the first element of the tuple returned by ``cur.fetchone()``
 from the underlying driver.
 This is mostly useful for queries returning IDs, COUNTs or other aggregates.
 
@@ -189,7 +189,7 @@ the inserted row using
 ```cur.lastrowid`` <https://docs.python.org/3/library/sqlite3.html#sqlite3.Cursor.lastrowid>`__.
 
 As recent version of SQLite do support the ``returning`` clause, simply forget
-about this, use the clause explicitely and treat the whole command as a standard
+about this, use the clause explicitly and treat the whole command as a standard
 select with the *empty* operator (relation), or ``^`` (tuple), or ``$`` (scalar).
 
 .. literalinclude:: ../../tests/blogdb/sql/blogs/li/blogs.sql

@@ -190,7 +190,7 @@ application:
         # Aloha, William!
         # …
 
-Or even in an asynchroneous way, with two SQL queries running in parallel
+Or even in an asynchronous way, with two SQL queries running in parallel
 using ``aiosqlite`` and ``asyncio``:
 
 .. code:: python

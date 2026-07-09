@@ -69,7 +69,7 @@ argument when building Queries:
 
     queries = aiosql.from_path("foo.sql", driver_adapter=AcmeAdapter)
 
-Alternatively, an adapter can be registered or overriden:
+Alternatively, an adapter can be registered or overridden:
 
 .. code:: python
 

@@ -262,9 +262,9 @@ in the above query and having the resultant method expect an inbound argument to
 substitute for ``:username``.
 
 You can call the ``get_user_blogs`` function with plain arguments or keyword arguments with the
-name of the subsitution variable.
+name of the substitution variable.
 
-If a parameter list is explicitely declared, here ``(username)`` it is checked
+If a parameter list is explicitly declared, here ``(username)`` it is checked
 statically and enforced dynamically by required named parameters.
 
 .. code:: python
