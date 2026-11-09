@@ -42,6 +42,13 @@ jobs:
         - version: "3.14t"
           gil: 0
           noduckdb: 1
+        - version: "3.15"
+        - version: "3.15t"
+          gil: 1
+          noduckdb: 1
+        - version: "3.15t"
+          gil: 0
+          noduckdb: 1
     env:
       PYTHON_GIL: ${{ matrix.python.gil }}
       NO_DUCKDB: ${{ matrix.python.noduckdb }}
