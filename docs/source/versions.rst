@@ -1,12 +1,17 @@
 AioSQL - Versions
 =================
 
+? on ?
+------
+
+- remove Python 3.10 tests
+
 16.0 on 2026-11-09
 ------------------
 
 - update copyright year in documentation configuration
 - add maintainer as a co-author
-- update github action versions
+- add Python 3.15 to github action
 - minor fixes for updated ruff
 - remove older python versions
 - add latest python versions
