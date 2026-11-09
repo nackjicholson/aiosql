@@ -6,6 +6,10 @@ AioSQL - Versions
 
 - update copyright year in documentation configuration
 - add maintainer as a co-author
+- update github action versions
+- minor fixes for updated ruff
+- remove older python versions
+- add latest python versions
 
 15.0 on 2026-01-04
 ------------------
