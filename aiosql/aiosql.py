@@ -55,7 +55,7 @@ def _make_driver_adapter(
             raise ValueError(f"Encountered unregistered driver_adapter: {driver_adapter}")
     # try some guessing if it is a PEP249 module
     elif hasattr(driver_adapter, "paramstyle"):
-        style = driver_adapter.paramstyle
+        style = driver_adapter.paramstyle  # type: ignore
         if style == "pyformat":
             adapter = PyFormatAdapter  # type: ignore
         elif style == "named":
