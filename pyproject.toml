@@ -26,7 +26,7 @@ classifiers = [
 [project.optional-dependencies]
 dev = [
     "pytest", "pytest-asyncio", "coverage",
-    "black", "flake8", "ruff",
+    "black", "flake8", "ruff", "rstcheck",
     # FIXME mypy librt installation issue with pypy
     "mypy < 1.19; implementation_name == 'pypy'",
     "mypy; implementation_name != 'pypy'",
@@ -92,3 +92,7 @@ target-version = ["py310"]
 [tool.mypy]
 exclude = ["(build|venv)/", ".*/virtualenvs/.*"]
 ignore_missing_imports = true
+
+[tool.ruff.lint]
+# ruff rules are what they are, but they are not always right
+ignore = ["BLE001", "B006", "I001", "PIE790"]

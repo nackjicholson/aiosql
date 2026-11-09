@@ -4,12 +4,16 @@ from enum import Enum
 from pathlib import Path
 from typing import (
     Any,
-    AsyncContextManager,
-    Callable,
-    ContextManager,
-    Generator,
     NamedTuple,
     Protocol,
+)
+from contextlib import (
+    AbstractContextManager as ContextManager,
+    AbstractAsyncContextManager as AsyncContextManager
+)
+from collections.abc import (
+    Callable,
+    Generator,
 )
 
 # FIXME None added for MySQL buggy drivers
