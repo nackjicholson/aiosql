@@ -1,8 +1,8 @@
 AioSQL - Versions
 =================
 
-? on ?
-------
+16.0 on 2026-11-09
+------------------
 
 - update copyright year in documentation configuration
 - add maintainer as a co-author
