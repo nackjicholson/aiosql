@@ -10,6 +10,7 @@ AioSQL - Versions
 - minor fixes for updated ruff
 - remove older python versions
 - add latest python versions
+- add rstcheck to dev dependencies
 
 15.0 on 2026-01-04
 ------------------
