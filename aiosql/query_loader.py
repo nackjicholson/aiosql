@@ -1,7 +1,8 @@
 import re
 import inspect
 from pathlib import Path
-from typing import Type, Sequence, Any
+from typing import Any
+from collections.abc import Sequence
 
 from .utils import SQLParseException, SQLLoadException, VAR_REF, VAR_REF_DOT, log
 from .types import QueryDatum, QueryDataTree, SQLOperationType, DriverAdapterProtocol
@@ -175,7 +176,7 @@ class QueryLoader:
             raise SQLParseException(f'cannot use named parameters in SQL script at {floc[0]}:{floc[1]} on "{qname_spec}"')
         return nameop["name"], operation, params
 
-    def _get_record_class(self, text: str) -> Type|None:
+    def _get_record_class(self, text: str) -> type|None:
         """Extract record class from spec."""
         rc_match = _RECORD_DEF.match(text)
         rc_name = rc_match.group(1) if rc_match else None
@@ -206,9 +207,9 @@ class QueryLoader:
             name = gd["var_name"]
             if name.isdigit() or name in names:
                 continue
-            if sig is not None:  # optional parameter declarations
-                if name not in sig:
-                    raise SQLParseException(f"undeclared parameter name in query {qname}: {name}")
+            if sig is not None and name not in sig:
+                 # optional parameter declarations
+                raise SQLParseException(f"undeclared parameter name in query {qname}: {name}")
             names.add(name)
             params.append(
                 inspect.Parameter(

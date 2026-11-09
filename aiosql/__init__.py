@@ -4,4 +4,11 @@ from importlib.metadata import version
 
 __version__ = version("aiosql")
 
-__all__ = ["from_path", "from_str", "register_adapter", "SQLParseException", "SQLLoadException"]
+# exported package interface
+__all__ = [
+    "SQLLoadException",
+    "SQLParseException",
+    "from_path",
+    "from_str",
+    "register_adapter"
+]

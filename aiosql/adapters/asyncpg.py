@@ -70,7 +70,7 @@ class AsyncPGAdapter:
         elif isinstance(parameters, tuple):
             return parameters
         else:
-            raise ValueError(f"Parameters expected to be dict or tuple, received {parameters}")
+            raise TypeError(f"Parameters expected to be dict or tuple, received {parameters}")
 
     async def select(self, conn, query_name, sql, parameters, record_class=None):
         parameters = self.maybe_order_params(query_name, parameters)

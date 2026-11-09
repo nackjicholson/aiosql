@@ -1,5 +1,6 @@
 from pathlib import Path
-from typing import Callable, Type, Any
+from typing import Any
+from collections.abc import Callable
 
 from .adapters.aiosqlite import AioSQLiteAdapter
 from .adapters.asyncpg import AsyncPGAdapter
@@ -54,7 +55,7 @@ def _make_driver_adapter(
             raise ValueError(f"Encountered unregistered driver_adapter: {driver_adapter}")
     # try some guessing if it is a PEP249 module
     elif hasattr(driver_adapter, "paramstyle"):
-        style = getattr(driver_adapter, "paramstyle")  # avoid mypy warning?
+        style = driver_adapter.paramstyle
         if style == "pyformat":
             adapter = PyFormatAdapter  # type: ignore
         elif style == "named":
@@ -79,8 +80,8 @@ def from_str(
     attribute: str|None = "__",
     args: list[Any] = [],
     kwargs: dict[str, Any] = {},
-    loader_cls: Type[QueryLoader] = QueryLoader,
-    queries_cls: Type[Queries] = Queries,
+    loader_cls: type[QueryLoader] = QueryLoader,
+    queries_cls: type[Queries] = Queries,
 ):
     """Load queries from a SQL string.
 
@@ -145,8 +146,8 @@ def from_path(
     attribute: str|None = "__",
     args: list[Any] = [],
     kwargs: dict[str, Any] = {},
-    loader_cls: Type[QueryLoader] = QueryLoader,
-    queries_cls: Type[Queries] = Queries,
+    loader_cls: type[QueryLoader] = QueryLoader,
+    queries_cls: type[Queries] = Queries,
     ext: tuple[str] = (".sql",),
     encoding=None,
 ):

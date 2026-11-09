@@ -3,8 +3,8 @@ import inspect
 from pathlib import Path
 from types import MethodType
 
-# TODO drop most of this ugly stuff when >= 3.10
-from typing import Any, Callable, cast
+from typing import Any, cast
+from collections.abc import Callable
 
 from .types import DriverAdapterProtocol, QueryDatum, QueryDataTree, QueryFn, SQLOperationType
 from .utils import SQLLoadException, SQLParseException, log

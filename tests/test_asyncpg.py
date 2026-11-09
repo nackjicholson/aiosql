@@ -120,5 +120,5 @@ def test_maybe_order_params():
     try:
         a.maybe_order_params("foo", "wrong-type-parameter")
         pytest.fail("exception should be raised")  # pragma: no cover
-    except ValueError as e:
+    except TypeError as e:
         assert "dict or tuple" in str(e)
