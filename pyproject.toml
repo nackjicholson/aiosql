@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aiosql"
-version = "15.0"
+version = "16.0"
 authors = [
     { name = "William Vaughn", email = "vaughnwilld@gmail.com" },
     { name = "Fabien Coelho", email = "aiosql@coelho.net" },
