@@ -72,8 +72,6 @@ Alternatively, there is a convenient ``Makefile`` to automate the above tasks:
     source venv/bin/activate
     make check  # run all checks: pytest, flake8, coverage…
 
-Also, there is a working ``poetry`` setup in ``pyproject.toml``.
-
 Dependency Management
 ---------------------
 
