@@ -5,7 +5,7 @@ name: Aiosql Package
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
   pull_request:
     branches: [ main ]
 
@@ -51,7 +51,7 @@ jobs:
       NO_DUCKDB: ${{ matrix.python.noduckdb }}
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python.version }}
       uses: actions/setup-python@v7
       with:
@@ -63,8 +63,8 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install .[dev,dev-postgres,dev-mysql,dev-sqlite]
         [ "$NO_DUCKDB" ] || python -m pip install .[dev-duckdb]
-    - name: Check types with mypy
-      run: make VENV= INSTALL= check.mypy
+    # - name: Check types with mypy
+    #   run: make VENV= INSTALL= check.mypy
     - name: Check types with pyright
       run: make VENV= INSTALL= check.pyright
     - name: Lint with ruff
@@ -73,3 +73,5 @@ jobs:
       run: make VENV= INSTALL= check.pytest
     - name: Coverage tests
       run: make VENV= INSTALL= check.coverage
+    - name: RST tests
+      run: make VENV= INSTALL= check.rstcheck

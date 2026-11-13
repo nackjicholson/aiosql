@@ -35,7 +35,7 @@ help:
 	echo " - check.black: run black formatter checks"
 	echo " - check.coverage: run coverage and generate html report"
 	echo " - check.rstcheck: check rest files"
-	echo " - check: run all above checks"
+	echo " - check: run most of above checks"
 	echo " - publish: publish a new release on pypi (for maintainers)"
 
 #
@@ -159,6 +159,7 @@ check.pytest.local: check.pytest.misc check.pytest.postgres.local check.pytest.$
 .PHONY: check.coverage
 check.coverage: check.coverage.local
 
+# NOTE only a subset of possible checks are triggered here.
 .PHONY: check
 check: check.ruff check.pyright check.pytest check.coverage check.rstcheck
 
