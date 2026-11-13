@@ -35,7 +35,7 @@ based drivers for
 (`mariadb <https://pypi.org/project/mariadb/>`__),
 `DuckDB <https://www.duckdb.org/>`__
 (`duckdb <https://duckdb.org/docs/api/python/dbapi>`__) and
-`MS SQL Server <https//en.wikipedia.org/wiki/Microsoft_SQL_Server>`__
+`MS SQL Server <https://en.wikipedia.org/wiki/Microsoft_SQL_Server>`__
 (`pymssql <https://pypi.org/project/pymssql/>`__),
 However, some detailed feature support may vary depending on the underlying driver
 and database engine actual capabilities.
