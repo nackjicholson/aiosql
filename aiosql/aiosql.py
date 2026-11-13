@@ -35,6 +35,19 @@ _ADAPTERS: dict[str, Callable[..., DriverAdapterProtocol]] = {
 }
 """Map adapter names to their adapter class."""
 
+_DRIVERS: dict[str, list[str]] = {
+    "postgres": ["apsycopg", "asyncpg", "pg8000", "psycopg", "psycopg2", "pygresql"],
+    "sqlite": ["sqlite3", "aiosqlite", "apsw"],
+    "duckdb": ["duckdb"],
+    "mysql": ["mysqldb", "mysql-connector", "pymysql"],
+    "mariadb": ["mariadb"],
+    "mssql": ["pymssql"],
+}
+"""Database drivers."""
+
+# check inclusions both ways
+assert all(all(d in _ADAPTERS for d in drivers) for drivers in _DRIVERS.values()), "database/driver sanity check"
+assert all(any(d in drivers for drivers in _DRIVERS.values()) for d in _ADAPTERS), "driver/database sanity chec"
 
 def register_adapter(name: str, adapter: Callable[..., DriverAdapterProtocol]):
     """Register or override an adapter."""
