@@ -1,0 +1,39 @@
+#
+# TEST is either "pytest" or "coverage"
+#
+
+name: aiosql-tests
+
+services:
+  #
+  # other tests
+  #
+  mariadb-server:
+    image: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=pytest
+      - MYSQL_USER=pytest
+      - MYSQL_PASSWORD=pytest
+      - MYSQL_DATABASE=pytest
+  mssql-server:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_TCP_PORT=1433
+      - MSSQL_SA_PASSWORD=Abc123..
+      - MSSQL_PID=Developer
+  dbs-client:
+    image: python-aiosql-dbs
+    depends_on:
+      - mariadb-server
+      - mssql-server
+    volumes:
+      - ..:/code
+    environment:
+      - MA_HOST=mariadb-server
+      - MA_PORT=3306
+      - MS_HOST=mssql-server
+      - MS_PORT=1433
+      - MS_PASS=Abc123..
+    command: >
+      make VENV=/venv MA_HOST=mariadb-server MA_PORT=3306 MS_HOST=mssql-server MS_PORT=1433 MS_PASS=Abc123.. check.$TEST.mariadb.detached check.$TEST.mssql.detached check.$TEST.misc

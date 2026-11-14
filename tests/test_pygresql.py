@@ -27,7 +27,7 @@ def rconn(pg_params):
     params["database"] = params["dbname"]
     del params["dbname"]
     if "port" in params:
-        params["host"] += ":" + params["port"]
+        params["host"] += f":{params['port']}"
         del params["port"]
     u.log.debug(f"params: {params}")
     with db.connect(**params) as conn:

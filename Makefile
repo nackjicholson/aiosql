@@ -280,7 +280,7 @@ check.pytest.mariadb.detached: check.pytest.mariadb
 .PHONY: check.pytest.mariadb
 check.pytest.mariadb: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	$(WAIT) $(MA_HOST) $(MA_PORT) 10 || exit 1
+	$(WAIT) $(MA_HOST) $(MA_PORT) 5 || exit 1
 	echo "# running mariadb tests..."
 	$(PYTEST) $(PYTOPT) --mysql-driver=mariadb tests/test_mariadb.py
 
