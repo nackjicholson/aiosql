@@ -171,18 +171,24 @@ def run_cursor(conn, queries):
     cur.close()
     conn.commit()
 
+BOB = {
+    "userid": 1,
+    "username": "bobsmith",
+    "firstname": "Bob",
+    "lastname": "Smith",
+}
+
 def run_record_query(dconn, queries):
     get_all = queries.f("users.get_all")
     raw_actual = get_all(dconn)
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
     assert len(actual) == 3
-    assert actual[0] == {
-        "userid": 1,
-        "username": "bobsmith",
-        "firstname": "Bob",
-        "lastname": "Smith",
-    }
+    bob = actual[0]
+    if isinstance(bob, dict):
+        assert bob == BOB
+    else:  # mssql-python Row?
+        assert all(bob.__getattr__(k) == BOB[k] for k in BOB)
 
 def run_parameterized_query(conn, queries):
     # select on a parameter
@@ -205,6 +211,18 @@ def run_parameterized_query(conn, queries):
 
     conn.commit()
 
+PIE = {
+    "title": "How to make a pie.",
+    "username": "bobsmith",
+    "published": "2018-11-23 00:00",
+}
+
+TEST = {
+    "title": "Testing",
+    "username": "janedoe",
+    "published": "2018-01-01 00:00"
+}
+
 def run_parameterized_record_query(dconn, queries, date):
     get_blogs_published_after = queries.f("blogs.get_blogs_published_after")
 
@@ -212,16 +230,13 @@ def run_parameterized_record_query(dconn, queries, date):
     assert isinstance(raw_actual, Iterable)
     actual = list(raw_actual)
 
-    expected = [
-        {
-            "title": "How to make a pie.",
-            "username": "bobsmith",
-            "published": "2018-11-23 00:00",
-        },
-        {"title": "Testing", "username": "janedoe", "published": "2018-01-01 00:00"},
-    ]
+    expected = [ PIE, TEST ]
 
-    assert actual == expected
+    if any(isinstance(i, dict) for i in actual):
+        assert actual == expected
+    else:  # mssql-python Row
+        for a, e in zip(actual, expected):
+            assert all(a.__getattr__(k) == e[k] for k in e)
 
     dconn.commit()
 

@@ -38,10 +38,10 @@ def conn(conn_str, ms_db):
     global connections
     conn_id = connections
     connections += 1
-    u.log.info(f"pytest connection: {conn_str} [{conn_id}]")
+    u.log.debug(f"pytest connection [{conn_id}]")
     with db.connect(conn_str, autocommit=False) as conn:
         yield conn
-    u.log.info(f"pytest connection off: [{conn_id}]")
+    u.log.debug(f"pytest deconnection [{conn_id}]")
 
 @pytest.fixture
 def dconn(conn):
@@ -54,28 +54,28 @@ def master_conn(conn_str, ms_dsn):
     global connections
     conn_id = connections
     connections += 1
-    u.log.info(f"master connection: {master_conn_str} [{conn_id}]")
+    u.log.debug(f"master connection [{conn_id}]")
     with db.connect(master_conn_str, autocommit=True) as conn:
         yield conn
-    u.log.info(f"master connection off: [{connections}]")
+    u.log.debug(f"master deconnection [{connections}]")
 
 # NOTE master_conn needed so that "pytest" database exists
 def test_sanity_conn_str(conn_str, ms_db):
     global connections
     conn_id = connections
     connections += 1
-    u.log.info(f"pytest connection: {conn_str} [{conn_id}]")
+    u.log.debug(f"pytest connection [{conn_id}]")
     with db.connect(conn_str) as conn:
         t.run_sanity(conn)
-    u.log.info(f"pytest connection off: [{conn_id}]")
+    u.log.debug(f"pytest deconnection [{conn_id}]")
 
 from run_tests import (
     run_sanity as test_sanity,
 	run_something as test_something,
 	run_cursor as test_cursor,
-	run_record_query as OOPS_test_record_query,
+	run_record_query as test_record_query,
 	run_parameterized_query as test_parameterized_query,
-	run_parameterized_record_query as OOPS_test_parameterized_record_query,
+	run_parameterized_record_query as test_parameterized_record_query,
     # FIXME broken with is_dict
 	# run_record_class_query as test_record_class_query,
 	run_select_cursor_context_manager as test_select_cursor_context_manager,

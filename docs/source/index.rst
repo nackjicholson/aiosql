@@ -74,7 +74,7 @@ Badges
 .. image:: https://img.shields.io/badge/coverage-100%25-success
    :alt: Code Coverage
    :target: https://github.com/nackjicholson/aiosql/actions/
-.. image:: https://img.shields.io/badge/tests-299%20✓-success
+.. image:: https://img.shields.io/badge/tests-301%20✓-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 .. image:: https://img.shields.io/github/issues/nackjicholson/aiosql?style=flat
