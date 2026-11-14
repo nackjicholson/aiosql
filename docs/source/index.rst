@@ -36,7 +36,9 @@ based drivers for
 `DuckDB <https://www.duckdb.org/>`__
 (`duckdb <https://duckdb.org/docs/api/python/dbapi>`__) and
 `MS SQL Server <https://en.wikipedia.org/wiki/Microsoft_SQL_Server>`__
-(`pymssql <https://pypi.org/project/pymssql/>`__),
+(`pymssql <https://pypi.org/project/pymssql/>`__,
+`mssql-python <https://pypi.org/project/mssql-python/>`__
+),
 However, some detailed feature support may vary depending on the underlying driver
 and database engine actual capabilities.
 
@@ -72,7 +74,7 @@ Badges
 .. image:: https://img.shields.io/badge/coverage-100%25-success
    :alt: Code Coverage
    :target: https://github.com/nackjicholson/aiosql/actions/
-.. image:: https://img.shields.io/badge/tests-283%20✓-success
+.. image:: https://img.shields.io/badge/tests-299%20✓-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 .. image:: https://img.shields.io/github/issues/nackjicholson/aiosql?style=flat
@@ -96,7 +98,7 @@ Badges
 .. image:: https://img.shields.io/badge/databases-6-informational
    :alt: Databases
    :target: https://github.com/nackjicholson/aiosql/
-.. image:: https://img.shields.io/badge/drivers-15-informational
+.. image:: https://img.shields.io/badge/drivers-16-informational
    :alt: Drivers
    :target: https://github.com/nackjicholson/aiosql/
 .. image:: https://img.shields.io/github/languages/count/nackjicholson/aiosql?style=flat

@@ -83,6 +83,8 @@ def to_tuple(v):
         return tuple(v)
     elif isinstance(v, dict):
         return tuple(v.values())
+    elif hasattr(v, "_values"):  # mssql-python Row class
+        return tuple(v._values)
     else:
         raise Exception(f"unexpected row type: {type(v).__name__}")
 
@@ -118,7 +120,7 @@ class Queries:
         raise Exception(f"query function not found: {name}")
 
 @pytest.fixture(scope="module")
-def queries(driver: str):
+def queries(driver):
     """Load queries into AioSQL, plus a convenient test wrapper."""
     RECORD_CLASSES = {"UserBlogSummary": UserBlogSummary}
     dir_path = Path(__file__).parent / "blogdb" / "sql"
@@ -298,6 +300,8 @@ def run_insert_returning(conn, queries, date):
         assert driver in ("duckdb", "pymssql")
         title = blogid.get("title")
         blogid = blogid.get("blogid")
+    elif hasattr(blogid, "_values"):  # mssql-python Row?
+        title, blogid = blogid.title, blogid.blogid
     else:
         assert driver in ("sqlite3", "apsw")
         blogid, title = blogid, "My first blog"
@@ -399,6 +403,8 @@ def run_object_attributes(conn, queries):
         assert name == calvin.name and age == calvin.age
     elif isinstance(r, dict):
         assert r["name"] == calvin.name and r["age"] == calvin.age
+    elif hasattr(r, "_values"):  # mssql-python Row
+        assert r.name == calvin.name and r.age == calvin.age
     else:
         pytest.fail("unexpected query output")
 

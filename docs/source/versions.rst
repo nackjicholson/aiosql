@@ -10,6 +10,7 @@ AioSQL - Versions
 - update mariadb docker installer
 - upgrade mssql docker version
 - split and fix docker coverage tests
+- add support for "mssql-python" driver
 
 16.0 on 2026-11-09
 ------------------

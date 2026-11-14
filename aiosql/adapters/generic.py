@@ -71,6 +71,8 @@ class GenericAdapter(SyncDriverAdapterProtocol):
                     return result[0]
                 elif isinstance(result, dict):  # pragma: no cover
                     return next(iter(result.values()))
+                elif hasattr(result, "__getitem__"):  # for mssql-python
+                    return result[0]
                 else:  # pragma: no cover
                     raise TypeError(f"unexpected value type: {type(result)}")
             else:

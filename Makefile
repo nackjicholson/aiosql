@@ -200,7 +200,7 @@ check.pytest.postgres.local: check.pytest.postgres
 check.pytest.postgres: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	$(WAIT) $(PG_HOST) $(PG_PORT) 5 || exit 1
-	echo "# running mssql tests..."
+	echo "# running pg tests..."
 	$(PYTEST) $(PYTOPT) \
 	  tests/test_psycopg2.py \
 	  tests/test_psycopg3.py \
@@ -312,7 +312,9 @@ check.pytest.mssql: $(INSTALL)
 	sleep 5
 	$(WAIT) $(MS_HOST) $(MS_PORT) 10 || exit 1
 	echo "# running mssql tests..."
-	$(PYTEST) $(PYTOPT) tests/test_pymssql.py
+	$(PYTEST) $(PYTOPT) \
+	  tests/test_pymssql.py \
+	  tests/test_mssql.py
 
 #
 # SQLite3, DuckDB and Misc
