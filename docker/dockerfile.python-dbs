@@ -10,7 +10,5 @@ WORKDIR /code
 RUN curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | bash -s -- --mariadb-server-version=13.0
 RUN apt install -y --no-install-recommends libmariadb-dev sqlite3
 RUN apt clean
-# manual fix for pytest-mysql dependency installation which looks for "mariadb" instead of "libmariadb"
-RUN cp /usr/lib/x86_64-linux-gnu/pkgconfig/libmariadb.pc /usr/lib/x86_64-linux-gnu/pkgconfig/mariadb.pc
 # drivers
 RUN /venv/bin/pip install mariadb pytest-mysql duckdb apsw aiosqlite pymssql
