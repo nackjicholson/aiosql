@@ -5,6 +5,10 @@ AioSQL - Versions
 ------
 
 - remove Python 3.10 tests
+- add script to check badge metrics
+- add database and drivers consistency check
+- update mariadb docker installer
+- upgrade mssql docker version
 
 16.0 on 2026-11-09
 ------------------
