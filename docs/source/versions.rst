@@ -4,7 +4,8 @@ AioSQL - Versions
 ? on ?
 ------
 
-- remove Python 3.10 tests
+- remove unsupported Python 3.10 tests
+- remove much too slow Pypy 3.11 tests
 - add script to check badge metrics
 - add database and drivers consistency check
 - update mariadb docker installer
