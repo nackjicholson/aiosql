@@ -32,9 +32,8 @@ def ms_db(master_conn, queries):
         with master_conn.cursor() as cur:
             cur.execute("CREATE DATABASE pytest")
             cur.execute("USE pytest")
-        create_user_blogs(master_conn, queries)
-        fill_user_blogs(master_conn, queries)
-        with master_conn.cursor() as cur:
+            create_user_blogs(master_conn, queries)
+            fill_user_blogs(master_conn, queries)
             cur.execute("USE master")
     else:
         u.log.warning("skipping pytest schema creation")
