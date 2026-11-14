@@ -17,6 +17,7 @@ from .query_loader import QueryLoader
 from .types import DriverAdapterProtocol
 
 # NOTE see _ADAPTERS/_DRIVERS in tests
+# Map adapter names to their adapter class
 _ADAPTERS: dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore
     "apsw": GenericAdapter,
@@ -34,8 +35,8 @@ _ADAPTERS: dict[str, Callable[..., DriverAdapterProtocol]] = {
     "pymysql": BrokenMySQLAdapter,
     "sqlite3": SQLite3Adapter,
 }
-"""Map adapter names to their adapter class."""
 
+# Database drivers
 _DRIVERS: dict[str, list[str]] = {
     "postgres": ["apsycopg", "asyncpg", "pg8000", "psycopg", "psycopg2", "pygresql"],
     "sqlite": ["sqlite3", "aiosqlite", "apsw"],
@@ -44,7 +45,6 @@ _DRIVERS: dict[str, list[str]] = {
     "mariadb": ["mariadb"],
     "mssql": ["pymssql"],
 }
-"""Database drivers."""
 
 def register_adapter(name: str, adapter: Callable[..., DriverAdapterProtocol]):
     """Register or override an adapter."""
