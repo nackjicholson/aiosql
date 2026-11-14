@@ -437,7 +437,7 @@ docker.coverage:
 	  -e ACCEPT_EULA=1 \
 	  -e MSSQL_PID=Developer \
 	  -e MSSQL_SA_PASSWORD=$(MS_PASS) \
-	  mcr.microsoft.com/mssql/server:2022-latest
+	  mcr.microsoft.com/mssql/server:2025-latest
 	sleep 5
 	touch $@
 
