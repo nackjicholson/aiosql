@@ -319,7 +319,7 @@ check.pytest.misc: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	$(PYTEST) $(PYTOPT) \
 	  tests/test_loading.py \
-	  tests/test_patterns.py \
+	  tests/test_miscellaneous.py \
 	  tests/test_sqlite3.py \
 	  tests/test_apsw.py \
 	  tests/test_aiosqlite.py \
