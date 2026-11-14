@@ -30,6 +30,7 @@ _DB = {
     "pg8000": "postgres",
     "pymysql": "mysql",
     "pymssql": "mssql",
+    "mssql-python": "mssql",
     "mysql-connector": "mysql",
     "mysqldb": "mysql",
     "mariadb": "mariadb",
@@ -417,9 +418,14 @@ def run_object_attributes(conn, queries):
     conn.commit()
 
 def run_execute_script(conn, queries):
+    # NOTE some drivers/database want that as one tx
     create_table = queries.f("comments.create_table")
     actual = create_table(conn)
     assert actual in ("DONE", "CREATE TABLE")
+    drop_table = queries.f("comments.drop_table")
+    conn.commit()
+    actual = drop_table(conn)
+    assert actual in ("DONE", "DROP TABLE")
     conn.commit()
 
 def run_modulo(conn, queries):

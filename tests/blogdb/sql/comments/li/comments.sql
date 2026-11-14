@@ -6,3 +6,6 @@ create table comments (
     content text not null,
     foreign key(blogid) references blogs(blogid)
 );
+
+-- name: drop-table#
+drop table comments;

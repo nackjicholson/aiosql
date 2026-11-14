@@ -4,4 +4,7 @@ create table comments (
     blogid integer not null references blogs(blogid),
     author varchar(255) not null,
     content varchar(max) not null
-)
+);
+
+-- name: drop-table#
+drop table comments;
