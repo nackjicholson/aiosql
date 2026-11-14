@@ -34,7 +34,6 @@ def ms_db(master_conn, queries):
             cur.execute("USE pytest")
             create_user_blogs(master_conn, queries)
             fill_user_blogs(master_conn, queries)
-            cur.execute("USE master")
     else:
         u.log.warning("skipping pytest schema creation")
 
@@ -42,7 +41,8 @@ def ms_db(master_conn, queries):
     # cleanup (some issues with mssql-python because database is still in use)
     try:
         with master_conn.cursor() as cur:
-            # u.log.warning("cleaning up pytest schema")
+            drop_user_blogs(master_conn, queries)
+            cur.execute("USE master")
             cur.execute("DROP DATABASE pytest")
     except Exception as e:
         u.log.warning(f"cannot DROP DATABASE pytest: {e}")
