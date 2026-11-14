@@ -11,4 +11,4 @@ RUN curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | bash -s -- --
 RUN apt install -y --no-install-recommends libmariadb-dev sqlite3
 RUN apt clean
 # drivers
-RUN /venv/bin/pip install mariadb pytest-mysql duckdb apsw aiosqlite pymssql
+RUN /venv/bin/pip install mariadb pytest-mysql duckdb apsw aiosqlite pymssql mssql-python

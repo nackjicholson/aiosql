@@ -25,6 +25,7 @@ _ADAPTERS: dict[str, Callable[..., DriverAdapterProtocol]] = {
     "asyncpg": AsyncPGAdapter,  # type: ignore
     "duckdb": DuckDBAdapter,
     "mariadb": BrokenMySQLAdapter,
+    "mssql-python": PyFormatAdapter,
     "mysqldb": BrokenMySQLAdapter,
     "mysql-connector": PyFormatAdapter,
     "pg8000": Pg8000Adapter,
@@ -43,7 +44,7 @@ _DRIVERS: dict[str, list[str]] = {
     "duckdb": ["duckdb"],
     "mysql": ["mysqldb", "mysql-connector", "pymysql"],
     "mariadb": ["mariadb"],
-    "mssql": ["pymssql"],
+    "mssql": ["pymssql", "mssql-python"],
 }
 
 def register_adapter(name: str, adapter: Callable[..., DriverAdapterProtocol]):
