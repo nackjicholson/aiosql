@@ -17,15 +17,14 @@ clean:
 CACHE   =
 # CACHE	= --no-cache
 
-.docker-aiosql-%: dockerfile.python-%
+.docker-aiosql-%: container.%
 	tag=$@
-	tag=$${tag#.docker-aiosql-}
-	tag=python-aiosql-$$tag
+	tag=python-aiosql-$${tag#.docker-aiosql-}
 	$(DOCKER) build $(CACHE) -t $$tag -f $< . && touch $@
 
 .PHONY: docker.aiosql
 docker.aiosql: \
-	.docker-aiosql-postgres \
+	.docker-aiosql-pg \
 	.docker-aiosql-mysql \
 	.docker-aiosql-dbs
 
@@ -33,8 +32,9 @@ docker.aiosql: \
 # Run tests with docker
 #
 .PHONY: docker.run
-docker.run:
-	[ "$$TEST" ] || { echo "# Missing \$$TEST" >&2 ; exit 1 ; }
+docker.run: docker.run.pg docker.run.mysql docker.run.dbs
+
+foo:
 	echo "# starting up…"
 	$(DOCKER) compose up -d
 	# wait and show results, in probable completion order
@@ -45,10 +45,23 @@ docker.run:
 	$(DOCKER) container wait $(NAME)-my-client-1
 	$(DOCKER) container logs $(NAME)-my-client-1
 	# $(DOCKER) container logs -f $(NAME)-pg-client-1
-	$(DOCKER) container wait $(NAME)-pg-client-1
-	$(DOCKER) container logs $(NAME)-pg-client-1
 	echo "# shutting down…"
 	$(DOCKER) compose down -v
+
+.PHONY: check.test
+check.test:
+	[ "$$TEST" ] || { echo "# Missing \$$TEST" >&2 ; exit 1 ; }
+	[ "$$TEST" = "pytest" -o "$$TEST" = "coverage" ] || { echo "# Bad \$$TEST: $$TEST" ; exit 2 ; }
+
+.PHONY: docker.run.%
+docker.run.%: check.test
+	DB=$@
+	DB=$${DB#docker.run.}
+	echo "# DB=$$DB TEST=$$TEST"
+	$(DOCKER) compose -f docker-compose.$$DB.yml up -d
+	$(DOCKER) container wait $(NAME)-$$DB-client-1
+	$(DOCKER) container logs $(NAME)-$$DB-client-1
+	$(DOCKER) compose -f docker-compose.$$DB.yml down -v
 
 .PHONY: docker.pytest
 docker.pytest:

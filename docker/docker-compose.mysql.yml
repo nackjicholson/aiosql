@@ -1,0 +1,27 @@
+#
+# TEST is either "pytest" or "coverage"
+#
+
+name: aiosql-tests
+
+services:
+  #
+  # mysql tests
+  #
+  mysql-server:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=pytest
+      - MYSQL_USER=pytest
+      - MYSQL_PASSWORD=pytest
+      - MYSQL_DATABASE=pytest
+  mysql-client:
+    image: aiosql-mysql
+    depends_on:
+      - mysql-server
+    volumes:
+      - ..:/code
+    environment:
+      - MY_HOST=mysql-server
+      - MY_PORT=3306
+    command: make VENV=/venv MY_HOST=mysql-server MY_PORT=3306 check.$TEST.mysql.detached

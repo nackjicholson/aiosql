@@ -9,6 +9,7 @@ AioSQL - Versions
 - add database and drivers consistency check
 - update mariadb docker installer
 - upgrade mssql docker version
+- split and fix docker coverage tests
 
 16.0 on 2026-11-09
 ------------------

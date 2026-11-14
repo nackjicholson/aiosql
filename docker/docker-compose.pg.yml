@@ -1,0 +1,26 @@
+#
+# TEST is either "pytest" or "coverage"
+#
+
+name: aiosql-tests
+
+services:
+  #
+  # postgres tests
+  #
+  postgres-server:
+    image: postgres
+    environment:
+      - POSTGRES_DB=pytest
+      - POSTGRES_USER=pytest
+      - POSTGRES_PASSWORD=pytest
+  pg-client:
+    image: python-aiosql-pg
+    volumes:
+      - ..:/code
+    depends_on:
+      - postgres-server
+    environment:
+      - PG_HOST=postgres-server
+      - PG_PORT=5432
+    command: make VENV=/venv PG_HOST=postgres-server PG_PORT=5432 check.$TEST.postgres.detached
