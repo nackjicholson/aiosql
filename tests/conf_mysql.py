@@ -60,7 +60,7 @@ try:
                     yield conn
             except Exception as e:
                 fails += 1
-                u.log.warning(f"{driver} connection failed ({fails}): {e}")
+                u.log.warning(f"{my_driver} connection failed ({fails}): {e}")
                 time.sleep(1.0)
 
     @pytest.fixture
