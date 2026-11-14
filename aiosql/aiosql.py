@@ -16,6 +16,7 @@ from .queries import Queries
 from .query_loader import QueryLoader
 from .types import DriverAdapterProtocol
 
+# NOTE see _ADAPTERS/_DRIVERS in tests
 _ADAPTERS: dict[str, Callable[..., DriverAdapterProtocol]] = {
     "aiosqlite": AioSQLiteAdapter,  # type: ignore
     "apsw": GenericAdapter,
@@ -44,10 +45,6 @@ _DRIVERS: dict[str, list[str]] = {
     "mssql": ["pymssql"],
 }
 """Database drivers."""
-
-# check inclusions both ways
-assert all(all(d in _ADAPTERS for d in drivers) for drivers in _DRIVERS.values()), "database/driver sanity check"
-assert all(any(d in drivers for drivers in _DRIVERS.values()) for d in _ADAPTERS), "driver/database sanity chec"
 
 def register_adapter(name: str, adapter: Callable[..., DriverAdapterProtocol]):
     """Register or override an adapter."""

@@ -195,3 +195,17 @@ def test_parameters():
     except aiosql.SQLParseException as e:
         assert "SQL script" in str(e)
     conn.close()
+
+
+def test_adapter_driver_consistency():
+    from aiosql.aiosql import _ADAPTERS, _DRIVERS
+    # all listed drivers have an adapter
+    assert all(all(d in _ADAPTERS for d in drivers) for drivers in _DRIVERS.values()), \
+        "database/driver consistency check"
+    # all adapters have a database
+    # NOTE the "named" adapter is registered in the pytest configuration
+    for d in _ADAPTERS:
+        assert any(d in drivers for drivers in _DRIVERS.values()) or d == "named", \
+            f"driver {d} associated to a database"
+    assert len(_ADAPTERS) == 1 + sum(len(drivers) for drivers in _DRIVERS.values()), \
+        "all drivers are accounted for"
