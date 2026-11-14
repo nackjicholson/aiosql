@@ -4,4 +4,7 @@ create table comments (
     blogid integer not null references blogs(blogid),
     author text not null,
     content text not null
-)
+);
+
+-- name: drop-table#
+drop table comments;

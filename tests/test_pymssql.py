@@ -20,17 +20,27 @@ def driver():
 def date():
     return datetime.date
 
+# user connections
 @pytest.fixture
-def conn(ms_db):
-    yield ms_db
+def conn(ms_dsn, ms_db):
+    with db.connect(**ms_dsn) as conn:
+        yield conn
 
 @pytest.fixture
-def dconn(ms_db):
-    yield ms_db
+def dconn(conn, ms_db):
+    yield conn
 
-def test_sanity_master(ms_master):
-    with db.connect(**ms_master) as conn:
-        t.run_sanity(conn)
+# global admin connection
+@pytest.fixture(scope="module")
+def master_conn(ms_dsn):
+    ms_dsn_master = dict(ms_dsn)
+    ms_dsn_master["database"] = "master"
+    ms_dsn_master["autocommit"] = True
+    with db.connect(**ms_dsn_master) as conn:
+        yield conn
+
+def test_sanity_master(master_conn):
+    t.run_sanity(master_conn)
 
 from run_tests import (
     run_sanity as test_sanity,
