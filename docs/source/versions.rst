@@ -12,6 +12,7 @@ AioSQL - Versions
 - upgrade mssql docker version
 - split and fix docker coverage tests
 - add support for "mssql-python" driver
+- improve github ci with custom coverage failunder and other settings
 
 16.0 on 2026-11-09
 ------------------
