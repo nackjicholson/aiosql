@@ -239,7 +239,7 @@ check.pytest.mysql.detached: check.pytest.mysql
 check.pytest.mysql: $(INSTALL)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
 	# FIXME this does not seem to work…
-	$(WAIT) $(MY_HOST) $(MY_PORT) 10 || exit 1
+	$(WAIT) $(MY_HOST) $(MY_PORT) 20 || exit 1
 	set -e
 	# run with all 3 drivers
 	echo "# running mysql tests..."
