@@ -26,24 +26,25 @@ def ms_dsn(request):
 
 @pytest.fixture(scope="module")
 def ms_db(master_conn, queries):
-    """Build the test database and return a connection to that."""
+    """Build the test database and return an admin connection to that."""
+    need_db = not ms_has_db(master_conn, "pytest")
     # initial contents if needed
-    if not ms_has_db(master_conn, "pytest"):
+    if need_db:
         with master_conn.cursor() as cur:
             cur.execute("CREATE DATABASE pytest")
             cur.execute("USE pytest")
             create_user_blogs(master_conn, queries)
             fill_user_blogs(master_conn, queries)
     else:
-        u.log.warning("skipping pytest schema creation")
-
+        u.log.warning("skipping pytest database and schema creation")
     yield master_conn
     # cleanup (some issues with mssql-python because database is still in use)
-    try:
-        with master_conn.cursor() as cur:
-            drop_user_blogs(master_conn, queries)
-            cur.execute("USE master")
-            cur.execute("DROP DATABASE pytest")
-    except Exception as e:
-        u.log.warning(f"cannot DROP DATABASE pytest: {e}")
-        # raise?
+    if need_db:  # also do the cleanup
+        try:
+            with master_conn.cursor() as cur:
+                drop_user_blogs(master_conn, queries)
+                cur.execute("USE master")
+                cur.execute("DROP DATABASE pytest")
+        except Exception as e:
+            u.log.warning(f"cannot DROP DATABASE pytest: {e}")
+            # raise?
