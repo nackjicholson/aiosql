@@ -1,8 +1,8 @@
 AioSQL - Versions
 =================
 
-? on ?
-------
+16.1 on 2026-11-15
+------------------
 
 - remove unsupported Python 3.10 tests
 - remove much too slow Pypy 3.11 tests
