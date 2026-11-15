@@ -1,0 +1,61 @@
+aiosql package
+==============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   aiosql.adapters
+
+Submodules
+----------
+
+aiosql.aiosql module
+--------------------
+
+.. automodule:: aiosql.aiosql
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.queries module
+---------------------
+
+.. automodule:: aiosql.queries
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.query\_loader module
+---------------------------
+
+.. automodule:: aiosql.query_loader
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.types module
+-------------------
+
+.. automodule:: aiosql.types
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+aiosql.utils module
+-------------------
+
+.. automodule:: aiosql.utils
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: aiosql
+   :members:
+   :show-inheritance:
+   :undoc-members:
