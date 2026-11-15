@@ -82,7 +82,7 @@ Below is a *blogs.sql* file that defines two queries.
 
 Notice the ``-- name: <name_of_method>`` comments and the ``:username`` substitution variable.
 The comments that start with ``-- name:`` are the magic of aiosql.
-They are used by ```aiosql.from_path`` <./api.md#aiosqlfrom_path>`__ to parse the file
+They are used by :py:func:`aiosql.from_path` to parse the file
 into separate methods accessible by the name.
 If present, the parameter lists are enforced.
 The ``aiosql.from_path`` function takes a path to a sql file or directory
@@ -150,7 +150,7 @@ From a Directory of SQL Files
 
 Loading a directory of SQL files loads all of the queries defined in those files into a single object.
 The ``example/sql`` directory below contains three ``.sql`` files and can be loaded using
-``aiosql.from_path`` `<./api.md#aiosqlfrom_path>`__.
+:py:func:`aiosql.from_path`.
 
 ::
 
@@ -213,7 +213,7 @@ or otherwise set connection level properties that affect driver behavior.
 
 In the examples throughout this page a ``conn`` object has been passed.
 Here is a more code complete example that shows the connection creation and call to
-``aiosql.from_path`` `<./api.md#aiosqlfrom_path>`__ that make a queries object.
+:py:func:`aiosql.from_path` that make a queries object.
 
 .. code:: pycon
 
