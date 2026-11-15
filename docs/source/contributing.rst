@@ -11,7 +11,6 @@ All kinds of contributions are helpful and welcome.
 
 Whether you have an idea for a feature improvement or have found a troubling bug, thank you for being here.
 
-
 Packaging & Distribution
 ------------------------
 
@@ -50,13 +49,14 @@ The bare minimum of version pinning is declared in the dependencies.
 .. code:: sh
 
     # development tools
-    pip install .[dev]
+    pip install -e .[dev]
     # per-database stuff
-    pip install .[dev-sqlite]
-    pip install .[dev-postgres]
-    pip install .[dev-duckdb]
-    pip install .[dev-mysql]
-    pip install .[dev-mariadb]
+    pip install -e .[dev-sqlite]
+    pip install -e .[dev-postgres]
+    pip install -e .[dev-duckdb]
+    pip install -e .[dev-mysql]
+    pip install -e .[dev-mariadb]
+    pip install -e .[dev-mssql]
 
 1. Run tests
 
