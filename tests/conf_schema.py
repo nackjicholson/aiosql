@@ -32,7 +32,8 @@ def execute_any(conn, queries, name):
 def execute_commit(conn, queries):
     if queries.is_async:
         # transaction management is different with asyncpg…
-        if queries._driver == "asyncpg":
+        # aiopg forces autocommit
+        if queries._driver in ("asyncpg", "aiopg"):
             return
         return utils.run_async(conn.commit())
     else:

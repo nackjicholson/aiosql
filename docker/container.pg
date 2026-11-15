@@ -9,4 +9,4 @@ WORKDIR /code
 # postgres specific packages
 RUN apt install -y --no-install-recommends libpq-dev
 RUN apt clean
-RUN /venv/bin/pip install psycopg psycopg2 pygresql pg8000 asyncpg pytest-postgresql
+RUN /venv/bin/pip install psycopg psycopg2 pygresql pg8000 asyncpg pytest-postgresql aiopg

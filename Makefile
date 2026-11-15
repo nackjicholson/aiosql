@@ -210,7 +210,8 @@ check.pytest.postgres: $(INSTALL)
 	  tests/test_apsycopg3.py \
 	  tests/test_pygresql.py \
 	  tests/test_pg8000.py \
-	  tests/test_asyncpg.py
+	  tests/test_asyncpg.py \
+	  tests/test_aiopg.py
 
 #
 # MySQL
