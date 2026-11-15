@@ -181,6 +181,7 @@ def test_parameters():
     # parsed and possibly no runtime error depending on python version
     queries = aiosql.from_str(FT + P1, "sqlite3", mandatory_parameters=False, kwargs_only=False)
     try:
+        # this triggers a warning
         dh = queries.inc(conn, 17)
         assert dh == 18
         assert sys.version_info.major == 3 and sys.version_info.minor < 14
