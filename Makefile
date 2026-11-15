@@ -74,6 +74,9 @@ venv.last: venv
 .PHONY: dev
 dev: venv/.dev
 
+.PHONY: venv.dev
+venv.dev: dev
+
 # direct module installation for github or docker
 ifdef VENV
 PIP		= $(VENV)/bin/pip
@@ -145,7 +148,7 @@ check.black: $(VENV)
 .PHONY: check.rstcheck
 check.rstcheck: $(VENV)
 	[ "$(VENV)" ] && source $(VENV)/bin/activate
-	rstcheck --ignore-directives=toctree,literalinclude --ignore-roles=doc,ref docs/source/*.rst
+	rstcheck --ignore-directives=toctree,literalinclude --ignore-roles=doc,ref,py:func docs/source/*.rst
 
 .PHONY: check.pytest
 check.pytest: check.pytest.local
