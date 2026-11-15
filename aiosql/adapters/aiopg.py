@@ -14,7 +14,6 @@ class AioPgAdapter(AsyncPyFormatAdapter):
 
     async def _close(self, cur):
         cur.close()
-        return
 
     # AioPG does not have "executemany"
     async def insert_update_delete_many(self, conn, query_name, sql, parameters):
