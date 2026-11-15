@@ -25,8 +25,11 @@ jobs:
         # 2026-11-14 much too slow
         # - version: "pypy3.11"
         - version: "3.11"
+          nomysql: 1
         - version: "3.12"
+          nomysql: 1
         - version: "3.13"
+          nomysql: 1
         # - version: "3.13t"
         #   gil: 1
         #   noduckdb: 1
@@ -34,6 +37,7 @@ jobs:
         #   gil: 0
         #   noduckdb: 1
         - version: "3.14"
+          nomysql: 1
         - version: "3.14t"
           gil: 1
           noduckdb: 1
@@ -50,6 +54,7 @@ jobs:
     env:
       PYTHON_GIL: ${{ matrix.python.gil }}
       NO_DUCKDB: ${{ matrix.python.noduckdb }}
+      NO_MYSQL: ${{ matrix.python.nomysql }}
     steps:
     - name: Checkout Project
       uses: actions/checkout@v7
@@ -62,7 +67,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install .[dev,dev-postgres,dev-mysql,dev-sqlite]
+        python -m pip install .[dev,dev-postgres,dev-sqlite]
+        [ "$NO_MYSQL" ] || python -m pip install .[dev-mysql]
         [ "$NO_DUCKDB" ] || python -m pip install .[dev-duckdb]
     # - name: Check types with mypy
     #   run: make VENV= INSTALL= check.mypy
@@ -71,8 +77,12 @@ jobs:
     - name: Lint with ruff
       run: make VENV= INSTALL= check.ruff
     - name: Test with pytest and databases
-      run: make VENV= INSTALL= check.pytest
+      run: |
+        [ "$NO_MYSQL" ] && MYSQL=skip || MYSQL=mysql
+        make VENV= INSTALL= MYSQL=$MYSQL check.pytest
     - name: Coverage tests
-      run: make VENV= INSTALL= check.coverage
+      run: |
+        [ "$NO_MYSQL" ] && MYSQL=skip || MYSQL=mysql
+        make VENV= INSTALL= MYSQL=$MYSQL check.coverage
     - name: RST tests
       run: make VENV= INSTALL= check.rstcheck
