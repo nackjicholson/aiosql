@@ -43,7 +43,8 @@ dev-sqlite = [
 ]
 dev-postgres = [
     "pytest-postgresql",
-    "asyncpg; python_version < '3.13' and implementation_name != 'pypy'",
+    # "asyncpg; python_version < '3.13' and implementation_name != 'pypy'",
+    "asyncpg; implementation_name != 'pypy'",
     "psycopg >= 3",
     # 2.9.10 needed for 3.13
     "psycopg2 >= 2.9.10; implementation_name != 'pypy'",
