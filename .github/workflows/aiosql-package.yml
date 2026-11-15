@@ -41,25 +41,25 @@ jobs:
           failunder: 99.2
         - version: "3.14"
           nomysql: 1
-          failunder: 99.1
+          failunder: 99.2
         - version: "3.14t"
           gil: 1
           noduckdb: 1
-          failunder: 95.0
+          failunder: 95.1
         - version: "3.14t"
           gil: 0
           noduckdb: 1
-          failunder: 95.0
+          failunder: 95.1
         - version: "3.15"
           failunder: 99.7
         - version: "3.15t"
           gil: 1
           noduckdb: 1
-          failunder: 95.0
+          failunder: 95.1
         - version: "3.15t"
           gil: 0
           noduckdb: 1
-          failunder: 95.0
+          failunder: 95.1
     env:
       PYTHON_GIL: ${{ matrix.python.gil }}
       # TODO skip these intermediate env vars
