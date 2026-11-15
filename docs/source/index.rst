@@ -27,7 +27,7 @@ based drivers for
 `asyncpg <https://magicstack.github.io/asyncpg/current/>`__),
 `MySQL <https://www.mysql.com/>`__
 (`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__,
-`mysqlclient <https://pypi.org/project/mysqlclient/>`__,
+`mysqlclient <https://pypi.org/project/mysqlclient/>`__ aka MySQLdb,
 `mysql-connector <https://dev.mysql.com/doc/connector-python/en/>`__,
 `asyncmy <https://github.com/long2ice/asyncmy>`__ with
 `this adapter <https://github.com/GoogleCloudPlatform/database-assessment/blob/main/src/dma/lib/db/adapters/asyncmy.py>`__),

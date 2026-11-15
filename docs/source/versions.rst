@@ -1,6 +1,12 @@
 AioSQL - Versions
 =================
 
+? on ?
+------
+
+- minor doc consistency fixes
+- fix api links
+
 16.1 on 2026-11-15
 ------------------
 
