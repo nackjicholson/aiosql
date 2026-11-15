@@ -6,6 +6,7 @@ AioSQL - Versions
 
 - minor doc consistency fixes
 - fix api links
+- add "aiopg" (async postgres) driver adapter
 
 16.1 on 2026-11-15
 ------------------

@@ -49,7 +49,8 @@ dev-postgres = [
     # 2.9.10 needed for 3.13
     "psycopg2 >= 2.9.10; implementation_name != 'pypy'",
     "pygresql",
-    "pg8000"
+    "pg8000",
+    "aiopg"
 ]
 dev-mysql = [
     "pytest-mysql",

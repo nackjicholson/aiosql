@@ -24,7 +24,8 @@ based drivers for
 `psycopg2 <https://www.psycopg.org/docs/>`__,
 `pg8000 <https://pypi.org/project/pg8000/>`__,
 `pygresql <http://www.pygresql.org/>`__,
-`asyncpg <https://magicstack.github.io/asyncpg/current/>`__),
+`asyncpg <https://magicstack.github.io/asyncpg/current/>`__
+`aiopg <https://aiopg.readthedocs.io/>`__),
 `MySQL <https://www.mysql.com/>`__
 (`PyMySQL <https://github.com/PyMySQL/PyMySQL/>`__,
 `mysqlclient <https://pypi.org/project/mysqlclient/>`__ aka MySQLdb,
@@ -74,7 +75,7 @@ Badges
 .. image:: https://img.shields.io/badge/coverage-100%25-success
    :alt: Code Coverage
    :target: https://github.com/nackjicholson/aiosql/actions/
-.. image:: https://img.shields.io/badge/tests-301%20✓-success
+.. image:: https://img.shields.io/badge/tests-314%20✓-success
    :alt: Tests
    :target: https://github.com/nackjicholson/aiosql/actions/
 .. image:: https://img.shields.io/github/issues/nackjicholson/aiosql?style=flat
@@ -98,7 +99,7 @@ Badges
 .. image:: https://img.shields.io/badge/databases-6-informational
    :alt: Databases
    :target: https://github.com/nackjicholson/aiosql/
-.. image:: https://img.shields.io/badge/drivers-16-informational
+.. image:: https://img.shields.io/badge/drivers-17-informational
    :alt: Drivers
    :target: https://github.com/nackjicholson/aiosql/
 .. image:: https://img.shields.io/github/languages/count/nackjicholson/aiosql?style=flat

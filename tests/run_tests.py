@@ -22,6 +22,7 @@ _DB = {
     "sqlite3": "sqlite3",
     "apsw": "sqlite3",
     "aiosqlite": "sqlite3",
+    "aiopg": "postgres",
     "psycopg": "postgres",
     "apsycopg": "postgres",
     "psycopg2": "postgres",
@@ -88,6 +89,9 @@ def to_tuple(v):
     else:
         raise Exception(f"unexpected row type: {type(v).__name__}")
 
+# supported drivers
+_ASYNC_DRIVERS: set[str] = { "asyncpg", "aiosqlite", "apsycopg", "aiopg" }
+
 class Queries:
     """Queries wrapper
 
@@ -99,7 +103,7 @@ class Queries:
         self._db = _DB[driver]
         self._dir = _DIR[self._db]
         self._queries = queries
-        self.is_async = driver in ("asyncpg", "aiosqlite", "apsycopg")
+        self.is_async = driver in _ASYNC_DRIVERS
         self.driver_adapter = queries.driver_adapter
         assert self.is_async == hasattr(queries.driver_adapter, "is_aio_driver")
 

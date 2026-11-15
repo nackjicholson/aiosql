@@ -6,6 +6,7 @@ from .sqlite3 import SQLite3Adapter
 # async adapters
 from .aiosqlite import AioSQLiteAdapter
 from .asyncpg import AsyncPGAdapter
+from .aiopg import AioPgAdapter
 
 # silence flake8 F401 warning:
 _ALL = [
@@ -14,4 +15,5 @@ _ALL = [
     SQLite3Adapter,
     AioSQLiteAdapter,
     AsyncPGAdapter,
+    AioPgAdapter
 ]
