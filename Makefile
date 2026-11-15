@@ -373,8 +373,8 @@ check.coverage.local: check.coverage.misc check.coverage.postgres.local check.co
 
 IS_DOCKER	=
 
-# NOTE coverage expectations depend on what tests actually run
-FAIL_UNDER  = $(shell python -c 'import sys; import platform; print(100.0 if sys.version_info < (3, 13) and platform.python_implementation() == "CPython" else 83.9)')
+# this depends on what drivers and bases are active
+FAIL_UNDER  = 100.0
 
 .PHONY: check.coverage.combine
 check.coverage.combine: $(VENV)
