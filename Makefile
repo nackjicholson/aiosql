@@ -372,6 +372,8 @@ check.coverage.local: check.coverage.misc check.coverage.postgres.local check.co
 	$(MAKE) check.coverage.combine
 
 IS_DOCKER	=
+
+# NOTE coverage expectations depend on what tests actually run
 FAIL_UNDER  = $(shell python -c 'import sys; import platform; print(100.0 if sys.version_info < (3, 13) and platform.python_implementation() == "CPython" else 83.9)')
 
 .PHONY: check.coverage.combine
