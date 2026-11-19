@@ -84,6 +84,8 @@ def _preprocess_object_attributes(attribute, sql):
             return gd["dquote"]
         elif gd["squote"] is not None:
             return gd["squote"]
+        elif gd["comment"] is not None:
+            return gd["comment"]
         else:
             var, att = gd["var_name"].split(".", 1)
             var_name = var + attribute + att
@@ -202,7 +204,7 @@ class QueryLoader:
         names = set()
         for match in VAR_REF.finditer(sql):
             gd = match.groupdict()
-            if gd["squote"] or gd["dquote"]:
+            if gd["squote"] or gd["dquote"] or gd["comment"]:
                 continue
             name = gd["var_name"]
             if name.isdigit() or name in names:

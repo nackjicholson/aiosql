@@ -9,6 +9,8 @@ def _replacer(ma):
         return gd["dquote"]
     elif gd["squote"] is not None:  # '...'
         return gd["squote"]
+    elif gd["comment"] is not None:  # -- ...
+        return gd["comment"]
     else:  # :something to %(something)s
         return f'{gd["lead"]}%({gd["var_name"]})s'
 
