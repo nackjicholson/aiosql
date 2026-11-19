@@ -7,6 +7,8 @@ VAR_REF = re.compile(
     r'(?P<dquote>"(""|[^"])+")|'
     # FIXME mysql/mariadb use backslash escapes
     r"(?P<squote>\'(\'\'|[^\'])*\')|"
+    # one-line comment, may hold quotes or colons
+    r"(?P<comment>--[^\n]*)|"
     # NOTE beware of overlapping re
     r"(?P<lead>[^:]):(?P<var_name>\w+)(?=[^:]?)"
 )
@@ -16,6 +18,7 @@ VAR_REF = re.compile(
 VAR_REF_DOT = re.compile(
     r'(?P<dquote>"(""|[^"])+")|'
     r"(?P<squote>\'(\'\'|[^\'])*\')|"
+    r"(?P<comment>--[^\n]*)|"
     r"(?P<lead>[^:]):(?P<var_name>\w+\.\w+)(?=[^:]?)"
 )
 """Pattern to identify colon-variables with a simple attribute in SQL code."""
