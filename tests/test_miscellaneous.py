@@ -27,18 +27,20 @@ def test_var_pattern_is_quote_aware():
 
     expected = [
         {
+            "comment": None,
             "dquote": None,
             "lead": None,
             "squote": "'YYYY-MM-DD\"T\"HH24:MI:SSOF'",
             "var_name": None,
         },
         {
+            "comment": None,
             "dquote": None,
             "lead": " ",
             "squote": None,
             "var_name": "created_at_mark",
         },
-        {"dquote": None, "lead": " ", "squote": None, "var_name": "foo_mark"},
+        {"comment": None, "dquote": None, "lead": " ", "squote": None, "var_name": "foo_mark"},
     ]
     assert groupdicts == expected
 
@@ -57,7 +59,7 @@ def test_var_pattern_does_not_require_semicolon_trail():
     groupdicts = [m.groupdict() for m in VAR_REF.finditer(sql)]
     assert len(groupdicts) == 1
 
-    expected = {"dquote": None, "lead": " ", "squote": None, "var_name": "a"}
+    expected = {"comment": None, "dquote": None, "lead": " ", "squote": None, "var_name": "a"}
     assert groupdicts[0] == expected
 
 
@@ -71,6 +73,7 @@ def test_var_pattern_handles_empty_sql_string_literals():
     groupdicts = [m.groupdict() for m in VAR_REF.finditer(sql)]
 
     expected_single_quote_match = {
+        "comment": None,
         "dquote": None,
         "lead": None,
         "squote": "''",
@@ -79,12 +82,50 @@ def test_var_pattern_handles_empty_sql_string_literals():
     assert groupdicts[1] == expected_single_quote_match
 
     expected_var_match = {
+        "comment": None,
         "dquote": None,
         "lead": "(",
         "squote": None,
         "var_name": "blah",
     }
     assert groupdicts[3] == expected_var_match
+
+
+def test_var_pattern_skips_line_comments():
+    """Quotes and colons in a trailing -- comment must not hide or add parameters."""
+    sql = r"""
+        select id, name
+          from users  -- the user's row, see :not_a_param
+         where id = :uid
+           and name <> '';"""
+
+    names = [m.group("var_name") for m in VAR_REF.finditer(sql) if m.group("var_name")]
+    assert names == ["uid"]
+
+
+COMMENTED_QUERY = """
+-- name: get-user(uid)^
+select id, name
+  from users  -- the user's row, see :not_a_param
+ where id = :uid
+   and name <> '';
+"""
+
+
+def test_line_comments_in_query():
+    conn = sqlite3.connect(":memory:")
+    conn.execute("create table users(id integer primary key, name text)")
+    conn.execute("insert into users values (1, 'calvin'), (2, 'hobbes')")
+    queries = aiosql.from_str(COMMENTED_QUERY, "sqlite3")
+    assert queries.get_user(conn, uid=2) == (2, "hobbes")
+    conn.close()
+    # parameter conversions leave the comment alone
+    sql = aiosql.from_str(COMMENTED_QUERY, "psycopg").get_user.sql
+    assert "see :not_a_param" in sql and "id = %(uid)s" in sql
+    sql = aiosql.from_str(COMMENTED_QUERY, "duckdb").get_user.sql
+    assert "see :not_a_param" in sql and "id = $uid" in sql
+    sql = aiosql.from_str(COMMENTED_QUERY, "asyncpg").get_user.sql
+    assert "see :not_a_param" in sql and "id = $1" in sql
 
 
 # must remove *only* OK comments

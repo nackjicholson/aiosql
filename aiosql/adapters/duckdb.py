@@ -9,6 +9,8 @@ def _colon_to_dollar(ma) -> str:
         return gd["dquote"]
     elif gd["squote"] is not None:
         return gd["squote"]
+    elif gd["comment"] is not None:
+        return gd["comment"]
     else:
         return f'{gd["lead"]}${gd["var_name"]}'
 
