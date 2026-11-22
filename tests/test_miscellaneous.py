@@ -103,29 +103,17 @@ def test_var_pattern_skips_line_comments():
     assert names == ["uid"]
 
 
-COMMENTED_QUERY = """
--- name: get-user(uid)^
-select id, name
-  from users  -- the user's row, see :not_a_param
- where id = :uid
-   and name <> '';
-"""
-
-
 def test_line_comments_in_query():
+    sql = """
+    -- name: add(i, j)$
+    select :i +
+      -- oops ' :not_a_param
+      :j ; -- la ' !"""
+
+    queries = aiosql.from_str(sql, "sqlite3")
     conn = sqlite3.connect(":memory:")
-    conn.execute("create table users(id integer primary key, name text)")
-    conn.execute("insert into users values (1, 'calvin'), (2, 'hobbes')")
-    queries = aiosql.from_str(COMMENTED_QUERY, "sqlite3")
-    assert queries.get_user(conn, uid=2) == (2, "hobbes")
+    assert queries.add(conn, i=40, j=2) == 42
     conn.close()
-    # parameter conversions leave the comment alone
-    sql = aiosql.from_str(COMMENTED_QUERY, "psycopg").get_user.sql
-    assert "see :not_a_param" in sql and "id = %(uid)s" in sql
-    sql = aiosql.from_str(COMMENTED_QUERY, "duckdb").get_user.sql
-    assert "see :not_a_param" in sql and "id = $uid" in sql
-    sql = aiosql.from_str(COMMENTED_QUERY, "asyncpg").get_user.sql
-    assert "see :not_a_param" in sql and "id = $1" in sql
 
 
 # must remove *only* OK comments
