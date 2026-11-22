@@ -46,7 +46,7 @@ from run_tests import (
     run_parameterized_query as test_parameterized_query,
     run_select_one as test_select_one,
     run_select_value as test_select_value,
-    run_modulo as test_modulo,
+    run_arith as test_arith,
     run_delete as test_delete,
     run_date_time as test_date_time,
     run_execute_script as test_execute_script,

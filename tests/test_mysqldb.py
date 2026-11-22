@@ -52,5 +52,5 @@ from run_tests import (
 	run_object_attributes as test_object_attributes,
 	run_execute_script as test_execute_script,
     # FIXME kwargs -> args?
-	# run_modulo as test_modulo,
+	# run_arith as test_arith,
 )
