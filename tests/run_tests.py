@@ -453,11 +453,15 @@ def run_execute_script(conn, queries):
     assert actual in ("DONE", "DROP TABLE")
     conn.commit()
 
-def run_modulo(conn, queries):
+def run_arith(conn, queries):
+    # modulo
     get_modulo = queries.f("misc.get_modulo")
     actual = get_modulo(conn, numerator=7, denominator=3)
     expected = 7 % 3
     assert actual == expected
+    # plus (line comments test)
+    plus = queries.f("misc.plus")
+    assert plus(conn, i=40, j=2) == 42
     conn.commit()
 
 #

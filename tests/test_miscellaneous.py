@@ -103,19 +103,6 @@ def test_var_pattern_skips_line_comments():
     assert names == ["uid"]
 
 
-def test_line_comments_in_query():
-    sql = """
-    -- name: add(i, j)$
-    select :i +
-      -- oops ' :not_a_param
-      :j ; -- la ' !"""
-
-    queries = aiosql.from_str(sql, "sqlite3")
-    conn = sqlite3.connect(":memory:")
-    assert queries.add(conn, i=40, j=2) == 42
-    conn.close()
-
-
 # must remove *only* OK comments
 COMMENTED = """
 KO

@@ -28,3 +28,8 @@ select :val::int * :val::int as squared;
 
 -- name: not_a_select()
 INSERT INTO Foo VALUES (1);
+
+-- name: plus(i, j)$
+SELECT :i -- oops ' :not_a_param
+     + :j -- la ' :k
+;

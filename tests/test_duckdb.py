@@ -41,7 +41,7 @@ from run_tests import (
 	run_date_time as test_date_time,
 	run_object_attributes as test_object_attributes,
 	run_execute_script as test_execute_script,
-	run_modulo as test_modulo,
+	run_arith as test_arith,
 )
 
 def test_no_cursor(conn):

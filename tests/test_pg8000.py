@@ -59,5 +59,5 @@ from run_tests import (
     # FIXME not supported?
 	# run_object_attributes as test_object_attributes,
 	run_execute_script as test_execute_script,
-	run_modulo as test_modulo,
+	run_arith as test_arith,
 )
